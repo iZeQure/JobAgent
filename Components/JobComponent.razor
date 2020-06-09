@@ -1,0 +1,64 @@
+﻿@page "/{JobCategory}"
+
+@using JobAgent.Data
+@using JobAgent.Services
+@inject JobService JobService
+
+@if (JobPostings == null || !JobPostings.Any())
+{
+    <p><em>Ingen Job Opslag fundet i @JobCategory kategorien...</em></p>
+}
+else
+{
+    <div class="card-columns h-100 mb-3">
+        @foreach (var jobPost in JobPostings)
+        {
+            <div class="card overflow-auto">
+                <img class="card-img-top" src="@jobPost.ImageURL" alt="@jobPost.Company">
+                <div class="card-body">
+                    <h4 class="card-title">@jobPost.Company</h4>
+                    <h6 class="card-subtitle mb-2">@jobPost.Title</h6>
+                    <p class="card-text">@jobPost.Information</p>
+                    <a href="/@jobPost.Catetory/details/@jobPost.Id" class="card-link text-info" data-toggle="modal" data-target="#jobPostingDetail">Se Detailjer</a>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">@jobPost.DateTimeForPost</small>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string JobCategory { get; set; }
+
+    public List<JobPosting> JobPostings = new List<JobPosting>();
+
+    private List<JobPosting> TempJobPostings = new List<JobPosting>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        TempJobPostings = await JobService.GetJobPostingsAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        JobPostings.Clear();
+        await UpdateJobPostings();
+    }
+
+    private Task UpdateJobPostings()
+    {
+        var jobPostings = from jobPost in TempJobPostings
+                          where jobPost.Catetory == JobCategory
+                          select jobPost;
+
+        foreach (JobPosting jobPost in jobPostings)
+        {
+            JobPostings.Add(jobPost);
+        }
+
+        return Task.CompletedTask;
+    }
+}

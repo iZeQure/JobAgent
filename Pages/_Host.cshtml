@@ -1,0 +1,27 @@
+﻿@page "/"
+@namespace JobAgent.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Min Job Agent</title>
+    <base href="~/" />
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <link href="css/site.css" rel="stylesheet" />
+</head>
+<body>
+
+    <app>
+        @(await Html.RenderComponentAsync<App>(RenderMode.ServerPrerendered))
+    </app>
+
+    <script src="_framework/blazor.server.js"></script>
+
+    <script src="~/js/jquery-3.5.1.slim.min.js"></script>
+    <script src="~/js/popper-1.16.0.min.js"></script>
+    <script src="~/js/bootstrap-4.5.0.min.js"></script>
+</body>
+</html>

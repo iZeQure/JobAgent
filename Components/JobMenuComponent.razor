@@ -1,0 +1,54 @@
+﻿@using JobAgent.Data
+@using JobAgent.Services
+@inject JobService JobService
+
+@if (Jobs == null)
+{
+    <li class="nav-item px-3">
+        <div class="alert alert-info">
+            <p><em>Indlæser Menu...</em></p>
+        </div>
+    </li>
+}
+else
+{
+    @for (int i = 0; i < Jobs.Count; i++)
+    {
+        <li class="nav-item dropright px-3">
+            @for (int j = 0; j < Jobs[i].JobCategories.Count; j++)
+            {
+                @if (Jobs[i].JobCategories[j].Menus != null)
+                {
+                    <a class="nav-link dropdown-toggle text-white" data-toggle="dropdown" Match="@NavLink" role="button" aria-haspopup="true" aria-expanded="false">
+                        @Jobs[i].JobTitle
+                    </a>
+                    <div class="dropdown-menu">
+                        @for (int k = 0; k < Jobs[i].JobCategories[j].Menus.Length; k++)
+                        {
+                            <a href="/@Jobs[i].JobCategories[j].Menus[k]" Match="@NavLink" class="dropdown-item text-info">@Jobs[i].JobCategories[j].Menus[k]</a>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <a href="/@Jobs[i].JobTitle" Match="@NavLink" class="nav-link text-white" role="button" aria-haspopup="true" aria-expanded="false">
+                        @Jobs[i].JobTitle
+                    </a>
+                }
+            }
+        </li>
+    }
+}
+
+@code {
+    // Testing
+    NavLinkMatch NavLink = NavLinkMatch.Prefix;
+
+    List<Data.Job> Jobs = new List<Data.Job>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Jobs = await JobService.GetJobMenuAsync();
+    }
+    // End Testing
+}

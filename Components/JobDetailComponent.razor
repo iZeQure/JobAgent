@@ -1,0 +1,42 @@
+﻿@page "/{JobCategory}/details/{JobId}"
+
+@using JobAgent.Data
+@using JobAgent.Services
+@inject JobService JobService
+@* Job Detail Modal *@
+@*<div class="modal fade jobPostingDetail" id="jobPostingDetail" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="jobPostingDetailLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="jobPostingDetailLabel">Test</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Tilbage</button>
+                    <button type="button" class="btn btn-info">Søg Job Opslag</button>
+                </div>
+            </div>
+        </div>
+    </div>*@
+
+<p>
+    No text
+    JobId - @jobPostingDetail.Id
+    Category - @jobPostingDetail.Catetory
+</p>
+
+@code {
+    [Parameter]
+    public string JobCategory { get; set; }
+
+    [Parameter]
+    public int JobId { get; set; }
+
+    JobPosting jobPostingDetail;
+    List<JobPosting> jobPostings;
+}
