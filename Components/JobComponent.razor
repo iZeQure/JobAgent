@@ -4,22 +4,32 @@
 @using JobAgent.Services
 @inject JobService JobService
 
-@if (JobPostings == null || !JobPostings.Any())
+@if (jobPostings == null || !jobPostings.Any())
 {
-    <p><em>Ingen Job Opslag fundet i @JobCategory kategorien...</em></p>
+    <p><em>Indlæser @JobCategory...</em></p>
+
+    @if (!jobPostings.Any())
+    {
+        <p><em>Ingen Jobs fundet indenfor @JobCategory kategori...</em></p>
+    }
 }
 else
 {
-    <div class="card-columns h-100 mb-3">
-        @foreach (var jobPost in JobPostings)
+    <div class="card-columns">
+        @foreach (var jobPost in jobPostings)
         {
-            <div class="card overflow-auto">
-                <img class="card-img-top" src="@jobPost.ImageURL" alt="@jobPost.Company">
+            <div class="card">
+                @if (jobPost.ImageURL != null || !jobPost.ImageURL.Any())
+                {
+                    <img class="card-img-top img-fluid" src="@jobPost.ImageURL" alt="@jobPost.Company">
+                }
                 <div class="card-body">
                     <h4 class="card-title">@jobPost.Company</h4>
                     <h6 class="card-subtitle mb-2">@jobPost.Title</h6>
-                    <p class="card-text">@jobPost.Information</p>
-                    <a href="/@jobPost.Catetory/details/@jobPost.Id" class="card-link text-info" data-toggle="modal" data-target="#jobPostingDetail">Se Detailjer</a>
+                    <span class="card-text d-inline-block text-truncate text-break" style="max-width: 125px;">
+                        @jobPost.Information
+                    </span>
+                    <button @onclick="@(id => OnJobPostDetail(jobPost.Id))" class="btn btn-info btn-sm d-block" type="button" data-toggle="modal" data-target="#jobPostingDetail">Se Detailjer</button>
                 </div>
                 <div class="card-footer">
                     <small class="text-muted">@jobPost.DateTimeForPost</small>
@@ -27,38 +37,70 @@ else
             </div>
         }
     </div>
+
+    if (jobPost != null)
+    {
+        @* Job Detail Modal *@
+        <div class="modal fade jobPostingDetail" id="jobPostingDetail" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="jobPostingDetailLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="jobPostingDetailLabel">@jobPost.Company</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h6 class="card-subtitle">@jobPost.Title</h6>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p>
+                                    @jobPost.Information
+                                </p>
+                            </div>
+
+                            <div class="col-md-8">
+                                <img src="@jobPost.ImageURL" class="img-thumbnail" />
+                            </div>
+                        </div>
+                        <hr />
+                        <p>
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Tilbage</button>
+                        <button type="button" class="btn btn-info">Søg Job Opslag</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 }
 
 @code {
     [Parameter]
     public string JobCategory { get; set; }
 
-    public List<JobPosting> JobPostings = new List<JobPosting>();
+    JobPosting jobPost = new JobPosting();
 
-    private List<JobPosting> TempJobPostings = new List<JobPosting>();
+    List<JobPosting> jobPostings;
 
     protected override async Task OnInitializedAsync()
     {
-        TempJobPostings = await JobService.GetJobPostingsAsync();
+        jobPostings = await JobService.GetJobPostingsAsync(JobCategory);
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        JobPostings.Clear();
-        await UpdateJobPostings();
+        jobPostings = await JobService.GetJobPostingsAsync(JobCategory);
     }
 
-    private Task UpdateJobPostings()
+    void OnJobPostDetail(int id)
     {
-        var jobPostings = from jobPost in TempJobPostings
-                          where jobPost.Catetory == JobCategory
-                          select jobPost;
+        var jobPosts = jobPostings;
 
-        foreach (JobPosting jobPost in jobPostings)
-        {
-            JobPostings.Add(jobPost);
-        }
-
-        return Task.CompletedTask;
+        jobPost = (from job in jobPosts
+                   where job.Id == id
+                   select job).FirstOrDefault();
     }
 }

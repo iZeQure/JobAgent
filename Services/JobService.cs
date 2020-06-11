@@ -61,7 +61,7 @@ namespace JobAgent.Services
             return Task.FromResult(tempJobs);
         }
 
-        public Task<List<JobPosting>> GetJobPostingsAsync()
+        public Task<List<JobPosting>> GetJobPostingsAsync(string category)
         {
             List<JobPosting> temp = new List<JobPosting>
             {
@@ -137,6 +137,10 @@ namespace JobAgent.Services
                     DateTimeForPost = DateTime.Now
                 }
             };
+
+            temp = (from posts in temp
+                   where posts.Catetory == category
+                   select posts).ToList();
 
             return Task.FromResult(temp);
         }
