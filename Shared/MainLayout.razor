@@ -1,21 +1,40 @@
-﻿@using JobAgent.Components
+﻿@inject IBootstrapCss BootstrapCss
 
 @inherits LayoutComponentBase
 
-<div class="sidebar">
+<div class="sidebar overflow-auto">
     <NavMenu />
 </div>
 
 <div class="main">
-    <div class="top-row px-4 shadow p-3 bg-white rounded">
-        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#adminLogin">
-            Praktik Konsulenter
-        </button>
+    <div class="top-row">
+        <JobAgent.Components.LogInComponent></JobAgent.Components.LogInComponent>
     </div>
 
     <div class="content px-4">
         @Body
-    </div>
-
-    <LogInComponent></LogInComponent>
+    </div>    
 </div>
+
+@code {
+    private bool isServerSide = false;
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await BootstrapCss.SetBootstrapCss("4.3.1");
+        }
+        catch (Exception)
+        {
+            isServerSide = true;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRun)
+    {
+        if (isServerSide && firstRun)
+        {
+            await BootstrapCss.SetBootstrapCss("4.3.1");
+        }
+    }    
+} 

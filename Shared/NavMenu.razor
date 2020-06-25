@@ -1,7 +1,7 @@
 ﻿@using JobAgent.Components
 
-<div class="top-row pl-4 navbar navbar-dark shadow">
-    <a class="navbar-brand" href="" @onmouseover="MouseOverLogoAnimation" @onmouseout="MouseOutLogoAnimation">
+<div class="top-row pl-4 navbar navbar-dark shadow" @onmouseover="MouseOverLogoAnimation" @onmouseout="MouseOutLogoAnimation">
+    <a class="navbar-brand" href="">
         <div class="logo-wrapper pb-2">
             <span class="d-inline-block">
                 <svg version="1.1" id="logo" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 60 31" style="enable-background: new 0 0 60 31;" xml:space="preserve">
@@ -17,35 +17,24 @@
             <hr class="mt-1" />
         </div>
     </a>
-    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
 </div>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <ul class="nav flex-column">
-        <li class="nav-item">
-            <div class="nav-link text-center">
-                <span class="h4 font-weight-bolder text-white">
-                    Job Kategorier
-                </span>
-            </div>
-        </li>
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+    <div id="nav-side" class="d-flex flex-column align-items-start">
         <JobMenuComponent></JobMenuComponent>
-    </ul>
+    </div>
+
+    @*<ul class="nav flex-column">
+        <JobMenuComponent></JobMenuComponent>
+    </ul>*@
 </div>
 
 @code {
-    bool collapseNavMenu = true;
-
-    string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
     string LogoCssAnimationClass = "logoLoaded";
-
-    void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
 
     void MouseOverLogoAnimation()
     {

@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 
 namespace JobAgent.Data
 {
-    public class JobCategory
+    public abstract class BaseEntity
     {
         #region Attributes
-        private string[] menus;
+        private int id;
         #endregion
 
-        #region Properites
-        public string[] Menus { get { return menus; } set { menus = value; } }
+        #region Properties
+        public int Id { get { return id; } set { id = value; } }
         #endregion
     }
 }

@@ -1,8 +1,9 @@
 ﻿@using JobAgent.Data
 @using JobAgent.Services
+
 @inject JobService JobService
 
-@if (Jobs == null)
+@if (JobCategories == null)
 {
     <li class="nav-item px-3">
         <div class="alert alert-info">
@@ -12,43 +13,85 @@
 }
 else
 {
-    @for (int i = 0; i < Jobs.Count; i++)
+    @for (int i = 0; i < JobCategories.Count; i++)
     {
-        <li class="nav-item dropright px-3">
-            @for (int j = 0; j < Jobs[i].JobCategories.Count; j++)
-            {
-                @if (Jobs[i].JobCategories[j].Menus != null)
-                {
-                    <a class="nav-link dropdown-toggle text-white" data-toggle="dropdown" Match="@NavLink" role="button" aria-haspopup="true" aria-expanded="false">
-                        @Jobs[i].JobTitle
-                    </a>
-                    <div class="dropdown-menu">
-                        @for (int k = 0; k < Jobs[i].JobCategories[j].Menus.Length; k++)
-                        {
-                            <a href="/@Jobs[i].JobCategories[j].Menus[k]" Match="@NavLink" class="dropdown-item text-info">@Jobs[i].JobCategories[j].Menus[k]</a>
-                        }
+        @if (JobCategories[i].JobAdvertCategorySpecializations != null)
+        {
+
+            <div class="dropdown py-1 px-2">
+                <a id="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu" class="dropdown-toggle btn btn-link btn-sm text-white text-wrap text-left" href="#@RemoveWhitespace(JobCategories[i].Name)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    @JobCategories[i].Name
+                </a>
+
+                <div class="dropdown-menu" aria-labelledby="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu">
+                    @if (JobCategories[i].JobAdvertCategorySpecializations.Count > 1)
+                    {
+                        <h6 class="dropdown-header">Uddannelses Specialer</h6>
+                    }
+                    else
+                    {
+                        <h6 class="dropdown-header">Uddannelses Speciale</h6>
+                    }
+
+                    <div class="dropdown-divider"></div>
+
+                    @for (int j = 0; j < JobCategories[i].JobAdvertCategorySpecializations.Count; j++)
+                    {
+                        <a class="dropdown-item text-wrap text-left" href="/@JobCategories[i].JobAdvertCategorySpecializations[j].Name">
+                            @JobCategories[i].JobAdvertCategorySpecializations[j].Name
+                        </a>
+                    }
+                </div>
+            </div>
+
+            @*<li class="nav-item dropright">
+                    <div class="text-wrap mx-auto">
+                        <a class="nav-link dropdown-toggle text-white" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            @JobCategories[i].Name
+                        </a>
+
+                        <div class="dropdown-menu">
+                            @for (int j = 0; j < JobCategories[i].JobAdvertCategorySpecializations.Count; j++)
+                            {
+                                <a href="/@JobCategories[i].JobAdvertCategorySpecializations[j].Name" class="dropdown-item text-info">@JobCategories[i].JobAdvertCategorySpecializations[j].Name</a>
+                            }
+                        </div>
                     </div>
-                }
-                else
-                {
-                    <a href="/@Jobs[i].JobTitle" Match="@NavLink" class="nav-link text-white" role="button" aria-haspopup="true" aria-expanded="false">
-                        @Jobs[i].JobTitle
-                    </a>
-                }
-            }
-        </li>
+                </li>*@
+        }
+        else
+        {
+            <div class="py-1 px-2">
+                <a class="btn btn-link btn-sm text-white text-wrap text-left" href="/@JobCategories[i].Name">
+                    @JobCategories[i].Name
+                </a>
+            </div>
+
+            @*<li class="nav-item">
+                    <div class="text-wrap mx-auto">
+                        <a href="/@JobCategories[i].Name" class="nav-link text-white" role="button" aria-haspopup="true" aria-expanded="false">
+                            @JobCategories[i].Name
+                        </a>
+                    </div>
+                </li>*@
+        }
     }
 }
 
 @code {
     // Testing
-    NavLinkMatch NavLink = NavLinkMatch.Prefix;
-
-    List<Data.Job> Jobs = new List<Data.Job>();
+    List<JobAdvertCategory> JobCategories = new List<JobAdvertCategory>();
 
     protected override async Task OnInitializedAsync()
     {
-        Jobs = await JobService.GetJobMenuAsync();
+        JobCategories = await JobService.GetJobMenuAsync();
+    }
+
+    protected string RemoveWhitespace(string input)
+    {
+        return new string(input.ToCharArray()
+            .Where(c => !Char.IsWhiteSpace(c))
+            .ToArray());
     }
     // End Testing
 }

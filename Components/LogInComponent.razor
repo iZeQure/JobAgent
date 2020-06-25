@@ -1,36 +1,31 @@
-﻿@page "/login"
+﻿<BSButton Color="Color.Info" @onclick="@onToggleModal">Praktikekonsulenter</BSButton>
 
-@* Login Modal *@
-<div class="modal fade" id="adminLogin" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="adminLoginLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="adminLoginLabel">Praktik Konsulent Log ind</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+<BSModal @ref="VerticallyCentered" IsCentered="true" NoBackdrop="true" IgnoreClickOnBackdrop="true" IgnoreEscape="true">
+    <BSModalHeader OnClick="onToggleModal">Praktikkonsulent Log Ind</BSModalHeader>
+    <BSModalBody>
+        <form>
+            <div class="form-group">
+                <label for="exampleInputEmail1">Email Adresse</label>
+                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                <small id="emailHelp" class="form-text text-muted">Vi vil aldrig dele din email med andre.</small>
             </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label for="exampleInputEmail1">Email Adresse</label>
-                        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-                        <small id="emailHelp" class="form-text text-muted">Vi vil aldrig dele din email med andre.</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleInputPassword1">Agangskode</label>
-                        <input type="password" class="form-control" id="exampleInputPassword1">
-                    </div>
-                    <button type="submit" class="btn btn-info">Log ind</button>
-                </form>
+            <div class="form-group">
+                <label for="exampleInputPassword1">Agangskode</label>
+                <input type="password" class="form-control" id="exampleInputPassword1">
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Tilbage</button>
-            </div>
-        </div>
-    </div>
-</div>
+            <button type="submit" class="btn btn-info">Log ind</button>
+        </form>
+    </BSModalBody>
+    <BSModalFooter>
+        <BSButton Color="Color.Danger" @onclick="@onToggleModal">Tilbage</BSButton>
+    </BSModalFooter>
+</BSModal>
 
 @code {
+    BSModal VerticallyCentered;
 
+    public void onToggleModal(MouseEventArgs e)
+    {
+        VerticallyCentered.Toggle();
+    }
 }

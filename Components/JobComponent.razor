@@ -1,66 +1,58 @@
-﻿@page "/{JobCategory}"
+﻿@page "/{JobAdvertCategoryName}"
 
 @using JobAgent.Data
 @using JobAgent.Services
 @inject JobService JobService
 
-@if (jobPostings == null || !jobPostings.Any())
+@if (jobAdverts == null || !jobAdverts.Any())
 {
-    <p><em>Indlæser @JobCategory...</em></p>
+    <p><em>Indlæser @JobAdvertCategoryName ...</em></p>
 
-    @if (!jobPostings.Any())
+    @if (!jobAdverts.Any())
     {
-        <p><em>Ingen Jobs fundet indenfor @JobCategory kategori...</em></p>
+        <p><em>Ingen Jobs fundet indenfor @JobAdvertCategoryName kategori...</em></p>
     }
 }
 else
 {
     <div class="card-columns">
-        @foreach (var jobPost in jobPostings)
+        @foreach (var j in jobAdverts)
         {
             <div class="card">
-                @if (jobPost.ImageURL != null || !jobPost.ImageURL.Any())
-                {
-                    <img class="card-img-top img-fluid" src="@jobPost.ImageURL" alt="@jobPost.Company">
-                }
                 <div class="card-body">
-                    <h4 class="card-title">@jobPost.Company</h4>
-                    <h6 class="card-subtitle mb-2">@jobPost.Title</h6>
+                    <h4 class="card-title">@j.CompanyCVR.Name</h4>
+                    <h6 class="card-subtitle mb-2">@j.Title</h6>
                     <span class="card-text d-inline-block text-truncate text-break" style="max-width: 125px;">
-                        @jobPost.Information
+                        @j.JobDescription
                     </span>
-                    <button @onclick="@(id => OnJobPostDetail(jobPost.Id))" class="btn btn-info btn-sm d-block" type="button" data-toggle="modal" data-target="#jobPostingDetail">Se Detailjer</button>
+                    <button @onclick="@(id => OnJobPostDetail(j.Id))" class="btn btn-info btn-sm d-block" type="button" data-toggle="modal" data-target="#jobPostingDetail">Se Detailjer</button>
                 </div>
                 <div class="card-footer">
-                    <small class="text-muted">@jobPost.DateTimeForPost</small>
+                    <small class="text-muted">@j.JobRegisteredDate</small>
                 </div>
             </div>
         }
     </div>
 
-    if (jobPost != null)
+    if (jobAdvert != null)
     {
         @* Job Detail Modal *@
         <div class="modal fade jobPostingDetail" id="jobPostingDetail" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="jobPostingDetailLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="jobPostingDetailLabel">@jobPost.Company</h5>
+                        <h5 class="modal-title" id="jobPostingDetailLabel">@jobAdvert.CompanyCVR.Name</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
-                        <h6 class="card-subtitle">@jobPost.Title</h6>
+                        <h6 class="card-subtitle">@jobAdvert.Title</h6>
                     </div>
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-4">
                                 <p>
-                                    @jobPost.Information
+                                    @jobAdvert.JobDescription
                                 </p>
-                            </div>
-
-                            <div class="col-md-8">
-                                <img src="@jobPost.ImageURL" class="img-thumbnail" />
                             </div>
                         </div>
                         <hr />
@@ -79,28 +71,28 @@ else
 
 @code {
     [Parameter]
-    public string JobCategory { get; set; }
+    public string JobAdvertCategoryName { get; set; }
 
-    JobPosting jobPost = new JobPosting();
+    JobAdvert jobAdvert = new JobAdvert();
 
-    List<JobPosting> jobPostings;
+    List<JobAdvert> jobAdverts;
 
     protected override async Task OnInitializedAsync()
     {
-        jobPostings = await JobService.GetJobPostingsAsync(JobCategory);
+        jobAdverts = await JobService.GetJobAdvertsAsync(JobAdvertCategoryName);
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        jobPostings = await JobService.GetJobPostingsAsync(JobCategory);
+        jobAdverts = await JobService.GetJobAdvertsAsync(JobAdvertCategoryName);
     }
 
     void OnJobPostDetail(int id)
     {
-        var jobPosts = jobPostings;
+        var jobPosts = jobAdverts;
 
-        jobPost = (from job in jobPosts
-                   where job.Id == id
-                   select job).FirstOrDefault();
+        jobAdvert = (from job in jobPosts
+                     where job.Id == id
+                     select job).FirstOrDefault();
     }
 }

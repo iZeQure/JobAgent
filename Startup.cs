@@ -11,6 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using JobAgent.Data;
 using JobAgent.Services;
+using BlazorStrap;
+using JobAgent.Data.DB;
 
 namespace JobAgent
 {
@@ -29,8 +31,9 @@ namespace JobAgent
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
+            services.AddSingleton<Database>();
             services.AddSingleton<JobService>();
+            services.AddBootstrapCss();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
