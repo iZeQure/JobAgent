@@ -1,10 +1,8 @@
 ﻿using JobAgent.Data.Repository.Interface;
 using JobAgent.Data.DB;
-using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Data;
 
 namespace JobAgent.Data.Repository
@@ -358,7 +356,7 @@ namespace JobAgent.Data.Repository
             Database.Instance.OpenConnection();
 
             // Prepare command object.
-            using SqlCommand cmd = new SqlCommand("RemoveJobAdvertCategorySpecialization", id)
+            using SqlCommand cmd = new SqlCommand("RemoveJobAdvertCategorySpecialization", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
