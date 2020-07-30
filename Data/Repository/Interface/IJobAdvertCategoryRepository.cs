@@ -32,7 +32,7 @@ namespace JobAgent.Data.Repository.Interface
         /// <param name="categoryId">Used to identify the category that owns the specialization.</param>
         /// <param name="specializationId">Used to indicate the specialization to return.</param>
         /// <returns>Returns <see cref="JobAdvertCategorySpecialization"/></returns>
-        JobAdvertCategorySpecialization GetJobAdvertCategorySpecializationById(int categoryId, int specializationId);
+        JobAdvertCategorySpecialization GetJobAdvertCategorySpecializationById(int id);
 
         /// <summary>
         /// Get all category specializations.
