@@ -43,21 +43,6 @@ else
                     }
                 </div>
             </div>
-
-            @*<li class="nav-item dropright">
-                    <div class="text-wrap mx-auto">
-                        <a class="nav-link dropdown-toggle text-white" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                            @JobCategories[i].Name
-                        </a>
-
-                        <div class="dropdown-menu">
-                            @for (int j = 0; j < JobCategories[i].JobAdvertCategorySpecializations.Count; j++)
-                            {
-                                <a href="/@JobCategories[i].JobAdvertCategorySpecializations[j].Name" class="dropdown-item text-info">@JobCategories[i].JobAdvertCategorySpecializations[j].Name</a>
-                            }
-                        </div>
-                    </div>
-                </li>*@
         }
         else
         {
@@ -66,14 +51,6 @@ else
                     @JobCategories[i].Name
                 </a>
             </div>
-
-            @*<li class="nav-item">
-                    <div class="text-wrap mx-auto">
-                        <a href="/@JobCategories[i].Name" class="nav-link text-white" role="button" aria-haspopup="true" aria-expanded="false">
-                            @JobCategories[i].Name
-                        </a>
-                    </div>
-                </li>*@
         }
     }
 }
@@ -90,8 +67,8 @@ else
     protected string RemoveWhitespace(string input)
     {
         return new string(input.ToCharArray()
-            .Where(c => !Char.IsWhiteSpace(c))
-            .ToArray());
+        .Where(c => !Char.IsWhiteSpace(c))
+        .ToArray());
     }
     // End Testing
 }

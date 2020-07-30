@@ -13,7 +13,7 @@ namespace JobAgent.Data.DB
         #region Attributes
         private static Database instance = null;
         private SqlConnection sqlConnection;
-        private string connectionString = @"Server=10.108.48.72\SQLJOBAGENT,2009;Database=ProductionJobAgent; User Id=sa; Password=PaSSw0rd;";
+        private string connectionString = @"Server=GFUEL\DEVSQLSERVER; Database=JobAgentDB; Integrated Security=true;";
         #endregion
 
         #region Properites
@@ -29,8 +29,8 @@ namespace JobAgent.Data.DB
         {
             try
             {
-                ConnectionString = @"Server=10.108.48.72\SQLJOBAGENT,2009;Database=ProductionJobAgent; User Id=sa; Password=PaSSw0rd;";
-                //ConnectionString = @"Server=localhost;Database=DebugEnvironmentJobAgent; Integrated Security=true;";
+                //ConnectionString = @"Server=10.108.48.72\SQLJOBAGENT,2009;Database=ProductionJobAgent; User Id=sa; Password=PaSSw0rd;";
+                ConnectionString = @"Server=GFUEL\DEVSQLSERVER; Database=JobAgentDB; Integrated Security=true;";
 
                 SqlConnection = new SqlConnection(ConnectionString);
             }
@@ -45,7 +45,7 @@ namespace JobAgent.Data.DB
         {
             try
             {
-                ConnectionString = @"Server=10.108.48.72\SQLJOBAGENT,2009;Database=ProductionJobAgent; User Id=sa; Password=PaSSw0rd;";
+                ConnectionString = @"Server=GFUEL\DEVSQLSERVER; Database=JobAgentDB; Integrated Security=true;";
 
                 if (SqlConnection.State != ConnectionState.Open)
                 {

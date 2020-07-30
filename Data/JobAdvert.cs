@@ -17,6 +17,7 @@ namespace JobAgent.Data
         private DateTime deadlineDate;
         private Company companyCVR;
         private JobAdvertCategory jobAdvertCategoryId;
+        private JobAdvertCategorySpecialization jobAdvertCategorySpecializationId;
         #endregion
 
         #region Properties
@@ -29,6 +30,7 @@ namespace JobAgent.Data
         public DateTime DeadlineDate { get { return deadlineDate; } set { deadlineDate = value; } }
         public Company CompanyCVR { get { return companyCVR; } set { companyCVR = value; } }
         public JobAdvertCategory JobAdvertCategoryId { get { return jobAdvertCategoryId; } set { jobAdvertCategoryId = value; } } 
+        public JobAdvertCategorySpecialization JobAdvertCategorySpecializationId { get { return jobAdvertCategorySpecializationId; } set { jobAdvertCategorySpecializationId = value; } }
         #endregion
     }
 }

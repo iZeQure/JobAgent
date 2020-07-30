@@ -12,9 +12,9 @@ namespace JobAgent.Services
     {
         public Task<List<JobAdvertCategory>> GetJobMenuAsync()
         {
-            IRepository<JobAdvertCategory> repository = new JobAdvertCategoryRepository();
+            IJobAdvertCategoryRepository repository = new JobAdvertCategoryRepository();
 
-            return Task.FromResult(repository.GetAll().ToList());
+            return Task.FromResult(repository.GetAllJobAdvertCategoriesWithSpecializations().ToList());
         }
 
         public Task<List<JobAdvert>> GetJobAdvertsAsync(string categoryName)

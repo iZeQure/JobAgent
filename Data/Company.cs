@@ -9,12 +9,10 @@ namespace JobAgent.Data
     {
         #region Attributes
         private string name;
-        private Contract contractId;
         #endregion
 
         #region Properties
         public string Name { get { return name; } set { name = value; } }
-        public Contract ContractId{ get { return contractId; } set { contractId = value; } }
         #endregion
     }
 }

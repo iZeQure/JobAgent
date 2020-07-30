@@ -13,6 +13,7 @@ namespace JobAgent.Data
         private DateTime expiryDate;
         private DateTime registrationDate;
         private User signedByUserId;
+        private Company companyCVR;
         #endregion
 
         #region Properties
@@ -21,6 +22,7 @@ namespace JobAgent.Data
         public DateTime ExpiryDate { get { return expiryDate; } set { expiryDate = value; } }
         public DateTime RegistrationDate { get { return registrationDate; } set { registrationDate = value; } }
         public User SignedByUserId { get { return signedByUserId; } set { signedByUserId = value; } }
+        public Company CompanyCVR { get { return companyCVR; } set { companyCVR = value; } }
         #endregion
     }
 }

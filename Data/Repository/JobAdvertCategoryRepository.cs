@@ -16,7 +16,17 @@ namespace JobAgent.Data.Repository
             throw new NotImplementedException();
         }
 
+        public void CreateJobAdvertCategorySpecialization(JobAdvertCategorySpecialization create, int categoryId)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<JobAdvertCategory> GetAll()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<JobAdvertCategory> GetAllJobAdvertCategoriesWithSpecializations()
         {
             List<JobAdvertCategory> tempJobAdvertCategories = new List<JobAdvertCategory>();
 
@@ -93,36 +103,6 @@ namespace JobAgent.Data.Repository
                                 JobAdvertCategorySpecializations = null
                             });
                         }
-
-
-                        //if (jobAdvertCategorySpecialization.Id == jobAdvertCategory.Id)
-                        //{
-                        //    tempJobAdvertCategories.Add(new JobAdvertCategory()
-                        //    {
-                        //        Id = jobAdvertCategory.Id,
-                        //        Name = jobAdvertCategory.Name,
-                        //        Description = jobAdvertCategory.Description,
-                        //        JobAdvertCategorySpecializations = new List<JobAdvertCategorySpecialization>()
-                        //        {
-                        //            new JobAdvertCategorySpecialization()
-                        //            {
-                        //                Id = jobAdvertCategorySpecialization.Id,
-                        //                Name = jobAdvertCategorySpecialization.Name,
-                        //                Description = jobAdvertCategorySpecialization.Description
-                        //            }
-                        //        }
-                        //    });
-                        //}
-                        //else
-                        //{
-                        //    tempJobAdvertCategories.Add(new JobAdvertCategory()
-                        //    {
-                        //        Id = jobAdvertCategory.Id,
-                        //        Name = jobAdvertCategory.Name,
-                        //        Description = jobAdvertCategory.Description,
-                        //        JobAdvertCategorySpecializations = null
-                        //    });
-                        //}
                     }
                 }
 
@@ -132,7 +112,17 @@ namespace JobAgent.Data.Repository
             }
         }
 
+        public List<JobAdvertCategorySpecialization> GetAllJobAdvertCategorySpecializations()
+        {
+            throw new NotImplementedException();
+        }
+
         public JobAdvertCategory GetById(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public JobAdvertCategorySpecialization GetJobAdvertCategorySpecializationById(int categoryId, int specializationId)
         {
             throw new NotImplementedException();
         }
@@ -142,7 +132,17 @@ namespace JobAgent.Data.Repository
             throw new NotImplementedException();
         }
 
+        public void RemoveJobAdvertCategorySpecialization(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Update(JobAdvertCategory update)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpdateJobAdvertCategorySpecialization(JobAdvertCategorySpecialization update)
         {
             throw new NotImplementedException();
         }
