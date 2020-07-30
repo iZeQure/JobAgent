@@ -33,6 +33,7 @@ namespace JobAgent
             services.AddServerSideBlazor();
             services.AddSingleton<Database>();
             services.AddSingleton<JobService>();
+            services.AddSingleton<SecurityService>();
             services.AddBootstrapCss();
         }
 
