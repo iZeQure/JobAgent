@@ -12,7 +12,7 @@ namespace JobAgent.Data.Security
         private static readonly Salt instance = null;
         private static readonly object singletonLock = new object();
 
-        private static readonly int saltLengthLimit;
+        private static readonly int saltLengthLimit = 64;
         private static byte[] salt;
 
         private Salt() { }

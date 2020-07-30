@@ -1,6 +1,5 @@
-﻿@inject IBootstrapCss BootstrapCss
-
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
+@inject IBootstrapCss BootstrapCss
 
 <div class="sidebar overflow-auto">
     <NavMenu />
@@ -18,23 +17,23 @@
 
 @code {
     private bool isServerSide = false;
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            await BootstrapCss.SetBootstrapCss("4.3.1");
-        }
-        catch (Exception)
-        {
-            isServerSide = true;
-        }
-    }
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    try
+    //    {
+    //        await BootstrapCss.SetBootstrapCss("4.3.1");
+    //    }
+    //    catch (Exception)
+    //    {
+    //        isServerSide = true;
+    //    }
+    //}
 
-    protected override async Task OnAfterRenderAsync(bool firstRun)
-    {
-        if (isServerSide && firstRun)
-        {
-            await BootstrapCss.SetBootstrapCss("4.3.1");
-        }
-    }    
+    //protected override async Task OnAfterRenderAsync(bool firstRun)
+    //{
+    //    if (isServerSide && firstRun)
+    //    {
+    //        await BootstrapCss.SetBootstrapCss("4.3.1");
+    //    }
+    //}    
 } 

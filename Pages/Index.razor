@@ -1,5 +1,10 @@
 ﻿@page "/"
 
+@using JobAgent.Services
+
+@inject SecurityService SecurityService
+
+
 <style>
     article {
         display: block;
@@ -28,5 +33,33 @@
             Hjemmesiden opdateres regelmæssigt.
         </p>
         <p>&mdash; The Team</p>
+
+        <div class="d-inline-block">
+            <button class="btn btn-primary btn-sm" @onclick="GetSaltAsync">Generate Salt</button>
+            <p>User Salt : @Salt </p>
+        </div>
+
+        <div class="d-block">
+            <input type="password" @bind="Password"/>
+            <button class="btn btn-primary btn-sm" @onclick="GetHashedPasswordAsync">Hash Password</button>
+            <p>Password : @Password </p>
+            <p>Hashed Pass : @HashedPassword </p>
+        </div>
     </div>
-</article> 
+</article>
+
+@code {
+    public string Salt { get; set; }
+    public string Password { get; set; }
+    public string HashedPassword { get; set; }
+
+    public async Task GetSaltAsync()
+    {
+        Salt = await SecurityService.GetNewSaltAsync();
+    }
+
+    public async Task GetHashedPasswordAsync()
+    {
+        HashedPassword = await SecurityService.HashPasswordAsync(Password, Salt);
+    }
+} 
