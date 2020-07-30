@@ -31,7 +31,7 @@ namespace JobAgent.Data.Security
             }
         }
 
-        public string GenerateHashedPassword(string password, byte[] salt)
+        public string GenerateHashedPassword(string password, string salt)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(password + salt);
             SHA384Managed sHA384ManagedString = new SHA384Managed();

@@ -44,6 +44,7 @@
             <button class="btn btn-primary btn-sm" @onclick="GetHashedPasswordAsync">Hash Password</button>
             <p>Password : @Password </p>
             <p>Hashed Pass : @HashedPassword </p>
+            <p>Length : @GetHashedLength </p>
         </div>
     </div>
 </article>
@@ -52,6 +53,7 @@
     public string Salt { get; set; }
     public string Password { get; set; }
     public string HashedPassword { get; set; }
+    public int GetHashedLength { get; set; }
 
     public async Task GetSaltAsync()
     {
@@ -61,5 +63,6 @@
     public async Task GetHashedPasswordAsync()
     {
         HashedPassword = await SecurityService.HashPasswordAsync(Password, Salt);
+        GetHashedLength = HashedPassword.Length;
     }
 } 

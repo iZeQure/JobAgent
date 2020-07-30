@@ -26,7 +26,7 @@ namespace JobAgent.Services
         /// <returns>A hashed password.</returns>
         public Task<string> HashPasswordAsync(string password, string salt)
         {
-            return Task.FromResult(Hash.Instance.GenerateHashedPassword(password, Encoding.ASCII.GetBytes(salt)));
+            return Task.FromResult(Hash.Instance.GenerateHashedPassword(password, salt));
         }
     }
 }
