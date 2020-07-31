@@ -61,7 +61,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        //JobCategories = await JobService.GetJobMenuAsync();
+        JobCategories = await JobService.GetJobMenuAsync();
     }
 
     protected string RemoveWhitespace(string input)
