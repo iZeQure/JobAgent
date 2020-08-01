@@ -1,0 +1,24 @@
+﻿<div class="position-absolute">
+    <div class="d-flex flex-row-reverse fixed-bottom mx-2 my-2">
+        <BSToast IsVisible="@isVisible">
+            <BSToastHeader>@headerService</BSToastHeader>
+            <BSToastBody>
+                <p>@notificationMessage</p>
+            </BSToastBody>
+        </BSToast>
+    </div>
+</div>
+
+@code {
+    // Toast Test
+    private bool isVisible { get; set; } = true;
+    private string headerService { get; set; } = "Job Agent Service";
+    private string notificationMessage { get; set; } = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+
+    void onclick(MouseEventArgs e)
+    {
+        isVisible = !isVisible;
+        StateHasChanged();
+    }
+    //
+}

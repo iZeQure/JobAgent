@@ -14,7 +14,9 @@ namespace JobAgent.Services
         {
             IJobAdvertCategoryRepository repository = new JobAdvertCategoryRepository();
 
-            return Task.FromResult(repository.GetAllJobAdvertCategoriesWithSpecializations().ToList());
+            var jobMenu = repository.GetAllJobAdvertCategoriesWithSpecializations();
+
+            return Task.FromResult(jobMenu);
         }
 
         public Task<List<JobAdvert>> GetJobAdvertsAsync(string categoryName)

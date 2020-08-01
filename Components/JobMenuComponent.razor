@@ -3,21 +3,12 @@
 
 @inject JobService JobService
 
-@if (JobCategories == null)
-{
-    <li class="nav-item px-3">
-        <div class="alert alert-info">
-            <p><em>Indlæser Menu...</em></p>
-        </div>
-    </li>
-}
-else
+@if (JobCategories.Any() || JobCategories != null)
 {
     @for (int i = 0; i < JobCategories.Count; i++)
     {
         @if (JobCategories[i].JobAdvertCategorySpecializations != null)
         {
-
             <div class="dropdown py-1 px-2">
                 <a id="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu" class="dropdown-toggle btn btn-link btn-sm text-white text-wrap text-left" href="#@RemoveWhitespace(JobCategories[i].Name)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     @JobCategories[i].Name
@@ -37,7 +28,7 @@ else
 
                     @for (int j = 0; j < JobCategories[i].JobAdvertCategorySpecializations.Count; j++)
                     {
-                        <a class="dropdown-item text-wrap text-left" href="/@JobCategories[i].JobAdvertCategorySpecializations[j].Name">
+                        <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].JobAdvertCategorySpecializations[j].Name">
                             @JobCategories[i].JobAdvertCategorySpecializations[j].Name
                         </a>
                     }
@@ -47,7 +38,7 @@ else
         else
         {
             <div class="py-1 px-2">
-                <a class="btn btn-link btn-sm text-white text-wrap text-left" href="/@JobCategories[i].Name">
+                <a class="btn btn-link btn-sm text-white text-wrap text-left" href="/job/@JobCategories[i].Name">
                     @JobCategories[i].Name
                 </a>
             </div>
@@ -61,7 +52,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        JobCategories = await JobService.GetJobMenuAsync();
+        if (JobService.GetJobMenuAsync() != null) JobCategories = await JobService.GetJobMenuAsync();
     }
 
     protected string RemoveWhitespace(string input)
@@ -70,5 +61,5 @@ else
         .Where(c => !Char.IsWhiteSpace(c))
         .ToArray());
     }
-    // End Testing
+    // End Testing    
 }
