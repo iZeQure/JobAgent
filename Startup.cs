@@ -11,8 +11,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using JobAgent.Data;
 using JobAgent.Services;
-using BlazorStrap;
 using JobAgent.Data.DB;
+using JobAgent.Components;
+using BlazorStrap;
+using Blazored.LocalStorage;
 
 namespace JobAgent
 {
@@ -31,9 +33,11 @@ namespace JobAgent
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddBlazoredLocalStorage();
             services.AddSingleton<Database>();
             services.AddSingleton<JobService>();
             services.AddSingleton<SecurityService>();
+            services.AddSingleton<AuthenticationService>();
             services.AddBootstrapCss();
         }
 

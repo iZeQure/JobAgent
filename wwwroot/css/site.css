@@ -104,8 +104,13 @@ app {
     outline: 1px solid red;
 }
 
+ul.validation-errors {
+    padding: 0 !important;
+}
+
 .validation-message {
     color: red;
+    list-style: none;
 }
 
 @media (max-width: 767.98px) {

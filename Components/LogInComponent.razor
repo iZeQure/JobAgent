@@ -1,31 +1,79 @@
-﻿<BSButton Color="Color.Info" @onclick="@onToggleModal">Praktikekonsulenter</BSButton>
+﻿@using JobAgent.Models
+@using JobAgent.Services
+@using Blazored.LocalStorage
 
-<BSModal @ref="VerticallyCentered" IsCentered="true" NoBackdrop="true" IgnoreClickOnBackdrop="true" IgnoreEscape="true">
-    <BSModalHeader OnClick="onToggleModal">Praktikkonsulent Log Ind</BSModalHeader>
+@inject AuthenticationService authService
+@inject SecurityService securityService
+@inject NavigationManager navigationManager
+@inject ILocalStorageService storageService
+@inject AuthenticationStateProvider authenticationStateProvicer
+
+<BSButton Color="Color.Info" @onclick="@(() => LoginModal.Show())" href="#login">Praktikekonsulenter</BSButton>
+
+<BSModal @ref="LoginModal" IsCentered="true" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+    <BSModalHeader OnClick="@(() => LoginModal.Hide())">Praktikkonsulent Log Ind</BSModalHeader>
     <BSModalBody>
-        <form>
-            <div class="form-group">
-                <label for="exampleInputEmail1">Email Adresse</label>
-                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-                <small id="emailHelp" class="form-text text-muted">Vi vil aldrig dele din email med andre.</small>
-            </div>
-            <div class="form-group">
-                <label for="exampleInputPassword1">Agangskode</label>
-                <input type="password" class="form-control" id="exampleInputPassword1">
-            </div>
-            <button type="submit" class="btn btn-info">Log ind</button>
-        </form>
+        @* Login Form *@
+        <EditForm Model="model" OnValidSubmit="LogInUserAsync">
+
+            @if (message != "" && message != null)
+            {
+                <BSAlert Color="Color.Dark">@message</BSAlert>
+            }
+
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <BSFormGroup>
+                <BSLabel For="inputEmail1">Email Adresse</BSLabel>
+                <BSInput Id="inputEmail1" InputType="InputType.Email" PlaceHolder="Indtast email adresse.." @bind-Value="model.Email" />
+            </BSFormGroup>
+            <BSFormGroup>
+                <BSLabel For="inputPassword">Adgangskode</BSLabel>
+                <BSInput Id="inputPassword" InputType="InputType.Password" Placeholder="Indtast adgangskode.." @bind-Value="model.Password" />
+            </BSFormGroup>
+            <BSButton Color="Color.Info" ButtonType="ButtonType.Submit" Class="btn-block mr-2" IsDisabled="@isProcessing">Log ind</BSButton>
+
+        </EditForm>
     </BSModalBody>
     <BSModalFooter>
-        <BSButton Color="Color.Danger" @onclick="@onToggleModal">Tilbage</BSButton>
+        <BSButton Color="Color.Danger" @onclick="@(() => LoginModal.Hide())">Tilbage</BSButton>
     </BSModalFooter>
 </BSModal>
 
 @code {
-    BSModal VerticallyCentered;
+    BSModal LoginModal { get; set; }
 
-    public void onToggleModal(MouseEventArgs e)
+    LogInModel model = new LogInModel();
+
+    bool isProcessing = false;
+    string message = string.Empty;
+
+    public async Task LogInUserAsync()
     {
-        VerticallyCentered.Toggle();
+        isProcessing = true;
+        message = "Processing request...";
+        var result = await authService.LogInUserAsync(model);
+
+        if (result.IsSuccess)
+        {
+            var userInfo = new JobAgent.Data.User()
+            {
+            };
+
+            message = result.Message;
+
+            await storageService.SetItemAsync("User", userInfo);
+            var authState = await authenticationStateProvicer.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            navigationManager.NavigateTo("/", true);
+        }
+        else
+        {
+            message = result.Message;
+
+        }
+        isProcessing = false;
     }
 }

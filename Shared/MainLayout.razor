@@ -7,35 +7,24 @@
 
 <div class="main">
     <div class="top-row">
-        <JobAgent.Components.LogInComponent></JobAgent.Components.LogInComponent>
+        <AuthorizeView>
+            <Authorized>
+                <h1>Hello, @context.User.Identity.Name!</h1>
+                <span>Is Authenticated : @context.User.Identity.IsAuthenticated</span>
+
+                <div class="float-right ml-auto">
+                    <button type="button" class="btn btn-dark btn-sm">Log ud</button>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <JobAgent.Components.LogInComponent></JobAgent.Components.LogInComponent>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
 
     <div class="content px-4">
-        @Body
-
         <JobAgent.Components.ToastNotificationComponent></JobAgent.Components.ToastNotificationComponent>
+
+        @Body
     </div>    
 </div>
-
-@code {
-    //private bool isServerSide = false;
-    //protected override async Task OnInitializedAsync()
-    //{
-    //    try
-    //    {
-    //        await BootstrapCss.SetBootstrapCss("4.3.1");
-    //    }
-    //    catch (Exception)
-    //    {
-    //        isServerSide = true;
-    //    }
-    //}
-
-    //protected override async Task OnAfterRenderAsync(bool firstRun)
-    //{
-    //    if (isServerSide && firstRun)
-    //    {
-    //        await BootstrapCss.SetBootstrapCss("4.3.1");
-    //    }
-    //}    
-} 

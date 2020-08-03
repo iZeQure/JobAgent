@@ -11,9 +11,9 @@
 
 @code {
     // Toast Test
-    private bool isVisible { get; set; } = true;
+    public bool isVisible { get; set; } = false;
     private string headerService { get; set; } = "Job Agent Service";
-    private string notificationMessage { get; set; } = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    public string notificationMessage { get; set; } = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
 
     void onclick(MouseEventArgs e)
     {
