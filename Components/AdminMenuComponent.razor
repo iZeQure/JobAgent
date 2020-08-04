@@ -1,0 +1,31 @@
+﻿@attribute [Authorize]
+
+@using JobAgent.Services
+
+@inject AdminService AdminService
+
+<div class="text-center">
+    <h3>Admin Panel</h3>
+</div>
+
+@if (AdminMenus.Any() || AdminMenus != null)
+{
+    @for (int i = 0; i < AdminMenus.Count; i++)
+    {
+        <div class="py-1 px-2">
+            <a class="btn btn-link btn-sm text-white text-wrap text-left" href="/admin/@AdminMenus[i]">
+                @AdminMenus[i]
+            </a>
+        </div>
+    }
+}
+
+@code {
+    // Store menu
+    List<string> AdminMenus { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        AdminMenus = await AdminService.GetAdminMenuAsync();
+    }
+}

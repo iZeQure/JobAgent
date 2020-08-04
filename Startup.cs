@@ -15,6 +15,9 @@ using JobAgent.Data.DB;
 using JobAgent.Components;
 using BlazorStrap;
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server;
+using Microsoft.AspNetCore.Identity;
 
 namespace JobAgent
 {
@@ -34,6 +37,11 @@ namespace JobAgent
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddBlazoredLocalStorage();
+            services.AddScoped<IHostEnvironmentAuthenticationStateProvider>(sp =>
+            {
+                var provider = (ServerAuthenticationStateProvider)sp.GetRequiredService<AuthenticationStateProvider>();
+                return provider;
+            });
             services.AddSingleton<Database>();
             services.AddSingleton<JobService>();
             services.AddSingleton<SecurityService>();

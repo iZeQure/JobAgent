@@ -25,12 +25,15 @@
 <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
     <div id="nav-side" class="d-flex flex-column align-items-start">
-        <JobMenuComponent></JobMenuComponent>
+        <AuthorizeView>
+            <Authorized>
+                <AdminMenuComponent></AdminMenuComponent>
+            </Authorized>
+            <NotAuthorized>
+                <JobMenuComponent></JobMenuComponent>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
-
-    @*<ul class="nav flex-column">
-        <JobMenuComponent></JobMenuComponent>
-    </ul>*@
 </div>
 
 @code {

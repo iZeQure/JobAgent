@@ -7,7 +7,8 @@ namespace JobAgent.Data.Repository.Interface
 {
     interface IUserRepository : IRepository<User>
     {
-        bool LogIn(string email, string password);
+        User GetUserByEmail(string email);
+        User LogIn(string email, string password);
         bool CheckUserExists(string email);
         bool ValidatePassword(string password);
         string GetUserSaltByEmail(string email);

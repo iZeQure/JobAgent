@@ -30,13 +30,18 @@ namespace JobAgent.Data.Repository
             // Define input parameters.
             cmd.Parameters.AddWithValue("UserEmail", email);
 
-            // Execture command, catch return value.
-            int returnBoolean = cmd.ExecuteNonQuery();
+            // Define return parameters.
+            var returnParameter = cmd.Parameters.AddWithValue("return_value", SqlDbType.Int);
+            returnParameter.Direction = ParameterDirection.ReturnValue;
 
-            // Check if the result is 0. - return false.
-            if (returnBoolean == 0) return false;
+            // Execute command, catch return value.
+            cmd.ExecuteNonQuery();
 
-            // Return true.
+            var result = returnParameter.Value;
+
+            // Check if return value is false.
+            if ((int)result == 0) return false;
+
             return true;
         }
 
@@ -48,6 +53,54 @@ namespace JobAgent.Data.Repository
         public IEnumerable<User> GetAll()
         {
             throw new NotImplementedException();
+        }
+
+        public User GetUserByEmail(string email)
+        {
+            // Initialize temporary user obj.
+            User tempUser = new User();
+
+            // Open connection to database.
+            Database.Instance.OpenConnection();
+
+            // Initialzie command obj.
+            using SqlCommand cmd = new SqlCommand("GetUserByEmail", Database.Instance.SqlConnection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            // Define input parameters.
+            cmd.Parameters.AddWithValue("UserEmail", email);
+
+            // Initialzie data reader.
+            using SqlDataReader reader = cmd.ExecuteReader();
+
+            // Check for data.
+            if (reader.HasRows)
+            {
+                // Read data.
+                while (reader.Read())
+                {
+                    tempUser = new User()
+                    {
+                        Id = reader.GetInt32("UserId"),
+                        FirstName = reader.GetString("FirstName"),
+                        LastName = reader.GetString("LastName"),
+                        Email = reader.GetString("Email"),
+                        ConsultantArea = new ConsultantArea()
+                        {
+                            Id = reader.GetInt32("ConsultantAreaId"),
+                            Name = reader.GetString("ConsultantAreaName")
+                        },
+                        Location = new Location()
+                        {
+                            Id = reader.GetInt32("LocationId"),
+                            Name = reader.GetString("LocationName")
+                        }
+                    };
+                }
+            }
+            return tempUser;
         }
 
         public User GetById(int id)
@@ -91,9 +144,51 @@ namespace JobAgent.Data.Repository
             return string.Empty;
         }
 
-        public bool LogIn(string email, string password)
+        public User LogIn(string email, string password)
         {
-            throw new NotImplementedException();
+            // Initialize temporary obj.
+            User tempUser = new User();
+
+            // Open connection to database.
+            Database.Instance.OpenConnection();
+
+            // Initialize command obj.
+            using SqlCommand cmd = new SqlCommand("UserLogin", Database.Instance.SqlConnection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            // Define input parameters.
+            cmd.Parameters.AddWithValue("UserEmail", email);
+            cmd.Parameters.AddWithValue("UserSecret", password);
+
+            // Initialize data reader.
+            using SqlDataReader reader = cmd.ExecuteReader();
+
+            // Check for data.
+            if (reader.HasRows)
+            {
+                // Read data.
+                while (reader.Read())
+                {
+                    tempUser.Id = reader.GetInt32("UserId");
+                    tempUser.FirstName = reader.GetString("FirstName");
+                    tempUser.LastName = reader.GetString("LastName");
+                    tempUser.Email = reader.GetString("Email");
+                    tempUser.ConsultantArea = new ConsultantArea()
+                    {
+                        Id = reader.GetInt32("ConsultantAreaId"),
+                        Name = reader.GetString("ConsultantAreaName")
+                    };
+                    tempUser.Location = new Location()
+                    {
+                        Id = reader.GetInt32("LocationId"),
+                        Name = reader.GetString("LocationName")
+                    };
+                }
+            }
+
+            return tempUser;
         }
 
         public void Remove(int id)

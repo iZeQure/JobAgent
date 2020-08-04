@@ -1,12 +1,11 @@
 ﻿@using JobAgent.Models
 @using JobAgent.Services
-@using Blazored.LocalStorage
 
 @inject AuthenticationService authService
 @inject SecurityService securityService
 @inject NavigationManager navigationManager
-@inject ILocalStorageService storageService
 @inject AuthenticationStateProvider authenticationStateProvicer
+@inject IHostEnvironmentAuthenticationStateProvider HostAuthentication
 
 <BSButton Color="Color.Info" @onclick="@(() => LoginModal.Show())" href="#login">Praktikekonsulenter</BSButton>
 
@@ -42,12 +41,18 @@
 </BSModal>
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthState { get; set; }
+
     BSModal LoginModal { get; set; }
 
     LogInModel model = new LogInModel();
 
     bool isProcessing = false;
     string message = string.Empty;
+
+    ClaimsPrincipal principal = new ClaimsPrincipal();
+    List<Claim> claims = new List<Claim>();
 
     public async Task LogInUserAsync()
     {
@@ -57,17 +62,26 @@
 
         if (result.IsSuccess)
         {
-            var userInfo = new JobAgent.Data.User()
+            if (!(await AuthState).User.Identity.IsAuthenticated)
             {
-            };
+                claims.Add(new Claim(ClaimTypes.Name, $"{result.UserInfo.FirstName} {result.UserInfo.LastName}"));
+                claims.Add(new Claim(ClaimTypes.Email, result.UserInfo.Email));
 
-            message = result.Message;
+                principal.AddIdentity(new ClaimsIdentity(claims));
 
-            await storageService.SetItemAsync("User", userInfo);
-            var authState = await authenticationStateProvicer.GetAuthenticationStateAsync();
-            var user = authState.User;
+                var identity = new ClaimsIdentity(
+                    principal.Claims,
+                    Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme
+                );
 
-            navigationManager.NavigateTo("/", true);
+                principal = new ClaimsPrincipal(identity);
+
+                HostAuthentication.SetAuthenticationState(Task.FromResult(new AuthenticationState(principal)));
+
+                AuthState = authenticationStateProvicer.GetAuthenticationStateAsync();
+
+                navigationManager.NavigateTo("/", true);
+            }
         }
         else
         {
@@ -75,5 +89,13 @@
 
         }
         isProcessing = false;
+    }
+
+    protected async override void OnParametersSet()
+    {
+        if (AuthState != null)
+        {
+            principal = (await AuthState).User;
+        }
     }
 }

@@ -33,9 +33,9 @@ namespace JobAgent.Services
                     // Validate password.
                     if (userRepository.ValidatePassword(hashedPassword))
                     {
+                        response.UserInfo = userRepository.GetUserByEmail(model.Email);
                         response.IsSuccess = true;
                         response.ExpireDate = DateTime.Now.AddDays(14);
-                        response.Message = "Logged in";
 
                         return response;
                     }
@@ -51,21 +51,6 @@ namespace JobAgent.Services
             response.Message = "Email eller adgangskode er forkert.";
 
             return response;
-
-            //var response = new UserManagerResponse()
-            //{
-            //    UserInfo = new User()
-            //    {
-            //        Id = 1,
-            //        Email = model.Email,
-            //        Password = model.Password
-            //    },
-            //    Message = "Success",
-            //    IsSuccess = true,
-            //    ExpireDate = DateTime.Now.AddDays(14)
-            //};
-
-            //return response;
         }
     }
 }
