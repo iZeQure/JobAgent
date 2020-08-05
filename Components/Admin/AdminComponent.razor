@@ -1,0 +1,26 @@
+﻿@page "/admin"
+@using System.Security.Claims
+@attribute [Authorize]
+
+@if (IsUserAuthenticated)
+{
+    
+}
+
+@code {
+    [Parameter]
+    public string AdminSettingsParameter { get; set; }
+
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthenticationState { get; set; }
+    ClaimsPrincipal user;
+
+    bool IsUserAuthenticated;
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = (await AuthenticationState).User;
+
+        if (user.Identity.IsAuthenticated) IsUserAuthenticated = true;
+    }
+}

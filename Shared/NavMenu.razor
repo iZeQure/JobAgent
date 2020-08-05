@@ -1,7 +1,9 @@
-﻿@using JobAgent.Components
+﻿@using System.Security.Claims 
+@using JobAgent.Components.Admin
+@using JobAgent.Components
 
 <div class="top-row pl-4 navbar navbar-dark shadow" @onmouseover="MouseOverLogoAnimation" @onmouseout="MouseOutLogoAnimation">
-    <a class="navbar-brand" href="">
+    <a class="navbar-brand" href="/@AuthorityLink">
         <div class="logo-wrapper pb-2">
             <span class="d-inline-block">
                 <svg version="1.1" id="logo" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 60 31" style="enable-background: new 0 0 60 31;" xml:space="preserve">
@@ -37,7 +39,21 @@
 </div>
 
 @code {
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthenticationState { get; set; }
+    ClaimsPrincipal user;
+
+    string AuthorityLink { get; set; } = "";
     string LogoCssAnimationClass = "logoLoaded";
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = (await AuthenticationState).User;
+
+        if (user.Identity.IsAuthenticated) AuthorityLink = "admin";
+
+        Console.WriteLine(AuthorityLink);
+    }
 
     void MouseOverLogoAnimation()
     {

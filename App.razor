@@ -1,9 +1,18 @@
-﻿<CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(Program).Assembly">
-        <Found Context="routeData">
-            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-        </Found>
-        <NotFound>
+﻿@using System.Security.Claims 
+@using JobAgent.Components
+
+@inject NavigationManager navigationManager
+
+<Router AppAssembly="@typeof(Program).Assembly">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+            <NotAuthorized>
+                <RedirectToLoginComponent />
+            </NotAuthorized>
+        </AuthorizeRouteView>
+    </Found>
+    <NotFound>
+        <CascadingAuthenticationState>
             <LayoutView Layout="@typeof(MainLayout)">
                 <p>
                     <b>404.</b>
@@ -15,6 +24,6 @@
                     <span class="text-muted">Det er alt vi ved.</span>
                 </p>
             </LayoutView>
-        </NotFound>
-    </Router>
-</CascadingAuthenticationState>
+        </CascadingAuthenticationState>
+    </NotFound>
+</Router>

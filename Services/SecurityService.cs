@@ -1,4 +1,6 @@
-﻿using JobAgent.Data.Security;
+﻿using JobAgent.Data.Repository;
+using JobAgent.Data.Repository.Interface;
+using JobAgent.Data.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +29,13 @@ namespace JobAgent.Services
         public Task<string> HashPasswordAsync(string password, string salt)
         {
             return Task.FromResult(Hash.Instance.GenerateHashedPassword(password, salt));
+        }
+
+        public Task<string> GenerateAccessTokenAsync(int id)
+        {
+            IUserRepository userRepository = new UserRepository();
+
+            return Task.FromResult(userRepository.GenerateAccessToken(id));
         }
     }
 }

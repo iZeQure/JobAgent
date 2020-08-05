@@ -1,0 +1,9 @@
+﻿@page "/admin/{Setting}"
+@attribute [Authorize]
+
+@code {
+    [Parameter]
+    public string Setting { get; set; }
+
+
+}

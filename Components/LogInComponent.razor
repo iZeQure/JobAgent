@@ -1,101 +1,85 @@
-﻿@using JobAgent.Models
-@using JobAgent.Services
+﻿@page "/login"
 
-@inject AuthenticationService authService
-@inject SecurityService securityService
+@using System.Security.Claims
+@using Blazored.LocalStorage
+@using JobAgent.Models
+@using JobAgent.Data
+@using JobAgent.Data.Interfaces
+
+@*@inject AuthenticationStateProvider authenticationStateProvider*@
+@inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navigationManager
-@inject AuthenticationStateProvider authenticationStateProvicer
-@inject IHostEnvironmentAuthenticationStateProvider HostAuthentication
+@inject ILocalStorageService localStorageService
+@inject IUserService userService
+@* Login Form *@
+<EditForm Model="user" OnValidSubmit="@ValidateUserAsync">
 
-<BSButton Color="Color.Info" @onclick="@(() => LoginModal.Show())" href="#login">Praktikekonsulenter</BSButton>
+    @if (LoginMessage != "" && LoginMessage != null)
+    {
+        <BSAlert Color="Color.Danger">@LoginMessage</BSAlert>
+    }
 
-<BSModal @ref="LoginModal" IsCentered="true" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
-    <BSModalHeader OnClick="@(() => LoginModal.Hide())">Praktikkonsulent Log Ind</BSModalHeader>
-    <BSModalBody>
-        @* Login Form *@
-        <EditForm Model="model" OnValidSubmit="LogInUserAsync">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
-            @if (message != "" && message != null)
-            {
-                <BSAlert Color="Color.Dark">@message</BSAlert>
-            }
+    <BSFormGroup>
+        <BSLabel For="inputEmail1">Email Adresse</BSLabel>
+        <BSInput Id="inputEmail1" InputType="InputType.Email" PlaceHolder="Indtast email adresse.." @bind-Value="user.Email" />
+    </BSFormGroup>
+    <BSFormGroup>
+        <BSLabel For="inputPassword">Adgangskode</BSLabel>
+        <BSInput Id="inputPassword" InputType="InputType.Password" Placeholder="Indtast adgangskode.." @bind-Value="user.Password" />
+    </BSFormGroup>
+    <BSButton Color="Color.Info" ButtonType="ButtonType.Submit" Class="btn-block mr-2" IsDisabled="@IsProcessing">Log ind</BSButton>
 
-            <DataAnnotationsValidator />
-            <ValidationSummary />
-
-            <BSFormGroup>
-                <BSLabel For="inputEmail1">Email Adresse</BSLabel>
-                <BSInput Id="inputEmail1" InputType="InputType.Email" PlaceHolder="Indtast email adresse.." @bind-Value="model.Email" />
-            </BSFormGroup>
-            <BSFormGroup>
-                <BSLabel For="inputPassword">Adgangskode</BSLabel>
-                <BSInput Id="inputPassword" InputType="InputType.Password" Placeholder="Indtast adgangskode.." @bind-Value="model.Password" />
-            </BSFormGroup>
-            <BSButton Color="Color.Info" ButtonType="ButtonType.Submit" Class="btn-block mr-2" IsDisabled="@isProcessing">Log ind</BSButton>
-
-        </EditForm>
-    </BSModalBody>
-    <BSModalFooter>
-        <BSButton Color="Color.Danger" @onclick="@(() => LoginModal.Hide())">Tilbage</BSButton>
-    </BSModalFooter>
-</BSModal>
+</EditForm>
 
 @code {
     [CascadingParameter]
-    private Task<AuthenticationState> AuthState { get; set; }
+    private Task<AuthenticationState> AuthenticationState { get; set; }
 
-    BSModal LoginModal { get; set; }
+    public string LoginMessage { get; set; }
 
-    LogInModel model = new LogInModel();
+    public bool IsProcessing { get; set; } = false;
 
-    bool isProcessing = false;
-    string message = string.Empty;
+    private User user;
+    private ClaimsPrincipal claimsPrincipal;
 
-    ClaimsPrincipal principal = new ClaimsPrincipal();
-    List<Claim> claims = new List<Claim>();
-
-    public async Task LogInUserAsync()
+    protected async override Task OnInitializedAsync()
     {
-        isProcessing = true;
-        message = "Processing request...";
-        var result = await authService.LogInUserAsync(model);
+        user = new User();
 
-        if (result.IsSuccess)
+        claimsPrincipal = (await AuthenticationState).User;
+
+        if (claimsPrincipal.Identity.IsAuthenticated)
         {
-            if (!(await AuthState).User.Identity.IsAuthenticated)
+            navigationManager.NavigateTo("admin");
+        }
+    }
+
+    private async Task<bool> ValidateUserAsync()
+    {
+        IsProcessing = true;
+
+        user = await userService.LoginAsync(user);
+
+        if (user.IsAuthenticatedByServer)
+        {
+            if (user.Email != null)
             {
-                claims.Add(new Claim(ClaimTypes.Name, $"{result.UserInfo.FirstName} {result.UserInfo.LastName}"));
-                claims.Add(new Claim(ClaimTypes.Email, result.UserInfo.Email));
-
-                principal.AddIdentity(new ClaimsIdentity(claims));
-
-                var identity = new ClaimsIdentity(
-                    principal.Claims,
-                    Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme
-                );
-
-                principal = new ClaimsPrincipal(identity);
-
-                HostAuthentication.SetAuthenticationState(Task.FromResult(new AuthenticationState(principal)));
-
-                AuthState = authenticationStateProvicer.GetAuthenticationStateAsync();
-
-                navigationManager.NavigateTo("/", true);
+                await ((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAuthenticated(user);
+                navigationManager.NavigateTo("/admin");
+            }
+            else
+            {
+                LoginMessage = "Forkert email eller adgangskode";
             }
         }
         else
         {
-            message = result.Message;
-
+            LoginMessage = "Noget gik galt, prøv igen senere..";
         }
-        isProcessing = false;
-    }
 
-    protected async override void OnParametersSet()
-    {
-        if (AuthState != null)
-        {
-            principal = (await AuthState).User;
-        }
+        return await Task.FromResult(IsProcessing = false);
     }
 }

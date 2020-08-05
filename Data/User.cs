@@ -15,6 +15,10 @@ namespace JobAgent.Data
         private string salt;
         private ConsultantArea consultantArea;
         private Location location;
+
+        private bool isAuthenticatedByServer;
+        private string accessToken;
+        private string refreshToken;
         #endregion
 
         #region Properties
@@ -25,6 +29,10 @@ namespace JobAgent.Data
         public string Salt { get { return salt; } set { salt = value; } }
         public ConsultantArea ConsultantArea { get { return consultantArea; } set { consultantArea = value; } }
         public Location Location { get { return location; } set { location = value; } }
+
+        public bool IsAuthenticatedByServer { get { return isAuthenticatedByServer; } set { isAuthenticatedByServer = value; } }
+        public string AccessToken { get { return accessToken; } set { accessToken = value; } }
+        public string RefreshToken { get { return refreshToken; } set { refreshToken = value; } }
         #endregion
     }
 }
