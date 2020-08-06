@@ -125,10 +125,12 @@ ul.validation-errors {
     }
 
     .sidebar {
-        width: 300px;
+        width: 275px;
         height: 100vh;
         position: sticky;
         top: 0;
+        overflow-wrap: break-word;
+        transition: 1.75s ease-in-out;
     }
 
     .main .top-row {
@@ -149,14 +151,56 @@ ul.validation-errors {
         /*Never collapse the sidebar for wide screens*/
         display: block;
     }
+
+    .logo-text {
+        display: none;
+    }
+}
+
+@media (min-width: 1000px) {
+    .sidebar {
+        width: 325px;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        overflow-wrap: break-word;
+        transition: 1.75s ease-in-out;
+    }
+
+    .logo-text {
+        display: inherit;
+    }
+}
+
+/*
+    ## Custom Navbar Changes ##
+*/
+
+.navbar {
+    padding: 0 !important;
+}
+
+.navbar-brand {
+    display: flex;
+    align-content: space-evenly;
+    align-items: center;
+    text-align: center;
 }
 
 /*
     ## Logo Style ##
 */
 
+.logo-wrapper {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+    overflow-wrap: break-word;
+}
+
 #logo {
-    width: 50px;
+    width: 65px;
     height: auto;
 }
 
@@ -170,22 +214,10 @@ ul.validation-errors {
     fill: none !important;
 }
 
-.logo-text:hover ~ hr {
-    margin-left: 50%;
+.logo-text {
+    font-size: 2.5vh;
+    display: inline-block;
 }
-
-hr {
-    height: .25rem;
-    width: 25%;
-    margin: 0;
-    background: grey;
-    border: none;
-    transition: .3s ease-in-out;
-}
-
-    hr:after:hover {
-        background: white;
-    }
 
 /*
     ## Scrollbar Style
@@ -204,11 +236,26 @@ hr {
     border-radius: 5px !important;
 }
 
-/*
-    ## Nav Side Style
-*/
-
-#nav-side {
-    overflow-y: auto!important;
-    overflow-x: hidden!important;
+/* Base Menu */
+#adminMenu {
+    padding: 20px;
 }
+    /* Set menu title */
+    #adminMenu .title {
+        color: lightgray;
+        font-size: 2vh;
+    }
+
+    /* Set menu icons */
+    #adminMenu .menu-icons {
+        color: #17a2b8;
+        font-size: 1.25rem;
+        margin-right: 1rem;
+    }
+
+    /* Set Menu Links */
+    #adminMenu a {
+        color: lightgray;
+        font-size: 1.25vh;
+        text-decoration: underline;
+    }

@@ -10,7 +10,7 @@
         @if (JobCategories[i].JobAdvertCategorySpecializations != null)
         {
             <div class="dropdown py-1 px-2">
-                <a id="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu" class="dropdown-toggle btn btn-link btn-sm text-white text-wrap text-left" href="#@RemoveWhitespace(JobCategories[i].Name)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a id="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu" class="dropdown-toggle btn btn-link btn-sm @MenuColor text-wrap text-left" href="#@RemoveWhitespace(JobCategories[i].Name)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     @JobCategories[i].Name
                 </a>
 
@@ -38,7 +38,7 @@
         else
         {
             <div class="py-1 px-2">
-                <a class="btn btn-link btn-sm text-white text-wrap text-left" href="/job/@JobCategories[i].Name">
+                <a class="btn btn-link btn-sm @MenuColor text-wrap text-left" href="/job/@JobCategories[i].Name">
                     @JobCategories[i].Name
                 </a>
             </div>
@@ -49,6 +49,8 @@
 @code {
     // Testing
     List<JobAdvertCategory> JobCategories = new List<JobAdvertCategory>();
+
+    public string MenuColor { get; set; } = "text-info";
 
     protected override async Task OnInitializedAsync()
     {

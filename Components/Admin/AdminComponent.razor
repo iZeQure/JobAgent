@@ -1,16 +1,30 @@
 ﻿@page "/admin"
 @using System.Security.Claims
+@inject JobAgent.Services.SecurityService SecurityService
 @attribute [Authorize]
 
 @if (IsUserAuthenticated)
 {
-    
+    <div class="d-inline-block">
+        <button class="btn btn-primary btn-sm" @onclick="GetSaltAsync">Generate Salt</button>
+        <p>User Salt : @Salt </p>
+    </div>
+
+    <div class="d-block">
+        <input type="password" @bind="Password" />
+        <button class="btn btn-primary btn-sm" @onclick="GetHashedPasswordAsync">Hash Password</button>
+        <p>Password : @Password </p>
+        <p>Hashed Pass : @HashedPassword </p>
+        <p>Length : @GetHashedLength </p>
+    </div>
+
+    <div class="d-block">
+        <button class="btn btn-dark btn-sm" @onclick="GenerateAccessToken">Generate Access Token</button>
+        <p>Token : @AccessToken</p>
+    </div>
 }
 
 @code {
-    [Parameter]
-    public string AdminSettingsParameter { get; set; }
-
     [CascadingParameter]
     protected Task<AuthenticationState> AuthenticationState { get; set; }
     ClaimsPrincipal user;
@@ -22,5 +36,28 @@
         user = (await AuthenticationState).User;
 
         if (user.Identity.IsAuthenticated) IsUserAuthenticated = true;
+    }
+
+    /* ## Test Variables ## */
+    public string Salt { get; set; }
+    public string Password { get; set; }
+    public string HashedPassword { get; set; }
+    public string AccessToken { get; set; }
+    public int GetHashedLength { get; set; }
+
+    public async Task GetSaltAsync()
+    {
+        Salt = await SecurityService.GetNewSaltAsync();
+    }
+
+    public async Task GetHashedPasswordAsync()
+    {
+        HashedPassword = await SecurityService.HashPasswordAsync(Password, Salt);
+        GetHashedLength = HashedPassword.Length;
+    }
+
+    public async Task GenerateAccessToken()
+    {
+        AccessToken = await SecurityService.GenerateAccessTokenAsync(1);
     }
 }

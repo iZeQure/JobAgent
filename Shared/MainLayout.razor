@@ -1,12 +1,12 @@
-﻿@using System.Security.Claims 
-@using JobAgent.Data 
-
-@inherits LayoutComponentBase
+﻿@using System.Security.Claims
+@using JobAgent.Data
 
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<div class="sidebar overflow-auto">
+@inherits LayoutComponentBase
+
+<div class="sidebar overflow-auto" style="overflow-x: hidden !important">
     <NavMenu />
 </div>
 
@@ -16,18 +16,18 @@
             <Authorized>
                 <h3>Velkommen, @context.User.Identity.Name!</h3>
 
-                <div class="float-right ml-auto">
+                <div class="float-right ml-auto mr-1">
                     <button type="button" class="btn btn-danger btn-sm" @onclick="(() => LogOut())">Log ud</button>
                 </div>
             </Authorized>
             <NotAuthorized>
-                <a class="btn btn-info btn-sm" type="button" href="/login">Praktikkonsulent Log ind</a>
+                <a class="btn btn-info btn-sm ml-auto mr-1" type="button" href="/login">Praktikkonsulent Log ind</a>
             </NotAuthorized>
         </AuthorizeView>
     </div>
 
     <div class="content px-4">
-        <JobAgent.Components.ToastNotificationComponent></JobAgent.Components.ToastNotificationComponent>
+        <JobAgent.Components.ToastNotificationComponent />
 
         @Body
     </div>

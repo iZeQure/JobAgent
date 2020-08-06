@@ -1,31 +1,51 @@
 ﻿@attribute [Authorize]
 
 @using JobAgent.Services
+@using System.Security.Claims 
 
 @inject AdminService AdminService
 
-<div class="text-center">
-    <h3>Admin Panel</h3>
+<div id="adminMenu">
+    <div id="administrate">
+        <div class="title">
+            <span>Administrer</span>
+            <span class="menu-icons"><i class="fas fa-cogs"></i></span>
+        </div>
+
+        <div class="links">
+            <nav class="nav flex-column">
+                <a class="nav-link" href="/admin/jobadverts"><span class="menu-icons"><i class="fas fa-list-ul"></i></span>Stillingsopslag</a>
+                <a class="nav-link" href="/admin/companies&contracts"><span class="menu-icons"><i class="fas fa-building"></i></span>Virksomheder &amp; Kontrakter</a>
+            </nav>
+        </div>
+    </div>
+
+    <div id="user">
+        <div class="title">
+            <span>Bruger Oplysninger</span>
+            <span class="menu-icons"><i class="fas fa-user-cog"></i></span>
+        </div>
+
+        <div class="links">
+            <nav class="nav flex-column">
+                <a class="nav-link" href="/admin/account/myprofile"><span class="menu-icons"><i class="fas fa-user-edit"></i></span>Min Bruger</a>
+                <a></a>
+            </nav>
+        </div>
+    </div>
 </div>
 
-@if (AdminMenus.Any() || AdminMenus != null)
-{
-    @for (int i = 0; i < AdminMenus.Count; i++)
-    {
-        <div class="py-1 px-2">
-            <a class="btn btn-link btn-sm text-white text-wrap text-left" href="/admin/@AdminMenus[i]">
-                @AdminMenus[i]
-            </a>
-        </div>
-    }
-}
-
 @code {
-    // Store menu
-    List<string> AdminMenus { get; set; }
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthenticationState { get; set; }
+    ClaimsPrincipal user;
+
+    bool IsUserAuthenticated;
 
     protected override async Task OnInitializedAsync()
     {
-        AdminMenus = await AdminService.GetAdminMenuAsync();
+        user = (await AuthenticationState).User;
+
+        if (user.Identity.IsAuthenticated) IsUserAuthenticated = true;
     }
 }
