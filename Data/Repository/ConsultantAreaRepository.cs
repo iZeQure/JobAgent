@@ -61,13 +61,16 @@ namespace JobAgent.Data.Repository
                 // Read data.
                 while (reader.Read())
                 {
-                    // Add dataset to the temporary list.
-                    tempConsultantAreas.Add(new ConsultantArea()
+                    ConsultantArea consultantArea = new ConsultantArea
                     {
                         Id = reader.GetInt32(0),
-                        Name = reader.GetString(1),
-                        Description = reader.GetString(2)
-                    });
+                        Name = reader.GetString(1)
+                    };
+
+                    if (!DataReaderExtensions.IsDBNull(reader, "Description")) consultantArea.Description = reader.GetString(2);
+
+                    // Add dataset to the temporary list.
+                    tempConsultantAreas.Add(consultantArea);
                 }
             }
 

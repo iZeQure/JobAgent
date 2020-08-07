@@ -1,10 +1,5 @@
 ﻿@attribute [Authorize]
 
-@using JobAgent.Services
-@using System.Security.Claims 
-
-@inject AdminService AdminService
-
 <div id="adminMenu">
     <div id="administrate">
         <div class="title">
@@ -29,23 +24,12 @@
         <div class="links">
             <nav class="nav flex-column">
                 <a class="nav-link" href="/admin/account/myprofile"><span class="menu-icons"><i class="fas fa-user-edit"></i></span>Min Bruger</a>
-                <a></a>
+                <a class="nav-link" href="/admin/account/changepassword"><span class="menu-icons"><i class="fas fa-user-lock"></i></span>Skift Adgangskode</a>
             </nav>
         </div>
     </div>
 </div>
 
 @code {
-    [CascadingParameter]
-    protected Task<AuthenticationState> AuthenticationState { get; set; }
-    ClaimsPrincipal user;
 
-    bool IsUserAuthenticated;
-
-    protected override async Task OnInitializedAsync()
-    {
-        user = (await AuthenticationState).User;
-
-        if (user.Identity.IsAuthenticated) IsUserAuthenticated = true;
-    }
 }

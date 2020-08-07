@@ -72,6 +72,7 @@ namespace JobAgent.Data
             {
                 claimsIdentity = new ClaimsIdentity(new[]
                                 {
+                                    new Claim("UserId", $"{user.Id}"),
                                     new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
                                     new Claim(ClaimTypes.Email, user.Email),
                                     new Claim(ClaimTypes.Role, user.ConsultantArea.Name)

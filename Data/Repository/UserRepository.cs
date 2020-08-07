@@ -107,12 +107,14 @@ namespace JobAgent.Data.Repository
                         ConsultantArea = new ConsultantArea()
                         {
                             Id = reader.GetInt32("ConsultantAreaId"),
-                            Name = reader.GetString("ConsultantAreaName")
+                            Name = reader.GetString("ConsultantAreaName"),
+                            Description = ""
                         },
                         Location = new Location()
                         {
                             Id = reader.GetInt32("LocationId"),
-                            Name = reader.GetString("LocationName")
+                            Name = reader.GetString("LocationName"), 
+                            Description = ""
                         }
                     };
                 }

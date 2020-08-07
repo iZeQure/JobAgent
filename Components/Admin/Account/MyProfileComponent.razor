@@ -1,0 +1,131 @@
+﻿@page "/admin/account/myprofile"
+
+@using System.Security.Claims
+@using JobAgent.Data
+@using JobAgent.Services
+
+@attribute [Authorize]
+
+@inject AdminService AdminService
+
+@if (user != null)
+{
+    @if (AuthorizationMessage != "" && AuthorizationMessage != null)
+    {
+        <BSAlert Color="Color.Danger">@AuthorizationMessage</BSAlert>
+    }
+
+    <EditForm Model="user" OnValidSubmit="@ChangeUserInformationAsync">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <label for="inputEmail" class="admin-label">Email Adresse :</label>
+                    <input id="inputEmail" type="email" class="form-control" placeholder="Email adresse" @bind-value="user.Email" />
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col">
+                    <label for="inputFirstName" class="admin-label">Fornavn :</label>
+                    <input id="inputFirstName" type="text" class="form-control" placeholder="Fornavn" @bind-value="user.FirstName" />
+                </div>
+
+                <div class="col">
+                    <label for="inputLastName" class="admin-label">Efternavn :</label>
+                    <input id="inputLastName" type="text" class="form-control" placeholder="Efternavn" @bind-value="user.LastName" />
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col">
+                    <label for="inputConsultantArea" class="admin-label">Konsulent Område :</label>
+                    <select id="inputConsultantArea" class="form-control">
+                        @if (consultantAreas != null)
+                        {
+                            @for (int i = 0; i < consultantAreas.Count; i++)
+                            {
+                                @if (consultantAreas[i].Id == user.ConsultantArea.Id)
+                                {
+                                    <option selected value="@user.ConsultantArea.Id">@user.ConsultantArea.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@consultantAreas[i].Id">@consultantAreas[i].Name</option>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <option>Blev ikke fundet nogen konsulent områder</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col">
+                    <label for="inputLocation" class="admin-label">Lokation :</label>
+                    <select id="inputLocation" class="form-control">
+                        @if (locations != null)
+                        {
+                            @for (int i = 0; i < locations.Count; i++)
+                            {
+                                @if (locations[i].Id == user.Location.Id)
+                                {
+                                    <option selected value="@user.Location.Id">@user.Location.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@locations[i].Id">@locations[i].Name</option>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <option>Blev ikke fundet nogen lokationer</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <hr />
+            <button type="submit" class="btn btn-info float-right ml-auto mt-5">Gem bruger oplysninger</button>
+        </div>
+
+    </EditForm>
+}
+
+@code {
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthenticationState { get; set; }
+
+    string AuthorizationMessage { get; set; }
+
+    private List<ConsultantArea> consultantAreas = new List<ConsultantArea>();
+    private List<Location> locations = new List<Location>();
+
+    private User user = new User()
+    {
+        ConsultantArea = new ConsultantArea(),
+        Location = new Location()
+    };
+    private ClaimsPrincipal claimUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        claimUser = (await AuthenticationState).User;
+
+        foreach (Claim item in claimUser.Claims)
+        {
+            if (item.Type == ClaimTypes.Email) user.Email = item.Value;
+            if (item.ValueType == "UserId") user.Id = int.Parse(item.Value);
+        }
+        user = await AdminService.GetUserByEmail(user.Email);
+        consultantAreas = await AdminService.GetAllConsultantAreas();
+        locations = await AdminService.GetAllLocations();
+    }
+
+    private async Task<bool> ChangeUserInformationAsync()
+    {
+        AuthorizationMessage = "Funktion er ikke implementeret i denne version.";
+
+        return await Task.FromResult(false);
+    }
+}

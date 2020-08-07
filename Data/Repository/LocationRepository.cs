@@ -61,13 +61,16 @@ namespace JobAgent.Data.Repository
                 // Read the data.
                 while (reader.Read())
                 {
-                    // Store data in the temporary list.
-                    tempLocations.Add(new Location()
+                    Location location = new Location
                     {
                         Id = reader.GetInt32(0),
-                        Name = reader.GetString(1),
-                        Description = reader.GetString(2)
-                    });
+                        Name = reader.GetString(1)
+                    };
+
+                    if (!DataReaderExtensions.IsDBNull(reader, "Description")) location.Description = reader.GetString(2);
+
+                    // Store data in the temporary list.
+                    tempLocations.Add(location);
                 }
             }
 

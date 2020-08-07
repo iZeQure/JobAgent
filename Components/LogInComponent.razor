@@ -12,7 +12,7 @@
 @inject ILocalStorageService localStorageService
 @inject IUserService userService
 @* Login Form *@
-<EditForm Model="user" OnValidSubmit="@ValidateUserAsync">
+<EditForm Model="userModel" OnValidSubmit="@ValidateUserAsync">
 
     @if (LoginMessage != "" && LoginMessage != null)
     {
@@ -24,11 +24,11 @@
 
     <BSFormGroup>
         <BSLabel For="inputEmail1">Email Adresse</BSLabel>
-        <BSInput Id="inputEmail1" InputType="InputType.Email" PlaceHolder="Indtast email adresse.." @bind-Value="user.Email" />
+        <BSInput Id="inputEmail1" InputType="InputType.Email" PlaceHolder="Indtast email adresse.." @bind-Value="userModel.Email" />
     </BSFormGroup>
     <BSFormGroup>
         <BSLabel For="inputPassword">Adgangskode</BSLabel>
-        <BSInput Id="inputPassword" InputType="InputType.Password" Placeholder="Indtast adgangskode.." @bind-Value="user.Password" />
+        <BSInput Id="inputPassword" InputType="InputType.Password" Placeholder="Indtast adgangskode.." @bind-Value="userModel.Password" />
     </BSFormGroup>
     <BSButton Color="Color.Info" ButtonType="ButtonType.Submit" Class="btn-block mr-2" IsDisabled="@IsProcessing">Log ind</BSButton>
 
@@ -41,6 +41,8 @@
     public string LoginMessage { get; set; }
 
     public bool IsProcessing { get; set; } = false;
+
+    public LogInModel userModel = new LogInModel();
 
     private User user;
     private ClaimsPrincipal claimsPrincipal;
@@ -61,6 +63,9 @@
     {
         IsProcessing = true;
 
+        user.Email = userModel.Email;
+        user.Password = userModel.Password;
+
         user = await userService.LoginAsync(user);
 
         if (user.IsAuthenticatedByServer)
@@ -72,12 +77,12 @@
             }
             else
             {
-                LoginMessage = "Forkert email eller adgangskode";
+                LoginMessage = "Forkert email eller adgangskode.";
             }
         }
         else
         {
-            LoginMessage = "Noget gik galt, prøv igen senere..";
+            LoginMessage = "Forkert email eller adgangskode.";
         }
 
         return await Task.FromResult(IsProcessing = false);
