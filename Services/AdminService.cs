@@ -1,6 +1,7 @@
 ﻿using JobAgent.Data;
 using JobAgent.Data.Repository;
 using JobAgent.Data.Repository.Interface;
+using JobAgent.Data.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,30 +14,45 @@ namespace JobAgent.Services
     {
         public Task<User> GetUserByEmail(string userMail)
         {
-            IUserRepository userRepository = new UserRepository();
+            IRepository<User> userRepository = new UserRepository();
 
-            return Task.FromResult(userRepository.GetUserByEmail(userMail));
+            return Task.FromResult(((IUserRepository)userRepository).GetUserByEmail(userMail));
         }
 
         public Task<List<ConsultantArea>> GetAllConsultantAreas()
         {
-            IConsultantAreaRepository consultantAreaRepository = new ConsultantAreaRepository();
+            IRepository<ConsultantArea> consultantAreaRepository = new ConsultantAreaRepository();
 
             return Task.FromResult(consultantAreaRepository.GetAll().ToList());
         }
 
         public Task<List<Location>> GetAllLocations()
         {
-            ILocationRepository locationRepository = new LocationRepository();
+            IRepository<Location> locationRepository = new LocationRepository();
 
             return Task.FromResult(locationRepository.GetAll().ToList());
         }
 
-        public void UpdateUserInformation(User user)
+        public Task<bool> UpdateUserInformation(User user)
         {
-            IUserRepository userRepository = new UserRepository();
+            IRepository<User> repository = new UserRepository();
 
-            userRepository.Update(user);
+            repository.Update(user);
+
+            return Task.FromResult(true);
+        }
+
+        public async void UpdateUserPassword(User auth)
+        {
+            IRepository<User> repository = new UserRepository();
+            SecurityService securityService = new SecurityService();
+
+            string userSalt = ((IUserRepository)repository).GetUserSaltByEmail(auth.Email);
+            var hashPassword = await Task.FromResult(securityService.HashPasswordAsync(auth.Password, userSalt));
+
+            auth.Password = hashPassword.Result;
+
+            ((IUserRepository)repository).UpdateUserPassword(auth);
         }
     }
 }

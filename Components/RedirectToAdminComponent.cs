@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JobAgent.Components
 {
-    public class RedirectToLoginComponent : ComponentBase
+    public class RedirectToAdminComponent : ComponentBase
     {
         [Inject]
         protected NavigationManager NavigationManager { get; set; }

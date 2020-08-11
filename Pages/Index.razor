@@ -1,5 +1,6 @@
 ﻿@page "/"
 
+@using System.Security.Claims
 @using JobAgent.Services
 
 @inject SecurityService SecurityService
@@ -22,19 +23,37 @@
             }
 </style>
 
-<article class="text-wrap">
-    <h1>Job Agenten er under udvikling!</h1>
-    <div>
-        <p>
-            Beklager ulejliheden, men vi udfører stadig operationer på hjemmesiden. Der er stadig mangel på funktionalitet,
-            hvis du har brug for det, kan du altid
-            <a href="#">Kontakte Os</a>.
-            Hjemmesiden opdateres regelmæssigt.
-        </p>
-        <p>&mdash; The Team</p>        
-    </div>
-</article>
+@if (IsUserAuthenticated)
+{
+    <JobAgent.Components.RedirectToAdminComponent/>
+}
+else
+{
+    <article class="text-wrap">
+        <h1>Job Agenten er under udvikling!</h1>
+        <div>
+            <p>
+                Beklager ulejliheden, men vi udfører stadig operationer på hjemmesiden. Der er stadig mangel på funktionalitet,
+                hvis du har brug for det, kan du altid
+                <a href="#">Kontakte Os</a>.
+                Hjemmesiden opdateres regelmæssigt.
+            </p>
+            <p>&mdash; The Team</p>
+        </div>
+    </article>
+}
 
 @code {
-    
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthenticationState { get; set; }
+    ClaimsPrincipal user;
+
+    bool IsUserAuthenticated;
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = (await AuthenticationState).User;
+
+        if (user.Identity.IsAuthenticated) IsUserAuthenticated = true;
+    }
 } 

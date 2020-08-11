@@ -266,7 +266,25 @@ namespace JobAgent.Data.Repository
 
         public void Update(User update)
         {
-            throw new NotImplementedException();
+            // Open connection to database.
+            Database.Instance.OpenConnection();
+
+            // Initialzie command obj.
+            using SqlCommand cmd = new SqlCommand("UpdateUser", Database.Instance.SqlConnection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            // Define input parameters.
+            cmd.Parameters.AddWithValue("UserId", update.Id).SqlDbType = SqlDbType.Int;
+            cmd.Parameters.AddWithValue("NewFirstName", update.FirstName).SqlDbType = SqlDbType.VarChar;
+            cmd.Parameters.AddWithValue("NewLastName", update.LastName).SqlDbType = SqlDbType.VarChar;
+            cmd.Parameters.AddWithValue("NewEmail", update.Email).SqlDbType = SqlDbType.VarChar;
+            cmd.Parameters.AddWithValue("NewConsultantAreaId", update.ConsultantArea.Id).SqlDbType = SqlDbType.Int;
+            cmd.Parameters.AddWithValue("NewLocationId", update.Location.Id).SqlDbType = SqlDbType.Int;
+
+            // Exectute command, catch return value.
+            int returnValue = cmd.ExecuteNonQuery();
         }
 
         /// <summary>
@@ -334,6 +352,25 @@ namespace JobAgent.Data.Repository
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+        }
+
+        public void UpdateUserPassword(User authorization)
+        {
+            // Open connection to database.
+            Database.Instance.OpenConnection();
+
+            // Initialize command obj.
+            using SqlCommand cmd = new SqlCommand("UpdateUserPassword", Database.Instance.SqlConnection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            // Define input parameters.
+            cmd.Parameters.AddWithValue("UserEmail", authorization.Email);
+            cmd.Parameters.AddWithValue("UserSecret", authorization.Password);
+
+            // Execute cmd.
+            cmd.ExecuteNonQuery();
         }
     }
 }

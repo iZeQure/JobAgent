@@ -1,4 +1,5 @@
 ﻿@page "/admin"
+@using System.Threading
 @using System.Security.Claims
 @inject JobAgent.Services.SecurityService SecurityService
 @attribute [Authorize]
@@ -22,6 +23,10 @@
         <button class="btn btn-dark btn-sm" @onclick="GenerateAccessToken">Generate Access Token</button>
         <p>Token : @AccessToken</p>
     </div>
+
+    <h1>@Count</h1>
+
+    <button @onclick="StartCountdown">Start Countdown</button>
 }
 
 @code {
@@ -59,5 +64,22 @@
     public async Task GenerateAccessToken()
     {
         AccessToken = await SecurityService.GenerateAccessTokenAsync(1);
+    }
+
+    private int Count { get; set; } = 10;
+
+    void StartCountdown()
+    {
+        var timer = new Timer(new TimerCallback(_ =>
+        {
+            if (Count <= 0) return;
+            Count--;
+
+        // Note that the following line is necessary because otherwise
+        // Blazor would not recognize the state change and not refresh the UI
+        InvokeAsync(
+                StateHasChanged
+                );
+        }), null, 1000, 1000);
     }
 }

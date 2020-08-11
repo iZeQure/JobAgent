@@ -5,45 +5,68 @@
 
 @if (JobCategories.Any() || JobCategories != null)
 {
-    @for (int i = 0; i < JobCategories.Count; i++)
+    if (JobCategories.Count != 0)
     {
-        @if (JobCategories[i].JobAdvertCategorySpecializations != null)
+        @for (int i = 0; i < JobCategories.Count; i++)
         {
-            <div class="dropdown py-1 px-2">
-                <a id="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu" class="dropdown-toggle btn btn-link btn-sm @MenuColor text-wrap text-left" href="#@RemoveWhitespace(JobCategories[i].Name)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    @JobCategories[i].Name
-                </a>
+            @if (JobCategories[i].JobAdvertCategorySpecializations != null)
+            {
+                <div class="dropdown py-1 px-2">
+                    <a id="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu" class="dropdown-toggle btn btn-link btn-sm @MenuColor text-wrap text-left" href="#@RemoveWhitespace(JobCategories[i].Name)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        @JobCategories[i].Name
+                    </a>
 
-                <div class="dropdown-menu" aria-labelledby="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu">
-                    @if (JobCategories[i].JobAdvertCategorySpecializations.Count > 1)
-                    {
-                        <h6 class="dropdown-header">Uddannelses Specialer</h6>
-                    }
-                    else
-                    {
-                        <h6 class="dropdown-header">Uddannelses Speciale</h6>
-                    }
+                    <div class="dropdown-menu" aria-labelledby="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu">
+                        @if (JobCategories[i].JobAdvertCategorySpecializations.Count > 1)
+                        {
+                            <h6 class="dropdown-header">Uddannelses Specialer</h6>
+                        }
+                        else
+                        {
+                            <h6 class="dropdown-header">Uddannelses Speciale</h6>
+                        }
 
-                    <div class="dropdown-divider"></div>
+                        <div class="dropdown-divider"></div>
 
-                    @for (int j = 0; j < JobCategories[i].JobAdvertCategorySpecializations.Count; j++)
-                    {
-                        <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].JobAdvertCategorySpecializations[j].Name">
-                            @JobCategories[i].JobAdvertCategorySpecializations[j].Name
-                        </a>
-                    }
+                        @for (int j = 0; j < JobCategories[i].JobAdvertCategorySpecializations.Count; j++)
+                        {
+                            <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].JobAdvertCategorySpecializations[j].Name">
+                                @JobCategories[i].JobAdvertCategorySpecializations[j].Name
+                            </a>
+                        }
+                    </div>
                 </div>
-            </div>
-        }
-        else
-        {
-            <div class="py-1 px-2">
-                <a class="btn btn-link btn-sm @MenuColor text-wrap text-left" href="/job/@JobCategories[i].Name">
-                    @JobCategories[i].Name
-                </a>
-            </div>
+            }
+            else
+            {
+                <div class="py-1 px-2">
+                    <a class="btn btn-link btn-sm @MenuColor text-wrap text-left" href="/job/@JobCategories[i].Name">
+                        @JobCategories[i].Name
+                    </a>
+                </div>
+            }
         }
     }
+    else
+    {
+        <div class="container mt-2">
+            <div class="alert alert-danger">
+                <p>
+                    @SystemMessage
+                </p>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="container mt-2">
+        <div class="alert alert-danger">
+            <p>
+                @SystemMessage
+            </p>
+        </div>
+    </div>
 }
 
 @code {
@@ -52,9 +75,20 @@
 
     public string MenuColor { get; set; } = "text-info";
 
+    public string SystemMessage { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        if (JobService.GetJobMenuAsync() != null) JobCategories = await JobService.GetJobMenuAsync();
+        try
+        {
+            if (JobService.GetJobMenuAsync() != null) JobCategories = await JobService.GetJobMenuAsync();
+
+            if (JobCategories.Count == 0) SystemMessage = "Fandt ikke nogen kategorier..";
+        }
+        catch (Exception)
+        {
+            SystemMessage = "Noget fik galt, prøv igen senere.";
+        }
     }
 
     protected string RemoveWhitespace(string input)
@@ -63,5 +97,5 @@
         .Where(c => !Char.IsWhiteSpace(c))
         .ToArray());
     }
-    // End Testing    
+    // End Testing
 }

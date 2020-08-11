@@ -16,5 +16,11 @@ namespace JobAgent.Data.Repository.Interface
         string GetUserSaltByEmail(string email);
         RefreshTokenModel GenerateRefreshToken();
         string GenerateAccessToken(int id);
+
+        /// <summary>
+        /// Update users password.
+        /// </summary>
+        /// <param name="authorization">Used to identify user with new password.</param>
+        void UpdateUserPassword(User authorization);
     }
 }

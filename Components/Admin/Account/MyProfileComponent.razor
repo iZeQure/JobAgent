@@ -1,5 +1,6 @@
 ﻿@page "/admin/account/myprofile"
 
+@using System.Threading
 @using System.Security.Claims
 @using JobAgent.Data
 @using JobAgent.Services
@@ -10,12 +11,25 @@
 
 @if (user != null)
 {
-    @if (AuthorizationMessage != "" && AuthorizationMessage != null)
-    {
-        <BSAlert Color="Color.Danger">@AuthorizationMessage</BSAlert>
-    }
+    <div class="container">
+        @if (AuthorizationMessage != String.Empty && AuthorizationMessage != null)
+        {
+            <div class="alert alert-info">
+                <div class="d-flex align-items-center">
 
-    <EditForm Model="user" OnValidSubmit="@ChangeUserInformationAsync">
+                    <span>@AuthorizationMessage</span>
+
+                    @if (!IsSuccess)
+                    {
+                        <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
+                    }
+
+                </div>
+            </div>
+        }
+    </div>
+
+    <EditForm Model="user" OnValidSubmit="@OnValidSubmit_ChangeUserInformation">
         <div class="container">
             <div class="row">
                 <div class="col">
@@ -86,7 +100,7 @@
                 </div>
             </div>
             <hr />
-            <button type="submit" class="btn btn-info float-right ml-auto mt-5">Gem bruger oplysninger</button>
+            <button type="submit" class="btn btn-info float-right ml-auto mt-5" disabled="@IsProcessing">Gem bruger oplysninger</button>
         </div>
 
     </EditForm>
@@ -96,7 +110,10 @@
     [CascadingParameter]
     protected Task<AuthenticationState> AuthenticationState { get; set; }
 
-    string AuthorizationMessage { get; set; }
+    private int Count { get; set; } = 10;
+    private bool IsSuccess { get; set; } = false;
+    private bool IsProcessing { get; set; } = false;
+    string AuthorizationMessage { get; set; } = String.Empty;
 
     private List<ConsultantArea> consultantAreas = new List<ConsultantArea>();
     private List<Location> locations = new List<Location>();
@@ -122,10 +139,28 @@
         locations = await AdminService.GetAllLocations();
     }
 
-    private async Task<bool> ChangeUserInformationAsync()
+    private void OnValidSubmit_ChangeUserInformation()
     {
-        AuthorizationMessage = "Funktion er ikke implementeret i denne version.";
+        Count = 10;
 
-        return await Task.FromResult(false);
+        while (Count != 0)
+        {
+            IsSuccess = false;
+            IsProcessing = true;
+            AuthorizationMessage = "Vent venligst..";
+
+            Count--;
+
+            if (Count == 0)
+            {
+                AdminService.UpdateUserInformation(user);
+                IsSuccess = true;
+                IsProcessing = false;
+
+                AuthorizationMessage = "Bruger oplsyninger blev opdateret!";
+            }
+        }
+
+        AuthorizationMessage = String.Empty;
     }
 }
