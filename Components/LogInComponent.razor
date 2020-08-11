@@ -1,7 +1,6 @@
 ﻿@page "/login"
 
 @using System.Security.Claims
-@using Blazored.LocalStorage
 @using JobAgent.Models
 @using JobAgent.Data
 @using JobAgent.Data.Interfaces
@@ -9,7 +8,6 @@
 @*@inject AuthenticationStateProvider authenticationStateProvider*@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navigationManager
-@inject ILocalStorageService localStorageService
 @inject IUserService userService
 @* Login Form *@
 <EditForm Model="userModel" OnValidSubmit="@ValidateUserAsync">
@@ -55,7 +53,8 @@
 
         if (claimsPrincipal.Identity.IsAuthenticated)
         {
-            navigationManager.NavigateTo("admin");
+            await Task.FromResult(PageMetaModel.Instance.Title = $"Velkommen, {user.FirstName} {user.LastName}");
+            navigationManager.NavigateTo("admin", true);
         }
     }
 
@@ -72,8 +71,9 @@
         {
             if (user.Email != null)
             {
+                await Task.FromResult(PageMetaModel.Instance.Title = $"Velkommen, {user.FirstName} {user.LastName}");
                 await ((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAuthenticated(user);
-                navigationManager.NavigateTo("/admin");
+                navigationManager.NavigateTo("/admin", true);
             }
             else
             {

@@ -2,8 +2,10 @@
 
 @using System.Security.Claims
 @using JobAgent.Services
+@using JobAgent.Models
 
 @inject SecurityService SecurityService
+@inject IJSRuntime JSRunTime
 
 <style>
     article {
@@ -25,7 +27,7 @@
 
 @if (IsUserAuthenticated)
 {
-    <JobAgent.Components.RedirectToAdminComponent/>
+    <JobAgent.Components.RedirectToAdminComponent />
 }
 else
 {
@@ -55,5 +57,10 @@ else
         user = (await AuthenticationState).User;
 
         if (user.Identity.IsAuthenticated) IsUserAuthenticated = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Task.FromResult(PageMetaModel.Instance.Title = "Under udvikling");
     }
 } 

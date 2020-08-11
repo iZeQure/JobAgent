@@ -1,5 +1,6 @@
 ﻿@using System.Security.Claims
 @using JobAgent.Data
+@using JobAgent.Models
 
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -36,7 +37,8 @@
 @code {
     public async Task LogOut()
     {
+        PageMetaModel.Instance.Title = "Du er nu logget ud";
         await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsLoggedOut();
-        NavigationManager.NavigateTo("");
+        NavigationManager.NavigateTo("", true);
     }
 }

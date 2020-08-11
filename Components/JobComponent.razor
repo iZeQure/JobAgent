@@ -2,7 +2,9 @@
 
 @using JobAgent.Data
 @using JobAgent.Services
+@using JobAgent.Models
 @inject JobService JobService
+@inject NavigationManager NavigationManager
 
 @if (jobAdverts == null || !jobAdverts.Any())
 {
@@ -85,6 +87,13 @@ else
     protected override async Task OnParametersSetAsync()
     {
         jobAdverts = await JobService.GetJobAdvertsAsync(JobAdvertCategoryName);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        jobAdverts = await JobService.GetJobAdvertsAsync(JobAdvertCategoryName);
+
+        await Task.FromResult(jobAdverts);
     }
 
     void OnJobPostDetail(int id)

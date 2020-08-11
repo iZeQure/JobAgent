@@ -1,3 +1,3 @@
-$(document).ready(function () {
-    console.info("Successfully Init");
-});
+function SetMetaTitle(title) {
+    window.document.title = title;
+};

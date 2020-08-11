@@ -12,7 +12,7 @@
             @if (JobCategories[i].JobAdvertCategorySpecializations != null)
             {
                 <div class="dropdown py-1 px-2">
-                    <a id="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu" class="dropdown-toggle btn btn-link btn-sm @MenuColor text-wrap text-left" href="#@RemoveWhitespace(JobCategories[i].Name)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a id="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu" href="#/job/@(RemoveWhitespace( JobCategories[i].Name ))" class="dropdown-toggle btn btn-link btn-sm @MenuColor text-wrap text-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         @JobCategories[i].Name
                     </a>
 
