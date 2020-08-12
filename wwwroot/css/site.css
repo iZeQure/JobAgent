@@ -21,6 +21,21 @@ app {
     align-items: center;
 }
 
+.welcome-message {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+    .welcome-message p {
+        font-size: 1.5vh;
+        display: inline-flex;
+        margin: 0;
+        padding: 0;
+    }
+        .welcome-message p.smaller {
+            font-size: smaller;
+        }
+
 .main {
     flex: 1;
 }
