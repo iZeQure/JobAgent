@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace JobAgent.Components
+namespace JobAgent.Components.Redirect
 {
     public class RedirectToAdminComponent : ComponentBase
     {

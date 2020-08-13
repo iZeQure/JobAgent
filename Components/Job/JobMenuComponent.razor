@@ -12,7 +12,7 @@
             @if (JobCategories[i].JobAdvertCategorySpecializations != null)
             {
                 <div class="dropdown py-1 px-2">
-                    <a id="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu" href="#/job/@(RemoveWhitespace( JobCategories[i].Name ))" class="dropdown-toggle btn btn-link btn-sm @MenuColor text-wrap text-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a id="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu" class="dropdown-toggle btn btn-link btn-sm @MenuColor text-wrap text-left cursor-pointer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         @JobCategories[i].Name
                     </a>
 
@@ -30,7 +30,7 @@
 
                         @for (int j = 0; j < JobCategories[i].JobAdvertCategorySpecializations.Count; j++)
                         {
-                            <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].JobAdvertCategorySpecializations[j].Name">
+                            <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].JobAdvertCategorySpecializations[j].Id">
                                 @JobCategories[i].JobAdvertCategorySpecializations[j].Name
                             </a>
                         }
@@ -40,7 +40,7 @@
             else
             {
                 <div class="py-1 px-2">
-                    <a class="btn btn-link btn-sm @MenuColor text-wrap text-left" href="/job/@JobCategories[i].Name">
+                    <a class="btn btn-link btn-sm @MenuColor text-wrap text-left" href="/job/@JobCategories[i].Id">
                         @JobCategories[i].Name
                     </a>
                 </div>
@@ -73,7 +73,7 @@ else
     // Testing
     List<JobAdvertCategory> JobCategories = new List<JobAdvertCategory>();
 
-    public string MenuColor { get; set; } = "text-info";
+    public string MenuColor { get; set; } = "text-light";
 
     public string SystemMessage { get; set; }
 

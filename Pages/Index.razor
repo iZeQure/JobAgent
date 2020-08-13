@@ -3,6 +3,7 @@
 @using System.Security.Claims
 @using JobAgent.Services
 @using JobAgent.Models
+@using JobAgent.Components.Redirect 
 
 @inject SecurityService SecurityService
 @inject IJSRuntime JSRunTime
@@ -27,7 +28,7 @@
 
 @if (IsUserAuthenticated)
 {
-    <JobAgent.Components.RedirectToAdminComponent />
+    <RedirectToAdminComponent />
 }
 else
 {

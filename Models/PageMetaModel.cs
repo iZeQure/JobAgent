@@ -14,6 +14,7 @@ namespace JobAgent.Models
 
         private static PageMetaModel instance = null;
         private static readonly object pageMetaModelLock = new object();
+
         private string title = "Forside";
 
         private PageMetaModel() { }

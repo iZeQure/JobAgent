@@ -19,12 +19,14 @@ namespace JobAgent.Services
             return Task.FromResult(jobMenu);
         }
 
-        public Task<List<JobAdvert>> GetJobAdvertsAsync(string categoryName)
+        public Task<List<JobAdvert>> GetJobAdvertsAsync(int jobAdvertId)
         {
-            List<JobAdvert> temp = new List<JobAdvert>();
+            IRepository<JobAdvert> repository = new JobAdvertRepository();
+
+            List<JobAdvert> temp = repository.GetAll().ToList();
 
             temp = (from j in temp
-                   where j.JobAdvertCategoryId.Name == categoryName
+                   where j.Id == jobAdvertId
                    select j).ToList();
 
             return Task.FromResult(temp);

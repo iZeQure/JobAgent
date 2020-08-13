@@ -1,6 +1,7 @@
 ﻿@using System.Security.Claims
 @using JobAgent.Data
 @using JobAgent.Models
+@using JobAgent.Components.Notification
 
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -37,7 +38,7 @@
     </div>
 
     <div class="content px-4">
-        <JobAgent.Components.ToastNotificationComponent />
+        <ToastNotificationComponent />
 
         @Body
     </div>

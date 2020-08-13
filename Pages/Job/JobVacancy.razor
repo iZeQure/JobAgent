@@ -1,0 +1,136 @@
+﻿@page "/job/{JobAdvertId:int}"
+
+@using JobAgent.Data
+@using JobAgent.Services
+@using JobAgent.Models
+@inject JobService JobService
+@inject NavigationManager NavigationManager
+
+@if (jobAdverts == null || !jobAdverts.Any())
+{
+    <p><em>Indlæser @JobAdvertId ...</em></p>
+
+    @if (!jobAdverts.Any())
+    {
+        <p><em>Ingen Jobs fundet indenfor @JobAdvertId kategori...</em></p>
+    }
+}
+else
+{
+    <div class="card-columns">
+        @foreach (var j in jobAdverts)
+        {
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@j.Title</h5>
+                    <p class="card-text">@j.JobDescription</p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <span style="display:none;">
+                                @(DateTimeToSubstract = j.JobRegisteredDate)
+                            </span>
+                            Stillingsopslag opdateret
+                            @if (GetTimeDifference.TotalSeconds >= 60 * 60)
+                            {
+                                <span>@Math.Round(GetTimeDifference.TotalHours) timer</span>
+                            }
+                            else if (GetTimeDifference.TotalSeconds >= 60)
+                            {
+                                <span>@Math.Round(GetTimeDifference.TotalMinutes) minutter</span>
+                            }
+                            else
+                            {
+                                <span>@Math.Round(GetTimeDifference.TotalSeconds) sekunder</span>
+                            }
+                            siden.
+                        </small>
+                    </p>
+                    <button @onclick="@(id => OnJobPostDetail(j.Id))" class="btn btn-info btn-sm d-block" type="button" data-toggle="modal" data-target="#jobPostingDetail">Se Detailjer</button>
+                </div>
+            </div>
+
+        }
+    </div>
+}
+
+@* Get detailed view for job advert. *@
+@if (DetailsExists)
+{
+    @* Job Detail Modal *@
+    <div class="modal fade" id="jobPostingDetail" tabindex="-1" role="dialog" aria-labelledby="jobPostingDetailLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="jobPostingDetailLabel">@jobAdvert.Title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+
+                </div>
+                <div class="modal-body">
+                    @jobAdvert.JobDescription
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Tilbage</button>
+                    <a class="btn btn-info text-light cursor-pointer">Søg Job Opslag</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int JobAdvertId { get; set; }
+
+    private bool DetailsExists { get; set; }
+
+    public DateTime DateTimeToSubstract { get; set; }
+
+    private TimeSpan GetTimeDifference
+    {
+        get
+        {
+            return DateTime.Now.Subtract(DateTimeToSubstract);
+        }
+    }
+
+    JobAdvert jobAdvert = new JobAdvert();
+
+    List<JobAdvert> jobAdverts = new List<JobAdvert>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        jobAdverts = await JobService.GetJobAdvertsAsync(JobAdvertId);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        jobAdverts = await JobService.GetJobAdvertsAsync(JobAdvertId);
+    }
+
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    jobAdverts = await JobService.GetJobAdvertsAsync(JobAdvertId);
+
+    //    await Task.FromResult(jobAdverts);
+    //}
+
+    void OnJobPostDetail(int id)
+    {
+        // Get details for job advert.
+
+        if (jobAdverts.Select(x => x.Id = id).Any())
+        {
+            DetailsExists = true;
+
+            jobAdvert = (from job in jobAdverts
+                         where job.Id == id
+                         select job).FirstOrDefault();
+        }
+        else
+        {
+            DetailsExists = false;
+        }
+    }
+}
