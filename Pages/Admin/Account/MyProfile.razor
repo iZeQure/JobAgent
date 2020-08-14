@@ -1,5 +1,6 @@
 ﻿@page "/admin/account/myprofile"
 
+@using System.Timers
 @using System.Threading
 @using System.Security.Claims
 @using JobAgent.Data
@@ -139,28 +140,22 @@
         locations = await AdminService.GetAllLocations();
     }
 
-    private void OnValidSubmit_ChangeUserInformation()
+    private async Task OnValidSubmit_ChangeUserInformation()
     {
-        Count = 10;
+        IsSuccess = false;
+        IsProcessing = true;
+        AuthorizationMessage = "Vent venligst..";
 
-        while (Count != 0)
+        await Task.Delay(TimeSpan.FromSeconds(5));
+
+        await InvokeAsync(() =>
         {
-            IsSuccess = false;
-            IsProcessing = true;
-            AuthorizationMessage = "Vent venligst..";
+            AdminService.UpdateUserInformation(user);
+            AuthorizationMessage = "Bruger oplsyninger blev opdateret!";
+            StateHasChanged();
+        });
 
-            Count--;
-
-            if (Count == 0)
-            {
-                AdminService.UpdateUserInformation(user);
-                IsSuccess = true;
-                IsProcessing = false;
-
-                AuthorizationMessage = "Bruger oplsyninger blev opdateret!";
-            }
-        }
-
-        AuthorizationMessage = String.Empty;
+        IsSuccess = true;
+        IsProcessing = false;
     }
 }
