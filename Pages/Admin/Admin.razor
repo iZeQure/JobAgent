@@ -2,10 +2,9 @@
 @using System.Security.Claims
 @using JobAgent.Models
 @inject JobAgent.Services.SecurityService SecurityService
+
 @attribute [Authorize]
 
-@if (IsUserAuthenticated)
-{
     <div class="d-inline-block">
         <button class="btn btn-primary btn-sm" @onclick="GetSaltAsync">Generate Salt</button>
         <p>User Salt : @Salt </p>
@@ -23,25 +22,8 @@
         <button class="btn btn-dark btn-sm" @onclick="GenerateAccessToken">Generate Access Token</button>
         <p>Token : @AccessToken</p>
     </div>
-}
 
 @code {
-    [CascadingParameter]
-    protected Task<AuthenticationState> AuthenticationState { get; set; }
-    ClaimsPrincipal user;
-
-    bool IsUserAuthenticated;
-
-    protected override async Task OnInitializedAsync()
-    {
-        user = (await AuthenticationState).User;
-
-        if (user.Identity.IsAuthenticated)
-        {
-            IsUserAuthenticated = true;            
-        }
-    }
-
     /* ## Test Variables ## */
     public string Salt { get; set; }
     public string Password { get; set; }

@@ -43,7 +43,7 @@ namespace JobAgent
             services.AddRazorPages();
             services.AddServerSideBlazor();
 
-            services.AddScoped<IUserService, UserManagerService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
             var jwtSection = Configuration.GetSection("JWTSettings");

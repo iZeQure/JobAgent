@@ -8,9 +8,11 @@
 
 @attribute [Authorize]
 
+@inject AuthenticationStateProvider AuthProvider
 @inject AdminService AdminService
+@inject NavigationManager NavigationManager
 
-@if (user != null)
+@if (User != null)
 {
     <div class="container">
         @if (AuthorizationMessage != String.Empty && AuthorizationMessage != null)
@@ -30,72 +32,58 @@
         }
     </div>
 
-    <EditForm Model="user" OnValidSubmit="@OnValidSubmit_ChangeUserInformation">
+    <EditForm Model="User" OnValidSubmit="@OnValidSubmit_ChangeUserInformation">
         <div class="container">
             <div class="row">
                 <div class="col">
                     <label for="inputEmail" class="admin-label">Email Adresse :</label>
-                    <input id="inputEmail" type="email" class="form-control" placeholder="Email adresse" @bind-value="user.Email" />
+                    <input id="inputEmail" type="email" class="form-control" placeholder="Email adresse" @bind-value="User.Email" />
                 </div>
             </div>
             <hr />
             <div class="row">
                 <div class="col">
                     <label for="inputFirstName" class="admin-label">Fornavn :</label>
-                    <input id="inputFirstName" type="text" class="form-control" placeholder="Fornavn" @bind-value="user.FirstName" />
+                    <input id="inputFirstName" type="text" class="form-control" placeholder="Fornavn" @bind-value="User.FirstName" />
                 </div>
 
                 <div class="col">
                     <label for="inputLastName" class="admin-label">Efternavn :</label>
-                    <input id="inputLastName" type="text" class="form-control" placeholder="Efternavn" @bind-value="user.LastName" />
+                    <input id="inputLastName" type="text" class="form-control" placeholder="Efternavn" @bind-value="User.LastName" />
                 </div>
             </div>
             <hr />
             <div class="row">
                 <div class="col">
                     <label for="inputConsultantArea" class="admin-label">Konsulent Område :</label>
-                    <select id="inputConsultantArea" class="form-control">
-                        @if (consultantAreas != null)
+                    <select class="form-control" @bind="User.ConsultantArea.Id">
+                        @foreach (ConsultantArea area in ConsultantAreas)
                         {
-                            @for (int i = 0; i < consultantAreas.Count; i++)
+                            @if (area.Id == User.ConsultantArea.Id)
                             {
-                                @if (consultantAreas[i].Id == user.ConsultantArea.Id)
-                                {
-                                    <option selected value="@user.ConsultantArea.Id">@user.ConsultantArea.Name</option>
-                                }
-                                else
-                                {
-                                    <option value="@consultantAreas[i].Id">@consultantAreas[i].Name</option>
-                                }
+                                <option value="@area.Id" selected>@area.Name</option>
                             }
-                        }
-                        else
-                        {
-                            <option>Blev ikke fundet nogen konsulent områder</option>
+                            else
+                            {
+                                <option value="@area.Id">@area.Name</option>
+                            }
                         }
                     </select>
                 </div>
 
                 <div class="col">
                     <label for="inputLocation" class="admin-label">Lokation :</label>
-                    <select id="inputLocation" class="form-control">
-                        @if (locations != null)
+                    <select class="form-control" @bind="User.Location.Id">
+                        @foreach (Location lctn in Locations)
                         {
-                            @for (int i = 0; i < locations.Count; i++)
+                            @if (lctn.Id == User.Location.Id)
                             {
-                                @if (locations[i].Id == user.Location.Id)
-                                {
-                                    <option selected value="@user.Location.Id">@user.Location.Name</option>
-                                }
-                                else
-                                {
-                                    <option value="@locations[i].Id">@locations[i].Name</option>
-                                }
+                                <option value="@lctn.Id" selected>@lctn.Name</option>
                             }
-                        }
-                        else
-                        {
-                            <option>Blev ikke fundet nogen lokationer</option>
+                            else
+                            {
+                                <option value="@lctn.Id">@lctn.Name</option>
+                            }
                         }
                     </select>
                 </div>
@@ -109,35 +97,37 @@
 
 @code {
     [CascadingParameter]
-    protected Task<AuthenticationState> AuthenticationState { get; set; }
+    protected Task<AuthenticationState> AuthState { get; set; }
 
-    private int Count { get; set; } = 10;
+    public List<ConsultantArea> ConsultantAreas { get; set; } = new List<ConsultantArea>();
+
+    public List<Location> Locations { get; set; } = new List<Location>();
+
+    public User User { get; set; } = new User() { ConsultantArea = new ConsultantArea(), Location = new Location() };
+
+    public string UserEmail { get; set; }
     private bool IsSuccess { get; set; } = false;
     private bool IsProcessing { get; set; } = false;
-    string AuthorizationMessage { get; set; } = String.Empty;
+    private string AuthorizationMessage { get; set; } = String.Empty;
 
-    private List<ConsultantArea> consultantAreas = new List<ConsultantArea>();
-    private List<Location> locations = new List<Location>();
-
-    private User user = new User()
-    {
-        ConsultantArea = new ConsultantArea(),
-        Location = new Location()
-    };
-    private ClaimsPrincipal claimUser;
+    public ClaimsPrincipal GetPrincipal { get; set; } = new ClaimsPrincipal();
 
     protected override async Task OnInitializedAsync()
     {
-        claimUser = (await AuthenticationState).User;
+        GetPrincipal = (await AuthState).User;
 
-        foreach (Claim item in claimUser.Claims)
+        foreach (Claim item in GetPrincipal.Claims)
         {
-            if (item.Type == ClaimTypes.Email) user.Email = item.Value;
-            if (item.ValueType == "UserId") user.Id = int.Parse(item.Value);
+            // Get session values, to store inside the user object.
+            if (item.Type == ClaimTypes.Email) UserEmail = item.Value;
         }
-        user = await AdminService.GetUserByEmail(user.Email);
-        consultantAreas = await AdminService.GetAllConsultantAreas();
-        locations = await AdminService.GetAllLocations();
+
+        // Get user data, from the existing session data.
+        User = await AdminService.GetUserByEmail(UserEmail);
+
+        // Get Consulent areas and locations.
+        ConsultantAreas = await AdminService.GetAllConsultantAreas();
+        Locations = await AdminService.GetAllLocations();
     }
 
     private async Task OnValidSubmit_ChangeUserInformation()
@@ -150,11 +140,12 @@
 
         await InvokeAsync(() =>
         {
-            AdminService.UpdateUserInformation(user);
+            AdminService.UpdateUserInformation(User);
             AuthorizationMessage = "Bruger oplsyninger blev opdateret!";
             StateHasChanged();
         });
 
+        NavigationManager.NavigateTo("/admin/account/myprofile", true);
         IsSuccess = true;
         IsProcessing = false;
     }

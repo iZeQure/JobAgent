@@ -53,8 +53,6 @@
         user = (await AuthenticationState).User;
 
         if (user.Identity.IsAuthenticated) AuthorityLink = "admin";
-
-        Console.WriteLine(AuthorityLink);
     }
 
     void MouseOverLogoAnimation()

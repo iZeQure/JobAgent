@@ -2,7 +2,6 @@
 
 @using System.Security.Claims
 @using JobAgent.Services
-@using JobAgent.Models
 @using JobAgent.Components.Redirect 
 
 @inject SecurityService SecurityService
@@ -26,7 +25,7 @@
             }
 </style>
 
-@if (IsUserAuthenticated)
+@if (GetPrincipal.Identity.IsAuthenticated)
 {
     <RedirectToAdminComponent />
 }
@@ -49,19 +48,11 @@ else
 @code {
     [CascadingParameter]
     protected Task<AuthenticationState> AuthenticationState { get; set; }
-    ClaimsPrincipal user;
 
-    bool IsUserAuthenticated;
+    ClaimsPrincipal GetPrincipal { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        user = (await AuthenticationState).User;
-
-        if (user.Identity.IsAuthenticated) IsUserAuthenticated = true;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await Task.FromResult(PageMetaModel.Instance.Title = "Under udvikling");
+        GetPrincipal = (await AuthenticationState).User;
     }
 } 

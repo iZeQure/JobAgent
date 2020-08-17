@@ -5,14 +5,13 @@
 @using JobAgent.Data
 @using JobAgent.Data.Interfaces
 
-@*@inject AuthenticationStateProvider authenticationStateProvider*@
-@inject AuthenticationStateProvider authenticationStateProvider
-@inject NavigationManager navigationManager
-@inject IUserService userService
-@* Login Form *@
-<EditForm Model="userModel" OnValidSubmit="@ValidateUserAsync">
+@inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager NavigationManager
 
-    @if (LoginMessage != "" && LoginMessage != null)
+@* Login Form *@
+<EditForm Model="UserLogInModel" OnValidSubmit="@ValidateUserAsync">
+
+    @if (LoginMessage != String.Empty)
     {
         <BSAlert Color="Color.Danger">@LoginMessage</BSAlert>
     }
@@ -22,11 +21,11 @@
 
     <BSFormGroup>
         <BSLabel For="inputEmail1">Email Adresse</BSLabel>
-        <BSInput Id="inputEmail1" InputType="InputType.Email" PlaceHolder="Indtast email adresse.." @bind-Value="userModel.Email" />
+        <BSInput Id="inputEmail1" InputType="InputType.Email" PlaceHolder="Indtast email adresse.." @bind-Value="UserLogInModel.Email" />
     </BSFormGroup>
     <BSFormGroup>
         <BSLabel For="inputPassword">Adgangskode</BSLabel>
-        <BSInput Id="inputPassword" InputType="InputType.Password" Placeholder="Indtast adgangskode.." @bind-Value="userModel.Password" />
+        <BSInput Id="inputPassword" InputType="InputType.Password" Placeholder="Indtast adgangskode.." @bind-Value="UserLogInModel.Password" />
     </BSFormGroup>
     <BSButton Color="Color.Info" ButtonType="ButtonType.Submit" Class="btn-block mr-2" IsDisabled="@IsProcessing">Log ind</BSButton>
 
@@ -34,27 +33,26 @@
 
 @code {
     [CascadingParameter]
-    private Task<AuthenticationState> AuthenticationState { get; set; }
+    protected Task<AuthenticationState> AuthenticationState { get; set; }
 
-    public string LoginMessage { get; set; }
+    public LogInModel UserLogInModel { get; set; } = new LogInModel();
+
+    public User User { get; set; } = new User();
+
+    private ClaimsPrincipal claimsPrincipal { get; set; }
+
+    public string LoginMessage { get; set; } = String.Empty;
 
     public bool IsProcessing { get; set; } = false;
 
-    public LogInModel userModel = new LogInModel();
-
-    private User user;
-    private ClaimsPrincipal claimsPrincipal;
-
     protected async override Task OnInitializedAsync()
     {
-        user = new User();
-
         claimsPrincipal = (await AuthenticationState).User;
 
         if (claimsPrincipal.Identity.IsAuthenticated)
         {
-            await Task.FromResult(PageMetaModel.Instance.Title = $"Velkommen, {user.FirstName} {user.LastName}");
-            navigationManager.NavigateTo("admin", true);
+            await Task.FromResult(PageMetaModel.Instance.Title = $"Velkommen, {User.FirstName} {User.LastName}");
+            NavigationManager.NavigateTo("/admin", true);
         }
     }
 
@@ -62,18 +60,19 @@
     {
         IsProcessing = true;
 
-        user.Email = userModel.Email;
-        user.Password = userModel.Password;
+        User.Email = UserLogInModel.Email;
+        User.Password = UserLogInModel.Password;
 
-        user = await userService.LoginAsync(user);
+        User = await ((CustomAuthenticationStateProvider)AuthProvider).UserSerivce.LoginAsync(User);
+        //User = await UserService.LoginAsync(User);
 
-        if (user.IsAuthenticatedByServer)
+        if (User.IsAuthenticatedByServer)
         {
-            if (user.Email != null)
+            if (User.Email != null)
             {
-                await Task.FromResult(PageMetaModel.Instance.Title = $"Velkommen, {user.FirstName} {user.LastName}");
-                await ((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAuthenticated(user);
-                navigationManager.NavigateTo("/admin", true);
+                await Task.FromResult(PageMetaModel.Instance.Title = $"Velkommen, {User.FirstName} {User.LastName}");
+                await ((CustomAuthenticationStateProvider)AuthProvider).MarkUserAuthenticated(User);
+                NavigationManager.NavigateTo("/admin", true);
             }
             else
             {

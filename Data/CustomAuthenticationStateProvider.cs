@@ -43,7 +43,6 @@ namespace JobAgent.Data
         public async Task MarkUserAuthenticated(User user)
         {
             await LocalStorageService.SetItemAsync("accessToken", user.AccessToken);
-            await LocalStorageService.SetItemAsync("refreshToken", user.RefreshToken);
 
             var identity = GetClaimsIdentity(user);
 
@@ -54,7 +53,6 @@ namespace JobAgent.Data
 
         public async Task MarkUserAsLoggedOut()
         {
-            await LocalStorageService.RemoveItemAsync("refreshToken");
             await LocalStorageService.RemoveItemAsync("accessToken");
 
             var identity = new ClaimsIdentity();
@@ -75,7 +73,8 @@ namespace JobAgent.Data
                                     new Claim("UserId", $"{user.Id}"),
                                     new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
                                     new Claim(ClaimTypes.Email, user.Email),
-                                    new Claim(ClaimTypes.Role, user.ConsultantArea.Name)
+                                    new Claim(ClaimTypes.Role, user.ConsultantArea.Name),
+                                    new Claim("LocationName", $"{user.Location.Name}")
                                 }, "serverauth_type");
             }
 

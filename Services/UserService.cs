@@ -2,29 +2,17 @@
 using JobAgent.Data.Interfaces;
 using JobAgent.Data.Repository;
 using JobAgent.Data.Repository.Interface;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Net.Http;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace JobAgent.Services
 {
-    public class UserManagerService : IUserService
+    public class UserService : IUserService
     {
         private IUserRepository UserRepository { get; }
         private SecurityService SecurityService { get; }
 
-        public UserManagerService()
+        public UserService()
         {
             UserRepository = new UserRepository();
             SecurityService = new SecurityService();

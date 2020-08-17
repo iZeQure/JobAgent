@@ -16,20 +16,29 @@
     <div class="top-row">
         <AuthorizeView>
             <Authorized>
-                <div class="welcome-message">
-                    <p>Velkommen, @context.User.Identity.Name!</p>
-                    @foreach (var item in context.User.Claims)
-                    {
-                        @if (item.Type == ClaimTypes.Role)
-                        {
-                                <p class="text-muted smaller">@item.Value</p>
-                        }
-                    }
-                </div>
+                @if (context.User.Identity.IsAuthenticated)
+                {
+                    <div class="welcome-message">
+                        <p>Velkommen, @context.User.Identity.Name!</p>
+                        <div class="d-flex">
+                            @foreach (var claim in context.User.Claims)
+                            {
+                                @if (claim.Type == ClaimTypes.Role)
+                                {
+                                    <p class="text-muted smaller pr-2">@claim.Value</p>
+                                }
+                                @if (claim.Type == "LocationName")
+                                {
+                                    <p class="text-muted smaller pr-2">@claim.Value</p>
+                                }
+                            }
+                        </div>
+                    </div>
 
-                <div class="float-right ml-auto mr-1">
-                    <button type="button" class="btn btn-danger btn-sm" @onclick="(() => LogOut())">Log ud</button>
-                </div>
+                    <div class="float-right ml-auto mr-1">
+                        <button type="button" class="btn btn-danger btn-sm" @onclick="(() => LogOut())">Log ud</button>
+                    </div>
+                }
             </Authorized>
             <NotAuthorized>
                 <a class="btn btn-info btn-sm ml-auto mr-1" type="button" href="/login">Praktikkonsulent Log ind</a>
