@@ -4,11 +4,11 @@
 @inject NavigationManager navigationManager
 
 <CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(Program).Assembly">
+    <Router AppAssembly="typeof(Program).Assembly">
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
-                    <RedirectToLoginComponent />
+                    <RedirectToHomeComponent />
                 </NotAuthorized>
             </AuthorizeRouteView>
         </Found>
@@ -27,3 +27,26 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+
+@*<Router AppAssembly="@typeof(Program).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    <RedirectToLoginComponent />
+                </NotAuthorized>
+            </AuthorizeRouteView>
+        </Found>
+        <NotFound>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <p>
+                        <b>404.</b>
+                        Det er en fejl.
+                    </p>
+
+                    <p>
+                        Den anmodede URL /error blev ikke fundet på denne server. <br />
+                        <span class="text-muted">Det er alt vi ved.</span>
+                    </p>
+                </LayoutView>
+        </NotFound>
+    </Router>*@

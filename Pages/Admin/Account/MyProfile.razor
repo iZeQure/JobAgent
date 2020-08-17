@@ -4,11 +4,12 @@
 @using System.Threading
 @using System.Security.Claims
 @using JobAgent.Data
+@using JobAgent.Data.Security
 @using JobAgent.Services
 
 @attribute [Authorize]
 
-@inject AuthenticationStateProvider AuthProvider
+@inject MyAuthStateProvider AuthProvider
 @inject AdminService AdminService
 @inject NavigationManager NavigationManager
 
@@ -103,7 +104,7 @@
 
     public List<Location> Locations { get; set; } = new List<Location>();
 
-    public User User { get; set; } = new User() { ConsultantArea = new ConsultantArea(), Location = new Location() };
+    public User User { get; set; } = new User();
 
     public string UserEmail { get; set; }
     private bool IsSuccess { get; set; } = false;
@@ -114,7 +115,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        GetPrincipal = (await AuthState).User;
+        GetPrincipal = (await AuthProvider.GetAuthenticationStateAsync()).User;
 
         foreach (Claim item in GetPrincipal.Claims)
         {

@@ -1,10 +1,10 @@
 ﻿@using System.Security.Claims
-@using JobAgent.Data
-@using JobAgent.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@using JobAgent.Data.Security
 @using JobAgent.Components.Notification
 
-@inject NavigationManager NavigationManager
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@*@inject NavigationManager NavigationManager*@
+@inject MyAuthStateProvider MyAuthStateProvider
 
 @inherits LayoutComponentBase
 
@@ -14,35 +14,60 @@
 
 <div class="main">
     <div class="top-row">
-        <AuthorizeView>
-            <Authorized>
-                @if (context.User.Identity.IsAuthenticated)
-                {
-                    <div class="welcome-message">
-                        <p>Velkommen, @context.User.Identity.Name!</p>
-                        <div class="d-flex">
-                            @foreach (var claim in context.User.Claims)
-                            {
-                                @if (claim.Type == ClaimTypes.Role)
-                                {
-                                    <p class="text-muted smaller pr-2">@claim.Value</p>
-                                }
-                                @if (claim.Type == "LocationName")
-                                {
-                                    <p class="text-muted smaller pr-2">@claim.Value</p>
-                                }
-                            }
-                        </div>
-                    </div>
 
-                    <div class="float-right ml-auto mr-1">
-                        <button type="button" class="btn btn-danger btn-sm" @onclick="(() => LogOut())">Log ud</button>
-                    </div>
-                }
-            </Authorized>
+        @*<div class="welcome-message">
+                <p>Velkommen, @context.User.Identity.Name!</p>
+                <div class="d-flex">
+                    @foreach (var claim in context.User.Claims)
+                    {
+                        @if (claim.Type == ClaimTypes.Role)
+                        {
+                            <p class="text-muted smaller pr-2">@claim.Value</p>
+                        }
+                        @if (claim.Type == "LocationName")
+                        {
+                            <p class="text-muted smaller pr-2">@claim.Value</p>
+                        }
+                    }
+                </div>
+            </div>
+
+            <div class="float-right ml-auto mr-1">
+                <button type="button" class="btn btn-danger btn-sm" @onclick="(() => LogOut(false))">Log ud</button>
+            </div>*@
+
+        <AuthorizeView>
             <NotAuthorized>
+
+                @*Not Authorized..*@
+
                 <a class="btn btn-info btn-sm ml-auto mr-1" type="button" href="/login">Praktikkonsulent Log ind</a>
             </NotAuthorized>
+            <Authorizing>
+                Authorizing..
+            </Authorizing>
+            <Authorized>
+                <div class="welcome-message">
+                    <p>Velkommen, @context.User.Identity.Name!</p>
+                    <div class="d-flex">
+                        @foreach (var claim in context.User.Claims)
+                        {
+                            @if (claim.Type == ClaimTypes.Role)
+                            {
+                                <p class="text-muted smaller pr-2">@claim.Value</p>
+                            }
+                            @if (claim.Type == "LocationName")
+                            {
+                                <p class="text-muted smaller pr-2">@claim.Value</p>
+                            }
+                        }
+                    </div>
+                </div>
+
+                <div class="float-right ml-auto mr-1">
+                    <button type="button" class="btn btn-danger btn-sm" @onclick="(() => LogOut())">Log ud</button>
+                </div>
+            </Authorized>
         </AuthorizeView>
     </div>
 
@@ -54,10 +79,29 @@
 </div>
 
 @code {
-    public async Task LogOut()
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationState { get; set; }
+
+    private async Task LogOut()
     {
-        PageMetaModel.Instance.Title = "Du er nu logget ud";
-        await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsLoggedOut();
-        NavigationManager.NavigateTo("", true);
+        await (MyAuthStateProvider.MarkUserAsLoggedOut());
     }
+
+    //private void LogOut(bool? isAuthenticated)
+    //{
+    //    if (isAuthenticated.HasValue)
+    //    {
+    //        PageMetaModel.Instance.Title = "Du er nu logget ud";
+    //        JobAgentAuthenticationStateProvider.IsAuthenticating = false;
+    //        JobAgentAuthenticationStateProvider.IsAuthenticated = isAuthenticated.Value;
+    //        MyAuthStateProvider.NotifyAuthenticationStateChanged();
+    //        NavigationManager.NavigateTo("");
+    //    }
+    //    else
+    //    {
+    //        JobAgentAuthenticationStateProvider.IsAuthenticating = true;
+    //    }
+
+    //    //await ((JobAgentAuthenticationStateProvider)MyAuthStateProvider).MarkUserAsLoggedOut();
+    //}
 }

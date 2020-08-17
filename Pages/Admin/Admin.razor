@@ -1,27 +1,36 @@
 ﻿@page "/admin"
-@using System.Security.Claims
-@using JobAgent.Models
-@inject JobAgent.Services.SecurityService SecurityService
+
+@using JobAgent.Services
+@using JobAgent.Components.Redirect
+
+@inject SecurityService SecurityService
 
 @attribute [Authorize]
 
-    <div class="d-inline-block">
-        <button class="btn btn-primary btn-sm" @onclick="GetSaltAsync">Generate Salt</button>
-        <p>User Salt : @Salt </p>
-    </div>
+    <AuthorizeView>
+        <Authorized>
+            <div class="d-inline-block">
+                <button class="btn btn-primary btn-sm" @onclick="GetSaltAsync">Generate Salt</button>
+                <p>User Salt : @Salt </p>
+            </div>
 
-    <div class="d-block">
-        <input type="password" @bind="Password" />
-        <button class="btn btn-primary btn-sm" @onclick="GetHashedPasswordAsync">Hash Password</button>
-        <p>Password : @Password </p>
-        <p>Hashed Pass : @HashedPassword </p>
-        <p>Length : @GetHashedLength </p>
-    </div>
+            <div class="d-block">
+                <input type="password" @bind="Password" />
+                <button class="btn btn-primary btn-sm" @onclick="GetHashedPasswordAsync">Hash Password</button>
+                <p>Password : @Password </p>
+                <p>Hashed Pass : @HashedPassword </p>
+                <p>Length : @GetHashedLength </p>
+            </div>
 
-    <div class="d-block">
-        <button class="btn btn-dark btn-sm" @onclick="GenerateAccessToken">Generate Access Token</button>
-        <p>Token : @AccessToken</p>
-    </div>
+            <div class="d-block">
+                <button class="btn btn-dark btn-sm" @onclick="GenerateAccessToken">Generate Access Token</button>
+                <p>Token : @AccessToken</p>
+            </div>
+        </Authorized>
+        <NotAuthorized>
+            <RedirectToHomeComponent />
+        </NotAuthorized>
+    </AuthorizeView>
 
 @code {
     /* ## Test Variables ## */

@@ -1,11 +1,6 @@
 ﻿@page "/"
 
-@using System.Security.Claims
-@using JobAgent.Services
-@using JobAgent.Components.Redirect 
-
-@inject SecurityService SecurityService
-@inject IJSRuntime JSRunTime
+@using JobAgent.Components.Redirect
 
 <style>
     article {
@@ -25,34 +20,26 @@
             }
 </style>
 
-@if (GetPrincipal.Identity.IsAuthenticated)
-{
-    <RedirectToAdminComponent />
-}
-else
-{
-    <article class="text-wrap">
-        <h1>Job Agenten er under udvikling!</h1>
-        <div>
-            <p>
-                Beklager ulejliheden, men vi udfører stadig operationer på hjemmesiden. Der er stadig mangel på funktionalitet,
-                hvis du har brug for det, kan du altid
-                <a href="#">Kontakte Os</a>.
-                Hjemmesiden opdateres regelmæssigt.
-            </p>
-            <p>&mdash; The Team</p>
-        </div>
-    </article>
-}
+<AuthorizeView>
+        <Authorized>
+            <RedirectToAdminComponent />
+        </Authorized>
+        <NotAuthorized>
+            <article class="text-wrap">
+                <h1>Job Agenten er under udvikling!</h1>
+                <div>
+                    <p>
+                        Beklager ulejliheden, men vi udfører stadig operationer på hjemmesiden. Der er stadig mangel på funktionalitet,
+                        hvis du har brug for det, kan du altid
+                        <a href="#">Kontakte Os</a>.
+                        Hjemmesiden opdateres regelmæssigt.
+                    </p>
+                    <p>&mdash; The Team</p>
+                </div>
+            </article>
+        </NotAuthorized>
+    </AuthorizeView>
 
 @code {
-    [CascadingParameter]
-    protected Task<AuthenticationState> AuthenticationState { get; set; }
 
-    ClaimsPrincipal GetPrincipal { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        GetPrincipal = (await AuthenticationState).User;
-    }
 } 
