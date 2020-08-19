@@ -14,8 +14,6 @@ namespace JobAgent.Data.Repository.Interface
         bool CheckUserExists(string email);
         bool ValidatePassword(string password);
         string GetUserSaltByEmail(string email);
-        RefreshTokenModel GenerateRefreshToken();
-        string GenerateAccessToken(int id);
 
         /// <summary>
         /// Update users password.

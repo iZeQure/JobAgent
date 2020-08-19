@@ -41,7 +41,7 @@ namespace JobAgent.Services
                     {                        
                         var returnedUser = UserRepository.LogIn(user.Email, user.Password);
                         returnedUser.IsAuthenticatedByServer = true;
-                        returnedUser.AccessToken = returnedUser.Email;
+                        returnedUser.AccessToken = returnedUser.AccessToken;
 
                         // Return authenticated user.
                         return await Task.FromResult(returnedUser);
@@ -55,9 +55,21 @@ namespace JobAgent.Services
             return await Task.FromResult(user);
         }
 
-        public Task<User> RegisterUserAsync(User user)
+        public async Task<bool> CheckUserExistsAsync(User user)
         {
-            throw new NotImplementedException();
+            if (UserRepository.CheckUserExists(user.Email))
+            {
+                return await Task.FromResult(true);
+            }
+
+            return await Task.FromResult(false);
+        }
+
+        public async Task<User> RegisterUserAsync(User user)
+        {
+            UserRepository.Create(user);
+
+            return await Task.FromResult(user);
         }
 
         public Task<User> RereshTokenAsync(RefreshRequest refreshRequest)

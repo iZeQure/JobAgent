@@ -20,12 +20,7 @@
                 <p>Password : @Password </p>
                 <p>Hashed Pass : @HashedPassword </p>
                 <p>Length : @GetHashedLength </p>
-            </div>
-
-            <div class="d-block">
-                <button class="btn btn-dark btn-sm" @onclick="GenerateAccessToken">Generate Access Token</button>
-                <p>Token : @AccessToken</p>
-            </div>
+            </div>            
         </Authorized>
         <NotAuthorized>
             <RedirectToHomeComponent />
@@ -37,7 +32,6 @@
     public string Salt { get; set; }
     public string Password { get; set; }
     public string HashedPassword { get; set; }
-    public string AccessToken { get; set; }
     public int GetHashedLength { get; set; }
 
     public async Task GetSaltAsync()
@@ -49,10 +43,5 @@
     {
         HashedPassword = await SecurityService.HashPasswordAsync(Password, Salt);
         GetHashedLength = HashedPassword.Length;
-    }
-
-    public async Task GenerateAccessToken()
-    {
-        AccessToken = await SecurityService.GenerateAccessTokenAsync(1);
     }
 }

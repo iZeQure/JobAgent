@@ -20,6 +20,11 @@ namespace JobAgent.Data.Security
         public static bool IsAuthenticated { get; set; }
         public static bool IsAuthenticating { get; set; }
 
+        public MyAuthStateProvider()
+        {
+
+        }
+
         public MyAuthStateProvider(ILocalStorageService localStorageService, IUserService userService)
         {
             LocalStorageService = localStorageService;
@@ -108,7 +113,7 @@ namespace JobAgent.Data.Security
         /// </summary>
         /// <param name="user">Used to express to definition of the claims identity.</param>
         /// <returns>An identity with the user.</returns>
-        private ClaimsIdentity GetClaimsIdentity(User user)
+        public ClaimsIdentity GetClaimsIdentity(User user)
         {
             // Initialize new identity.
             ClaimsIdentity identity = new ClaimsIdentity();
@@ -127,7 +132,7 @@ namespace JobAgent.Data.Security
                                     new Claim(ClaimTypes.Email, user.Email),
                                     new Claim(ClaimTypes.Role, user.ConsultantArea.Name),
                                     new Claim("LocationName", $"{user.Location.Name}")
-                                }, "LOCAL_AUTH");
+                                }, $"{user.AccessToken}");
                 }
             }
 

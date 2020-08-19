@@ -8,6 +8,7 @@
 @attribute [Authorize]
 
 @inject MyAuthStateProvider MyAuthStateProvider
+@inject DataService DataService
 @inject AdminService AdminService
 @inject NavigationManager NavigationManager
 
@@ -133,8 +134,8 @@
         User = await AdminService.GetUserByEmail(UserEmail);
 
         // Get Consulent areas and locations.
-        ConsultantAreas = await AdminService.GetAllConsultantAreas();
-        Locations = await AdminService.GetAllLocations();
+        ConsultantAreas = await DataService.GetAllConsultantAreasTask();
+        Locations = await DataService.GetAllLocationsTask();
     }
 
     private async Task OnValidSubmit_ChangeUserInformation()

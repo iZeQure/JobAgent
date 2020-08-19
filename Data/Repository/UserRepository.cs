@@ -1,5 +1,6 @@
 ﻿using JobAgent.Data.DB;
 using JobAgent.Data.Repository.Interface;
+using JobAgent.Data.Security;
 using JobAgent.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -18,16 +19,6 @@ namespace JobAgent.Data.Repository
 {
     public class UserRepository : IUserRepository
     {
-        private readonly JWTSettings jwtSettings;
-        private JwtSecurityTokenHandler JwtSecurityTokenHandler { get; set; }
-
-        public UserRepository() { }
-
-        public UserRepository(IOptions<JWTSettings> jwt)
-        {
-            jwtSettings = jwt.Value;
-        }
-
         /// <summary>
         /// Check if the user email exists.
         /// </summary>
@@ -64,7 +55,27 @@ namespace JobAgent.Data.Repository
 
         public void Create(User create)
         {
-            throw new NotImplementedException();
+            // Open connection to database.
+            Database.Instance.OpenConnection();
+
+            // Initialzie command obj.
+            using SqlCommand cmd = new SqlCommand("CreateUser", Database.Instance.SqlConnection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            // Define input parameters.
+            cmd.Parameters.AddWithValue("FirstName", create.FirstName);
+            cmd.Parameters.AddWithValue("LastName", create.LastName);
+            cmd.Parameters.AddWithValue("Email", create.Email);
+            cmd.Parameters.AddWithValue("Password", create.Password);
+            cmd.Parameters.AddWithValue("Salt", create.Salt);
+            cmd.Parameters.AddWithValue("AccessToken", create.AccessToken);
+            cmd.Parameters.AddWithValue("ConsultantAreaId", create.ConsultantArea.Id);
+            cmd.Parameters.AddWithValue("LocationId", create.Location.Id);
+
+            // Execute command, catch returned value.
+            int returnValue = cmd.ExecuteNonQuery();
         }
 
         public IEnumerable<User> GetAll()
@@ -243,6 +254,7 @@ namespace JobAgent.Data.Repository
                     tempUser.FirstName = reader.GetString("FirstName");
                     tempUser.LastName = reader.GetString("LastName");
                     tempUser.Email = reader.GetString("Email");
+                    tempUser.AccessToken = reader.GetString("AccessToken");
                     tempUser.ConsultantArea = new ConsultantArea()
                     {
                         Id = reader.GetInt32("ConsultantAreaId"),
@@ -319,39 +331,6 @@ namespace JobAgent.Data.Repository
             if ((int)result == 0) return false;
 
             return true;
-        }
-
-        public RefreshTokenModel GenerateRefreshToken()
-        {
-            RefreshTokenModel refreshToken = new RefreshTokenModel();
-
-            var randomNumber = new byte[32];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(randomNumber);
-                refreshToken.Token = Convert.ToBase64String(randomNumber);
-            }
-            refreshToken.ExpiryDate = DateTime.UtcNow.AddMonths(6);
-
-            return refreshToken;
-        }
-
-        public string GenerateAccessToken(int id)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, Convert.ToString(id))
-                }),
-                Expires = DateTime.UtcNow.AddDays(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
         }
 
         public void UpdateUserPassword(User authorization)

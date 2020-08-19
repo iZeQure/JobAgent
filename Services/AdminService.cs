@@ -17,21 +17,7 @@ namespace JobAgent.Services
             IRepository<User> userRepository = new UserRepository();
 
             return Task.FromResult(((IUserRepository)userRepository).GetUserByEmail(userMail));
-        }
-
-        public Task<List<ConsultantArea>> GetAllConsultantAreas()
-        {
-            IRepository<ConsultantArea> consultantAreaRepository = new ConsultantAreaRepository();
-
-            return Task.FromResult(consultantAreaRepository.GetAll().ToList());
-        }
-
-        public Task<List<Location>> GetAllLocations()
-        {
-            IRepository<Location> locationRepository = new LocationRepository();
-
-            return Task.FromResult(locationRepository.GetAll().ToList());
-        }
+        }        
 
         public Task<bool> UpdateUserInformation(User user)
         {

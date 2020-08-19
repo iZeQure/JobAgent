@@ -1,0 +1,216 @@
+﻿@page "/admin/account/register"
+
+@using JobAgent.Services
+@using JobAgent.Data
+@using JobAgent.Data.Interfaces
+@using JobAgent.Models
+
+@inject IUserService UserSerivce
+@inject DataService DataService
+@inject SecurityService SecurityService
+
+@attribute [Authorize]
+
+<div class="container">
+
+    @if (!IsLoadingInformation)
+    {
+        <div class="d-block">
+            <button class="btn btn-dark btn-sm">Generate Access Token</button>
+            <p>Token : @AccessToken</p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(SystemMessage))
+        {
+            <div class="alert alert-info">
+                <div class="d-flex align-items-center">
+
+                    <span>@SystemMessage</span>
+
+                    @if (IsProcessing)
+                    {
+                        <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
+                    }
+                    else if (!IsProcessing && IsSuccess)
+                    {
+                        <div class="ml-auto"><i class="fas fa-check"></i></div>
+                    }
+                </div>
+            </div>
+        }
+
+        <EditForm Model="RegisterModel" OnValidSubmit="OnValidSubmit_RegisterAccountAsync" autocomplete="off">
+
+            <ValidationSummary />
+            <DataAnnotationsValidator />
+
+            <div class="row">
+                <div class="col">
+                    <label for="inputEmail" class="admin-label">Email Adresse :</label>
+                    <input id="inputEmail" type="email" class="form-control" placeholder="Email adresse" @bind-value="RegisterModel.Email" />
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col">
+                    <label for="inputFirstName" class="admin-label">Fornavn :</label>
+                    <input id="inputFirstName" type="text" class="form-control" placeholder="Fornavn" @bind-value="RegisterModel.FirstName" />
+                </div>
+
+                <div class="col">
+                    <label for="inputLastName" class="admin-label">Efternavn :</label>
+                    <input id="inputLastName" type="text" class="form-control" placeholder="Efternavn" @bind-value="RegisterModel.LastName" />
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col">
+                    <label for="inputConsultantArea" class="admin-label">Konsulent Område :</label>
+                    <select class="form-control" @bind="RegisterModel.ConsultantAreaId">
+                        @if (!GetConsultantAreas.Any())
+                        {
+                            <option value="0" selected>Fandt ikke nogen områder..</option>
+                        }
+                        else
+                        {
+                            <option value="0" selected>Vælg et konsulent område</option>
+
+                            @foreach (ConsultantArea c in GetConsultantAreas)
+                            {
+                                <option value="@c.Id">@c.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col">
+                    <label for="inputLocation" class="admin-label">Lokation :</label>
+                    <select class="form-control" @bind="RegisterModel.LocationId">
+                        @if (!GetLocations.Any())
+                        {
+                            <option value="0" selected>Fandt ikke nogen lokationer..</option>
+                        }
+                        else
+                        {
+                            <option value="0" selected>Vælg en lokation</option>
+
+                            @foreach (Location l in GetLocations)
+                            {
+                                <option value="@l.Id">@l.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col">
+                    <label for="inputPassword" class="admin-label">Adgangskode :</label>
+                    <input id="inputPassword" type="password" class="form-control" placeholder="Adgangskode" @bind="RegisterModel.Password" />
+                </div>
+
+                <div class="col">
+                    <label for="inputConfirmPassword" class="admin-label">Bekræft Adgangskode :</label>
+                    <input id="inputPassword" type="password" class="form-control" placeholder="Bekræft adgangskode" @bind="RegisterModel.ConfirmPassword" />
+                </div>
+            </div>
+            <button type="submit" class="btn btn-info float-right ml-auto mt-5" disabled="@IsProcessing">Opret Konsulent</button>
+
+        </EditForm>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <div class="d-flex align-items-center">
+                <span>Henter oplysninger, vent venligst..</span>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private RegisterAccountModel RegisterModel { get; set; } = new RegisterAccountModel();
+
+    private User User { get; set; } = new User() { ConsultantArea = new ConsultantArea(), Location = new Location() };
+
+    public IEnumerable<ConsultantArea> GetConsultantAreas { get; protected set; } = new List<ConsultantArea>();
+    public IEnumerable<Location> GetLocations { get; protected set; } = new List<Location>();
+
+    public string SystemMessage { get; set; } = string.Empty;
+    public string AccessToken { get; set; }
+    public bool IsLoadingInformation { get; set; } = true;
+    public bool IsSuccess { get; set; } = false;
+    public bool IsProcessing { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadInformationForModel();
+    }
+
+    private async Task LoadInformationForModel()
+    {
+        GetConsultantAreas = await DataService.GetAllConsultantAreasTask();
+        GetLocations = await DataService.GetAllLocationsTask();
+
+        IsLoadingInformation = false;
+    }
+
+    private async Task OnValidSubmit_RegisterAccountAsync()
+    {
+        IsProcessing = true;
+
+        User.Email = RegisterModel.Email;
+
+        if (RegisterModel.ConsultantAreaId != 0 && RegisterModel.LocationId != 0)
+        {
+            if (UserSerivce is UserService service)
+            {
+                if (!service.CheckUserExistsAsync(User).Result)
+                {
+                    // Generate new salt.
+                    string salt = (await SecurityService.GetNewSaltAsync());
+
+                    // Hash user's password.
+                    string hashedSecret = (await SecurityService.HashPasswordAsync(RegisterModel.Password, salt));
+
+                    User.FirstName = RegisterModel.FirstName;
+                    User.LastName = RegisterModel.LastName;
+                    User.ConsultantArea.Id = RegisterModel.ConsultantAreaId;
+                    User.Location.Id = RegisterModel.LocationId;
+                    User.Salt = salt;
+                    User.Password = hashedSecret;
+
+                    string jwtToken = (await GenerateAccessToken(User));
+
+                    User.AccessToken = jwtToken;
+
+                    await InvokeAsync(async () =>
+                    {
+                        await service.RegisterUserAsync(User);
+
+                        SystemMessage = "Konsulent blev registreret.";
+                        IsSuccess = true;
+                        IsProcessing = false;
+
+                        StateHasChanged();
+                    });
+                }
+                else
+                {
+                    SystemMessage = "Fejl, konsulent eksistere allerede.";
+                }
+            }
+        }
+        else
+        {
+            SystemMessage = "Vælg venligst et konsulent område eller lokation.";
+        }
+
+        IsProcessing = false;
+    }
+
+    public async Task<string> GenerateAccessToken(User user)
+    {
+        return await SecurityService.GenerateAccessTokenAsync(user);
+    }
+}

@@ -68,6 +68,7 @@ namespace JobAgent
             services.AddSingleton<Database>(); // Database Service.
             services.AddSingleton<SecurityService>(); // Security Service.
             services.AddSingleton<JobService>(); // Job Service.
+            services.AddSingleton<DataService>(); // Data Service.
             services.AddSingleton<AdminService>(); // Admin Service.
 
             services.AddBlazoredLocalStorage();
