@@ -1,18 +1,25 @@
 ﻿@page "/login"
 
-@using System.Security.Claims
 @using JobAgent.Models
 @using JobAgent.Data
 @using JobAgent.Data.Security
 @using JobAgent.Data.Interfaces
+@using JobAgent.Components.Redirect 
 
 @inject MyAuthStateProvider MyAuthStateProvider
 @inject IUserService UserService
 @inject NavigationManager NavManager
-@* Login Form *@
-<EditForm Model="UserLogInModel" OnValidSubmit="@ValidateLoginAsync">
 
-    <div class="container">
+<AuthorizeView>
+    <Authorized>
+        @if (true) { <RedirectToAdminComponent/> }
+    </Authorized>
+</AuthorizeView>
+
+@* Login Form *@
+<div class="container">
+    <EditForm Model="UserLogInModel" OnValidSubmit="@ValidateLoginAsync">
+
         @if (!string.IsNullOrEmpty(LoginMessage))
         {
             <div class="alert alert-info">
@@ -28,22 +35,22 @@
                 </div>
             </div>
         }
-    </div>
 
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-    <BSFormGroup>
-        <BSLabel For="inputEmail1">Email Adresse</BSLabel>
-        <BSInput Id="inputEmail1" InputType="InputType.Email" PlaceHolder="Indtast email adresse.." @bind-Value="UserLogInModel.Email" />
-    </BSFormGroup>
-    <BSFormGroup>
-        <BSLabel For="inputPassword">Adgangskode</BSLabel>
-        <BSInput Id="inputPassword" InputType="InputType.Password" Placeholder="Indtast adgangskode.." @bind-Value="UserLogInModel.Password" />
-    </BSFormGroup>
-    <BSButton Color="Color.Info" ButtonType="ButtonType.Submit" Class="btn-block mr-2" IsDisabled="IsProcessing">Log ind</BSButton>
+        <BSFormGroup>
+            <BSLabel For="inputEmail1">Email Adresse</BSLabel>
+            <BSInput Id="inputEmail1" InputType="InputType.Email" PlaceHolder="Indtast email adresse.." @bind-Value="UserLogInModel.Email" />
+        </BSFormGroup>
+        <BSFormGroup>
+            <BSLabel For="inputPassword">Adgangskode</BSLabel>
+            <BSInput Id="inputPassword" InputType="InputType.Password" Placeholder="Indtast adgangskode.." @bind-Value="UserLogInModel.Password" />
+        </BSFormGroup>
+        <BSButton Color="Color.Info" ButtonType="ButtonType.Submit" Class="btn-block mr-2" IsDisabled="IsProcessing">Log ind</BSButton>
 
-</EditForm>
+    </EditForm>
+</div>
 
 @code {
     [CascadingParameter]
@@ -58,78 +65,50 @@
     public bool IsSuccess { get; set; }
     public bool IsProcessing { get; set; } = false;
 
-    private async Task<bool> ValidateLoginAsync()
+    private async Task ValidateLoginAsync()
     {
-        IsProcessing = true;
         IsSuccess = false;
-        LoginMessage = "Vent venligst...";
+        IsProcessing = true;
+        LoginMessage = "Vent venligst..";
 
-        await Task.Delay(3000);
+        await Task.Delay(TimeSpan.FromSeconds(5));
 
-        try
+        // Get values from the form.
+        User.Email = UserLogInModel.Email.ToString();
+        User.Password = UserLogInModel.Password;
+
+        // Check if the email is valid.
+        if (UserLogInModel.IsValidEmail(User.Email))
         {
-            User.Email = UserLogInModel.Email;
-            User.Password = UserLogInModel.Password;
-
+            // Validate User credentials.
             User = await UserService.LoginAsync(User);
 
+            // Check if the credentials is validated.
             if (User.IsAuthenticatedByServer)
             {
-                IsSuccess = true;
-                IsProcessing = false;
-                await MyAuthStateProvider.MarkUserAsAuthenticated(User);
-
-                if (IsSuccess)
+                await InvokeAsync(async () =>
                 {
-                    NavManager.NavigateTo("/admin", true);
-                }
+                    // Mark User as authenticated to the service.
+                    await MyAuthStateProvider.MarkUserAsAuthenticated(User);
+                    StateHasChanged();
+                });
+
+                // Redirecting..
+                LoginMessage = "Logger ind..";
+
+                NavManager.NavigateTo("/admin", true);
             }
             else
             {
-                LoginMessage = "Forkert email eller adgangskode.";
-                IsSuccess = false;
+                LoginMessage = "Email eller adgangskode er forkert.";
             }
-
-            IsProcessing = false;
         }
-        catch (Exception)
+        else
         {
-            IsSuccess = false;
-            IsProcessing = false;
+            LoginMessage = "Email er ikke gyldig.";
         }
 
-        return await Task.FromResult(IsProcessing);
+        IsSuccess = true;
+        IsProcessing = false;
     }
-
-    //private void ValidateUserAsync()
-    //{
-    //    IsProcessing = true;
-
-    //    User.Email = UserLogInModel.Email;
-    //    User.Password = UserLogInModel.Password;
-
-    //    MyAuthStateProvider.User = UserSerivce.LoginAsync(User).Result;
-
-    //    if (MyAuthStateProvider.User.IsAuthenticatedByServer)
-    //    {
-    //        if (MyAuthStateProvider.User.Email != null)
-    //        {
-    //            PageMetaModel.Instance.Title = $"Velkommen, {User.FirstName} {User.LastName}";
-
-    //            MyAuthStateProvider.IsAuthenticated = true;
-    //            MyAuthStateProvider.NotifyAuthenticationStateChanged();
-    //            //await ((MyAuthStateProvider)AuthProvider).MarkUserAuthenticated(User);
-    //        }
-    //        else
-    //        {
-    //            LoginMessage = "Forkert email eller adgangskode.";
-    //        }
-    //    }
-    //    else
-    //    {
-    //        LoginMessage = "Forkert email eller adgangskode.";
-    //    }
-
-    //    IsProcessing = false;
-    //}
 }

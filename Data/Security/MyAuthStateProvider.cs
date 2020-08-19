@@ -20,9 +20,6 @@ namespace JobAgent.Data.Security
         public static bool IsAuthenticated { get; set; }
         public static bool IsAuthenticating { get; set; }
 
-        // Test object, leave for now. - Out comment if necessary .
-        public User User { get; set; } = new User();
-
         public MyAuthStateProvider(ILocalStorageService localStorageService, IUserService userService)
         {
             LocalStorageService = localStorageService;
@@ -34,26 +31,29 @@ namespace JobAgent.Data.Security
             // Declare a variable to store the identity.
             ClaimsIdentity identity;
 
+            // Declare a varible to store the user.
+            User user;
+
             // Get the access token, from current auth state.
             string accessToken = await LocalStorageService.GetItemAsync<string>(ACCESS_TOKEN);
 
             if (!string.IsNullOrWhiteSpace(accessToken) && !string.IsNullOrEmpty(accessToken))
             {
                 // Get the user by access token.
-                User = await UserService.GetUserByAccessToken(accessToken);
+                user = await UserService.GetUserByAccessToken(accessToken);
 
                 // TODO : Call get claims identity, to store the user into.
                 // Get claims identity with the authenticated user.
-                identity = GetClaimsIdentity(User);
+                identity = GetClaimsIdentity(user);
             }
             else
             {
                 identity = new ClaimsIdentity();
             }
 
-            ClaimsPrincipal user = new ClaimsPrincipal(identity);
+            ClaimsPrincipal principalUser = new ClaimsPrincipal(identity);
 
-            return await Task.FromResult(new AuthenticationState(user));           
+            return await Task.FromResult(new AuthenticationState(principalUser));           
         }
 
         /// <summary>
@@ -122,11 +122,11 @@ namespace JobAgent.Data.Security
                     identity = new ClaimsIdentity(
                                 new List<Claim>
                                 {
-                                    new Claim("UserId", $"{User.Id}"),
-                                    new Claim(ClaimTypes.Name, $"{User.FirstName} {User.LastName}"),
-                                    new Claim(ClaimTypes.Email, User.Email),
-                                    new Claim(ClaimTypes.Role, User.ConsultantArea.Name),
-                                    new Claim("LocationName", $"{User.Location.Name}")
+                                    new Claim("UserId", $"{user.Id}"),
+                                    new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
+                                    new Claim(ClaimTypes.Email, user.Email),
+                                    new Claim(ClaimTypes.Role, user.ConsultantArea.Name),
+                                    new Claim("LocationName", $"{user.Location.Name}")
                                 }, "LOCAL_AUTH");
                 }
             }

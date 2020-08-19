@@ -1,5 +1,6 @@
 ﻿@using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Hosting
 @using JobAgent.Data.Security
 @using JobAgent.Components.Notification
 
@@ -52,11 +53,7 @@
                     <div class="d-flex">
                         @foreach (var claim in context.User.Claims)
                         {
-                            @if (claim.Type == ClaimTypes.Role)
-                            {
-                                <p class="text-muted smaller pr-2">@claim.Value</p>
-                            }
-                            @if (claim.Type == "LocationName")
+                            @if (claim.Type == ClaimTypes.Role || claim.Type == "LocationName")
                             {
                                 <p class="text-muted smaller pr-2">@claim.Value</p>
                             }
@@ -79,9 +76,6 @@
 </div>
 
 @code {
-    [CascadingParameter]
-    private Task<AuthenticationState> AuthenticationState { get; set; }
-
     private async Task LogOut()
     {
         await (MyAuthStateProvider.MarkUserAsLoggedOut());

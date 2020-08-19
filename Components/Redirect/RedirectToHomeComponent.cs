@@ -13,7 +13,7 @@ namespace JobAgent.Components.Redirect
 
         protected override void OnInitialized()
         {
-            NavigationManager.NavigateTo("/", true);
+            NavigationManager.NavigateTo("", true);
         }
     }
 }
