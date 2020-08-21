@@ -1,3 +1,3 @@
-function SetMetaTitle(title) {
-    window.document.title = title;
-};
+window.HTMLTitleElement = (title) => {
+    document.title = title;
+}

@@ -1,18 +1,20 @@
-﻿@page "/job/{JobAdvertId:int}"
+﻿@page "/job/{JobAdvertId:int}/{JobAdvertName}"
 
 @using JobAgent.Data
 @using JobAgent.Services
-@using JobAgent.Models
 @inject JobService JobService
 @inject NavigationManager NavigationManager
 
+@* Set Job as Page Title *@
+<PageTitle Title="@JobAdvertName" />
+
 @if (jobAdverts == null || !jobAdverts.Any())
 {
-    <p><em>Indlæser @JobAdvertId ...</em></p>
+    <p><em>Indlæser @JobAdvertName ...</em></p>
 
     @if (!jobAdverts.Any())
     {
-        <p><em>Ingen Jobs fundet indenfor @JobAdvertId kategori...</em></p>
+        <p><em>Ingen Jobs fundet indenfor @JobAdvertName kategori...</em></p>
     }
 }
 else
@@ -83,6 +85,12 @@ else
     [Parameter]
     public int JobAdvertId { get; set; }
 
+    [Parameter]
+    public int JobAdvertSpecId { get; set; }
+
+    [Parameter]
+    public string JobAdvertName { get; set; }
+
     private bool DetailsExists { get; set; }
 
     public DateTime DateTimeToSubstract { get; set; }
@@ -99,19 +107,19 @@ else
 
     List<JobAdvert> jobAdverts = new List<JobAdvert>();
 
-    protected override async Task OnInitializedAsync()
-    {
-        jobAdverts = await JobService.GetJobAdvertsAsync(JobAdvertId);
-    }
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    jobAdverts = await JobService.GetJobAdvertsAsync(JobAdvertId, JobAdvertName);
+    //}
 
     protected override async Task OnParametersSetAsync()
     {
-        jobAdverts = await JobService.GetJobAdvertsAsync(JobAdvertId);
+        jobAdverts = await JobService.GetJobAdvertsAsync(JobAdvertId, 0, JobAdvertName);
     }
 
     //protected override async Task OnAfterRenderAsync(bool firstRender)
     //{
-    //    jobAdverts = await JobService.GetJobAdvertsAsync(JobAdvertId);
+    //    jobAdverts = await JobService.GetJobAdvertsAsync(JobAdvertId, JobAdvertName);
 
     //    await Task.FromResult(jobAdverts);
     //}

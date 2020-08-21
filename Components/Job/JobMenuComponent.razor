@@ -30,7 +30,7 @@
 
                         @for (int j = 0; j < JobCategories[i].JobAdvertCategorySpecializations.Count; j++)
                         {
-                            <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].JobAdvertCategorySpecializations[j].Id">
+                            <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].JobAdvertCategorySpecializations[j].Id/@JobCategories[i].JobAdvertCategorySpecializations[j].Name">
                                 @JobCategories[i].JobAdvertCategorySpecializations[j].Name
                             </a>
                         }
@@ -40,7 +40,7 @@
             else
             {
                 <div class="py-1 px-2">
-                    <a class="btn btn-link btn-sm @MenuColor text-wrap text-left" href="/job/@JobCategories[i].Id">
+                    <a class="btn btn-link btn-sm @MenuColor text-wrap text-left" href="/job/@JobCategories[i].Id/@JobCategories[i].Name">
                         @JobCategories[i].Name
                     </a>
                 </div>
@@ -87,7 +87,7 @@ else
         }
         catch (Exception)
         {
-            SystemMessage = "Noget fik galt, prøv igen senere.";
+            SystemMessage = "Kunne ikke indlæse menu, prøv og indlæs igen.";
         }
     }
 

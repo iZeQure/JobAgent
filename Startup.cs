@@ -39,32 +39,6 @@ namespace JobAgent
             services.AddScoped<AuthenticationStateProvider>(provider =>
                 provider.GetRequiredService<MyAuthStateProvider>());
 
-            var jwtSection = Configuration.GetSection("JWTSettings");
-            services.Configure<JWTSettings>(jwtSection);
-
-            // Validate token.
-            var appSettings = jwtSection.Get<JWTSettings>();
-            var key = Encoding.ASCII.GetBytes(appSettings.SecretKey);
-
-            services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-                .AddJwtBearer(x =>
-                {
-                    x.RequireHttpsMetadata = true;
-                    x.SaveToken = true;
-                    x.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ClockSkew = TimeSpan.Zero
-                    };
-                });
-
             services.AddSingleton<Database>(); // Database Service.
             services.AddSingleton<SecurityService>(); // Security Service.
             services.AddSingleton<JobService>(); // Job Service.

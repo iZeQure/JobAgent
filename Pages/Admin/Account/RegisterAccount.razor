@@ -11,15 +11,13 @@
 
 @attribute [Authorize]
 
+@* Page Title *@
+<PageTitle Title="Registrer Ny Konsulent" />
+
 <div class="container">
 
     @if (!IsLoadingInformation)
     {
-        <div class="d-block">
-            <button class="btn btn-dark btn-sm">Generate Access Token</button>
-            <p>Token : @AccessToken</p>
-        </div>
-
         @if (!string.IsNullOrEmpty(SystemMessage))
         {
             <div class="alert alert-info">
@@ -137,7 +135,6 @@
     public IEnumerable<Location> GetLocations { get; protected set; } = new List<Location>();
 
     public string SystemMessage { get; set; } = string.Empty;
-    public string AccessToken { get; set; }
     public bool IsLoadingInformation { get; set; } = true;
     public bool IsSuccess { get; set; } = false;
     public bool IsProcessing { get; set; } = false;
