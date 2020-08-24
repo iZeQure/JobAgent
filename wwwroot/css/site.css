@@ -192,6 +192,15 @@ ul.validation-errors {
 }
 
 /*
+    ## Table changes ##
+*/
+
+.table, .table-responsive {
+     margin-bottom: 0 !important;
+     border-radius: 0.25rem !important;
+}
+
+/*
     ## Button Changes
 */
 .btn:hover {

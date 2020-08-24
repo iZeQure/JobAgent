@@ -30,6 +30,7 @@
 
                         @for (int j = 0; j < JobCategories[i].JobAdvertCategorySpecializations.Count; j++)
                         {
+                            // Link : {domain}/job/CategoryId/CategoryName/SpecializationId/SpecializationName
                             <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].Id/@JobCategories[i].Name/@JobCategories[i].JobAdvertCategorySpecializations[j].Id/@JobCategories[i].JobAdvertCategorySpecializations[j].Name">
                                 @JobCategories[i].JobAdvertCategorySpecializations[j].Name
                             </a>
@@ -40,6 +41,7 @@
             else
             {
                 <div class="py-1 px-2">
+                    @* Link : {domain}/job/CategoryId/CategoryName *@
                     <a class="btn btn-link btn-sm @MenuColor text-wrap text-left" href="/job/@JobCategories[i].Id/@JobCategories[i].Name">
                         @JobCategories[i].Name
                     </a>
@@ -85,8 +87,9 @@ else
 
             if (JobCategories.Count == 0) SystemMessage = "Fandt ikke nogen kategorier..";
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            Console.WriteLine($"Job Menu Exception : {e.Message} - {e}");
             SystemMessage = "Kunne ikke indlæse menu, prøv og indlæs igen.";
         }
     }

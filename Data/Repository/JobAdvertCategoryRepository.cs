@@ -136,15 +136,15 @@ namespace JobAgent.Data.Repository
                     // Test
 
                     // Category Data
-                    jobCategoryData.Id = reader.GetInt32(0);
-                    jobCategoryData.Name = reader.GetString(1);
-                    if (!DataReaderExtensions.IsDBNull(reader, "CategoryDescription")) jobCategoryData.Description = reader.GetString(2);
+                    jobCategoryData.Id = reader.GetInt32("Id");
+                    jobCategoryData.Name = reader.GetString("CategoryName");
+                    if (!DataReaderExtensions.IsDBNull(reader, "CategoryDescription")) jobCategoryData.Description = reader.GetString("CategoryDescription");
 
                     // Specialization Data
-                    if (!DataReaderExtensions.IsDBNull(reader, "JobAdvertCategoryId")) jobSpecializationData.JobAdvertCategoryId = reader.GetInt32(3);
-                    if (!DataReaderExtensions.IsDBNull(reader, "SpecId")) jobSpecializationData.Id = reader.GetInt32(4);
-                    if (!DataReaderExtensions.IsDBNull(reader, "SpecializationName")) jobSpecializationData.Name = reader.GetString(5);
-                    if (!DataReaderExtensions.IsDBNull(reader, "SpecializationDescription")) jobSpecializationData.Description = reader.GetString(6);
+                    if (!DataReaderExtensions.IsDBNull(reader, "SpecId")) jobSpecializationData.Id = reader.GetInt32("SpecId");
+                    if (!DataReaderExtensions.IsDBNull(reader, "JobAdvertCategoryId")) jobSpecializationData.JobAdvertCategoryId = reader.GetInt32("JobAdvertCategoryId");
+                    if (!DataReaderExtensions.IsDBNull(reader, "SpecializationName")) jobSpecializationData.Name = reader.GetString("SpecializationName");
+                    if (!DataReaderExtensions.IsDBNull(reader, "SpecializationDescription")) jobSpecializationData.Description = reader.GetString("SpecializationDescription");
 
                     // Check if job category has a matching specialization.
                     if (jobCategoryData.Id == jobSpecializationData.JobAdvertCategoryId)

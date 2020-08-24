@@ -8,7 +8,7 @@
 @attribute [Authorize]
 
 <div class="table-responsive">
-    <table class="table table-striped table-hover rounded">
+    <table class="table table-striped table-hover ">
         <thead class="thead-dark">
             <tr>
                 <th scope="col">#</th>
@@ -39,18 +39,10 @@
                     <td>@Model[i].JobAdvert.JobRegisteredDate</td>
                     <td>@Model[i].JobAdvert.DeadlineDate</td>
                     <td>
-                        <span>
-                            <i class="far fa-edit"></i>
-                            <BSButton Id='@($"edittooltip{Model[i].JobAdvert.Id}")' IsOutline="true" Color="Color.Info"></BSButton>
-                        </span>                        
-                        <BSTooltip Target='@($"edittooltip{Model[i].JobAdvert.Id}")' Placement="Placement.Top">Skift information på opslag.</BSTooltip>
+                        <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette opslag." Color="Popover.PopoverType.Info" />
                     </td>
                     <td>
-                        <span>
-                            <i class="fas fa-trash-alt"></i>
-                            <BSButton Id='@($"removetooltip{Model[i].JobAdvert.Id}")' IsOutline="true" Color="Color.Danger"></BSButton>
-                        </span>                        
-                        <BSTooltip Target='@($"removetooltip{Model[i].JobAdvert.Id}")' Placement="Placement.Top">Fjern job opslag.</BSTooltip>
+                        <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
                     </td>
                 </tr>
             }
