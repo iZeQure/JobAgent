@@ -1,10 +1,10 @@
 ﻿@page "/job/{JobAdvertId:int}/{JobAdvertName}"
+@page "/job/{JobAdvertId:int}/{JobAdvertName}/{SpecializationId:int}/{SpecializationName}"
 
 @using JobAgent.Data
 @using JobAgent.Services
 @inject JobService JobService
 @inject NavigationManager NavigationManager
-
 @* Set Job as Page Title *@
 <PageTitle Title="@JobAdvertName" />
 
@@ -86,10 +86,13 @@ else
     public int JobAdvertId { get; set; }
 
     [Parameter]
-    public int JobAdvertSpecId { get; set; }
+    public string JobAdvertName { get; set; }
 
     [Parameter]
-    public string JobAdvertName { get; set; }
+    public int SpecializationId { get; set; }
+
+    [Parameter]
+    public string SpecializationName { get; set; }
 
     private bool DetailsExists { get; set; }
 
@@ -107,22 +110,12 @@ else
 
     List<JobAdvert> jobAdverts = new List<JobAdvert>();
 
-    //protected override async Task OnInitializedAsync()
-    //{
-    //    jobAdverts = await JobService.GetJobAdvertsAsync(JobAdvertId, JobAdvertName);
-    //}
-
     protected override async Task OnParametersSetAsync()
     {
-        jobAdverts = await JobService.GetJobAdvertsAsync(JobAdvertId, 0, JobAdvertName);
+        if (SpecializationId == 0) jobAdverts = await JobService.GetJobVacanciesAsync(JobAdvertId, JobAdvertName);
+
+        if (SpecializationId != 0) jobAdverts = await JobService.GetJobSpecialVacanciesAsync(SpecializationId, SpecializationName);
     }
-
-    //protected override async Task OnAfterRenderAsync(bool firstRender)
-    //{
-    //    jobAdverts = await JobService.GetJobAdvertsAsync(JobAdvertId, JobAdvertName);
-
-    //    await Task.FromResult(jobAdverts);
-    //}
 
     void OnJobPostDetail(int id)
     {

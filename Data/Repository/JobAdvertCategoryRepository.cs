@@ -130,68 +130,148 @@ namespace JobAgent.Data.Repository
                     var jobAdvertCategory = new JobAdvertCategory();
                     var jobAdvertCategorySpecialization = new JobAdvertCategorySpecialization();
 
-                    // Check if the values from the database contains null.
-                    if (!DataReaderExtensions.IsDBNull(reader, "Id")) jobAdvertCategory.Id = reader.GetInt32(0);
-                    if (!DataReaderExtensions.IsDBNull(reader, "CategoryName")) jobAdvertCategory.Name = reader.GetString(1);
-                    if (!DataReaderExtensions.IsDBNull(reader, "CategoryDescription")) jobAdvertCategory.Description = reader.GetString(2);
-                    if (!DataReaderExtensions.IsDBNull(reader, "JobAdvertCategoryId")) jobAdvertCategorySpecialization.Id = reader.GetInt32(3);
-                    if (!DataReaderExtensions.IsDBNull(reader, "SpecializationName")) jobAdvertCategorySpecialization.Name = reader.GetString(4);
-                    if (!DataReaderExtensions.IsDBNull(reader, "SpecializationDescription")) jobAdvertCategorySpecialization.Description = reader.GetString(5);
+                    var jobCategoryData = new JobAdvertCategory();
+                    var jobSpecializationData = new JobAdvertCategorySpecialization();
 
-                    // If the Category ID Matches the specialization associated ID.
-                    if (jobAdvertCategory.Id == jobAdvertCategorySpecialization.Id)
+                    // Test
+
+                    // Category Data
+                    jobCategoryData.Id = reader.GetInt32(0);
+                    jobCategoryData.Name = reader.GetString(1);
+                    if (!DataReaderExtensions.IsDBNull(reader, "CategoryDescription")) jobCategoryData.Description = reader.GetString(2);
+
+                    // Specialization Data
+                    if (!DataReaderExtensions.IsDBNull(reader, "JobAdvertCategoryId")) jobSpecializationData.JobAdvertCategoryId = reader.GetInt32(3);
+                    if (!DataReaderExtensions.IsDBNull(reader, "SpecId")) jobSpecializationData.Id = reader.GetInt32(4);
+                    if (!DataReaderExtensions.IsDBNull(reader, "SpecializationName")) jobSpecializationData.Name = reader.GetString(5);
+                    if (!DataReaderExtensions.IsDBNull(reader, "SpecializationDescription")) jobSpecializationData.Description = reader.GetString(6);
+
+                    // Check if job category has a matching specialization.
+                    if (jobCategoryData.Id == jobSpecializationData.JobAdvertCategoryId)
                     {
-                        // Check if the category exists in the list.
-                        if (tempJobAdvertCategories.Any(id => id.Id == jobAdvertCategory.Id))
+                        // Check if the category exists in the temp list.
+                        if (tempJobAdvertCategories.Any(data => data.Id == jobCategoryData.Id))
                         {
-                            // Loop through category list.
-                            foreach (var category in tempJobAdvertCategories)
+                            // Loop through temp list.
+                            foreach (var cat in tempJobAdvertCategories)
                             {
-                                // Check if the specialization id matches any category id's in the list.
-                                if (category.Id == jobAdvertCategorySpecialization.Id)
+                                // Check if any specialization matches any categories in the temp list.
+                                if (cat.Id == jobSpecializationData.JobAdvertCategoryId)
                                 {
-                                    // Add specialization to the category with the associated list of specializations.
-                                    category.JobAdvertCategorySpecializations.Add(
-                                    new JobAdvertCategorySpecialization()
-                                    {
-                                        Id = jobAdvertCategorySpecialization.Id,
-                                        Name = jobAdvertCategorySpecialization.Name,
-                                        Description = jobAdvertCategorySpecialization.Description
-                                    });
+                                    cat.JobAdvertCategorySpecializations.Add(
+                                        new JobAdvertCategorySpecialization()
+                                        {
+                                            Id = jobSpecializationData.Id,
+                                            Name = jobSpecializationData.Name,
+                                            Description = jobSpecializationData.Description,
+                                            JobAdvertCategoryId = jobSpecializationData.JobAdvertCategoryId
+                                        });
                                 }
                             }
                         }
                         else
                         {
-                            // Add Category with specialization if not exists in the current temporary list.
-                            tempJobAdvertCategories.Add(new JobAdvertCategory()
-                            {
-                                Id = jobAdvertCategory.Id,
-                                Name = jobAdvertCategory.Name,
-                                Description = jobAdvertCategory.Description,
-                                JobAdvertCategorySpecializations = new List<JobAdvertCategorySpecialization>()
-                                    {
-                                        new JobAdvertCategorySpecialization()
-                                        {
-                                            Id = jobAdvertCategorySpecialization.Id,
-                                            Name = jobAdvertCategorySpecialization.Name,
-                                            Description = jobAdvertCategorySpecialization.Description
-                                        }
-                                    }
-                            });
+                            // Add category to the temp list, when it's non existent in the temp list.
+                            tempJobAdvertCategories.Add(
+                                new JobAdvertCategory()
+                                {
+                                    Id = jobCategoryData.Id,
+                                    Name = jobCategoryData.Name,
+                                    Description = jobCategoryData.Description,
+                                    JobAdvertCategorySpecializations = new List<JobAdvertCategorySpecialization>()
+                                     {
+                                         new JobAdvertCategorySpecialization()
+                                         {
+                                             Id = jobSpecializationData.Id,
+                                             Name = jobSpecializationData.Name,
+                                             Description = jobSpecializationData.Description,
+                                             JobAdvertCategoryId = jobSpecializationData.JobAdvertCategoryId
+                                         }
+                                     }
+                                });
                         }
                     }
                     else
                     {
-                        // Add new category if not exists.
-                        tempJobAdvertCategories.Add(new JobAdvertCategory()
-                        {
-                            Id = jobAdvertCategory.Id,
-                            Name = jobAdvertCategory.Name,
-                            Description = jobAdvertCategory.Description,
-                            JobAdvertCategorySpecializations = null
-                        });
+                        // Add category if non existent in the current temp list.
+                        tempJobAdvertCategories.Add(
+                            new JobAdvertCategory()
+                            {
+                                Id = jobCategoryData.Id,
+                                Name = jobCategoryData.Name,
+                                Description = jobCategoryData.Description,
+                                JobAdvertCategorySpecializations = null
+                            });
                     }
+
+
+                    // Check if the values from the database contains null.
+                    //if (!DataReaderExtensions.IsDBNull(reader, "Id")) jobAdvertCategory.Id = reader.GetInt32(0);
+                    //if (!DataReaderExtensions.IsDBNull(reader, "CategoryName")) jobAdvertCategory.Name = reader.GetString(1);
+                    //if (!DataReaderExtensions.IsDBNull(reader, "CategoryDescription")) jobAdvertCategory.Description = reader.GetString(2);
+                    //if (!DataReaderExtensions.IsDBNull(reader, "JobAdvertCategoryId")) jobAdvertCategorySpecialization.JobAdvertCategoryId.Id = reader.GetInt32(3);
+                    //if (!DataReaderExtensions.IsDBNull(reader, "SpecId")) jobAdvertCategorySpecialization.Id = reader.GetInt32(4);
+                    //if (!DataReaderExtensions.IsDBNull(reader, "SpecializationName")) jobAdvertCategorySpecialization.Name = reader.GetString(5);
+                    //if (!DataReaderExtensions.IsDBNull(reader, "SpecializationDescription")) jobAdvertCategorySpecialization.Description = reader.GetString(6);
+
+                    // If the Category ID Matches the specialization associated ID.
+                    //if (jobAdvertCategory.Id == jobAdvertCategorySpecialization.Id)
+                    //{
+                    //    // Check if the category exists in the list.
+                    //    if (tempJobAdvertCategories.Any(id => id.Id == jobAdvertCategory.Id))
+                    //    {
+                    //        // Loop through category list.
+                    //        foreach (var category in tempJobAdvertCategories)
+                    //        {
+                    //            // Check if the specialization id matches any category id's in the list.
+                    //            if (category.Id == jobAdvertCategorySpecialization.Id)
+                    //            {
+                    //                // Add specialization to the category with the associated list of specializations.
+                    //                category.JobAdvertCategorySpecializations.Add(
+                    //                new JobAdvertCategorySpecialization()
+                    //                {
+                    //                    Id = jobAdvertCategorySpecialization.Id,
+                    //                    Name = jobAdvertCategorySpecialization.Name,
+                    //                    Description = jobAdvertCategorySpecialization.Description,
+                    //                    JobAdvertCategoryId = new JobAdvertCategory()
+                    //                    {
+                    //                        Id = jobAdvertCategorySpecialization.JobAdvertCategoryId.Id
+                    //                    }
+                    //                });
+                    //            }
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        // Add Category with specialization if not exists in the current temporary list.
+                    //        tempJobAdvertCategories.Add(new JobAdvertCategory()
+                    //        {
+                    //            Id = jobAdvertCategory.Id,
+                    //            Name = jobAdvertCategory.Name,
+                    //            Description = jobAdvertCategory.Description,
+                    //            JobAdvertCategorySpecializations = new List<JobAdvertCategorySpecialization>()
+                    //                {
+                    //                    new JobAdvertCategorySpecialization()
+                    //                    {
+                    //                        Id = jobAdvertCategorySpecialization.Id,
+                    //                        Name = jobAdvertCategorySpecialization.Name,
+                    //                        Description = jobAdvertCategorySpecialization.Description
+                    //                    }
+                    //                }
+                    //        });
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    // Add new category if not exists.
+                    //    tempJobAdvertCategories.Add(new JobAdvertCategory()
+                    //    {
+                    //        Id = jobAdvertCategory.Id,
+                    //        Name = jobAdvertCategory.Name,
+                    //        Description = jobAdvertCategory.Description,
+                    //        JobAdvertCategorySpecializations = null
+                    //    });
+                    //}
                 }
             }
 
@@ -234,10 +314,7 @@ namespace JobAgent.Data.Repository
                         Id = reader.GetInt32(0),
                         Name = reader.GetString(1),
                         Description = reader.GetString(2),
-                        JobAdvertCategoryId = new JobAdvertCategory()
-                        {
-                            Id = reader.GetInt32(3)
-                        }
+                        JobAdvertCategoryId = reader.GetInt32(3)
                     });
                 }
             }

@@ -30,7 +30,7 @@
 
                         @for (int j = 0; j < JobCategories[i].JobAdvertCategorySpecializations.Count; j++)
                         {
-                            <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].JobAdvertCategorySpecializations[j].Id/@JobCategories[i].JobAdvertCategorySpecializations[j].Name">
+                            <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].Id/@JobCategories[i].Name/@JobCategories[i].JobAdvertCategorySpecializations[j].Id/@JobCategories[i].JobAdvertCategorySpecializations[j].Name">
                                 @JobCategories[i].JobAdvertCategorySpecializations[j].Name
                             </a>
                         }
@@ -81,7 +81,7 @@ else
     {
         try
         {
-            if (JobService.GetJobMenuAsync() != null) JobCategories = await JobService.GetJobMenuAsync();
+            if (JobCategories == null || JobCategories.Count == 0) JobCategories = await JobService.GetJobMenuAsync();
 
             if (JobCategories.Count == 0) SystemMessage = "Fandt ikke nogen kategorier..";
         }

@@ -10,75 +10,38 @@ namespace JobAgent.Services
 {
     public class JobService
     {
+        private IRepository<JobAdvertCategory> CategoryRepository { get; } = new JobAdvertCategoryRepository();
+        private IRepository<JobAdvert> AdvertRepository { get; } = new JobAdvertRepository();
+
+        private List<JobAdvert> JobAdverts { get; set; } = new List<JobAdvert>();
+
         public Task<List<JobAdvertCategory>> GetJobMenuAsync()
         {
-            IJobAdvertCategoryRepository repository = new JobAdvertCategoryRepository();
-
-            var jobMenu = repository.GetAllJobAdvertCategoriesWithSpecializations();
+            var jobMenu = ((IJobAdvertCategoryRepository)CategoryRepository).GetAllJobAdvertCategoriesWithSpecializations();
 
             return Task.FromResult(jobMenu);
         }
 
-        public Task<List<JobAdvert>> GetJobAdvertsAsync(int jobAdvertId, int jobAdvertSpecId, string jobAdvertName)
+        public async Task<List<JobAdvert>> GetJobVacanciesAsync(int id, string name)
         {
-            IRepository<JobAdvert> repository = new JobAdvertRepository();
+            JobAdverts = await Task.FromResult(AdvertRepository.GetAll().ToList());
 
-            List<JobAdvert> temp = repository.GetAll().ToList();
+            var sortJobs = from job in JobAdverts
+                           where job.JobAdvertCategoryId.Id == id
+                           select job;
 
-            if (temp.Any(x => x.JobAdvertCategoryId.Id == jobAdvertId && x.JobAdvertCategorySpecializationId.Id == 0))
-            {
-                temp = (from j in temp
-                        where j.JobAdvertCategoryId.Id == jobAdvertId
-                        select j
-                        ).ToList(); 
-            }
-            else
-            {
-                temp = (from j in temp
-                        where j.JobAdvertCategorySpecializationId.Id == jobAdvertSpecId
-                        select j
-                        ).ToList();
-            }
-
-            //if (temp.Any(x => x.JobAdvertCategorySpecializationId.Id == 0))
-            //{
-            //    temp = (from j in temp
-            //            where j.JobAdvertCategoryId.Id == jobAdvertId
-            //            select j).ToList();
-            //}
-            //else if (temp.Any(x => x.JobAdvertCategorySpecializationId.Name == jobAdvertName))
-            //{
-            //    temp = (from j in temp
-            //            where j.JobAdvertCategorySpecializationId.Name == jobAdvertName && j.JobAdvertCategoryId.Id == jobAdvertId
-            //            select j).ToList();
-            //}            
-
-            return Task.FromResult(temp);
+            return await Task.FromResult(sortJobs.ToList());
         }
 
-        /*
-         * 
-         *  Id = reader.GetInt32(0),
-            Title = reader.GetString(1),
-            Email = reader.GetString(2),
-            PhoneNumber = reader.GetString(3),
-            JobDescription = reader.GetString(4),
-            JobLocation = reader.GetString(5),
-            JobRegisteredDate = reader.GetDateTime(6),
-            DeadlineDate = reader.GetDateTime(7),
-            CompanyCVR = new Company()
-            {
-                Id = reader.GetInt32(8)
-            },
-            JobAdvertCategoryId = new JobAdvertCategory()
-            {
-                Id = reader.GetInt32(9)
-            },
-            JobAdvertCategorySpecializationId = new JobAdvertCategorySpecialization()
-            {
-                Id = reader.GetInt32(10)
-            }
-         * 
-         */
+        public async Task<List<JobAdvert>> GetJobSpecialVacanciesAsync(int id, string name)
+        {
+            JobAdverts = await Task.FromResult(AdvertRepository.GetAll().ToList());
+
+            var sortJobs = from job in JobAdverts
+                           where job.JobAdvertCategorySpecializationId.Id == id
+                           select job;
+
+            return await Task.FromResult(sortJobs.ToList());
+        }
     }
 }
