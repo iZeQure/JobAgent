@@ -31,13 +31,13 @@ app {
     flex-direction: column;
 }
     .welcome-message p {
-        font-size: 1.5vh;
+        font-size: 1rem;
         display: inline-flex;
         margin: 0;
         padding: 0;
     }
         .welcome-message p.smaller {
-            font-size: smaller;
+            font-size: 0.75rem;
         }
 
 .main {
@@ -192,6 +192,13 @@ ul.validation-errors {
 }
 
 /*
+    ## Button Changes
+*/
+.btn:hover {
+    color: white;
+}
+
+/*
     ## Custom Navbar Changes ##
 */
 
@@ -234,7 +241,7 @@ ul.validation-errors {
 }
 
 .logo-text {
-    font-size: 2.5vh;
+    font-size: 1.75rem;
     display: inline-block;
 }
 
@@ -262,24 +269,26 @@ ul.validation-errors {
     /* Set menu title */
     #adminMenu .title {
         color: lightgray;
-        font-size: 2vh;
+        font-size: 1.25rem;
     }
 
     /* Set menu icons */
     #adminMenu .menu-icons {
         color: #17a2b8;
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         margin-right: 1rem;
+        vertical-align: middle;
     }
 
     /* Set Menu Links */
     #adminMenu a {
         color: lightgray;
-        font-size: 1.25vh;
+        font-size: 0.75rem;
         text-decoration: underline;
     }
 
 .admin-label {
+    font-size: 1rem;
     color: white;
     background-color: #343a40;
     padding: 10px;
