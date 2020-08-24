@@ -1,5 +1,6 @@
 ﻿using JobAgent.Data.DB;
 using JobAgent.Data.Repository.Interface;
+using JobAgent.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -73,6 +74,62 @@ namespace JobAgent.Data.Repository
         public JobAdvert GetById(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public IEnumerable<JobVacanciesAdminModel> GetJobAdvertsForAdmins()
+        {
+            // Initialize command obj.
+            using SqlCommand c = new SqlCommand()
+            {
+                CommandText = "GetAllJobAdvertsForAdmins",
+                CommandType = CommandType.StoredProcedure,
+                Connection = Database.Instance.SqlConnection
+            };
+
+            // Initialize data reader.
+            using SqlDataReader r = c.ExecuteReader();
+
+            // Create temp list with job adverts.
+            List<JobVacanciesAdminModel> dataList = new List<JobVacanciesAdminModel>();
+
+            // Temp objects.
+            JobAdvertCategorySpecialization specialization = new JobAdvertCategorySpecialization();
+
+            // Check for rows.
+            if (r.HasRows)
+            {
+                // Read data.
+                while (r.Read())
+                {
+                    if (!DataReaderExtensions.IsDBNull(r, "Specialization")) specialization.Name = r.GetString("Specialization");
+                    else specialization.Name = string.Empty;
+
+                    dataList.Add(new JobVacanciesAdminModel()
+                    {
+                        JobAdvert = new JobAdvert()
+                        {
+                            Id = r.GetInt32("JobId"),
+                            Title = r.GetString("Title"),
+                            JobRegisteredDate = r.GetDateTime("JobRegisteredDate"),
+                            DeadlineDate = r.GetDateTime("DeadlineDate")
+                        },
+                        Category = new JobAdvertCategory()
+                        {
+                            Name = r.GetString("Category")
+                        },
+                        Specialization = new JobAdvertCategorySpecialization()
+                        {
+                            Name = specialization.Name
+                        },
+                        Company = new Company()
+                        {
+                            Name = r.GetString("Name")
+                        }
+                    });
+                }
+            }
+
+            return dataList;
         }
 
         public void Remove(int id)

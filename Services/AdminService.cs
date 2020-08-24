@@ -2,6 +2,7 @@
 using JobAgent.Data.Repository;
 using JobAgent.Data.Repository.Interface;
 using JobAgent.Data.Security;
+using JobAgent.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,8 @@ namespace JobAgent.Services
 {
     public class AdminService
     {
+        private IRepository<JobAdvert> JobRepository { get; } = new JobAdvertRepository();
+
         public Task<User> GetUserByEmail(string userMail)
         {
             IRepository<User> userRepository = new UserRepository();
@@ -39,6 +42,11 @@ namespace JobAgent.Services
             auth.Password = hashPassword.Result;
 
             ((IUserRepository)repository).UpdateUserPassword(auth);
+        }
+
+        public Task<List<JobVacanciesAdminModel>> GetJobVacancies()
+        {
+            return Task.FromResult(((IJobAdvertRepository)JobRepository).GetJobAdvertsForAdmins().ToList());
         }
     }
 }

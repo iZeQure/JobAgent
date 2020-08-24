@@ -1,9 +1,68 @@
 ﻿@page "/admin/settings/job/vacancies"
 
+@using JobAgent.Models
+@using JobAgent.Services
+
+@inject AdminService Service
+
 @attribute [Authorize]
 
-<h3>JobVacancySettings</h3>
+<div class="table-responsive">
+    <table class="table table-striped table-hover rounded">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Titel</th>
+                <th scope="col">Job Kategory</th>
+                <th scope="col">Virksomhed</th>
+                <th scope="col">Opslag Registeret</th>
+                <th scope="col">Ansøgningsfrist</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <tr>
+                    <th scope="row">@Model[i].JobAdvert.Id</th>
+                    <td>@Model[i].JobAdvert.Title</td>
+                    @if (string.IsNullOrEmpty(Model[i].Specialization.Name))
+                    {
+                        <td>@Model[i].Category.Name</td>
+                    }
+                    else
+                    {
+                        <td>@Model[i].Specialization.Name</td>
+                    }
+                    <td>@Model[i].Company.Name</td>
+                    <td>@Model[i].JobAdvert.JobRegisteredDate</td>
+                    <td>@Model[i].JobAdvert.DeadlineDate</td>
+                    <td>
+                        <span>
+                            <i class="far fa-edit"></i>
+                            <BSButton Id='@($"edittooltip{Model[i].JobAdvert.Id}")' IsOutline="true" Color="Color.Info"></BSButton>
+                        </span>                        
+                        <BSTooltip Target='@($"edittooltip{Model[i].JobAdvert.Id}")' Placement="Placement.Top">Skift information på opslag.</BSTooltip>
+                    </td>
+                    <td>
+                        <span>
+                            <i class="fas fa-trash-alt"></i>
+                            <BSButton Id='@($"removetooltip{Model[i].JobAdvert.Id}")' IsOutline="true" Color="Color.Danger"></BSButton>
+                        </span>                        
+                        <BSTooltip Target='@($"removetooltip{Model[i].JobAdvert.Id}")' Placement="Placement.Top">Fjern job opslag.</BSTooltip>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 @code {
+    public List<JobVacanciesAdminModel> Model = new List<JobVacanciesAdminModel>();
 
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await Service.GetJobVacancies();
+    }
 }

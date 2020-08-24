@@ -39,15 +39,17 @@
         <DataAnnotationsValidator />
         <ValidationSummary />
 
-        <BSFormGroup>
-            <BSLabel For="inputEmail1">Email Adresse</BSLabel>
-            <BSInput Id="inputEmail1" InputType="InputType.Email" PlaceHolder="Indtast email adresse.." @bind-Value="UserLogInModel.Email" />
-        </BSFormGroup>
-        <BSFormGroup>
-            <BSLabel For="inputPassword">Adgangskode</BSLabel>
-            <BSInput Id="inputPassword" InputType="InputType.Password" Placeholder="Indtast adgangskode.." @bind-Value="UserLogInModel.Password" />
-        </BSFormGroup>
-        <BSButton Color="Color.Info" ButtonType="ButtonType.Submit" Class="btn-block mr-2" IsDisabled="IsProcessing">Log ind</BSButton>
+        <div class="form-group">
+            <label for="inputEmail" class="admin-label">Email Adresse :</label>
+            <input id="inputEmail" class="form-control" type="email" placeholder="Indtast email adresse.." @bind="UserLogInModel.Email" />
+        </div>
+        <hr />
+        <div class="form-group">
+            <label for="inputPassword" class="admin-label">Adgangskode :</label>
+            <input id="inputPassword" class="form-control" type="password" placeholder="Indtast adgangskode.." @bind="UserLogInModel.Password" />
+        </div>
+        <hr />
+        <button type="submit" class="btn btn-info ml-auto float-right mt-5" IsDisabled="IsProcessing">Log ind</button>
 
     </EditForm>
 </div>
