@@ -15,6 +15,7 @@ namespace JobAgent.Data
         private string jobLocation;
         private DateTime jobRegisteredDate;
         private DateTime deadlineDate;
+        private string sourceUrl;
         private Company companyCVR;
         private JobAdvertCategory jobAdvertCategoryId;
         private JobAdvertCategorySpecialization jobAdvertCategorySpecializationId;
@@ -28,6 +29,7 @@ namespace JobAgent.Data
         public string JobLocation { get { return jobLocation; } set { jobLocation = value; } }
         public DateTime JobRegisteredDate { get { return jobRegisteredDate; } set { jobRegisteredDate = value; } }
         public DateTime DeadlineDate { get { return deadlineDate; } set { deadlineDate = value; } }
+        public string SourceURL { get { return sourceUrl; } set { sourceUrl = value; } }
         public Company CompanyCVR { get { return companyCVR; } set { companyCVR = value; } }
         public JobAdvertCategory JobAdvertCategoryId { get { return jobAdvertCategoryId; } set { jobAdvertCategoryId = value; } } 
         public JobAdvertCategorySpecialization JobAdvertCategorySpecializationId { get { return jobAdvertCategorySpecializationId; } set { jobAdvertCategorySpecializationId = value; } }

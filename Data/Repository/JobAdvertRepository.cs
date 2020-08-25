@@ -76,6 +76,73 @@ namespace JobAgent.Data.Repository
             throw new NotImplementedException();
         }
 
+        public JobVacanciesAdminModel GetJobAdvertDetailsForAdminsById(int id)
+        {
+            // Initialize command obj.
+            using SqlCommand c = new SqlCommand()
+            {
+                CommandText = "GetJobAdvertDetailsForAdminsById",
+                CommandType = CommandType.StoredProcedure,
+                Connection = Database.Instance.SqlConnection
+            };
+
+            c.Parameters.AddWithValue("@id", id);
+
+            // Initialize data reader.
+            using SqlDataReader r = c.ExecuteReader();
+
+            // Initialize temporary obj.
+            JobVacanciesAdminModel tempModel = null;
+
+            JobAdvertCategorySpecialization specialization = new JobAdvertCategorySpecialization();
+
+            Database.Instance.OpenConnection();
+
+            // Check if the data reader has rows.
+            if (r.HasRows)
+            {
+                // Read data.
+                while (r.Read())
+                {
+                    if (!DataReaderExtensions.IsDBNull(r, "SpecializationName")) specialization.Name = r.GetString("SpecializationName");
+                    else specialization.Name = string.Empty;
+
+                    tempModel = new JobVacanciesAdminModel()
+                    {
+                        JobAdvert = new JobAdvert()
+                        {
+                            Id = r.GetInt32("BaseId"),
+                            Title = r.GetString("Title"),
+                            Email = r.GetString("Email"),
+                            PhoneNumber = r.GetString("PhoneNumber"),
+                            JobDescription = r.GetString("Desc"),
+                            JobLocation = r.GetString("Loc"),
+                            JobRegisteredDate = r.GetDateTime("RegDate"),
+                            DeadlineDate = r.GetDateTime("DeadlineDate"),
+                            SourceURL = r.GetString("SourceURL")
+                        },
+                        Company = new Company()
+                        {
+                            Id = r.GetInt32("CompanyId"),
+                            Name = r.GetString("CompanyName")
+                        },
+                        Category = new JobAdvertCategory()
+                        {
+                            Id = r.GetInt32("CategoryId"),
+                            Name = r.GetString("CategoryName")
+                        },
+                        Specialization = new JobAdvertCategorySpecialization()
+                        {
+                            Id = r.GetInt32("SpecializationId"),
+                            Name = specialization.Name
+                        }
+                    };
+                }
+            }
+
+            return tempModel;
+        }
+
         public IEnumerable<JobVacanciesAdminModel> GetJobAdvertsForAdmins()
         {
             // Initialize command obj.

@@ -25,3 +25,11 @@ window.HTMLBodyElement = (name, body, color) => {
         });
     }    
 }
+
+window.HTMLBodyElement = () => {
+    $('#vacancyAdminDetails').modal({
+        backdrop: 'static',
+        keyboard: false,
+        show: false
+    });
+}

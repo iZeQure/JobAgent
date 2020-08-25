@@ -15,6 +15,8 @@ namespace JobAgent.Services
     {
         private IRepository<JobAdvert> JobRepository { get; } = new JobAdvertRepository();
 
+        private IRepository<JobAdvertCategory> CategoryRepository { get; } = new JobAdvertCategoryRepository();
+
         public Task<User> GetUserByEmail(string userMail)
         {
             IRepository<User> userRepository = new UserRepository();
@@ -47,6 +49,21 @@ namespace JobAgent.Services
         public Task<List<JobVacanciesAdminModel>> GetJobVacancies()
         {
             return Task.FromResult(((IJobAdvertRepository)JobRepository).GetJobAdvertsForAdmins().ToList());
+        }
+
+        public Task<JobVacanciesAdminModel> GetJobVacancyDetailsById(int id)
+        {
+            return Task.FromResult(((IJobAdvertRepository)JobRepository).GetJobAdvertDetailsForAdminsById(id));
+        }
+
+        public Task<List<JobAdvertCategory>> GetAllJobAdvertCategories()
+        {
+            return Task.FromResult(CategoryRepository.GetAll().ToList());
+        }
+
+        public Task<List<JobAdvertCategorySpecialization>> GetAllJobAdvertCategorySpecializations()
+        {
+            return Task.FromResult(((IJobAdvertCategoryRepository)CategoryRepository).GetAllJobAdvertCategorySpecializations());
         }
     }
 }

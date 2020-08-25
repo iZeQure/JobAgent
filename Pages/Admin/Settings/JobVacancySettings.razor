@@ -1,5 +1,6 @@
 ﻿@page "/admin/settings/job/vacancies"
 
+@using JobAgent.Data
 @using JobAgent.Models
 @using JobAgent.Services
 
@@ -7,8 +8,9 @@
 
 @attribute [Authorize]
 
-<div class="table-responsive">
-    <table class="table table-striped table-hover ">
+<div class="table-responsive table-responsive-sm table-responsive-md">
+    <table class="table table-sm table-striped table-hover">
+        <caption>Liste over stillingsopslag..</caption>
         <thead class="thead-dark">
             <tr>
                 <th scope="col">#</th>
@@ -22,27 +24,32 @@
             </tr>
         </thead>
         <tbody>
-            @for (int i = 0; i < Model.Count; i++)
+
+            @foreach (var item in Model)
             {
                 <tr>
-                    <th scope="row">@Model[i].JobAdvert.Id</th>
-                    <td>@Model[i].JobAdvert.Title</td>
-                    @if (string.IsNullOrEmpty(Model[i].Specialization.Name))
+                    <th scope="row">@item.JobAdvert.Id</th>
+                    <td class="text-truncate d-inline-block">@item.JobAdvert.Title</td>
+                    @if (string.IsNullOrEmpty(item.Specialization.Name))
                     {
-                        <td>@Model[i].Category.Name</td>
+                        <td>@item.Category.Name</td>
                     }
                     else
                     {
-                        <td>@Model[i].Specialization.Name</td>
+                        <td>@item.Specialization.Name</td>
                     }
-                    <td>@Model[i].Company.Name</td>
-                    <td>@Model[i].JobAdvert.JobRegisteredDate</td>
-                    <td>@Model[i].JobAdvert.DeadlineDate</td>
+                    <td>@item.Company.Name</td>
+                    <td>@item.JobAdvert.JobRegisteredDate</td>
+                    <td>@item.JobAdvert.DeadlineDate</td>
                     <td>
-                        <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette opslag." Color="Popover.PopoverType.Info" />
+                        <span @onclick="(id => Test(item.JobAdvert.Id))" data-toggle="modal" data-target="#vacancyAdminDetails">
+                            <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette opslag." Color="Popover.PopoverType.Info" />
+                        </span>
                     </td>
                     <td>
-                        <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
+                        <span @onclick="@(id => Test(item.JobAdvert.Id))">
+                            <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
+                        </span>
                     </td>
                 </tr>
             }
@@ -50,11 +57,148 @@
     </table>
 </div>
 
+@* Job Detail Modal *@
+<div class="modal fade" id="vacancyAdminDetails" tabindex="-1" role="dialog" aria-labelledby="jobPostingDetailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <EditForm Model="ModelDetails" OnValidSubmit="OnValidSubmit_SaveJobVacancy">
+
+                <div class="modal-header">
+                    <input id="inputTitle" type="text" class="form-control" placeholder="Indtast titel" @bind-value="ModelDetails.JobAdvert.Title" />
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col">
+                            <label for="inputEmail" class="admin-label">Email Adresse :</label>
+                            <input id="inputEmail" class="form-control" type="email" placeholder="Indtast email adressse" @bind-value="ModelDetails.JobAdvert.Email" />
+                        </div>
+                        <div class="col">
+                            <label for="inputPhoneNumber" class="admin-label">Telefon nr. :</label>
+                            <input id="inputPhoneNumber" class="form-control" type="text" placeholder="Indtast telefon nr." @bind-value="ModelDetails.JobAdvert.PhoneNumber" />
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="inputDesc" class="admin-label">Beskrivelse :</label>
+                            <textarea id="inputDesc" class="form-control" style="max-height: 450px; min-height: 150px;" @bind="ModelDetails.JobAdvert.JobDescription"></textarea>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="inputLocation" class="admin-label">Lokation :</label>
+                            <input id="inputLocation" class="form-control" placeholder="Indtast lokation" @bind-value="ModelDetails.JobAdvert.JobLocation" />
+                        </div>
+                        <div class="col">
+                            <label for="inputLocation" class="admin-label">Link til Stillingsopslag :</label>
+                            <input id="inputLocation" class="form-control" placeholder="Indtast stillingsopslagets URL" @bind-value="ModelDetails.JobAdvert.SourceURL" />
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="inputRegisteredDate" class="admin-label">Opslag Registeret :</label>
+                            <input id="inputRegisteredDate" class="form-control" type="date" @bind-value="ModelDetails.JobAdvert.JobRegisteredDate" />
+                        </div>
+                        <div class="col">
+                            <label for="inputDeadlineDate" class="admin-label">Ansøgningsfrist :</label>
+                            <input id="inputDeadlineDate" class="form-control" type="date" @bind-value="ModelDetails.JobAdvert.DeadlineDate" />
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="inputConsultantArea" class="admin-label">Kategori :</label>
+                            <select class="form-control" @bind="ModelDetails.Category.Id">
+                                @foreach (var cat in GetCategories)
+                                {
+                                    @if (cat.Id == ModelDetails.Category.Id)
+                                    {
+                                        <option value="@cat.Id" selected>@cat.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@cat.Id">@cat.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label for="inputLocation" class="admin-label">Kategori Speciale :</label>
+                            <select class="form-control" @bind="ModelDetails.Specialization.Id">
+                                @foreach (var spec in GetSpecializations)
+                                {
+                                    @if (spec.Id == ModelDetails.Specialization.Id)
+                                    {
+                                        <option value="@spec.Id" selected>@spec.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@spec.Id">@spec.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Annuller</button>
+                    <a class="btn btn-info text-light cursor-pointer">Gem ændringer</a>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
 @code {
-    public List<JobVacanciesAdminModel> Model = new List<JobVacanciesAdminModel>();
+    public List<JobVacanciesAdminModel> Model { get; set; } = new List<JobVacanciesAdminModel>();
+
+    public JobVacanciesAdminModel ModelDetails { get; set; }
+        = new JobVacanciesAdminModel()
+        {
+            JobAdvert = new JobAdvert(),
+            Category = new JobAdvertCategory(),
+            Company = new Company(),
+            Specialization = new JobAdvertCategorySpecialization()
+        };
+
+    public List<JobAdvertCategory> GetCategories { get; set; } = new List<JobAdvertCategory>();
+    public List<JobAdvertCategorySpecialization> GetSpecializations { get; set; } = new List<JobAdvertCategorySpecialization>();
 
     protected override async Task OnInitializedAsync()
     {
         Model = await Service.GetJobVacancies();
+
+        GetCategories = await Service.GetAllJobAdvertCategories();
+        GetSpecializations = await Service.GetAllJobAdvertCategorySpecializations();
+    }
+
+    public async Task Test(int id)
+    {
+        // Get full details of job vacancy post.
+
+        ModelDetails = await Service.GetJobVacancyDetailsById(id);
+    }
+
+    public async Task OnValidSubmit_SaveJobVacancy()
+    {
+        await InvokeAsync(async () =>
+        {
+            await Task.FromResult(true);
+            StateHasChanged();
+        });
+
+        await Task.FromResult(false);
     }
 }

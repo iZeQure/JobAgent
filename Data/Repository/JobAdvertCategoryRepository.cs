@@ -80,17 +80,23 @@ namespace JobAgent.Data.Repository
             // Initialize Data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
 
+            // Temp
+            JobAdvertCategory temp = new JobAdvertCategory();
+
             // Check if the reader has rows.
             if (reader.HasRows)
             {
                 // Add data to the temp list while reading the data.
                 while (reader.Read())
                 {
+                    if (DataReaderExtensions.IsDBNull(reader, "Description")) temp.Description = string.Empty;
+                    else temp.Description = reader.GetString(2);
+
                     tempCategories.Add(new JobAdvertCategory()
                     {
                         Id = reader.GetInt32(0),
                         Name = reader.GetString(1),
-                        Description = reader.GetString(2)
+                        Description = temp.Description
                     });
                 }
             }
@@ -303,17 +309,23 @@ namespace JobAgent.Data.Repository
             // Initialize data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
 
+            // Temp
+            JobAdvertCategorySpecialization temp = new JobAdvertCategorySpecialization();
+
             // Check if any rows.
             if (reader.HasRows)
             {
                 // Add data to temporary list while reading.
                 while (reader.Read())
                 {
+                    if (DataReaderExtensions.IsDBNull(reader, "Description")) temp.Description = string.Empty;
+                    else temp.Description = reader.GetString(2);
+
                     tempSpecializations.Add(new JobAdvertCategorySpecialization()
                     {
                         Id = reader.GetInt32(0),
                         Name = reader.GetString(1),
-                        Description = reader.GetString(2),
+                        Description = temp.Description,
                         JobAdvertCategoryId = reader.GetInt32(3)
                     });
                 }

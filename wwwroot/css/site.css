@@ -200,6 +200,14 @@ ul.validation-errors {
      border-radius: 0.25rem !important;
 }
 
+td {
+    max-width: 35vh;
+    /*overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block !important;*/
+}
+
 /*
     ## Button Changes
 */
@@ -302,4 +310,13 @@ ul.validation-errors {
     background-color: #343a40;
     padding: 10px;
     border-radius: 5px;
+}
+
+/*
+    ## Popover Styling
+*/
+
+.popover-info,
+.popover-danger {
+    cursor: pointer;
 }
