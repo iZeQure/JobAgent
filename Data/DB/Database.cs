@@ -37,7 +37,7 @@ namespace JobAgent.Data.DB
             }
             catch (Exception)
             {
-                throw;
+                CloseConnection();
             }
         }
         #endregion
@@ -49,8 +49,6 @@ namespace JobAgent.Data.DB
                 if (SqlConnection.State != ConnectionState.Open)
                 {
                     if (SqlConnection.State == ConnectionState.Connecting) return;
-
-                    SqlConnection.ConnectionString = ConnectionString;
                     SqlConnection.Open();
                 }
 

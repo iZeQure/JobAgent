@@ -33,3 +33,7 @@ window.HTMLBodyElement = () => {
         show: false
     });
 }
+
+window.Modal = () => {
+    $('#vacancyAdminDetails').modal('toggle');
+}

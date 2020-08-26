@@ -88,6 +88,8 @@ namespace JobAgent.Data.Repository
 
             c.Parameters.AddWithValue("@id", id);
 
+            Database.Instance.OpenConnection();
+
             // Initialize data reader.
             using SqlDataReader r = c.ExecuteReader();
 
@@ -95,8 +97,6 @@ namespace JobAgent.Data.Repository
             JobVacanciesAdminModel tempModel = null;
 
             JobAdvertCategorySpecialization specialization = new JobAdvertCategorySpecialization();
-
-            Database.Instance.OpenConnection();
 
             // Check if the data reader has rows.
             if (r.HasRows)
@@ -140,6 +140,8 @@ namespace JobAgent.Data.Repository
                 }
             }
 
+            Database.Instance.CloseConnection();
+
             return tempModel;
         }
 
@@ -153,47 +155,57 @@ namespace JobAgent.Data.Repository
                 Connection = Database.Instance.SqlConnection
             };
 
-            // Initialize data reader.
-            using SqlDataReader r = c.ExecuteReader();
+            // Open database connection.
+            Database.Instance.OpenConnection();
 
             // Create temp list with job adverts.
             List<JobVacanciesAdminModel> dataList = new List<JobVacanciesAdminModel>();
 
-            // Temp objects.
-            JobAdvertCategorySpecialization specialization = new JobAdvertCategorySpecialization();
-
-            // Check for rows.
-            if (r.HasRows)
+            try
             {
-                // Read data.
-                while (r.Read())
-                {
-                    if (!DataReaderExtensions.IsDBNull(r, "Specialization")) specialization.Name = r.GetString("Specialization");
-                    else specialization.Name = string.Empty;
+                // Initialize data reader.
+                using SqlDataReader r = c.ExecuteReader();
 
-                    dataList.Add(new JobVacanciesAdminModel()
+                // Temp objects.
+                JobAdvertCategorySpecialization specialization = new JobAdvertCategorySpecialization();
+
+                // Check for rows.
+                if (r.HasRows)
+                {
+                    // Read data.
+                    while (r.Read())
                     {
-                        JobAdvert = new JobAdvert()
+                        if (!DataReaderExtensions.IsDBNull(r, "Specialization")) specialization.Name = r.GetString("Specialization");
+                        else specialization.Name = string.Empty;
+
+                        dataList.Add(new JobVacanciesAdminModel()
                         {
-                            Id = r.GetInt32("JobId"),
-                            Title = r.GetString("Title"),
-                            JobRegisteredDate = r.GetDateTime("JobRegisteredDate"),
-                            DeadlineDate = r.GetDateTime("DeadlineDate")
-                        },
-                        Category = new JobAdvertCategory()
-                        {
-                            Name = r.GetString("Category")
-                        },
-                        Specialization = new JobAdvertCategorySpecialization()
-                        {
-                            Name = specialization.Name
-                        },
-                        Company = new Company()
-                        {
-                            Name = r.GetString("Name")
-                        }
-                    });
+                            JobAdvert = new JobAdvert()
+                            {
+                                Id = r.GetInt32("JobId"),
+                                Title = r.GetString("Title"),
+                                JobRegisteredDate = r.GetDateTime("JobRegisteredDate"),
+                                DeadlineDate = r.GetDateTime("DeadlineDate")
+                            },
+                            Category = new JobAdvertCategory()
+                            {
+                                Name = r.GetString("Category")
+                            },
+                            Specialization = new JobAdvertCategorySpecialization()
+                            {
+                                Name = specialization.Name
+                            },
+                            Company = new Company()
+                            {
+                                Name = r.GetString("Name")
+                            }
+                        });
+                    }
                 }
+            }
+            finally
+            {
+                Database.Instance.CloseConnection();
             }
 
             return dataList;
@@ -201,12 +213,61 @@ namespace JobAgent.Data.Repository
 
         public void Remove(int id)
         {
-            throw new NotImplementedException();
+            // Initialize command obj.
+            using SqlCommand c = new SqlCommand()
+            {
+                CommandText = "RemoveJobAdvert",
+                CommandType = CommandType.StoredProcedure,
+                Connection = Database.Instance.SqlConnection
+            };
+
+            // Define id to remove.
+            c.Parameters.AddWithValue("@JobAdvertId", id);
+
+            try
+            {
+                Database.Instance.OpenConnection();
+
+                c.ExecuteNonQuery();
+            }
+            finally
+            {
+                Database.Instance.CloseConnection();
+            }
         }
 
         public void Update(JobAdvert update)
         {
-            throw new NotImplementedException();
+            // Initialzie command obj.
+            using SqlCommand c = new SqlCommand()
+            {
+                CommandText = "UpdateJobAdvert",
+                CommandType = CommandType.StoredProcedure,
+                Connection = Database.Instance.SqlConnection
+            };
+
+            // Set parameters.
+            c.Parameters.AddWithValue("@RowId", update.Id);
+            c.Parameters.AddWithValue("@NewTitle", update.Title);
+            c.Parameters.AddWithValue("@NewEmail", update.Email);
+            c.Parameters.AddWithValue("@NewPhoneNumber", update.PhoneNumber);
+            c.Parameters.AddWithValue("@NewJobDescription", update.JobDescription);
+            c.Parameters.AddWithValue("@NewJobLocation", update.JobLocation);
+            c.Parameters.AddWithValue("@NewRegDate", update.JobRegisteredDate);
+            c.Parameters.AddWithValue("@NewDeadlineDate", update.DeadlineDate);
+            c.Parameters.AddWithValue("@NewSourceURL", update.SourceURL);
+            c.Parameters.AddWithValue("@NewCompanyCVR", update.CompanyCVR.Id);
+            c.Parameters.AddWithValue("@NewJobAdvertCategoryId", update.JobAdvertCategoryId.Id);
+            c.Parameters.AddWithValue("@NewJobAdvertCategorySpecializationId", update.JobAdvertCategorySpecializationId.Id);
+
+            // Open connection to db.
+            Database.Instance.OpenConnection();
+
+            // Update data.
+            c.ExecuteNonQuery();
+
+            // Close connection to db.
+            Database.Instance.CloseConnection();
         }
     }
 }
