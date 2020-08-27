@@ -2,6 +2,18 @@ window.HTMLTitleElement = (title) => {
     document.title = title;
 }
 
+window.OnInformationChangeAnimation = (id) => {
+    console.info(`Animating => ${id}`);
+
+    $(`#${id}`).toggleClass('onInformationChangeAnimation');
+
+    setTimeout(function () {
+        $(`#${id}`).toggleClass('onInformationChangeAnimation');
+    }, 6000);
+
+    //$(`#${id}`).toggleClass('animation', 3000);
+}
+
 window.HTMLBodyElement = (name, body, color) => {
 
     console.log(color);
@@ -34,6 +46,10 @@ window.HTMLBodyElement = () => {
     });
 }
 
-window.Modal = () => {
+window.ToggleUpdateVacancyModal = () => {
     $('#vacancyAdminDetails').modal('toggle');
+}
+
+window.ToggleRemoveVacancyModal = () => {
+    $('#vacandyRemoveConfirmation').modal('toggle');
 }

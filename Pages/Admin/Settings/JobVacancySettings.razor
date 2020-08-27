@@ -4,6 +4,8 @@
 @using JobAgent.Models
 @using JobAgent.Services
 
+@using Syncfusion.Blazor.Calendars
+
 @inject AdminService Service
 @inject IJSRuntime JSRuntime
 
@@ -11,83 +13,92 @@
 
 @attribute [Authorize]
 
-<div class="table-responsive table-responsive-sm table-responsive-md">
-    <table class="table table-sm table-striped table-hover">
-        <caption>Liste over stillingsopslag..</caption>
-        <thead class="thead-dark">
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Titel</th>
-                <th scope="col">Job Kategory</th>
-                <th scope="col">Virksomhed</th>
-                <th scope="col">Opslag Registeret</th>
-                <th scope="col">Ansøgningsfrist</th>
-                <th scope="col"></th>
-                <th scope="col"></th>
-            </tr>
-        </thead>
-        <tbody>
+@if (JobVacancyModel.Count == 0)
+{
+    <div class="alert alert-info" role="alert">
+        <h4 class="alert-heading">System Besked!</h4>
 
-            @foreach (var item in Model)
-            {
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+
+        <p>Fejl i Database.</p>
+        <hr>
+        <p>Der blev desværre ikke fundet nogen stillingsopslag i databasen.</p>
+        <p class="mb-0">Genindlæs siden eller prøv igen senere..</p>
+    </div>
+}
+else
+{
+    <div class="table-responsive table-responsive-sm table-responsive-md">
+        <table class="table table-sm table-striped table-hover">
+            <caption>Liste over stillingsopslag..</caption>
+            <thead class="thead-dark">
                 <tr>
-                    <th scope="row">@item.JobAdvert.Id</th>
-                    <td class="text-truncate d-inline-block">@item.JobAdvert.Title</td>
-                    @if (string.IsNullOrEmpty(item.Specialization.Name))
-                    {
-                        <td>@item.Category.Name</td>
-                    }
-                    else
-                    {
-                        <td>@item.Specialization.Name</td>
-                    }
-                    <td>@item.Company.Name</td>
-                    <td>@item.JobAdvert.JobRegisteredDate</td>
-                    <td>@item.JobAdvert.DeadlineDate</td>
-                    <td>
-                        <span @onclick="(id => OnClick_GetDetailsById(item.JobAdvert.Id))" data-toggle="modal" data-target="#vacancyAdminDetails">
-                            <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette opslag." Color="Popover.PopoverType.Info" />
-                        </span>
-                    </td>
-                    <td>
-                        <span @onclick="@(id => OnClick_RemoveJobVancacy(item.JobAdvert.Id))">
-                            <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
-                        </span>
-                    </td>
+                    <th scope="col">#</th>
+                    <th scope="col">Titel</th>
+                    <th scope="col">Job Kategory</th>
+                    <th scope="col">Virksomhed</th>
+                    <th scope="col">Opslag Registeret</th>
+                    <th scope="col">Ansøgningsfrist</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
                 </tr>
-            }
-        </tbody>
-    </table>
-</div>
+            </thead>
+            <tbody>
+
+                @foreach (var item in JobVacancyModel)
+                {
+                    <tr id="@item.JobAdvert.Id">
+                        <th scope="row">@item.JobAdvert.Id</th>
+                        <td class="text-truncate d-inline-block">@item.JobAdvert.Title</td>
+                        @if (string.IsNullOrEmpty(item.Specialization.Name))
+                        {
+                            <td>@item.Category.Name</td>
+                        }
+                        else
+                        {
+                            <td>@item.Specialization.Name</td>
+                        }
+                        <td>@item.Company.Name</td>
+                        <td>@item.JobAdvert.JobRegisteredDate.ToString("D")</td>
+                        <td>@item.JobAdvert.DeadlineDate.ToString("D")</td>
+                        <td>
+                            <span @onclick="(id => OnClickEdit_GetJobVacancyDetailsById(item.JobAdvert.Id))" data-toggle="modal" data-target="#vacancyAdminDetails">
+                                <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette opslag." Color="Popover.PopoverType.Info" />
+                            </span>
+                        </td>
+                        <td>
+                            <span @onclick="@(id => OnClick_StoreId(item.JobAdvert.Id))" data-toggle="modal" data-target="#vacandyRemoveConfirmation">
+                                <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
 
 @* Job Detail Modal *@
 <div class="modal fade" id="vacancyAdminDetails" tabindex="-1" role="dialog" aria-labelledby="jobPostingDetailLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
-            <EditForm Model="ModelDetails" OnValidSubmit="OnValidSubmit_UpdateJobVacancy">
+            <EditForm Model="JobVacancyModelDetails" OnValidSubmit="OnValidSubmit_UpdateJobVacancy">
 
                 <div class="modal-header">
-                    <input id="inputTitle" type="text" class="form-control" placeholder="Indtast titel" @bind-value="ModelDetails.JobAdvert.Title" />
+                    <input id="inputTitle" type="text" class="form-control form-control-sm" placeholder="Indtast titel" @bind-value="JobVacancyModelDetails.JobAdvert.Title" />
                 </div>
 
                 <div class="modal-body">
                     <div class="row">
                         <div class="col">
-                            <label for="inputEmail" class="admin-label">Email Adresse :</label>
-                            <input id="inputEmail" class="form-control" type="email" placeholder="Indtast email adressse" @bind-value="ModelDetails.JobAdvert.Email" />
+                            <label for="inputEmail" class="admin-label col-form-label col-form-label-sm">Email Adresse :</label>
+                            <input id="inputEmail" class="form-control form-control-sm" type="email" placeholder="Indtast email adressse" @bind-value="JobVacancyModelDetails.JobAdvert.Email" />
                         </div>
                         <div class="col">
-                            <label for="inputPhoneNumber" class="admin-label">Telefon nr. :</label>
-                            <input id="inputPhoneNumber" class="form-control" type="text" placeholder="Indtast telefon nr." @bind-value="ModelDetails.JobAdvert.PhoneNumber" />
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="inputDesc" class="admin-label">Beskrivelse :</label>
-                            <textarea id="inputDesc" class="form-control" style="max-height: 450px; min-height: 150px;" @bind="ModelDetails.JobAdvert.JobDescription"></textarea>
+                            <label for="inputPhoneNumber" class="admin-label col-form-label col-form-label-sm">Telefon nr. :</label>
+                            <input id="inputPhoneNumber" class="form-control form-control-sm" type="text" placeholder="Indtast telefon nr." @bind-value="JobVacancyModelDetails.JobAdvert.PhoneNumber" />
                         </div>
                     </div>
 
@@ -95,15 +106,24 @@
 
                     <div class="row">
                         <div class="col">
-                            <label for="inputLocation" class="admin-label">Lokation :</label>
-                            <input id="inputLocation" class="form-control" placeholder="Indtast lokation" @bind-value="ModelDetails.JobAdvert.JobLocation" />
+                            <label for="inputDesc" class="admin-label col-form-label col-form-label-sm">Beskrivelse :</label>
+                            <textarea id="inputDesc" class="form-control form-control-sm" style="max-height: 450px; min-height: 150px;" @bind="JobVacancyModelDetails.JobAdvert.JobDescription"></textarea>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="inputLocation" class="admin-label col-form-label col-form-label-sm">Lokation :</label>
+                            <input id="inputLocation" class="form-control form-control-sm" placeholder="Indtast lokation" @bind-value="JobVacancyModelDetails.JobAdvert.JobLocation" />
                         </div>
                         <div class="col">
-                            <label for="inputCompany" class="admin-label">Virksomhed :</label>
-                            <select class="form-control" @bind="ModelDetails.Company.Id">
+                            <label for="inputCompany" class="admin-label col-form-label col-form-label-sm">Virksomhed :</label>
+                            <select class="form-control form-control-sm" @bind="JobVacancyModelDetails.Company.Id">
                                 @foreach (var comp in GetCompanies)
                                 {
-                                    @if (comp.Id == ModelDetails.Company.Id)
+                                    @if (comp.Id == JobVacancyModelDetails.Company.Id)
                                     {
                                         <option value="@comp.Id" selected>@comp.Name</option>
                                     }
@@ -120,8 +140,8 @@
 
                     <div class="row">
                         <div class="col">
-                            <label for="inputSourceUrl" class="admin-label">Link til Stillingsopslag :</label>
-                            <input id="inputSourceUrl" class="form-control" placeholder="Indtast stillingsopslagets URL" @bind-value="ModelDetails.JobAdvert.SourceURL" />
+                            <label for="inputSourceUrl" class="admin-label col-form-label col-form-label-sm">Link til Stillingsopslag :</label>
+                            <input id="inputSourceUrl" class="form-control form-control-sm" placeholder="Indtast stillingsopslagets URL" @bind-value="JobVacancyModelDetails.JobAdvert.SourceURL" />
                         </div>
                     </div>
 
@@ -129,12 +149,17 @@
 
                     <div class="row">
                         <div class="col">
-                            <label for="inputRegisteredDate" class="admin-label">Opslag Registeret :</label>
-                            <input id="inputRegisteredDate" class="form-control" type="date" @bind-value="ModelDetails.JobAdvert.JobRegisteredDate" />
+                            <label for="inputRegisteredDate" class="admin-label col-form-label col-form-label-sm">Opslag Registeret :</label>
+
+                            <SfDateTimePicker ID="inputRegisteredDate" Locale="da" TValue="DateTime?" Value="JobVacancyModelDetails.JobAdvert.JobRegisteredDate" StrictMode="true" Min="@MinDateTime" WeekNumber="true" Placeholder="Vælg en dato">
+                                <DateTimePickerEvents TValue="DateTime?" ValueChange="@OnDateChange_Registered"></DateTimePickerEvents>
+                            </SfDateTimePicker>
                         </div>
                         <div class="col">
-                            <label for="inputDeadlineDate" class="admin-label">Ansøgningsfrist :</label>
-                            <input id="inputDeadlineDate" class="form-control" type="date" @bind-value="ModelDetails.JobAdvert.DeadlineDate" />
+                            <label for="inputDeadlineDate" class="admin-label col-form-label col-form-label-sm">Ansøgningsfrist :</label>
+                            <SfDateTimePicker ID="inputDeadlineDate" Locale="da" TValue="DateTime?" Value="JobVacancyModelDetails.JobAdvert.DeadlineDate" StrictMode="true" Min="@MinDateTime" WeekNumber="true" Placeholder="Vælg en ansøgningsfrist">
+                                <DateTimePickerEvents TValue="DateTime?" ValueChange="@OnDateChange_Deadline"></DateTimePickerEvents>
+                            </SfDateTimePicker>
                         </div>
                     </div>
 
@@ -142,11 +167,11 @@
 
                     <div class="row">
                         <div class="col">
-                            <label for="inputConsultantArea" class="admin-label">Kategori :</label>
-                            <select class="form-control" @onchange="OnChange_GetSpecializationBydCategoryId">
+                            <label for="inputConsultantArea" class="admin-label col-form-label col-form-label-sm">Kategori :</label>
+                            <select class="form-control form-control-sm" @onchange="OnCategoryChange_GetSpecializationBydCategoryId">
                                 @foreach (var cat in GetCategories)
                                 {
-                                    @if (cat.Id == ModelDetails.Category.Id)
+                                    @if (cat.Id == JobVacancyModelDetails.Category.Id)
                                     {
                                         <option value="@cat.Id" selected>@cat.Name</option>
                                     }
@@ -160,11 +185,11 @@
                         @if (SortedSpecialization.Count != 0)
                         {
                             <div class="col">
-                                <label for="inputLocation" class="admin-label">Kategori Speciale :</label>
-                                <select class="form-control" @bind="ModelDetails.Specialization.Id">
+                                <label for="inputLocation" class="admin-label col-form-label col-form-label-sm">Kategori Speciale :</label>
+                                <select class="form-control form-control-sm" @bind="JobVacancyModelDetails.Specialization.Id">
                                     @foreach (var spec in SortedSpecialization)
                                     {
-                                        @if (spec.Id == ModelDetails.Specialization.Id)
+                                        @if (spec.Id == JobVacancyModelDetails.Specialization.Id)
                                         {
                                             <option value="@spec.Id">@spec.Name</option>
                                         }
@@ -188,17 +213,26 @@
     </div>
 </div>
 
-@code {
-    public List<JobVacanciesAdminModel> Model { get; set; } = new List<JobVacanciesAdminModel>();
+@* Job Remove Confirmation Modal *@
+<div class="modal fade" id="vacandyRemoveConfirmation" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Er du sikker på du vil slette dette opslag?</h5>
+            </div>
 
-    public JobVacanciesAdminModel ModelDetails { get; set; }
-        = new JobVacanciesAdminModel()
-        {
-            JobAdvert = new JobAdvert(),
-            Category = new JobAdvertCategory(),
-            Company = new Company(),
-            Specialization = new JobAdvertCategorySpecialization()
-        };
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" data-dismiss="modal" @onclick="@(() => OnClickRemove_ConfirmRemove(false, 0))">Annuller</button>
+                <button type="button" class="btn btn-danger" @onclick="@(id => OnClickRemove_ConfirmRemove(true, ItemId))">Slet Opslag</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    public List<JobVacanciesAdminModel> JobVacancyModel { get; set; } = new List<JobVacanciesAdminModel>();
+
+    public JobVacanciesAdminModel JobVacancyModelDetails { get; set; } = new JobVacanciesAdminModel() { JobAdvert = new JobAdvert(), Category = new JobAdvertCategory(), Company = new Company(), Specialization = new JobAdvertCategorySpecialization() };
 
     public List<JobAdvertCategory> GetCategories { get; set; } = new List<JobAdvertCategory>();
     public List<JobAdvertCategorySpecialization> GetSpecializations { get; set; } = new List<JobAdvertCategorySpecialization>();
@@ -206,19 +240,22 @@
 
     public List<JobAdvertCategorySpecialization> SortedSpecialization { get; set; } = new List<JobAdvertCategorySpecialization>();
 
+    public DateTime MinDateTime { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 7, 0, 0, 0);
+    public int ItemId { get; set; } = 0;
+
     protected override async Task OnInitializedAsync()
     {
-        Model = await Service.GetJobVacancies();
+        JobVacancyModel = await Service.GetJobVacancies();
 
         GetCategories = await Service.GetAllJobAdvertCategories();
         GetSpecializations = await Service.GetAllJobAdvertCategorySpecializations();
         GetCompanies = await Service.GetAllCompanies();
     }
 
-    public void OnChange_GetSpecializationBydCategoryId(ChangeEventArgs e)
+    public void OnCategoryChange_GetSpecializationBydCategoryId(ChangeEventArgs e)
     {
-        ModelDetails.Category.Id = int.Parse(e.Value.ToString());
-        ModelDetails.Specialization.Id = 0;
+        JobVacancyModelDetails.Category.Id = int.Parse(e.Value.ToString());
+        JobVacancyModelDetails.Specialization.Id = 0;
 
         SortedSpecialization.Clear();
 
@@ -228,44 +265,80 @@
         }
     }
 
-    public async Task OnClick_GetDetailsById(int id)
+    public async Task OnClickEdit_GetJobVacancyDetailsById(int id)
     {
         // Get full details of job vacancy post.
 
-        ModelDetails = new JobVacanciesAdminModel();
+        JobVacancyModelDetails = new JobVacanciesAdminModel();
 
-        ModelDetails = await Service.GetJobVacancyDetailsById(id);
+        JobVacancyModelDetails = await Service.GetJobVacancyDetailsById(id);
 
         SortedSpecialization.Clear();
 
         foreach (var item in GetSpecializations)
         {
-            if (item.JobAdvertCategoryId == ModelDetails.Specialization.JobAdvertCategoryId) SortedSpecialization.Add(item);
+            if (item.JobAdvertCategoryId == JobVacancyModelDetails.Specialization.JobAdvertCategoryId) SortedSpecialization.Add(item);
         }
     }
 
     public async Task OnValidSubmit_UpdateJobVacancy()
     {
-        Service.UpdateJobVacancy(ModelDetails);
+        Service.UpdateJobVacancy(JobVacancyModelDetails);
 
         await InvokeAsync(async () =>
         {
-            Model = await Service.GetJobVacancies();
+            JobVacancyModel = await Service.GetJobVacancies();
             StateHasChanged();
         });
 
-        await JSRuntime.InvokeVoidAsync("Modal");
+        await JSRuntime.InvokeVoidAsync("OnInformationChangeAnimation", $"{JobVacancyModelDetails.JobAdvert.Id}");
+
+        await JSRuntime.InvokeVoidAsync("ToggleUpdateVacancyModal");
     }
 
-    public async Task OnClick_RemoveJobVancacy(int id)
+    public async Task OnClickRemove_ConfirmRemove(bool confirmation, int id)
+    {
+        if (confirmation)
+        {
+            if (id != 0)
+            {
+                await JSRuntime.InvokeVoidAsync("ToggleRemoveVacancyModal");
+
+                await RemoveJobVancacy(id);
+            }
+        }
+
+        ItemId = 0;
+
+        await Task.FromResult(confirmation);
+    }
+
+    public async Task RemoveJobVancacy(int id)
     {
         Service.RemoveJobVacancyById(id);
 
         await InvokeAsync(async () =>
         {
-            Model = await Service.GetJobVacancies();
+            JobVacancyModel = await Service.GetJobVacancies();
 
             StateHasChanged();
         });
+    }
+
+    private void OnDateChange_Registered(ChangedEventArgs<DateTime?> args)
+    {
+        JobVacancyModelDetails.JobAdvert.JobRegisteredDate = args.Value.Value;
+        StateHasChanged();
+    }
+
+    private void OnDateChange_Deadline(ChangedEventArgs<DateTime?> args)
+    {
+        JobVacancyModelDetails.JobAdvert.DeadlineDate = args.Value.Value;
+        StateHasChanged();
+    }
+
+    public void OnClick_StoreId(int id)
+    {
+        ItemId = id;
     }
 }

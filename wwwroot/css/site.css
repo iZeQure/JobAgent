@@ -30,12 +30,14 @@ app {
     display: flex;
     flex-direction: column;
 }
+
     .welcome-message p {
         font-size: 1rem;
         display: inline-flex;
         margin: 0;
         padding: 0;
     }
+
         .welcome-message p.smaller {
             font-size: 0.75rem;
         }
@@ -196,8 +198,8 @@ ul.validation-errors {
 */
 
 .table, .table-responsive {
-     margin-bottom: 0 !important;
-     border-radius: 0.25rem !important;
+    margin-bottom: 0 !important;
+    border-radius: 0.25rem !important;
 }
 
 td {
@@ -305,18 +307,87 @@ td {
     }
 
 .admin-label {
-    font-size: 1rem;
     color: white;
     background-color: #343a40;
-    padding: 10px;
+    padding: 5px 10px 5px 10px;
+    margin-bottom: 5px;
     border-radius: 5px;
 }
 
 /*
-    ## Popover Styling
+    ## Popover Styling ##
 */
 
 .popover-info,
 .popover-danger {
     cursor: pointer;
+}
+
+/*
+    ## Visible Information Changing Information ##
+*/
+
+.onInformationChangeAnimation {
+    background: linear-gradient(130deg, #28a745b3, #00000000);
+    background-size: 400% 400%;
+    -webkit-animation: BackgroundConfirmationAnimation 6s ease forwards;
+    -moz-animation: BackgroundConfirmationAnimation 6s ease forwards;
+    -o-animation: BackgroundConfirmationAnimation 6s ease forwards;
+    animation: BackgroundConfirmationAnimation 6s ease forwards;
+}
+
+@-webkit-keyframes BackgroundConfirmationAnimation {
+    0% {
+        background-position: 100% 0%
+    }
+
+    50% {
+        background-position: 0% 100%
+    }
+
+    100% {
+        background-position: 100% 0%
+    }
+}
+
+@-moz-keyframes BackgroundConfirmationAnimation {
+    0% {
+        background-position: 100% 0%
+    }
+
+    50% {
+        background-position: 0% 100%
+    }
+
+    100% {
+        background-position: 100% 0%
+    }
+}
+
+@-o-keyframes BackgroundConfirmationAnimation {
+    0% {
+        background-position: 100% 0%
+    }
+
+    50% {
+        background-position: 0% 100%
+    }
+
+    100% {
+        background-position: 100% 0%
+    }
+}
+
+@keyframes BackgroundConfirmationAnimation {
+    0% {
+        background-position: 100% 0%
+    }
+
+    50% {
+        background-position: 0% 100%
+    }
+
+    100% {
+        background-position: 100% 0%;
+    }
 }
