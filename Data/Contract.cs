@@ -18,7 +18,7 @@ namespace JobAgent.Data
 
         #region Properties
         public string ContactPerson { get { return contactPerson; } set { contactPerson = value; } }
-        public string ContractPerson { get { return contractLocation; } set { contractLocation = value; } }
+        public string ContractLocation { get { return contractLocation; } set { contractLocation = value; } }
         public DateTime ExpiryDate { get { return expiryDate; } set { expiryDate = value; } }
         public DateTime RegistrationDate { get { return registrationDate; } set { registrationDate = value; } }
         public User SignedByUserId { get { return signedByUserId; } set { signedByUserId = value; } }

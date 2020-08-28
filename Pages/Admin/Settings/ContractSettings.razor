@@ -1,0 +1,129 @@
+﻿@page "/admin/settings/contracts"
+
+@using JobAgent.Data
+@using JobAgent.Models
+@using JobAgent.Services
+
+@using Syncfusion.Blazor.PdfViewerServer
+
+@inject AdminService Service
+@inject IJSRuntime JSRuntime
+
+@inherits ComponentBase
+
+@attribute [Authorize]
+
+@if (GetContracts.Count == 0)
+{
+    <div class="alert alert-info" role="alert">
+        <h4 class="alert-heading">System Besked!</h4>
+
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+
+        <p>Fejl i Database.</p>
+        <hr>
+        <p>Der blev desværre ikke fundet nogen kontrakter i databasen.</p>
+        <p class="mb-0">Genindlæs siden eller prøv igen senere..</p>
+    </div>
+}
+else
+{
+    <div class="table-responsive table-responsive-sm table-responsive-md">
+        <table class="table table-sm table-striped table-hover">
+            <caption>Liste over virksomheders kontrakter..</caption>
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Virksomhed</th>
+                    <th scope="col">Kontakt Person</th>
+                    <th scope="col">Praktikkonsulent</th>
+                    <th scope="col">Kontrakt</th>
+                    <th scope="col">Kontrakt Oprettet</th>
+                    <th scope="col">Udløbsdato</th>
+                    @*<th scope="col"></th>
+                        <th scope="col"></th>*@
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var contract in GetContracts)
+                {
+                    <tr id="@(contract.Id)">
+                        <th scope="row">@(contract.Id)</th>
+                        <td>@(contract.CompanyCVR.Name)</td>
+                        <td>@(contract.ContactPerson)</td>
+                        <td>@($"{contract.SignedByUserId.FirstName} {contract.SignedByUserId.LastName}")</td>
+                        @if (!string.IsNullOrEmpty(contract.ContractLocation))
+                        {
+                            <td @onclick="@(path => OnClick_OpenContract(GetLocationPath(contract.ContractLocation)))">
+                                <span class="table-icons" data-toggle="modal" data-target="#contractModal">
+                                    <i class="fas fa-file-invoice"></i>
+                                </span>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>Ingen kontrakt fundet.</td>
+                        }
+                        <td>@(contract.RegistrationDate.ToString("D"))</td>
+                        <td>@(contract.ExpiryDate.ToString("D"))</td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+}
+
+@* Contract Modal *@
+<div class="modal fade" id="contractModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Kontrakt</h5>
+            </div>
+
+            <div class="modal-body">
+                <div class="container-fluid justify-content-center">
+                    <SfPdfViewerServer DocumentPath="@(ContractPath)" Height="500" Width="1060px">
+                        <PdfViewerEvents DocumentLoadFailed="DocumentLoadFailed"></PdfViewerEvents>
+                    </SfPdfViewerServer>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" data-dismiss="modal">Luk kontrakt</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    public List<Data.Contract> GetContracts { get; set; } = new List<Data.Contract>();
+
+    public string ContractPath { get; set; } = string.Empty;
+
+    public string ErrorMessage { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetContracts = await Service.GetContracts();
+    }
+
+    private void OnClick_OpenContract(string path)
+    {
+        ContractPath = path;
+    }
+
+    private string GetLocationPath(string location)
+    {
+        return $"wwwroot/Data/{location}";
+    }
+
+    private void DocumentLoadFailed(LoadFailedEventArgs args)
+    {
+        ErrorMessage = args.DocumentName;
+    }
+}

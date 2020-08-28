@@ -36,7 +36,7 @@ namespace JobAgent
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
-            services.AddServerSideBlazor();
+            services.AddServerSideBlazor().AddHubOptions(o => { o.MaximumReceiveMessageSize = 102400000; });
 
             services.AddSyncfusionBlazor(true);
 
@@ -75,6 +75,9 @@ namespace JobAgent
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            //Register Syncfusion license
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzA5NzMzQDMxMzgyZTMyMmUzMFBINy93UlFGV203WlJldHBxclNIcWM2cjBVL0pIVjY2YjlFLzZpVkZjeVU9");
+
             app.UseRequestLocalization();
 
             if (env.IsDevelopment())

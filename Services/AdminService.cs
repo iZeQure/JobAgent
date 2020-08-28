@@ -21,6 +21,8 @@ namespace JobAgent.Services
 
         private IRepository<Company> CompanyRepository { get; } = new CompanyRepository();
 
+        private IRepository<Contract> ContractRepository { get; } = new ContractRepository();
+
         public Task<User> GetUserByEmail(string userMail)
         {
             return Task.FromResult(((IUserRepository)UserRepository).GetUserByEmail(userMail));
@@ -108,6 +110,11 @@ namespace JobAgent.Services
         public void RemoveJobVacancyById(int id)
         {
             JobRepository.Remove(id);
+        }
+
+        public Task<List<Contract>> GetContracts()
+        {
+            return Task.FromResult(ContractRepository.GetAll().ToList());
         }
     }
 }
