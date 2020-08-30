@@ -27,6 +27,8 @@ namespace JobAgent
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            Database.Instance.Configuration = Configuration;
         }
 
         public IConfiguration Configuration { get; }
@@ -36,9 +38,10 @@ namespace JobAgent
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+            services.AddBlazoredLocalStorage();
             services.AddServerSideBlazor().AddHubOptions(o => { o.MaximumReceiveMessageSize = 102400000; });
-
             services.AddSyncfusionBlazor(true);
+            services.AddBootstrapCss();
 
             services.Configure<RequestLocalizationOptions>(options =>
             {
@@ -65,11 +68,7 @@ namespace JobAgent
             services.AddSingleton<SecurityService>(); // Security Service.
             services.AddSingleton<JobService>(); // Job Service.
             services.AddSingleton<DataService>(); // Data Service.
-            services.AddSingleton<AdminService>(); // Admin Service.
-
-            services.AddBlazoredLocalStorage();
-
-            services.AddBootstrapCss();
+            services.AddSingleton<AdminService>(); // Admin Service.            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -28,6 +28,7 @@ namespace JobAgent.Services
 
             var sortJobs = from job in JobAdverts
                            where job.JobAdvertCategoryId.Id == id
+                           orderby job.JobRegisteredDate ascending
                            select job;
 
             return await Task.FromResult(sortJobs.ToList());
@@ -39,6 +40,7 @@ namespace JobAgent.Services
 
             var sortJobs = from job in JobAdverts
                            where job.JobAdvertCategorySpecializationId.Id == id
+                           orderby job.JobRegisteredDate ascending
                            select job;
 
             return await Task.FromResult(sortJobs.ToList());
