@@ -23,6 +23,11 @@ namespace JobAgent.Services
 
         private IRepository<Contract> ContractRepository { get; } = new ContractRepository();
 
+        public Task<List<User>> GetUsers()
+        {
+            return Task.FromResult(UserRepository.GetAll().ToList());
+        }
+
         public Task<User> GetUserByEmail(string userMail)
         {
             return Task.FromResult(((IUserRepository)UserRepository).GetUserByEmail(userMail));
@@ -115,6 +120,11 @@ namespace JobAgent.Services
         public Task<List<Contract>> GetContracts()
         {
             return Task.FromResult(ContractRepository.GetAll().ToList());
+        }
+
+        public Task<Contract> GetContractById(int contractId)
+        {
+            return Task.FromResult(ContractRepository.GetById(contractId));
         }
     }
 }

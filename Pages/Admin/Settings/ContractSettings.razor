@@ -1,10 +1,10 @@
 ﻿@page "/admin/settings/contracts"
 
+@using System.IO
+
 @using JobAgent.Data
 @using JobAgent.Models
 @using JobAgent.Services
-
-@using Syncfusion.Blazor.PdfViewerServer
 
 @inject AdminService Service
 @inject IJSRuntime JSRuntime
@@ -42,8 +42,7 @@ else
                     <th scope="col">Kontrakt</th>
                     <th scope="col">Kontrakt Oprettet</th>
                     <th scope="col">Udløbsdato</th>
-                    @*<th scope="col"></th>
-                        <th scope="col"></th>*@
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
@@ -54,10 +53,10 @@ else
                         <th scope="row">@(contract.Id)</th>
                         <td>@(contract.CompanyCVR.Name)</td>
                         <td>@(contract.ContactPerson)</td>
-                        <td>@($"{contract.SignedByUserId.FirstName} {contract.SignedByUserId.LastName}")</td>
+                        <td>@(contract.SignedByUserId.FullName)</td>
                         @if (!string.IsNullOrEmpty(contract.ContractLocation))
                         {
-                            <td @onclick="@(path => OnClick_OpenContract(GetLocationPath(contract.ContractLocation)))">
+                            <td @onclick="@(path => OnClickOpen_Contract(GetLocationPath(contract.ContractLocation)))">
                                 <span class="table-icons" data-toggle="modal" data-target="#contractModal">
                                     <i class="fas fa-file-invoice"></i>
                                 </span>
@@ -69,6 +68,11 @@ else
                         }
                         <td>@(contract.RegistrationDate.ToString("D"))</td>
                         <td>@(contract.ExpiryDate.ToString("D"))</td>
+                        <td>
+                            <span @onclick="(id => OnClickEdit_GetContractDetailsById(contract.Id))" data-toggle="modal" data-target="#contractDetails">
+                                <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne kontrakt." Color="Popover.PopoverType.Info" />
+                            </span>
+                        </td>
                     </tr>
                 }
 
@@ -87,9 +91,8 @@ else
 
             <div class="modal-body">
                 <div class="container-fluid justify-content-center">
-                    <SfPdfViewerServer DocumentPath="@(ContractPath)" Height="500" Width="1060px">
-                        <PdfViewerEvents DocumentLoadFailed="DocumentLoadFailed"></PdfViewerEvents>
-                    </SfPdfViewerServer>
+                    <iframe src="data:application/pdf;base64,@(ContractPath)" height="500" width="1060" lang="da" title="Kontrakt Information" frameborder="1" allowtransparency="true">
+                    </iframe>
                 </div>
             </div>
 
@@ -100,8 +103,98 @@ else
     </div>
 </div>
 
+@* Contract Modal Details *@
+<div class="modal fade" id="contractDetails" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+
+            <EditForm Model="ContractDetails" OnValidSubmit="OnValidSubmit_UpdateContract">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Kontrakt Information :</h5>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col">
+                            <label for="inputCompany" class="admin-label col-form-label col-form-label-sm">Kontrakt for :</label>
+                            <select id="inputCompany" class="form-control form-control-sm" @bind="ContractDetails.CompanyCVR.Id">
+                                @foreach (var company in GetCompanies)
+                                {
+                                    if (company.Id == ContractDetails.CompanyCVR.Id)
+                                    {
+                                        <option value="@company.Id" selected>@company.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@company.Id">@company.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label for="inputSignedByUser" class="admin-label col-form-label col-form-label-sm">Underskrevet af :</label>
+                            <select id="inputSignedByUser" class="form-control form-control-sm" @bind="ContractDetails.SignedByUserId.Id">
+                                @foreach (var user in GetUsers)
+                                {
+                                    if (user.Id == ContractDetails.SignedByUserId.Id)
+                                    {
+                                        <option value="@user.Id" selected>@user.FullName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@user.Id">@user.FullName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="inputContactPerson" class="admin-label col-form-label col-form-label-sm">Virksomheds Kontakt Person :</label>
+                            <input id="inputContactPerson" class="form-control form-control-sm" type="text" placeholder="Indtast en kontakt person.." @bind="ContractDetails.ContactPerson" />
+                        </div>
+                        <div class="col">
+                            <label for="inputContractName" class="admin-label col-form-label col-form-label-sm">Kontraktens Navn : <span class="font-italic small" style="color: red;">*Ikke ændre dette hvis navnet på kontrakten ikke bliver ændret.</span></label>
+                            <input id="inputContractName" class="form-control form-control-sm" type="text" placeholder="Indtast kontraktens fil navn / lokation.." disabled @bind="ContractDetails.ContractLocation" />
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="inputRegisteredDate" class="admin-label col-form-label col-form-label-sm">Kontrakt Registreret Dato :</label>
+                            <input id="inputRegisteredDate" class="form-control form-control-sm" type="datetime" placeholder="Registrerings dato for kontrakt.." value="@(ContractDetails.RegistrationDate)" />
+                        </div>
+                        <div class="col">
+                            <label for="inputExpiryDate" class="admin-label col-form-label col-form-label-sm">Udløbsdato :</label>
+                            <input id="inputExpiryDate" class="form-control form-control-sm" type="datetime" placeholder="Udløbsdato for kontrakt.." value="@(ContractDetails.ExpiryDate)" />
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Annuller</button>
+                    <button class="btn btn-info text-light cursor-pointer" type="submit">Gem ændringer</button>
+                </div>
+
+            </EditForm>
+
+        </div>
+    </div>
+</div>
+
 @code {
-    public List<Data.Contract> GetContracts { get; set; } = new List<Data.Contract>();
+    public List<User> GetUsers { get; set; } = new List<User>();
+    public List<Company> GetCompanies { get; set; } = new List<Company>();
+    public List<Contract> GetContracts { get; set; } = new List<Contract>();
+
+    public Contract ContractDetails = new Contract() { CompanyCVR = new Company(), SignedByUserId = new User() };
 
     public string ContractPath { get; set; } = string.Empty;
 
@@ -110,16 +203,51 @@ else
     protected override async Task OnInitializedAsync()
     {
         GetContracts = await Service.GetContracts();
+        GetCompanies = await Service.GetAllCompanies();
+        GetUsers = await Service.GetUsers();
     }
 
-    private void OnClick_OpenContract(string path)
+    private async void OnClickEdit_GetContractDetailsById(int contractId)
+    {
+        ContractDetails = await Service.GetContractById(contractId);
+    }
+
+    private void OnClickOpen_Contract(string path)
     {
         ContractPath = path;
     }
 
-    private string GetLocationPath(string location)
+    private async Task OnValidSubmit_UpdateContract()
     {
-        return $"wwwroot/Data/{location}";
+        await Task.FromResult(true);
+    }
+
+    private string GetLocationPath(string fileName)
+    {
+        string contractDirectory = @"\\10.108.48.72\_shared\admin\contracts\";
+
+        try
+        {
+            var pdfFiles = Directory.EnumerateFiles(contractDirectory, "*.pdf");
+
+            foreach (string currentFile in pdfFiles)
+            {
+                if (currentFile.Contains(fileName))
+                {
+                    Byte[] bytes = File.ReadAllBytes(currentFile);
+
+                    return Convert.ToBase64String(bytes);
+
+                    //return currentFile;
+                }
+            }
+
+            return string.Empty;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     private void DocumentLoadFailed(LoadFailedEventArgs args)

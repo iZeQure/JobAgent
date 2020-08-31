@@ -80,7 +80,40 @@ namespace JobAgent.Data.Repository
 
         public IEnumerable<User> GetAll()
         {
-            throw new NotImplementedException();
+            // Initialize command obj.
+            using SqlCommand c = new SqlCommand()
+            {
+                CommandText = "GetAllUsers",
+                CommandType = CommandType.StoredProcedure,
+                Connection = Database.Instance.SqlConnection
+            };
+
+            Database.Instance.OpenConnection();
+
+            // Initialzie data reader.
+            using SqlDataReader r = c.ExecuteReader();
+
+            // Temporary list.
+            List<User> tempUsers = new List<User>();
+
+            // Check for any data.
+            if (r.HasRows)
+            {
+                // Read data.
+                while (r.Read())
+                {
+                    tempUsers.Add(
+                        new User
+                        {
+                            Id = r.GetInt32("Id"),
+                            FirstName = r.GetString("FirstName"),
+                            LastName = r.GetString("LastName")
+                        });
+                }
+            }
+
+            // Return data list.
+            return tempUsers;
         }
 
         public User GetUserByEmail(string email)

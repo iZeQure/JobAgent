@@ -25,6 +25,7 @@ namespace JobAgent.Data
         #region Properties
         public string FirstName { get { return firstName; } set { firstName = value; } }
         public string LastName { get { return lastName; } set { lastName = value; } }
+        public string FullName { get { return $"{FirstName} {LastName}"; } }
         public string Email { get { return email; } set { email = value; } }
         public string Password { get { return password; } set { password = value;} }
         public string ConfirmPassword { get { return confirmPassword; } set { confirmPassword = value; } }

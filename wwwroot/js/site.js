@@ -46,6 +46,14 @@ window.HTMLBodyElement = () => {
     });
 }
 
+window.HTMLBodyElement = () => {
+    $('#contractDetails').modal({
+        backdrop: 'static',
+        keyboard: false,
+        show: false
+    });
+}
+
 window.ToggleUpdateVacancyModal = () => {
     $('#vacancyAdminDetails').modal('toggle');
 }

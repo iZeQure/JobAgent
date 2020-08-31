@@ -68,7 +68,52 @@ namespace JobAgent.Data.Repository
 
         public Contract GetById(int id)
         {
-            throw new NotImplementedException();
+            // Initialize command obj.
+            using SqlCommand c = new SqlCommand()
+            {
+                CommandText = "GetContractById",
+                CommandType = CommandType.StoredProcedure,
+                Connection = Database.Instance.SqlConnection
+            };
+
+            c.Parameters.AddWithValue("ContractId", id);
+
+            Database.Instance.OpenConnection();
+
+            // Initialzie data reader.
+            using SqlDataReader r = c.ExecuteReader();
+
+            // Temporary contract.
+            Contract tempContract = new Contract();
+
+            // Check for any data.
+            if (r.HasRows)
+            {
+                // Read data.
+                while (r.Read())
+                {
+                    tempContract = new Contract()
+                    {
+                        Id = r.GetInt32("Id"),
+                        ContactPerson = r.GetString("ContactPerson"),
+                        ContractLocation = r.GetString("ContractLocation"),
+                        ExpiryDate = r.GetDateTime("ExpiryDate"),
+                        RegistrationDate = r.GetDateTime("RegisteredDate"),
+                        SignedByUserId = new User()
+                        {
+                            FirstName = r.GetString("FirstName"),
+                            LastName = r.GetString("LastName")
+                        },
+                        CompanyCVR = new Company()
+                        {
+                            Id = r.GetInt32("CVR"),
+                            Name = r.GetString("Name")
+                        }
+                    };
+                }
+            }
+
+            return tempContract;
         }
 
         public void Remove(int id)
