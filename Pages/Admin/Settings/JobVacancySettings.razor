@@ -1,6 +1,6 @@
 ﻿@page "/admin/settings/job/vacancies"
 
-@using JobAgent.Data
+@using JobAgent.Data.Objects
 @using JobAgent.Models
 @using JobAgent.Services
 
@@ -232,13 +232,13 @@ else
 @code {
     public List<JobVacanciesAdminModel> JobVacancyModel { get; set; } = new List<JobVacanciesAdminModel>();
 
-    public JobVacanciesAdminModel JobVacancyModelDetails { get; set; } = new JobVacanciesAdminModel() { JobAdvert = new JobAdvert(), Category = new JobAdvertCategory(), Company = new Company(), Specialization = new JobAdvertCategorySpecialization() };
+    public JobVacanciesAdminModel JobVacancyModelDetails { get; set; } = new JobVacanciesAdminModel() { JobAdvert = new JobAdvert(), Category = new Category(), Company = new Company(), Specialization = new Specialization() };
 
-    public List<JobAdvertCategory> GetCategories { get; set; } = new List<JobAdvertCategory>();
-    public List<JobAdvertCategorySpecialization> GetSpecializations { get; set; } = new List<JobAdvertCategorySpecialization>();
+    public List<Category> GetCategories { get; set; } = new List<Category>();
+    public List<Specialization> GetSpecializations { get; set; } = new List<Specialization>();
     public List<Company> GetCompanies { get; set; } = new List<Company>();
 
-    public List<JobAdvertCategorySpecialization> SortedSpecialization { get; set; } = new List<JobAdvertCategorySpecialization>();
+    public List<Specialization> SortedSpecialization { get; set; } = new List<Specialization>();
 
     public DateTime MinDateTime { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 7, 0, 0, 0);
     public int ItemId { get; set; } = 0;
@@ -261,7 +261,7 @@ else
 
         foreach (var item in GetSpecializations)
         {
-            if (item.JobAdvertCategoryId == int.Parse(e.Value.ToString())) SortedSpecialization.Add(item);
+            if (item.CategoryId == int.Parse(e.Value.ToString())) SortedSpecialization.Add(item);
         }
     }
 
@@ -277,7 +277,7 @@ else
 
         foreach (var item in GetSpecializations)
         {
-            if (item.JobAdvertCategoryId == JobVacancyModelDetails.Specialization.JobAdvertCategoryId) SortedSpecialization.Add(item);
+            if (item.CategoryId == JobVacancyModelDetails.Specialization.CategoryId) SortedSpecialization.Add(item);
         }
     }
 

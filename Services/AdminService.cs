@@ -1,7 +1,6 @@
-﻿using JobAgent.Data;
+﻿using JobAgent.Data.Objects;
 using JobAgent.Data.Repository;
 using JobAgent.Data.Repository.Interface;
-using JobAgent.Data.Security;
 using JobAgent.Models;
 using System;
 using System.Collections.Generic;
@@ -17,7 +16,7 @@ namespace JobAgent.Services
 
         private IRepository<JobAdvert> JobRepository { get; } = new JobAdvertRepository();
 
-        private IRepository<JobAdvertCategory> CategoryRepository { get; } = new JobAdvertCategoryRepository();
+        private IRepository<Category> CategoryRepository { get; } = new CategoryRepository();
 
         private IRepository<Company> CompanyRepository { get; } = new CompanyRepository();
 
@@ -74,11 +73,11 @@ namespace JobAgent.Services
                 },
 
                 // Category Data
-                JobAdvertCategoryId = new JobAdvertCategory()
+                JobAdvertCategoryId = new Category()
                 {
                     Id = data.Category.Id
                 },
-                JobAdvertCategorySpecializationId = new JobAdvertCategorySpecialization()
+                JobAdvertCategorySpecializationId = new Specialization()
                 {
                     Id = data.Specialization.Id
                 }
@@ -102,14 +101,14 @@ namespace JobAgent.Services
             return Task.FromResult(CompanyRepository.GetAll().ToList());
         }
 
-        public Task<List<JobAdvertCategory>> GetAllJobAdvertCategories()
+        public Task<List<Category>> GetAllJobAdvertCategories()
         {
             return Task.FromResult(CategoryRepository.GetAll().ToList());
         }
 
-        public Task<List<JobAdvertCategorySpecialization>> GetAllJobAdvertCategorySpecializations()
+        public Task<List<Specialization>> GetAllJobAdvertCategorySpecializations()
         {
-            return Task.FromResult(((IJobAdvertCategoryRepository)CategoryRepository).GetAllJobAdvertCategorySpecializations());
+            return Task.FromResult(((ICategoryRepository)CategoryRepository).GetAllCategorySpecializations());
         }
 
         public void RemoveJobVacancyById(int id)

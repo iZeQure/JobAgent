@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using JobAgent.Data;
+using JobAgent.Data.Objects;
 using JobAgent.Data.Repository;
 using JobAgent.Data.Repository.Interface;
 
@@ -10,14 +10,14 @@ namespace JobAgent.Services
 {
     public class JobService
     {
-        private IRepository<JobAdvertCategory> CategoryRepository { get; } = new JobAdvertCategoryRepository();
+        private IRepository<Category> CategoryRepository { get; } = new CategoryRepository();
         private IRepository<JobAdvert> AdvertRepository { get; } = new JobAdvertRepository();
 
         private List<JobAdvert> JobAdverts { get; set; } = new List<JobAdvert>();
 
-        public Task<List<JobAdvertCategory>> GetJobMenuAsync()
+        public Task<List<Category>> GetJobMenuAsync()
         {
-            var jobMenu = ((IJobAdvertCategoryRepository)CategoryRepository).GetAllJobAdvertCategoriesWithSpecializations();
+            var jobMenu = ((ICategoryRepository)CategoryRepository).GetAllCategoriesWithSpecializations();
 
             return Task.FromResult(jobMenu);
         }

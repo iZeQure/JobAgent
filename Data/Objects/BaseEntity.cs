@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace JobAgent.Data
+namespace JobAgent.Data.Objects
 {
     public abstract class BaseEntity
     {
@@ -12,6 +12,9 @@ namespace JobAgent.Data
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Identifier for the entity.
+        /// </summary>
         public int Id { get { return id; } set { id = value; } }
         #endregion
     }

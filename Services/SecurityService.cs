@@ -1,4 +1,4 @@
-﻿using JobAgent.Data;
+﻿using JobAgent.Data.Objects;
 using JobAgent.Data.Repository;
 using JobAgent.Data.Repository.Interface;
 using JobAgent.Data.Security;

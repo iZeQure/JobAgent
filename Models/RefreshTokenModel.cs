@@ -1,4 +1,4 @@
-﻿using JobAgent.Data;
+﻿using JobAgent.Data.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;

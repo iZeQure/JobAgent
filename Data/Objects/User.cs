@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace JobAgent.Data
+namespace JobAgent.Data.Objects
 {
     public class User : BaseEntity
     {
@@ -23,10 +23,26 @@ namespace JobAgent.Data
         #endregion
 
         #region Properties
+        /// <summary>
+        /// A user's name.
+        /// </summary>
         public string FirstName { get { return firstName; } set { firstName = value; } }
+
+        /// <summary>
+        /// Defines the user's family name.
+        /// </summary>
         public string LastName { get { return lastName; } set { lastName = value; } }
+
+        /// <summary>
+        /// Gets the values from a user's name and family name, then combines them.
+        /// </summary>
         public string FullName { get { return $"{FirstName} {LastName}"; } }
+
+        /// <summary>
+        /// A user's unique email address.
+        /// </summary>
         public string Email { get { return email; } set { email = value; } }
+
         public string Password { get { return password; } set { password = value;} }
         public string ConfirmPassword { get { return confirmPassword; } set { confirmPassword = value; } }
         public string Salt { get { return salt; } set { salt = value; } }

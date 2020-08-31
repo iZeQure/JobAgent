@@ -4,29 +4,29 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Data;
+using JobAgent.Data.Objects;
 
 namespace JobAgent.Data.Repository
 {
-    public class JobAdvertCategoryRepository : IJobAdvertCategoryRepository
+    public class CategoryRepository : ICategoryRepository
     {
         /// <summary>
         /// Create a job advert category.
         /// </summary>
         /// <param name="create">Used to specify the data for the category.</param>
-        public void Create(JobAdvertCategory create)
+        public void Create(Category create)
         {
             // Open connection to database.
             Database.Instance.OpenConnection();
 
             // Prepare command object with information.
-            using SqlCommand cmd = new SqlCommand("CreateJobAdvertCategory", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("CreateCategory", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
             // Give the parameters some values.
             cmd.Parameters.AddWithValue("CategoryName", create.Name);
-            cmd.Parameters.AddWithValue("CategoryDescription", create.Description);
 
             // Execute the command, catch return code.
             int returnCode = cmd.ExecuteNonQuery();
@@ -37,13 +37,13 @@ namespace JobAgent.Data.Repository
         /// </summary>
         /// <param name="create">Used to specify the data for the specialization.</param>
         /// <param name="categoryId">Used to bind the specialization to a specific category.</param>
-        public void CreateJobAdvertCategorySpecialization(JobAdvertCategorySpecialization create, int categoryId)
+        public void CreateCategorySpecialization(Specialization create, int categoryId)
         {
             // Open connection to database.
             Database.Instance.OpenConnection();
 
             // Prepare command object with information.
-            using SqlCommand cmd = new SqlCommand("CreateJobAdvertCategorySpecialization", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("CreateCategorySpecialization", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -51,7 +51,6 @@ namespace JobAgent.Data.Repository
             // Give the parameters some values.
             cmd.Parameters.AddWithValue("CategoryID", categoryId);
             cmd.Parameters.AddWithValue("SpecializationName", create.Name);
-            cmd.Parameters.AddWithValue("SpecializationDescription", create.Description);
 
             // Exectue the command, catch the return code.
             int returnCode = cmd.ExecuteNonQuery();
@@ -60,11 +59,11 @@ namespace JobAgent.Data.Repository
         /// <summary>
         /// Get all categories.
         /// </summary>
-        /// <returns>A list of <see cref="JobAdvertCategory"/></returns>
-        public IEnumerable<JobAdvertCategory> GetAll()
+        /// <returns>A list of <see cref="Category"/></returns>
+        public IEnumerable<Category> GetAll()
         {
             // Initialize a temporary list with categories.
-            List<JobAdvertCategory> tempCategories = new List<JobAdvertCategory>();
+            List<Category> tempCategories = new List<Category>();
 
             // Open connection to the database.
             Database.Instance.OpenConnection();
@@ -73,7 +72,7 @@ namespace JobAgent.Data.Repository
             using SqlCommand cmd = new SqlCommand()
             {
                 CommandType = CommandType.StoredProcedure,
-                CommandText = "GetAllJobAdvertCategories",
+                CommandText = "GetAllCategories",
                 Connection = Database.Instance.SqlConnection
             };
 
@@ -81,7 +80,7 @@ namespace JobAgent.Data.Repository
             using SqlDataReader reader = cmd.ExecuteReader();
 
             // Temp
-            JobAdvertCategory temp = new JobAdvertCategory();
+            Category temp = new Category();
 
             // Check if the reader has rows.
             if (reader.HasRows)
@@ -89,14 +88,10 @@ namespace JobAgent.Data.Repository
                 // Add data to the temp list while reading the data.
                 while (reader.Read())
                 {
-                    if (DataReaderExtensions.IsDBNull(reader, "Description")) temp.Description = string.Empty;
-                    else temp.Description = reader.GetString(2);
-
-                    tempCategories.Add(new JobAdvertCategory()
+                    tempCategories.Add(new Category()
                     {
                         Id = reader.GetInt32(0),
-                        Name = reader.GetString(1),
-                        Description = temp.Description
+                        Name = reader.GetString(1)
                     });
                 }
             }
@@ -108,17 +103,17 @@ namespace JobAgent.Data.Repository
         /// <summary>
         /// Get all categories with associated specializations.
         /// </summary>
-        /// <returns>A list of <see cref="JobAdvertCategory" with a list of <see cref="JobAdvertCategory.JobAdvertCategorySpecializations"/>/></returns>
-        public List<JobAdvertCategory> GetAllJobAdvertCategoriesWithSpecializations()
+        /// <returns>A list of <see cref="Category" with a list of <see cref="Category.CategorySpecializations"/>/></returns>
+        public List<Category> GetAllCategoriesWithSpecializations()
         {
             // Initialize a temporary list with categories.
-            List<JobAdvertCategory> tempJobAdvertCategories = new List<JobAdvertCategory>();
+            List<Category> tempCategories = new List<Category>();
 
             // Open connection to the database.
             Database.Instance.OpenConnection();
 
             // Prepare sql command object with information.
-            using SqlCommand cmd = new SqlCommand("GetAllJobAdvertCategoriesWithSpecialization", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("GetAllCategoriesWithSpecialization", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -133,44 +128,41 @@ namespace JobAgent.Data.Repository
                 while (reader.Read())
                 {
                     // Initialize temporary objects to store the data received from the database.
-                    var jobAdvertCategory = new JobAdvertCategory();
-                    var jobAdvertCategorySpecialization = new JobAdvertCategorySpecialization();
+                    var Category = new Category();
+                    var CategorySpecialization = new Specialization();
 
-                    var jobCategoryData = new JobAdvertCategory();
-                    var jobSpecializationData = new JobAdvertCategorySpecialization();
+                    var jobCategoryData = new Category();
+                    var jobSpecializationData = new Specialization();
 
                     // Test
 
                     // Category Data
                     jobCategoryData.Id = reader.GetInt32("Id");
                     jobCategoryData.Name = reader.GetString("CategoryName");
-                    if (!DataReaderExtensions.IsDBNull(reader, "CategoryDescription")) jobCategoryData.Description = reader.GetString("CategoryDescription");
 
                     // Specialization Data
                     if (!DataReaderExtensions.IsDBNull(reader, "SpecId")) jobSpecializationData.Id = reader.GetInt32("SpecId");
-                    if (!DataReaderExtensions.IsDBNull(reader, "JobAdvertCategoryId")) jobSpecializationData.JobAdvertCategoryId = reader.GetInt32("JobAdvertCategoryId");
+                    if (!DataReaderExtensions.IsDBNull(reader, "JobAdvertCategoryId")) jobSpecializationData.CategoryId = reader.GetInt32("JobAdvertCategoryId");
                     if (!DataReaderExtensions.IsDBNull(reader, "SpecializationName")) jobSpecializationData.Name = reader.GetString("SpecializationName");
-                    if (!DataReaderExtensions.IsDBNull(reader, "SpecializationDescription")) jobSpecializationData.Description = reader.GetString("SpecializationDescription");
 
                     // Check if job category has a matching specialization.
-                    if (jobCategoryData.Id == jobSpecializationData.JobAdvertCategoryId)
+                    if (jobCategoryData.Id == jobSpecializationData.CategoryId)
                     {
                         // Check if the category exists in the temp list.
-                        if (tempJobAdvertCategories.Any(data => data.Id == jobCategoryData.Id))
+                        if (tempCategories.Any(data => data.Id == jobCategoryData.Id))
                         {
                             // Loop through temp list.
-                            foreach (var cat in tempJobAdvertCategories)
+                            foreach (var cat in tempCategories)
                             {
                                 // Check if any specialization matches any categories in the temp list.
-                                if (cat.Id == jobSpecializationData.JobAdvertCategoryId)
+                                if (cat.Id == jobSpecializationData.CategoryId)
                                 {
-                                    cat.JobAdvertCategorySpecializations.Add(
-                                        new JobAdvertCategorySpecialization()
+                                    cat.Specializations.Add(
+                                        new Specialization()
                                         {
                                             Id = jobSpecializationData.Id,
                                             Name = jobSpecializationData.Name,
-                                            Description = jobSpecializationData.Description,
-                                            JobAdvertCategoryId = jobSpecializationData.JobAdvertCategoryId
+                                            CategoryId = jobSpecializationData.CategoryId
                                         });
                                 }
                             }
@@ -178,20 +170,18 @@ namespace JobAgent.Data.Repository
                         else
                         {
                             // Add category to the temp list, when it's non existent in the temp list.
-                            tempJobAdvertCategories.Add(
-                                new JobAdvertCategory()
+                            tempCategories.Add(
+                                new Category()
                                 {
                                     Id = jobCategoryData.Id,
                                     Name = jobCategoryData.Name,
-                                    Description = jobCategoryData.Description,
-                                    JobAdvertCategorySpecializations = new List<JobAdvertCategorySpecialization>()
+                                    Specializations = new List<Specialization>()
                                      {
-                                         new JobAdvertCategorySpecialization()
+                                         new Specialization()
                                          {
                                              Id = jobSpecializationData.Id,
                                              Name = jobSpecializationData.Name,
-                                             Description = jobSpecializationData.Description,
-                                             JobAdvertCategoryId = jobSpecializationData.JobAdvertCategoryId
+                                             CategoryId = jobSpecializationData.CategoryId
                                          }
                                      }
                                 });
@@ -200,13 +190,12 @@ namespace JobAgent.Data.Repository
                     else
                     {
                         // Add category if non existent in the current temp list.
-                        tempJobAdvertCategories.Add(
-                            new JobAdvertCategory()
+                        tempCategories.Add(
+                            new Category()
                             {
                                 Id = jobCategoryData.Id,
                                 Name = jobCategoryData.Name,
-                                Description = jobCategoryData.Description,
-                                JobAdvertCategorySpecializations = null
+                                Specializations = null
                             });
                     }
 
@@ -285,23 +274,23 @@ namespace JobAgent.Data.Repository
             reader.Close();
 
             // return data.
-            return tempJobAdvertCategories;
+            return tempCategories;
         }
 
         /// <summary>
         /// Get all category specializations.
         /// </summary>
-        /// <returns>A list of <see cref="JobAdvertCategorySpecialization"/>.</returns>
-        public List<JobAdvertCategorySpecialization> GetAllJobAdvertCategorySpecializations()
+        /// <returns>A list of <see cref="Specialization"/>.</returns>
+        public List<Specialization> GetAllCategorySpecializations()
         {
             // Initialize a temporary list with specializations.
-            List<JobAdvertCategorySpecialization> tempSpecializations = new List<JobAdvertCategorySpecialization>();
+            List<Specialization> tempSpecializations = new List<Specialization>();
 
             // Open connection to the database.
             Database.Instance.OpenConnection();
 
             // Prepare command with information to execute.
-            using SqlCommand cmd = new SqlCommand("GetAllJobAdvertCategorySpecializations", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("GetAllCategorySpecializations", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -310,7 +299,7 @@ namespace JobAgent.Data.Repository
             using SqlDataReader reader = cmd.ExecuteReader();
 
             // Temp
-            JobAdvertCategorySpecialization temp = new JobAdvertCategorySpecialization();
+            Specialization temp = new Specialization();
 
             // Check if any rows.
             if (reader.HasRows)
@@ -318,15 +307,11 @@ namespace JobAgent.Data.Repository
                 // Add data to temporary list while reading.
                 while (reader.Read())
                 {
-                    if (DataReaderExtensions.IsDBNull(reader, "Description")) temp.Description = string.Empty;
-                    else temp.Description = reader.GetString(2);
-
-                    tempSpecializations.Add(new JobAdvertCategorySpecialization()
+                    tempSpecializations.Add(new Specialization()
                     {
                         Id = reader.GetInt32(0),
                         Name = reader.GetString(1),
-                        Description = temp.Description,
-                        JobAdvertCategoryId = reader.GetInt32(3)
+                        CategoryId = reader.GetInt32(3)
                     });
                 }
             }
@@ -339,17 +324,17 @@ namespace JobAgent.Data.Repository
         /// Get category by id.
         /// </summary>
         /// <param name="id">Used to indicate which category to return.</param>
-        /// <returns>A <see cref="JobAdvertCategory"/>.</returns>
-        public JobAdvertCategory GetById(int id)
+        /// <returns>A <see cref="Category"/>.</returns>
+        public Category GetById(int id)
         {
             // Initalize temporary category object.
-            JobAdvertCategory tempCategory = new JobAdvertCategory();
+            Category tempCategory = new Category();
 
             // Open connection to database.
             Database.Instance.OpenConnection();
 
             // Prepare command object with information.
-            using SqlCommand cmd = new SqlCommand("GetJobAdvertCategoryById", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("GetCategoryById", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -365,7 +350,6 @@ namespace JobAgent.Data.Repository
                 // Get the row specified by the id.
                 tempCategory.Id = reader.GetInt32(0);
                 tempCategory.Name = reader.GetString(1);
-                tempCategory.Description = reader.GetString(2);
             }
 
             // return data
@@ -376,17 +360,17 @@ namespace JobAgent.Data.Repository
         /// Get category specialization by id.
         /// </summary>
         /// <param name="id">Used to identify the specialization to return.</param>
-        /// <returns>A <see cref="JobAdvertCategorySpecialization"/>.</returns>
-        public JobAdvertCategorySpecialization GetJobAdvertCategorySpecializationById(int id)
+        /// <returns>A <see cref="Specialization"/>.</returns>
+        public Specialization GetCategorySpecializationById(int id)
         {
             // Initialize temporary data object.
-            JobAdvertCategorySpecialization tempSpecializationObj = new JobAdvertCategorySpecialization();
+            Specialization tempSpecializationObj = new Specialization();
 
             // Open connection to database.
             Database.Instance.OpenConnection();
 
             // Prepare command with information.
-            using SqlCommand cmd = new SqlCommand("GetJobAdvertCategorySpecializationById", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("GetCategorySpecializationById", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -405,7 +389,6 @@ namespace JobAgent.Data.Repository
                 {
                     tempSpecializationObj.Id = reader.GetInt32(0);
                     tempSpecializationObj.Name = reader.GetString(1);
-                    tempSpecializationObj.Description = reader.GetString(2);
                 }
             }
 
@@ -423,7 +406,7 @@ namespace JobAgent.Data.Repository
             Database.Instance.OpenConnection();
 
             // Prepare command object.
-            using SqlCommand cmd = new SqlCommand("RemoveJobAdvertCategory")
+            using SqlCommand cmd = new SqlCommand("RemoveCategory")
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -439,13 +422,13 @@ namespace JobAgent.Data.Repository
         /// Remove category specialization by id.
         /// </summary>
         /// <param name="id">Used to indentify the data to delete.</param>
-        public void RemoveJobAdvertCategorySpecialization(int id)
+        public void RemoveCategorySpecialization(int id)
         {
             // Open connection to the database.
             Database.Instance.OpenConnection();
 
             // Prepare command object.
-            using SqlCommand cmd = new SqlCommand("RemoveJobAdvertCategorySpecialization", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("RemoveCategorySpecialization", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -461,13 +444,13 @@ namespace JobAgent.Data.Repository
         /// Update category.
         /// </summary>
         /// <param name="update">Used to update the current existing data with.</param>
-        public void Update(JobAdvertCategory update)
+        public void Update(Category update)
         {
             // Open connection to database.
             Database.Instance.OpenConnection();
 
             // Prepare command obj.
-            using SqlCommand cmd = new SqlCommand("UpdateJobAdvertCategory", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("UpdateCategory", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -475,7 +458,6 @@ namespace JobAgent.Data.Repository
             // Define input parameters.
             cmd.Parameters.AddWithValue("CategoryId", update.Id);
             cmd.Parameters.AddWithValue("NewCategoryName", update.Name);
-            cmd.Parameters.AddWithValue("NewCategoryDescription", update.Description);
 
             // Execute command, catch return code.
             int returnCode = cmd.ExecuteNonQuery();
@@ -485,22 +467,21 @@ namespace JobAgent.Data.Repository
         /// Update category specialization.
         /// </summary>
         /// <param name="update">Used to update the existing data with new.</param>
-        public void UpdateJobAdvertCategorySpecialization(JobAdvertCategorySpecialization update)
+        public void UpdateCategorySpecialization(Specialization update)
         {
             // Open connection to database.
             Database.Instance.OpenConnection();
 
             // Prepare command obj.
-            using SqlCommand cmd = new SqlCommand("UpdateJobAdvertCategorySpecialization", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("UpdateCategorySpecialization", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("CategoryId", update.JobAdvertCategoryId);
+            cmd.Parameters.AddWithValue("CategoryId", update.CategoryId);
             cmd.Parameters.AddWithValue("SpecializationId", update.Id);
             cmd.Parameters.AddWithValue("NewSpecializationName", update.Name);
-            cmd.Parameters.AddWithValue("NewSpecializationDescription", update.Description);
 
             // Execute command, catch return code.
             int returnCode = cmd.ExecuteNonQuery();

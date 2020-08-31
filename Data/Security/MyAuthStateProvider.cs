@@ -1,9 +1,10 @@
-﻿using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Components.Authorization;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components.Authorization;
-using Blazored.LocalStorage;
-using JobAgent.Data.Interfaces;
 using System.Collections.Generic;
+using JobAgent.Data.Interfaces;
+using JobAgent.Data.Objects;
+using Blazored.LocalStorage;
 
 namespace JobAgent.Data.Security
 {

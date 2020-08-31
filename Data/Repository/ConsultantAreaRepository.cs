@@ -1,4 +1,5 @@
 ﻿using JobAgent.Data.DB;
+using JobAgent.Data.Objects;
 using JobAgent.Data.Repository.Interface;
 using System;
 using System.Collections.Generic;
@@ -27,8 +28,9 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("Name", create.Name);
-            cmd.Parameters.AddWithValue("Description", create.Description);
+            cmd.Parameters.AddWithValue("@name", create.Name);
+
+            cmd.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.ReturnValue;
 
             // Execute command, catch return code.
             int returnCode = cmd.ExecuteNonQuery();
@@ -61,16 +63,12 @@ namespace JobAgent.Data.Repository
                 // Read data.
                 while (reader.Read())
                 {
-                    ConsultantArea consultantArea = new ConsultantArea
-                    {
-                        Id = reader.GetInt32(0),
-                        Name = reader.GetString(1)
-                    };
-
-                    if (!DataReaderExtensions.IsDBNull(reader, "Description")) consultantArea.Description = reader.GetString(2);
-
-                    // Add dataset to the temporary list.
-                    tempConsultantAreas.Add(consultantArea);
+                    tempConsultantAreas.Add(
+                        new ConsultantArea()
+                        {
+                            Id = reader.GetInt32(0),
+                            Name = reader.GetString(1)
+                        });
                 }
             }
 
@@ -98,7 +96,7 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("ConsultantAreaId", id);
+            cmd.Parameters.AddWithValue("@id", id);
 
             // Initialize data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
@@ -111,7 +109,6 @@ namespace JobAgent.Data.Repository
                 {
                     tempConsultantArea.Id = reader.GetInt32(0);
                     tempConsultantArea.Name = reader.GetString(1);
-                    tempConsultantArea.Description = reader.GetString(2);
                 }
             }
 
@@ -125,9 +122,6 @@ namespace JobAgent.Data.Repository
         /// <param name="id">Used to specify which dataset to remove.</param>
         public void Remove(int id)
         {
-            // Open connection to database.
-            Database.Instance.OpenConnection();
-
             // Initialize command obj.
             using SqlCommand cmd = new SqlCommand()
             {
@@ -135,10 +129,13 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("ConsultantAreaId", id);
+            cmd.Parameters.AddWithValue("@id", id);
+
+            // Open connection to database.
+            Database.Instance.OpenConnection();
 
             // Execute command, catch return code.
-            int returnCode = cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQuery();
         }
 
         /// <summary>
@@ -147,9 +144,6 @@ namespace JobAgent.Data.Repository
         /// <param name="update">Used to specify what dataset needs to update.</param>
         public void Update(ConsultantArea update)
         {
-            // Open connection to database.
-            Database.Instance.OpenConnection();
-
             // Initialize command obj.
             using SqlCommand cmd = new SqlCommand("RemoveConsultantArea", Database.Instance.SqlConnection)
             {
@@ -157,12 +151,14 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("ConsultantAreaId", update.Id);
-            cmd.Parameters.AddWithValue("NewName", update.Name);
-            cmd.Parameters.AddWithValue("NewDescription", update.Description);
+            cmd.Parameters.AddWithValue("@id", update.Id);
+            cmd.Parameters.AddWithValue("@name", update.Name);
+
+            // Open connection to database.
+            Database.Instance.OpenConnection();
 
             // Execute command, catch return code.
-            int returnCode = cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQuery();
         }
     }
 }

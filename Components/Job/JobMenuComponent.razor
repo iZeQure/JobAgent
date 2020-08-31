@@ -1,4 +1,4 @@
-﻿@using JobAgent.Data
+﻿@using JobAgent.Data.Objects
 @using JobAgent.Services
 
 @inject JobService JobService
@@ -9,7 +9,7 @@
     {
         @for (int i = 0; i < JobCategories.Count; i++)
         {
-            @if (JobCategories[i].JobAdvertCategorySpecializations != null)
+            @if (JobCategories[i].Specializations != null)
             {
                 <div class="dropdown py-1 px-2">
                     <a id="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu" class="dropdown-toggle btn btn-link btn-sm @MenuColor text-wrap text-left cursor-pointer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -17,7 +17,7 @@
                     </a>
 
                     <div class="dropdown-menu" aria-labelledby="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu">
-                        @if (JobCategories[i].JobAdvertCategorySpecializations.Count > 1)
+                        @if (JobCategories[i].Specializations.Count > 1)
                         {
                             <h6 class="dropdown-header">Uddannelses Specialer</h6>
                         }
@@ -28,11 +28,11 @@
 
                         <div class="dropdown-divider"></div>
 
-                        @for (int j = 0; j < JobCategories[i].JobAdvertCategorySpecializations.Count; j++)
+                        @for (int j = 0; j < JobCategories[i].Specializations.Count; j++)
                         {
                             // Link : {domain}/job/CategoryId/CategoryName/SpecializationId/SpecializationName
-                            <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].Id/@JobCategories[i].Name/@JobCategories[i].JobAdvertCategorySpecializations[j].Id/@JobCategories[i].JobAdvertCategorySpecializations[j].Name">
-                                @JobCategories[i].JobAdvertCategorySpecializations[j].Name
+                            <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].Id/@JobCategories[i].Name/@JobCategories[i].Specializations[j].Id/@JobCategories[i].Specializations[j].Name">
+                                @JobCategories[i].Specializations[j].Name
                             </a>
                         }
                     </div>
@@ -73,7 +73,7 @@ else
 
 @code {
     // Testing
-    List<JobAdvertCategory> JobCategories = new List<JobAdvertCategory>();
+    List<Category> JobCategories = new List<Category>();
 
     public string MenuColor { get; set; } = "text-light";
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JobAgent.Data
+namespace JobAgent.Data.Objects
 {
     public class JobAdvert : BaseEntity
     {
@@ -18,8 +18,8 @@ namespace JobAgent.Data
         private DateTime deadlineDate;
         private string sourceUrl;
         private Company companyCVR;
-        private JobAdvertCategory jobAdvertCategoryId;
-        private JobAdvertCategorySpecialization jobAdvertCategorySpecializationId;
+        private Category jobAdvertCategoryId;
+        private Specialization jobAdvertCategorySpecializationId;
         #endregion
 
         #region Properties
@@ -76,8 +76,8 @@ namespace JobAgent.Data
         public DateTime DeadlineDate { get { return deadlineDate; } set { deadlineDate = value; } }
         public string SourceURL { get { return sourceUrl; } set { sourceUrl = value; } }
         public Company CompanyCVR { get { return companyCVR; } set { companyCVR = value; } }
-        public JobAdvertCategory JobAdvertCategoryId { get { return jobAdvertCategoryId; } set { jobAdvertCategoryId = value; } }
-        public JobAdvertCategorySpecialization JobAdvertCategorySpecializationId { get { return jobAdvertCategorySpecializationId; } set { jobAdvertCategorySpecializationId = value; } }
+        public Category JobAdvertCategoryId { get { return jobAdvertCategoryId; } set { jobAdvertCategoryId = value; } }
+        public Specialization JobAdvertCategorySpecializationId { get { return jobAdvertCategorySpecializationId; } set { jobAdvertCategorySpecializationId = value; } }
         #endregion
     }
 }

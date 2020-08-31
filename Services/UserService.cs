@@ -1,4 +1,4 @@
-﻿using JobAgent.Data;
+﻿using JobAgent.Data.Objects;
 using JobAgent.Data.Interfaces;
 using JobAgent.Data.Repository;
 using JobAgent.Data.Repository.Interface;
@@ -70,11 +70,6 @@ namespace JobAgent.Services
             UserRepository.Create(user);
 
             return await Task.FromResult(user);
-        }
-
-        public Task<User> RereshTokenAsync(RefreshRequest refreshRequest)
-        {
-            throw new NotImplementedException();
         }
     }
 }

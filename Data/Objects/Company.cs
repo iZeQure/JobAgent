@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace JobAgent.Data
+namespace JobAgent.Data.Objects
 {
     public class Company : BaseEntity
     {

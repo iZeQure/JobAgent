@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace JobAgent.Data
+namespace JobAgent.Data.Objects
 {
-    public class Location : BaseEntity
+    public class ConsultantArea : BaseEntity
     {
         #region Attributes
         private string name;
-        private string description;
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Defines the actual name of the Consultant Area.
+        /// </summary>
         public string Name { get { return name; } set { name = value; } }
-        public string Description { get { return description; } set { description = value; } }
         #endregion
     }
 }

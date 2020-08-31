@@ -1,4 +1,5 @@
 ﻿using JobAgent.Data.DB;
+using JobAgent.Data.Objects;
 using JobAgent.Data.Repository.Interface;
 using JobAgent.Data.Security;
 using JobAgent.Models;
@@ -151,8 +152,7 @@ namespace JobAgent.Data.Repository
                         ConsultantArea = new ConsultantArea()
                         {
                             Id = reader.GetInt32("ConsultantAreaId"),
-                            Name = reader.GetString("ConsultantAreaName"),
-                            Description = ""
+                            Name = reader.GetString("ConsultantAreaName")
                         },
                         Location = new Location()
                         {

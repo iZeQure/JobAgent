@@ -1,4 +1,5 @@
 ﻿using JobAgent.Data.DB;
+using JobAgent.Data.Objects;
 using JobAgent.Data.Repository.Interface;
 using JobAgent.Models;
 using System;
@@ -55,11 +56,11 @@ namespace JobAgent.Data.Repository
                         {
                             Id = reader.GetInt32(8)
                         },
-                        JobAdvertCategoryId = new JobAdvertCategory()
+                        JobAdvertCategoryId = new Category()
                         {
                             Id = reader.GetInt32(9)
                         },
-                        JobAdvertCategorySpecializationId = new JobAdvertCategorySpecialization()
+                        JobAdvertCategorySpecializationId = new Specialization()
                         {
                             Id = reader.GetInt32(10)
                         }
@@ -96,7 +97,7 @@ namespace JobAgent.Data.Repository
             // Initialize temporary obj.
             JobVacanciesAdminModel tempModel = null;
 
-            JobAdvertCategorySpecialization specialization = new JobAdvertCategorySpecialization();
+            Specialization specialization = new Specialization();
 
             // Check if the data reader has rows.
             if (r.HasRows)
@@ -126,12 +127,12 @@ namespace JobAgent.Data.Repository
                             Id = r.GetInt32("CompanyId"),
                             Name = r.GetString("CompanyName")
                         },
-                        Category = new JobAdvertCategory()
+                        Category = new Category()
                         {
                             Id = r.GetInt32("CategoryId"),
                             Name = r.GetString("CategoryName")
                         },
-                        Specialization = new JobAdvertCategorySpecialization()
+                        Specialization = new Specialization()
                         {
                             Id = r.GetInt32("SpecializationId"),
                             Name = specialization.Name
@@ -167,7 +168,7 @@ namespace JobAgent.Data.Repository
                 using SqlDataReader r = c.ExecuteReader();
 
                 // Temp objects.
-                JobAdvertCategorySpecialization specialization = new JobAdvertCategorySpecialization();
+                Specialization specialization = new Specialization();
 
                 // Check for rows.
                 if (r.HasRows)
@@ -187,11 +188,11 @@ namespace JobAgent.Data.Repository
                                 JobRegisteredDate = r.GetDateTime("JobRegisteredDate"),
                                 DeadlineDate = r.GetDateTime("DeadlineDate")
                             },
-                            Category = new JobAdvertCategory()
+                            Category = new Category()
                             {
                                 Name = r.GetString("Category")
                             },
-                            Specialization = new JobAdvertCategorySpecialization()
+                            Specialization = new Specialization()
                             {
                                 Name = specialization.Name
                             },

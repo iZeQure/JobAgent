@@ -1,4 +1,5 @@
 ﻿using JobAgent.Data.DB;
+using JobAgent.Data.Objects;
 using JobAgent.Data.Repository.Interface;
 using System;
 using System.Collections.Generic;
@@ -17,9 +18,6 @@ namespace JobAgent.Data.Repository
         /// <param name="create">Used to specify the data.</param>
         public void Create(Location create)
         {
-            // Open connection to database.
-            Database.Instance.OpenConnection();
-
             // Prepare command obj.
             using SqlCommand cmd = new SqlCommand("CreateLocation", Database.Instance.SqlConnection)
             {
@@ -27,11 +25,14 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters
-            cmd.Parameters.AddWithValue("Name", create.Name);
-            cmd.Parameters.AddWithValue("Description", create.Description);
+            cmd.Parameters.AddWithValue("@name", create.Name);
+            cmd.Parameters.AddWithValue("@description", create.Description);
 
-            // Execute command, catch return code.
-            int returnCode = cmd.ExecuteNonQuery();
+            // Open connection to database.
+            Database.Instance.OpenConnection();
+
+            // Execute command
+            cmd.ExecuteNonQuery();
         }
 
         /// <summary>
@@ -43,14 +44,14 @@ namespace JobAgent.Data.Repository
             // Initialize temporary list.
             List<Location> tempLocations = new List<Location>();
 
-            // Open connection to database.
-            Database.Instance.OpenConnection();
-
             // Prepare command obj.
             using SqlCommand cmd = new SqlCommand("GetAllLocations", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
+
+            // Open connection to database.
+            Database.Instance.OpenConnection();
 
             // Initialize data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
@@ -67,7 +68,7 @@ namespace JobAgent.Data.Repository
                         Name = reader.GetString(1)
                     };
 
-                    if (!DataReaderExtensions.IsDBNull(reader, "Description")) location.Description = reader.GetString(2);
+                    if (!DataReaderExtensions.IsDBNull(reader, "@description")) location.Description = reader.GetString(2);
 
                     // Store data in the temporary list.
                     tempLocations.Add(location);
@@ -88,9 +89,6 @@ namespace JobAgent.Data.Repository
             // Initalize temporary obj.
             Location tempLocationObj = new Location();
 
-            // Open connetion to database.
-            Database.Instance.OpenConnection();
-
             // Initialize command obj.
             using SqlCommand cmd = new SqlCommand("GetLocationById", Database.Instance.SqlConnection)
             {
@@ -98,7 +96,10 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("LocationId", id);
+            cmd.Parameters.AddWithValue("@id", id);
+
+            // Open connetion to database.
+            Database.Instance.OpenConnection();
 
             // Initialize data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
@@ -111,7 +112,11 @@ namespace JobAgent.Data.Repository
                 {
                     tempLocationObj.Id = reader.GetInt32(0);
                     tempLocationObj.Name = reader.GetString(1);
-                    tempLocationObj.Description = reader.GetString(2);
+
+                    if (!DataReaderExtensions.IsDBNull(reader, "@description"))
+                        tempLocationObj.Description = reader.GetString(2);
+                    else
+                        tempLocationObj.Description = string.Empty;
                 }
             }
 
@@ -125,9 +130,6 @@ namespace JobAgent.Data.Repository
         /// <param name="id">Used to specify the data to remove.</param>
         public void Remove(int id)
         {
-            // Open connetion to database.
-            Database.Instance.OpenConnection();
-
             // Initialize command obj.
             using SqlCommand cmd = new SqlCommand("RemoveLocation", Database.Instance.SqlConnection)
             {
@@ -135,10 +137,13 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("LocationId", id);
+            cmd.Parameters.AddWithValue("@id", id);
 
-            // Execute command, catch return code.
-            int returnCode = cmd.ExecuteNonQuery();
+            // Open connetion to database.
+            Database.Instance.OpenConnection();
+
+            // Execute command.
+            cmd.ExecuteNonQuery();
         }
 
         /// <summary>
@@ -147,9 +152,6 @@ namespace JobAgent.Data.Repository
         /// <param name="update">Used to specify the data set to update.</param>
         public void Update(Location update)
         {
-            // Open connection to database.
-            Database.Instance.OpenConnection();
-
             // Initialize command obj.
             using SqlCommand cmd = new SqlCommand("UpdateLocation", Database.Instance.SqlConnection)
             {
@@ -157,12 +159,15 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("LocationId", update.Id);
-            cmd.Parameters.AddWithValue("NewLocationName", update.Name);
-            cmd.Parameters.AddWithValue("NewLocationDescription", update.Description);
+            cmd.Parameters.AddWithValue("@id", update.Id);
+            cmd.Parameters.AddWithValue("@name", update.Name);
+            cmd.Parameters.AddWithValue("@description", update.Description);
 
-            // Execute update, catch return code.
-            int returnCode = cmd.ExecuteNonQuery();
+            // Open connection to database.
+            Database.Instance.OpenConnection();
+
+            // Execute update.
+            cmd.ExecuteNonQuery();
         }
     }
 }

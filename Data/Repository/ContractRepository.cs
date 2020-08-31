@@ -1,4 +1,5 @@
 ﻿using JobAgent.Data.DB;
+using JobAgent.Data.Objects;
 using JobAgent.Data.Repository.Interface;
 using System;
 using System.Collections.Generic;

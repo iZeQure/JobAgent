@@ -1,8 +1,9 @@
-﻿using JobAgent.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JobAgent.Models;
+using JobAgent.Data.Objects;
 
 namespace JobAgent.Data.Repository.Interface
 {
