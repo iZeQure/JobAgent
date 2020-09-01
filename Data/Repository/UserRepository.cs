@@ -37,7 +37,7 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("UserEmail", email);
+            cmd.Parameters.AddWithValue("@email", email);
 
             // Define return parameters.
             var returnParameter = cmd.Parameters.AddWithValue("return_value", SqlDbType.Int);
@@ -56,9 +56,6 @@ namespace JobAgent.Data.Repository
 
         public void Create(User create)
         {
-            // Open connection to database.
-            Database.Instance.OpenConnection();
-
             // Initialzie command obj.
             using SqlCommand cmd = new SqlCommand("CreateUser", Database.Instance.SqlConnection)
             {
@@ -66,17 +63,20 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("FirstName", create.FirstName);
-            cmd.Parameters.AddWithValue("LastName", create.LastName);
-            cmd.Parameters.AddWithValue("Email", create.Email);
-            cmd.Parameters.AddWithValue("Password", create.Password);
-            cmd.Parameters.AddWithValue("Salt", create.Salt);
-            cmd.Parameters.AddWithValue("AccessToken", create.AccessToken);
-            cmd.Parameters.AddWithValue("ConsultantAreaId", create.ConsultantArea.Id);
-            cmd.Parameters.AddWithValue("LocationId", create.Location.Id);
+            cmd.Parameters.AddWithValue("@firstName", create.FirstName);
+            cmd.Parameters.AddWithValue("@lastName", create.LastName);
+            cmd.Parameters.AddWithValue("@email", create.Email);
+            cmd.Parameters.AddWithValue("@password", create.Password);
+            cmd.Parameters.AddWithValue("@salt", create.Salt);
+            cmd.Parameters.AddWithValue("@accessToken", create.AccessToken);
+            cmd.Parameters.AddWithValue("@consultantAreaId", create.ConsultantArea.Id);
+            cmd.Parameters.AddWithValue("@locationId", create.Location.Id);
 
-            // Execute command, catch returned value.
-            int returnValue = cmd.ExecuteNonQuery();
+            // Open connection to database.
+            Database.Instance.OpenConnection();
+
+            // Execute command.
+            cmd.ExecuteNonQuery();
         }
 
         public IEnumerable<User> GetAll()
@@ -108,7 +108,17 @@ namespace JobAgent.Data.Repository
                         {
                             Id = r.GetInt32("Id"),
                             FirstName = r.GetString("FirstName"),
-                            LastName = r.GetString("LastName")
+                            LastName = r.GetString("LastName"),
+                            Email = r.GetString("Email"),
+                            ConsultantArea = new ConsultantArea()
+                            {
+                                Name = r.GetString("ConsultantAreaName")
+                            },
+                            Location = new Location()
+                            {
+                                Name = r.GetString("LocationName"),
+                                Description = !DataReaderExtensions.IsDBNull(r, "LocationDesc") ? r.GetString("LocationDesc") : string.Empty
+                            }
                         });
                 }
             }
@@ -132,7 +142,7 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("UserEmail", email);
+            cmd.Parameters.AddWithValue("@email", email);
 
             // Initialzie data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
@@ -157,8 +167,7 @@ namespace JobAgent.Data.Repository
                         Location = new Location()
                         {
                             Id = reader.GetInt32("LocationId"),
-                            Name = reader.GetString("LocationName"), 
-                            Description = ""
+                            Name = reader.GetString("LocationName")
                         }
                     };
                 }
@@ -181,7 +190,7 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("UserAccessToken", accessToken);
+            cmd.Parameters.AddWithValue("@token", accessToken);
 
             // Initialzie data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
@@ -237,7 +246,7 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("UserEmail", email);
+            cmd.Parameters.AddWithValue("@email", email);
 
             // Initalize data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
@@ -248,7 +257,7 @@ namespace JobAgent.Data.Repository
                 // Read the data.
                 while (reader.Read())
                 {
-                    return reader.GetString(0);
+                    return reader.GetString("Salt");
                 }
             }
 
@@ -271,8 +280,8 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("UserEmail", email);
-            cmd.Parameters.AddWithValue("UserSecret", password);
+            cmd.Parameters.AddWithValue("@email", email);
+            cmd.Parameters.AddWithValue("@secret", password);
 
             // Initialize data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
@@ -321,12 +330,12 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("UserId", update.Id).SqlDbType = SqlDbType.Int;
-            cmd.Parameters.AddWithValue("NewFirstName", update.FirstName).SqlDbType = SqlDbType.VarChar;
-            cmd.Parameters.AddWithValue("NewLastName", update.LastName).SqlDbType = SqlDbType.VarChar;
-            cmd.Parameters.AddWithValue("NewEmail", update.Email).SqlDbType = SqlDbType.VarChar;
-            cmd.Parameters.AddWithValue("NewConsultantAreaId", update.ConsultantArea.Id).SqlDbType = SqlDbType.Int;
-            cmd.Parameters.AddWithValue("NewLocationId", update.Location.Id).SqlDbType = SqlDbType.Int;
+            cmd.Parameters.AddWithValue("@id", update.Id).SqlDbType = SqlDbType.Int;
+            cmd.Parameters.AddWithValue("@firstName", update.FirstName).SqlDbType = SqlDbType.VarChar;
+            cmd.Parameters.AddWithValue("@lastName", update.LastName).SqlDbType = SqlDbType.VarChar;
+            cmd.Parameters.AddWithValue("@email", update.Email).SqlDbType = SqlDbType.VarChar;
+            cmd.Parameters.AddWithValue("@consultantAreaId", update.ConsultantArea.Id).SqlDbType = SqlDbType.Int;
+            cmd.Parameters.AddWithValue("@locationId", update.Location.Id).SqlDbType = SqlDbType.Int;
 
             // Exectute command, catch return value.
             int returnValue = cmd.ExecuteNonQuery();
@@ -349,7 +358,7 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("UserPassword", password);
+            cmd.Parameters.AddWithValue("@secret", password);
 
             // Define return parameters.
             var returnParameter = cmd.Parameters.AddWithValue("return_value", SqlDbType.Int);
@@ -378,8 +387,8 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("UserEmail", authorization.Email);
-            cmd.Parameters.AddWithValue("UserSecret", authorization.Password);
+            cmd.Parameters.AddWithValue("@email", authorization.Email);
+            cmd.Parameters.AddWithValue("@secret", authorization.Password);
 
             // Execute cmd.
             cmd.ExecuteNonQuery();

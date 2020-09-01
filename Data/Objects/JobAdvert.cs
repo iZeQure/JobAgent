@@ -18,8 +18,8 @@ namespace JobAgent.Data.Objects
         private DateTime deadlineDate;
         private string sourceUrl;
         private Company companyCVR;
-        private Category jobAdvertCategoryId;
-        private Specialization jobAdvertCategorySpecializationId;
+        private Category category;
+        private Specialization specialization;
         #endregion
 
         #region Properties
@@ -76,8 +76,8 @@ namespace JobAgent.Data.Objects
         public DateTime DeadlineDate { get { return deadlineDate; } set { deadlineDate = value; } }
         public string SourceURL { get { return sourceUrl; } set { sourceUrl = value; } }
         public Company CompanyCVR { get { return companyCVR; } set { companyCVR = value; } }
-        public Category JobAdvertCategoryId { get { return jobAdvertCategoryId; } set { jobAdvertCategoryId = value; } }
-        public Specialization JobAdvertCategorySpecializationId { get { return jobAdvertCategorySpecializationId; } set { jobAdvertCategorySpecializationId = value; } }
+        public Category Category { get { return category; } set { category = value; } }
+        public Specialization Specialization { get { return specialization; } set { specialization = value; } }
         #endregion
     }
 }

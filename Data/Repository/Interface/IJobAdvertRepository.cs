@@ -9,7 +9,7 @@ namespace JobAgent.Data.Repository.Interface
 {
     interface IJobAdvertRepository : IRepository<JobAdvert>
     {
-        public IEnumerable<JobVacanciesAdminModel> GetJobAdvertsForAdmins();
+        public IEnumerable<JobVacanciesAdminModel> GetAllJobAdvertsForAdmins();
 
         public JobVacanciesAdminModel GetJobAdvertDetailsForAdminsById(int id);
     }

@@ -16,16 +16,7 @@ namespace JobAgent.Services
 
         private IRepository<JobAdvert> JobRepository { get; } = new JobAdvertRepository();
 
-        private IRepository<Category> CategoryRepository { get; } = new CategoryRepository();
-
-        private IRepository<Company> CompanyRepository { get; } = new CompanyRepository();
-
-        private IRepository<Contract> ContractRepository { get; } = new ContractRepository();
-
-        public Task<List<User>> GetUsers()
-        {
-            return Task.FromResult(UserRepository.GetAll().ToList());
-        }
+        private IRepository<Contract> ContractRepository { get; } = new ContractRepository();        
 
         public Task<User> GetUserByEmail(string userMail)
         {
@@ -73,11 +64,11 @@ namespace JobAgent.Services
                 },
 
                 // Category Data
-                JobAdvertCategoryId = new Category()
+                Category = new Category()
                 {
                     Id = data.Category.Id
                 },
-                JobAdvertCategorySpecializationId = new Specialization()
+                Specialization = new Specialization()
                 {
                     Id = data.Specialization.Id
                 }
@@ -88,28 +79,13 @@ namespace JobAgent.Services
 
         public Task<List<JobVacanciesAdminModel>> GetJobVacancies()
         {
-            return Task.FromResult(((IJobAdvertRepository)JobRepository).GetJobAdvertsForAdmins().ToList());
+            return Task.FromResult(((IJobAdvertRepository)JobRepository).GetAllJobAdvertsForAdmins().ToList());
         }
 
         public Task<JobVacanciesAdminModel> GetJobVacancyDetailsById(int id)
         {
             return Task.FromResult(((IJobAdvertRepository)JobRepository).GetJobAdvertDetailsForAdminsById(id));
-        }
-
-        public Task<List<Company>> GetAllCompanies()
-        {
-            return Task.FromResult(CompanyRepository.GetAll().ToList());
-        }
-
-        public Task<List<Category>> GetAllJobAdvertCategories()
-        {
-            return Task.FromResult(CategoryRepository.GetAll().ToList());
-        }
-
-        public Task<List<Specialization>> GetAllJobAdvertCategorySpecializations()
-        {
-            return Task.FromResult(((ICategoryRepository)CategoryRepository).GetAllCategorySpecializations());
-        }
+        }            
 
         public void RemoveJobVacancyById(int id)
         {

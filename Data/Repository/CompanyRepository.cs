@@ -62,9 +62,9 @@ namespace JobAgent.Data.Repository
                 {
                     tempCompanies.Add(new Company()
                     {
-                        Id = reader.GetInt32(0),
-                        Name = reader.GetString(1),
-                        URL = reader.GetString(2)
+                        Id = reader.GetInt32("CVR"),
+                        Name = reader.GetString("Name"),
+                        URL = reader.GetString("URL")
                     });
                 }
             }
@@ -104,9 +104,9 @@ namespace JobAgent.Data.Repository
                 // Read data.
                 while (reader.Read())
                 {
-                    tempCompany.Id = reader.GetInt32(0);
-                    tempCompany.Name = reader.GetString(1);
-                    tempCompany.URL = reader.GetString(2);
+                    tempCompany.Id = reader.GetInt32("CVR");
+                    tempCompany.Name = reader.GetString("Name");
+                    tempCompany.URL = reader.GetString("URL");
                 }
             }
 

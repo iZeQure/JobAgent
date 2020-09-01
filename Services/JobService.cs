@@ -10,8 +10,8 @@ namespace JobAgent.Services
 {
     public class JobService
     {
-        private IRepository<Category> CategoryRepository { get; } = new CategoryRepository();
-        private IRepository<JobAdvert> AdvertRepository { get; } = new JobAdvertRepository();
+        private protected IRepository<Category> CategoryRepository { get; } = new CategoryRepository();
+        private protected IRepository<JobAdvert> AdvertRepository { get; } = new JobAdvertRepository();
 
         private List<JobAdvert> JobAdverts { get; set; } = new List<JobAdvert>();
 
@@ -27,7 +27,7 @@ namespace JobAgent.Services
             JobAdverts = await Task.FromResult(AdvertRepository.GetAll().ToList());
 
             var sortJobs = from job in JobAdverts
-                           where job.JobAdvertCategoryId.Id == id
+                           where job.Category.Id == id
                            orderby job.JobRegisteredDate ascending
                            select job;
 
@@ -39,7 +39,7 @@ namespace JobAgent.Services
             JobAdverts = await Task.FromResult(AdvertRepository.GetAll().ToList());
 
             var sortJobs = from job in JobAdverts
-                           where job.JobAdvertCategorySpecializationId.Id == id
+                           where job.Specialization.Id == id
                            orderby job.JobRegisteredDate ascending
                            select job;
 

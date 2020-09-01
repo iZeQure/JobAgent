@@ -44,25 +44,25 @@ namespace JobAgent.Data.Repository
                     // Add data to collection.
                     tempJobAdverts.Add(new JobAdvert()
                     {
-                        Id = reader.GetInt32(0),
-                        Title = reader.GetString(1),
-                        Email = reader.GetString(2),
-                        PhoneNumber = reader.GetString(3),
-                        JobDescription = reader.GetString(4),
-                        JobLocation = reader.GetString(5),
-                        JobRegisteredDate = reader.GetDateTime(6),
-                        DeadlineDate = reader.GetDateTime(7),
+                        Id = reader.GetInt32("Id"),
+                        Title = reader.GetString("Title"),
+                        Email = reader.GetString("Email"),
+                        PhoneNumber = reader.GetString("PhoneNumber"),
+                        JobDescription = reader.GetString("JobDescription"),
+                        JobLocation = reader.GetString("JobLocation"),
+                        JobRegisteredDate = reader.GetDateTime("JobRegisteredDate"),
+                        DeadlineDate = reader.GetDateTime("DeadlineDate"),
                         CompanyCVR = new Company()
                         {
-                            Id = reader.GetInt32(8)
+                            Id = reader.GetInt32("CompanyCVR")
                         },
-                        JobAdvertCategoryId = new Category()
+                        Category = new Category()
                         {
-                            Id = reader.GetInt32(9)
+                            Id = reader.GetInt32("CategoryId")
                         },
-                        JobAdvertCategorySpecializationId = new Specialization()
+                        Specialization = new Specialization()
                         {
-                            Id = reader.GetInt32(10)
+                            Id = reader.GetInt32("SpecializationId")
                         }
                     });
                 }
@@ -146,7 +146,7 @@ namespace JobAgent.Data.Repository
             return tempModel;
         }
 
-        public IEnumerable<JobVacanciesAdminModel> GetJobAdvertsForAdmins()
+        public IEnumerable<JobVacanciesAdminModel> GetAllJobAdvertsForAdmins()
         {
             // Initialize command obj.
             using SqlCommand c = new SqlCommand()
@@ -223,7 +223,7 @@ namespace JobAgent.Data.Repository
             };
 
             // Define id to remove.
-            c.Parameters.AddWithValue("@JobAdvertId", id);
+            c.Parameters.AddWithValue("@id", id);
 
             try
             {
@@ -248,18 +248,18 @@ namespace JobAgent.Data.Repository
             };
 
             // Set parameters.
-            c.Parameters.AddWithValue("@RowId", update.Id);
-            c.Parameters.AddWithValue("@NewTitle", update.Title);
-            c.Parameters.AddWithValue("@NewEmail", update.Email);
-            c.Parameters.AddWithValue("@NewPhoneNumber", update.PhoneNumber);
-            c.Parameters.AddWithValue("@NewJobDescription", update.JobDescription);
-            c.Parameters.AddWithValue("@NewJobLocation", update.JobLocation);
-            c.Parameters.AddWithValue("@NewRegDate", update.JobRegisteredDate);
-            c.Parameters.AddWithValue("@NewDeadlineDate", update.DeadlineDate);
-            c.Parameters.AddWithValue("@NewSourceURL", update.SourceURL);
-            c.Parameters.AddWithValue("@NewCompanyCVR", update.CompanyCVR.Id);
-            c.Parameters.AddWithValue("@NewJobAdvertCategoryId", update.JobAdvertCategoryId.Id);
-            c.Parameters.AddWithValue("@NewJobAdvertCategorySpecializationId", update.JobAdvertCategorySpecializationId.Id);
+            c.Parameters.AddWithValue("@id", update.Id);
+            c.Parameters.AddWithValue("@title", update.Title);
+            c.Parameters.AddWithValue("@email", update.Email);
+            c.Parameters.AddWithValue("@phoneNumber", update.PhoneNumber);
+            c.Parameters.AddWithValue("@jobDescription", update.JobDescription);
+            c.Parameters.AddWithValue("@jobLocation", update.JobLocation);
+            c.Parameters.AddWithValue("@regDate", update.JobRegisteredDate);
+            c.Parameters.AddWithValue("@deadlineDate", update.DeadlineDate);
+            c.Parameters.AddWithValue("@sourceURL", update.SourceURL);
+            c.Parameters.AddWithValue("@companyCVR", update.CompanyCVR.Id);
+            c.Parameters.AddWithValue("@categoryId", update.Category.Id);
+            c.Parameters.AddWithValue("@specializationId", update.Specialization.Id);
 
             // Open connection to db.
             Database.Instance.OpenConnection();

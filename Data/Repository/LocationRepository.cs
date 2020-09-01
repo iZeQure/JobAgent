@@ -64,11 +64,14 @@ namespace JobAgent.Data.Repository
                 {
                     Location location = new Location
                     {
-                        Id = reader.GetInt32(0),
-                        Name = reader.GetString(1)
+                        Id = reader.GetInt32("Id"),
+                        Name = reader.GetString("Name")
                     };
 
-                    if (!DataReaderExtensions.IsDBNull(reader, "@description")) location.Description = reader.GetString(2);
+                    if (!DataReaderExtensions.IsDBNull(reader, "@description"))
+                        location.Description = reader.GetString("Description");
+                    else
+                        location.Description = string.Empty;
 
                     // Store data in the temporary list.
                     tempLocations.Add(location);
@@ -110,11 +113,11 @@ namespace JobAgent.Data.Repository
                 // Read the data.
                 while (reader.Read())
                 {
-                    tempLocationObj.Id = reader.GetInt32(0);
-                    tempLocationObj.Name = reader.GetString(1);
+                    tempLocationObj.Id = reader.GetInt32("Id");
+                    tempLocationObj.Name = reader.GetString("Name");
 
                     if (!DataReaderExtensions.IsDBNull(reader, "@description"))
-                        tempLocationObj.Description = reader.GetString(2);
+                        tempLocationObj.Description = reader.GetString("Description");
                     else
                         tempLocationObj.Description = string.Empty;
                 }

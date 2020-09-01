@@ -6,7 +6,8 @@
 @using JobAgent.Models
 @using JobAgent.Services
 
-@inject AdminService Service
+@inject AdminService AService
+@inject DataService DService
 @inject IJSRuntime JSRuntime
 
 @inherits ComponentBase
@@ -54,9 +55,9 @@ else
                         <td>@(contract.CompanyCVR.Name)</td>
                         <td>@(contract.ContactPerson)</td>
                         <td>@(contract.SignedByUserId.FullName)</td>
-                        @if (!string.IsNullOrEmpty(contract.ContractLocation))
+                        @if (!string.IsNullOrEmpty(contract.ContractName))
                         {
-                            <td @onclick="@(path => OnClickOpen_Contract(GetLocationPath(contract.ContractLocation)))">
+                            <td @onclick="@(path => OnClickOpen_Contract(GetLocationPath(contract.ContractName)))">
                                 <span class="table-icons" data-toggle="modal" data-target="#contractModal">
                                     <i class="fas fa-file-invoice"></i>
                                 </span>
@@ -159,7 +160,7 @@ else
                         </div>
                         <div class="col">
                             <label for="inputContractName" class="admin-label col-form-label col-form-label-sm">Kontraktens Navn : <span class="font-italic small" style="color: red;">*Ikke ændre dette hvis navnet på kontrakten ikke bliver ændret.</span></label>
-                            <input id="inputContractName" class="form-control form-control-sm" type="text" placeholder="Indtast kontraktens fil navn / lokation.." disabled @bind="ContractDetails.ContractLocation" />
+                            <input id="inputContractName" class="form-control form-control-sm" type="text" placeholder="Indtast kontraktens fil navn / lokation.." disabled @bind="ContractDetails.ContractName" />
                         </div>
                     </div>
 
@@ -202,14 +203,14 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        GetContracts = await Service.GetContracts();
-        GetCompanies = await Service.GetAllCompanies();
-        GetUsers = await Service.GetUsers();
+        GetContracts = await AService.GetContracts();
+        GetCompanies = await DService.GetAllCompanies();
+        GetUsers = await DService.GetUsers();
     }
 
     private async void OnClickEdit_GetContractDetailsById(int contractId)
     {
-        ContractDetails = await Service.GetContractById(contractId);
+        ContractDetails = await AService.GetContractById(contractId);
     }
 
     private void OnClickOpen_Contract(string path)

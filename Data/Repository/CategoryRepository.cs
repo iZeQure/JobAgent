@@ -16,9 +16,6 @@ namespace JobAgent.Data.Repository
         /// <param name="create">Used to specify the data for the category.</param>
         public void Create(Category create)
         {
-            // Open connection to database.
-            Database.Instance.OpenConnection();
-
             // Prepare command object with information.
             using SqlCommand cmd = new SqlCommand("CreateCategory", Database.Instance.SqlConnection)
             {
@@ -26,10 +23,13 @@ namespace JobAgent.Data.Repository
             };
 
             // Give the parameters some values.
-            cmd.Parameters.AddWithValue("CategoryName", create.Name);
+            cmd.Parameters.AddWithValue("@name", create.Name);
 
-            // Execute the command, catch return code.
-            int returnCode = cmd.ExecuteNonQuery();
+            // Open connection to database.
+            Database.Instance.OpenConnection();
+
+            // Execute the command.
+            cmd.ExecuteNonQuery();
         }
 
         /// <summary>
@@ -37,23 +37,23 @@ namespace JobAgent.Data.Repository
         /// </summary>
         /// <param name="create">Used to specify the data for the specialization.</param>
         /// <param name="categoryId">Used to bind the specialization to a specific category.</param>
-        public void CreateCategorySpecialization(Specialization create, int categoryId)
+        public void CreateSpecialization(Specialization create, int categoryId)
         {
-            // Open connection to database.
-            Database.Instance.OpenConnection();
-
             // Prepare command object with information.
-            using SqlCommand cmd = new SqlCommand("CreateCategorySpecialization", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("CreateSpecialization", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
             // Give the parameters some values.
-            cmd.Parameters.AddWithValue("CategoryID", categoryId);
-            cmd.Parameters.AddWithValue("SpecializationName", create.Name);
+            cmd.Parameters.AddWithValue("@id", categoryId);
+            cmd.Parameters.AddWithValue("@name", create.Name);
 
-            // Exectue the command, catch the return code.
-            int returnCode = cmd.ExecuteNonQuery();
+            // Open connection to database.
+            Database.Instance.OpenConnection();
+
+            // Exectue the command.
+            cmd.ExecuteNonQuery();
         }
 
         /// <summary>
@@ -65,9 +65,6 @@ namespace JobAgent.Data.Repository
             // Initialize a temporary list with categories.
             List<Category> tempCategories = new List<Category>();
 
-            // Open connection to the database.
-            Database.Instance.OpenConnection();
-
             // Prepare command object with information.
             using SqlCommand cmd = new SqlCommand()
             {
@@ -75,6 +72,9 @@ namespace JobAgent.Data.Repository
                 CommandText = "GetAllCategories",
                 Connection = Database.Instance.SqlConnection
             };
+
+            // Open connection to the database.
+            Database.Instance.OpenConnection();
 
             // Initialize Data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
@@ -109,14 +109,14 @@ namespace JobAgent.Data.Repository
             // Initialize a temporary list with categories.
             List<Category> tempCategories = new List<Category>();
 
-            // Open connection to the database.
-            Database.Instance.OpenConnection();
-
             // Prepare sql command object with information.
             using SqlCommand cmd = new SqlCommand("GetAllCategoriesWithSpecialization", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
+
+            // Open connection to the database.
+            Database.Instance.OpenConnection();
 
             // Initialize a data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
@@ -142,8 +142,8 @@ namespace JobAgent.Data.Repository
 
                     // Specialization Data
                     if (!DataReaderExtensions.IsDBNull(reader, "SpecId")) jobSpecializationData.Id = reader.GetInt32("SpecId");
-                    if (!DataReaderExtensions.IsDBNull(reader, "JobAdvertCategoryId")) jobSpecializationData.CategoryId = reader.GetInt32("JobAdvertCategoryId");
                     if (!DataReaderExtensions.IsDBNull(reader, "SpecializationName")) jobSpecializationData.Name = reader.GetString("SpecializationName");
+                    if (!DataReaderExtensions.IsDBNull(reader, "CategoryId")) jobSpecializationData.CategoryId = reader.GetInt32("CategoryId");
 
                     // Check if job category has a matching specialization.
                     if (jobCategoryData.Id == jobSpecializationData.CategoryId)
@@ -281,19 +281,19 @@ namespace JobAgent.Data.Repository
         /// Get all category specializations.
         /// </summary>
         /// <returns>A list of <see cref="Specialization"/>.</returns>
-        public List<Specialization> GetAllCategorySpecializations()
+        public List<Specialization> GetAllSpecializations()
         {
             // Initialize a temporary list with specializations.
             List<Specialization> tempSpecializations = new List<Specialization>();
 
-            // Open connection to the database.
-            Database.Instance.OpenConnection();
-
             // Prepare command with information to execute.
-            using SqlCommand cmd = new SqlCommand("GetAllCategorySpecializations", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("GetAllSpecializations", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
+
+            // Open connection to the database.
+            Database.Instance.OpenConnection();
 
             // Initialize data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
@@ -309,9 +309,9 @@ namespace JobAgent.Data.Repository
                 {
                     tempSpecializations.Add(new Specialization()
                     {
-                        Id = reader.GetInt32(0),
-                        Name = reader.GetString(1),
-                        CategoryId = reader.GetInt32(3)
+                        Id = reader.GetInt32("Id"),
+                        Name = reader.GetString("Name"),
+                        CategoryId = reader.GetInt32("CategoryId")
                     });
                 }
             }
@@ -330,16 +330,16 @@ namespace JobAgent.Data.Repository
             // Initalize temporary category object.
             Category tempCategory = new Category();
 
-            // Open connection to database.
-            Database.Instance.OpenConnection();
-
             // Prepare command object with information.
             using SqlCommand cmd = new SqlCommand("GetCategoryById", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
-            cmd.Parameters.AddWithValue("CategoryId", id);
+            cmd.Parameters.AddWithValue("@id", id);
+
+            // Open connection to database.
+            Database.Instance.OpenConnection();
 
             // Initialize data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
@@ -348,8 +348,8 @@ namespace JobAgent.Data.Repository
             if (reader.HasRows)
             {
                 // Get the row specified by the id.
-                tempCategory.Id = reader.GetInt32(0);
-                tempCategory.Name = reader.GetString(1);
+                tempCategory.Id = reader.GetInt32("Id");
+                tempCategory.Name = reader.GetString("Name");
             }
 
             // return data
@@ -361,22 +361,22 @@ namespace JobAgent.Data.Repository
         /// </summary>
         /// <param name="id">Used to identify the specialization to return.</param>
         /// <returns>A <see cref="Specialization"/>.</returns>
-        public Specialization GetCategorySpecializationById(int id)
+        public Specialization GetSpecializationById(int id)
         {
             // Initialize temporary data object.
             Specialization tempSpecializationObj = new Specialization();
 
-            // Open connection to database.
-            Database.Instance.OpenConnection();
-
             // Prepare command with information.
-            using SqlCommand cmd = new SqlCommand("GetCategorySpecializationById", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("GetSpecializationById", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
             // Add specialization to get.
-            cmd.Parameters.AddWithValue("SpecializationId", id);
+            cmd.Parameters.AddWithValue("@id", id);
+
+            // Open connection to database.
+            Database.Instance.OpenConnection();
 
             // Initialize data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
@@ -387,8 +387,8 @@ namespace JobAgent.Data.Repository
                 // Read the data
                 while (reader.Read())
                 {
-                    tempSpecializationObj.Id = reader.GetInt32(0);
-                    tempSpecializationObj.Name = reader.GetString(1);
+                    tempSpecializationObj.Id = reader.GetInt32("Id");
+                    tempSpecializationObj.Name = reader.GetString("Name");
                 }
             }
 
@@ -402,9 +402,6 @@ namespace JobAgent.Data.Repository
         /// <param name="id"></param>
         public void Remove(int id)
         {
-            // Open connection to the database.
-            Database.Instance.OpenConnection();
-
             // Prepare command object.
             using SqlCommand cmd = new SqlCommand("RemoveCategory")
             {
@@ -412,32 +409,35 @@ namespace JobAgent.Data.Repository
             };
 
             // Add category id parameter.
-            cmd.Parameters.AddWithValue("CategoryId", id);
+            cmd.Parameters.AddWithValue("@id", id);
 
-            // Execute command and catch return code.
-            int returnCode = cmd.ExecuteNonQuery();
+            // Open connection to the database.
+            Database.Instance.OpenConnection();
+
+            // Execute command.
+            cmd.ExecuteNonQuery();
         }
 
         /// <summary>
         /// Remove category specialization by id.
         /// </summary>
         /// <param name="id">Used to indentify the data to delete.</param>
-        public void RemoveCategorySpecialization(int id)
+        public void RemoveSpecialization(int id)
         {
-            // Open connection to the database.
-            Database.Instance.OpenConnection();
-
             // Prepare command object.
-            using SqlCommand cmd = new SqlCommand("RemoveCategorySpecialization", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("RemoveSpecialization", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
             // Define input parameters
-            cmd.Parameters.AddWithValue("SpecializationId", id);
+            cmd.Parameters.AddWithValue("@id", id);
 
-            // Execute command, catch return code.
-            int returnCode = cmd.ExecuteNonQuery();
+            // Open connection to the database.
+            Database.Instance.OpenConnection();
+
+            // Execute command.
+            cmd.ExecuteNonQuery();
         }
 
         /// <summary>
@@ -446,9 +446,6 @@ namespace JobAgent.Data.Repository
         /// <param name="update">Used to update the current existing data with.</param>
         public void Update(Category update)
         {
-            // Open connection to database.
-            Database.Instance.OpenConnection();
-
             // Prepare command obj.
             using SqlCommand cmd = new SqlCommand("UpdateCategory", Database.Instance.SqlConnection)
             {
@@ -456,35 +453,38 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("CategoryId", update.Id);
-            cmd.Parameters.AddWithValue("NewCategoryName", update.Name);
+            cmd.Parameters.AddWithValue("@id", update.Id);
+            cmd.Parameters.AddWithValue("@name", update.Name);
 
-            // Execute command, catch return code.
-            int returnCode = cmd.ExecuteNonQuery();
+            // Open connection to the database.
+            Database.Instance.OpenConnection();
+
+            // Execute command.
+            cmd.ExecuteNonQuery();
         }
 
         /// <summary>
         /// Update category specialization.
         /// </summary>
         /// <param name="update">Used to update the existing data with new.</param>
-        public void UpdateCategorySpecialization(Specialization update)
+        public void UpdateSpecialization(Specialization update)
         {
-            // Open connection to database.
-            Database.Instance.OpenConnection();
-
             // Prepare command obj.
-            using SqlCommand cmd = new SqlCommand("UpdateCategorySpecialization", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("UpdateSpecialization", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("CategoryId", update.CategoryId);
-            cmd.Parameters.AddWithValue("SpecializationId", update.Id);
-            cmd.Parameters.AddWithValue("NewSpecializationName", update.Name);
+            cmd.Parameters.AddWithValue("@categoryId", update.CategoryId);
+            cmd.Parameters.AddWithValue("@specializationId", update.Id);
+            cmd.Parameters.AddWithValue("@name", update.Name);
 
-            // Execute command, catch return code.
-            int returnCode = cmd.ExecuteNonQuery();
+            // Open connection to the database.
+            Database.Instance.OpenConnection();
+
+            // Execute command.
+            cmd.ExecuteNonQuery();
         }
     }
 }

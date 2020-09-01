@@ -6,7 +6,8 @@
 
 @using Syncfusion.Blazor.Calendars
 
-@inject AdminService Service
+@inject AdminService AService
+@inject DataService DService
 @inject IJSRuntime JSRuntime
 
 @inherits ComponentBase
@@ -245,11 +246,11 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        JobVacancyModel = await Service.GetJobVacancies();
+        JobVacancyModel = await AService.GetJobVacancies();
 
-        GetCategories = await Service.GetAllJobAdvertCategories();
-        GetSpecializations = await Service.GetAllJobAdvertCategorySpecializations();
-        GetCompanies = await Service.GetAllCompanies();
+        GetCategories = await DService.GetAllCategories();
+        GetSpecializations = await DService.GetAllSpecializations();
+        GetCompanies = await DService.GetAllCompanies();
     }
 
     public void OnCategoryChange_GetSpecializationBydCategoryId(ChangeEventArgs e)
@@ -271,7 +272,7 @@ else
 
         JobVacancyModelDetails = new JobVacanciesAdminModel();
 
-        JobVacancyModelDetails = await Service.GetJobVacancyDetailsById(id);
+        JobVacancyModelDetails = await AService.GetJobVacancyDetailsById(id);
 
         SortedSpecialization.Clear();
 
@@ -283,11 +284,11 @@ else
 
     public async Task OnValidSubmit_UpdateJobVacancy()
     {
-        Service.UpdateJobVacancy(JobVacancyModelDetails);
+        AService.UpdateJobVacancy(JobVacancyModelDetails);
 
         await InvokeAsync(async () =>
         {
-            JobVacancyModel = await Service.GetJobVacancies();
+            JobVacancyModel = await AService.GetJobVacancies();
             StateHasChanged();
         });
 
@@ -315,11 +316,11 @@ else
 
     public async Task RemoveJobVancacy(int id)
     {
-        Service.RemoveJobVacancyById(id);
+        AService.RemoveJobVacancyById(id);
 
         await InvokeAsync(async () =>
         {
-            JobVacancyModel = await Service.GetJobVacancies();
+            JobVacancyModel = await AService.GetJobVacancies();
 
             StateHasChanged();
         });

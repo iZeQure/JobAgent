@@ -18,9 +18,6 @@ namespace JobAgent.Data.Repository
         /// <param name="create">Used to specify the data set.</param>
         public void Create(ConsultantArea create)
         {
-            // Open connection to database.
-            Database.Instance.OpenConnection();
-
             // Initialize command obj.
             using SqlCommand cmd = new SqlCommand("CreateConsultantArea", Database.Instance.SqlConnection)
             {
@@ -32,8 +29,11 @@ namespace JobAgent.Data.Repository
 
             cmd.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.ReturnValue;
 
-            // Execute command, catch return code.
-            int returnCode = cmd.ExecuteNonQuery();
+            // Open connection to database.
+            Database.Instance.OpenConnection();
+
+            // Execute command.
+            cmd.ExecuteNonQuery();
         }
 
         /// <summary>
@@ -45,14 +45,14 @@ namespace JobAgent.Data.Repository
             // Initialize temporary list.
             List<ConsultantArea> tempConsultantAreas = new List<ConsultantArea>();
 
-            // Open connection to database.
-            Database.Instance.OpenConnection();
-
             // Initialize command obj.
             using SqlCommand cmd = new SqlCommand("GetAllConsultantAreas", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
+
+            // Open connection to database.
+            Database.Instance.OpenConnection();
 
             // Initialize data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
@@ -66,8 +66,8 @@ namespace JobAgent.Data.Repository
                     tempConsultantAreas.Add(
                         new ConsultantArea()
                         {
-                            Id = reader.GetInt32(0),
-                            Name = reader.GetString(1)
+                            Id = reader.GetInt32("Id"),
+                            Name = reader.GetString("Name")
                         });
                 }
             }
@@ -98,6 +98,8 @@ namespace JobAgent.Data.Repository
             // Define input parameters.
             cmd.Parameters.AddWithValue("@id", id);
 
+            cmd.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.Output;
+
             // Initialize data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
 
@@ -107,8 +109,8 @@ namespace JobAgent.Data.Repository
                 // Read dataset.
                 while (reader.Read())
                 {
-                    tempConsultantArea.Id = reader.GetInt32(0);
-                    tempConsultantArea.Name = reader.GetString(1);
+                    tempConsultantArea.Id = reader.GetInt32("Id");
+                    tempConsultantArea.Name = reader.GetString("Name");
                 }
             }
 

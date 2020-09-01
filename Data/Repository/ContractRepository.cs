@@ -27,6 +27,7 @@ namespace JobAgent.Data.Repository
                 Connection = Database.Instance.SqlConnection
             };
 
+            // Open connection to database.
             Database.Instance.OpenConnection();
 
             // Initialzie data reader.
@@ -46,11 +47,12 @@ namespace JobAgent.Data.Repository
                         {
                             Id = r.GetInt32("Id"),
                             ContactPerson = r.GetString("ContactPerson"),
-                            ContractLocation = r.GetString("ContractLocation"),
+                            ContractName = r.GetString("ContractName"),
                             ExpiryDate = r.GetDateTime("ExpiryDate"),
                             RegistrationDate = r.GetDateTime("RegisteredDate"),
                             SignedByUserId = new User()
                             {
+                                Id = r.GetInt32("UserId"),
                                 FirstName = r.GetString("FirstName"),
                                 LastName = r.GetString("LastName")
                             },
@@ -77,7 +79,7 @@ namespace JobAgent.Data.Repository
                 Connection = Database.Instance.SqlConnection
             };
 
-            c.Parameters.AddWithValue("ContractId", id);
+            c.Parameters.AddWithValue("@id", id);
 
             Database.Instance.OpenConnection();
 
@@ -97,11 +99,12 @@ namespace JobAgent.Data.Repository
                     {
                         Id = r.GetInt32("Id"),
                         ContactPerson = r.GetString("ContactPerson"),
-                        ContractLocation = r.GetString("ContractLocation"),
+                        ContractName = r.GetString("ContractName"),
                         ExpiryDate = r.GetDateTime("ExpiryDate"),
                         RegistrationDate = r.GetDateTime("RegisteredDate"),
                         SignedByUserId = new User()
                         {
+                            Id = r.GetInt32("UserId"),
                             FirstName = r.GetString("FirstName"),
                             LastName = r.GetString("LastName")
                         },
