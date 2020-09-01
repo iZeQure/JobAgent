@@ -7,6 +7,8 @@
 @using JobAgent.Models
 @using JobAgent.Services
 
+@using Syncfusion.Blazor.Calendars
+
 @inject AdminService AService
 @inject DataService DService
 @inject IJSRuntime JSRuntime
@@ -179,11 +181,21 @@ else
                     <div class="row">
                         <div class="col">
                             <label for="inputRegisteredDate" class="admin-label col-form-label col-form-label-sm">Kontrakt Registreret Dato :</label>
-                            <input id="inputRegisteredDate" class="form-control form-control-sm" type="datetime" placeholder="Registrerings dato for kontrakt.." value="@(ContractDetails.RegistrationDate)" />
+                            @*<input id="inputRegisteredDate" class="form-control form-control-sm" type="datetime" placeholder="Registrerings dato for kontrakt.." value="@(ContractDetails.RegistrationDate)" />*@
+
+                            <InputDate @bind-Value="@ContractDetails.RegistrationDate" TValue="DateTime" class="form-control form-control-sm"></InputDate>
+                            @*<SfDateTimePicker ID="inputRegisteredDate" Locale="da" TValue="DateTime" Value="ContractDetails.RegistrationDate" StrictMode="true" Min="@MinDateTime" WeekNumber="true" Placeholder="Vælg en dato">
+                                    <DateTimePickerEvents TValue="DateTime" ValueChange="@OnDateChange_Registered"></DateTimePickerEvents>
+                                </SfDateTimePicker>*@
                         </div>
                         <div class="col">
                             <label for="inputExpiryDate" class="admin-label col-form-label col-form-label-sm">Udløbsdato :</label>
-                            <input id="inputExpiryDate" class="form-control form-control-sm" type="datetime" placeholder="Udløbsdato for kontrakt.." value="@(ContractDetails.ExpiryDate)" />
+                            @*<input id="inputExpiryDate" class="form-control form-control-sm" type="datetime" placeholder="Udløbsdato for kontrakt.." value="@(ContractDetails.ExpiryDate)" />*@
+
+                            <InputDate @bind-Value="@ContractDetails.ExpiryDate" TValue="DateTime" class="form-control form-control-sm"></InputDate>
+                            @*<SfDateTimePicker ID="inputExpiryDate" Locale="da" TValue="DateTime" Value="ContractDetails.ExpiryDate" StrictMode="true" Min="@MinDateTime" WeekNumber="true" Placeholder="Vælg en ansøgningsfrist">
+                                    <DateTimePickerEvents TValue="DateTime" ValueChange="@OnDateChange_Deadline"></DateTimePickerEvents>
+                                </SfDateTimePicker>*@
                         </div>
                     </div>
 
@@ -206,6 +218,8 @@ else
     public List<Contract> GetContracts { get; set; } = new List<Contract>();
 
     public Contract ContractDetails = new Contract() { CompanyCVR = new Company(), SignedByUserId = new User() };
+
+    public DateTime MinDateTime { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 7, 0, 0, 0);
 
     public string ContractPath { get; set; } = string.Empty;
 
@@ -272,5 +286,17 @@ else
     private void DocumentLoadFailed(LoadFailedEventArgs args)
     {
         ErrorMessage = args.DocumentName;
+    }
+
+    private void OnDateChange_Registered(DateTime args)
+    {
+        ContractDetails.RegistrationDate = args;
+        StateHasChanged();
+    }
+
+    private void OnDateChange_Expiry(DateTime args)
+    {
+        ContractDetails.ExpiryDate = args;
+        StateHasChanged();
     }
 }

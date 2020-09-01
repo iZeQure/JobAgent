@@ -151,7 +151,6 @@ else
                     <div class="row">
                         <div class="col">
                             <label for="inputRegisteredDate" class="admin-label col-form-label col-form-label-sm">Opslag Registeret :</label>
-
                             <SfDateTimePicker ID="inputRegisteredDate" Locale="da" TValue="DateTime?" Value="JobVacancyModelDetails.JobAdvert.JobRegisteredDate" StrictMode="true" Min="@MinDateTime" WeekNumber="true" Placeholder="Vælg en dato">
                                 <DateTimePickerEvents TValue="DateTime?" ValueChange="@OnDateChange_Registered"></DateTimePickerEvents>
                             </SfDateTimePicker>

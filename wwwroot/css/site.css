@@ -316,6 +316,11 @@ span.table-icons {
     ## Scrollbar Style
 */
 
+iframe body::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-wheel-color) !important;
+    border-radius: 5px !important;
+}
+
 ::-webkit-scrollbar {
     width: 10px !important;
 }

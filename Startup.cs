@@ -40,8 +40,8 @@ namespace JobAgent
             services.AddRazorPages();
             services.AddBlazoredLocalStorage();
             services.AddServerSideBlazor().AddHubOptions(o => { o.MaximumReceiveMessageSize = 102400000; });
-            services.AddSyncfusionBlazor(true);
             services.AddBootstrapCss();
+            //services.AddSyncfusionBlazor(true);
 
             services.Configure<RequestLocalizationOptions>(options =>
             {
@@ -75,7 +75,7 @@ namespace JobAgent
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             //Register Syncfusion license
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzA5NzMzQDMxMzgyZTMyMmUzMFBINy93UlFGV203WlJldHBxclNIcWM2cjBVL0pIVjY2YjlFLzZpVkZjeVU9");
+            //Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzA5ODQ4QDMxMzgyZTMyMmUzME4yRnNCVk9POTVFMW8vbElhWThWaEtzY2thUlB6emlQWGtaYTFMZ1Y5Nkk9");
 
             app.UseRequestLocalization();
 
