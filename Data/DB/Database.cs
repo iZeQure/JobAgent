@@ -22,16 +22,12 @@ namespace JobAgent.Data.DB
         {
             try
             {
-                //ConnectionString = @"Server=10.108.48.72\SQLJOBAGENT,2009;Database=JobAgentDB; User Id=sa; Password=PaSSw0rd;";
-                //ConnectionString = @"Server=GFUEL\DEVSQLSERVER; Database=JobAgentDB; Integrated Security=true;";
-                //ConnectionString = @"Server=VIOLURREOT\DEVELOPMENT; Database=JobAgentDB; Integrated Security=true;";
-
                 SqlConnection = new SqlConnection(Configuration.GetConnectionString("DevDB"));
 
                 if (string.IsNullOrEmpty(SqlConnection.ConnectionString))
                 {
-                    //SqlConnection.ConnectionString = "Server=10.108.48.72\\SQLJOBAGENT,2009;Database=JobAgentDB; User Id=sa; Password=PaSSw0rd;";
-                    SqlConnection.ConnectionString = "Server=GFUEL\\DEVSQLSERVER; Database=JobAgentDB; Integrated Security=true;";
+                    SqlConnection.ConnectionString = "Server=10.108.48.72\\SQLJOBAGENT,2009;Database=JobAgentDB; User Id=sa; Password=PaSSw0rd;";
+                    //SqlConnection.ConnectionString = "Server=GFUEL\\DEVSQLSERVER; Database=JobAgentDB; Integrated Security=true;";
                     //SqlConnection.ConnectionString = "Server=VIOLURREOT\\DEVELOPMENT; Database=JobAgentDB; Integrated Security=true;";
                 }
             }

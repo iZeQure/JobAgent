@@ -56,25 +56,21 @@ namespace JobAgent.Data.Repository
             // Initialize data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
 
+            Location location = new Location();
+
             // Check if any data.
             if (reader.HasRows)
             {
                 // Read the data.
                 while (reader.Read())
                 {
-                    Location location = new Location
-                    {
-                        Id = reader.GetInt32("Id"),
-                        Name = reader.GetString("Name")
-                    };
-
-                    if (!DataReaderExtensions.IsDBNull(reader, "@description"))
-                        location.Description = reader.GetString("Description");
-                    else
-                        location.Description = string.Empty;
-
-                    // Store data in the temporary list.
-                    tempLocations.Add(location);
+                    tempLocations.Add(
+                        new Location()
+                        {
+                            Id = reader.GetInt32("Id"),
+                            Name = reader.GetString("Name"),
+                            Description = !DataReaderExtensions.IsDBNull(reader, "Description") ? reader.GetString("Description") : string.Empty
+                        });
                 }
             }
 

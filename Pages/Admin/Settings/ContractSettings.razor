@@ -1,6 +1,7 @@
 ﻿@page "/admin/settings/contracts"
 
 @using System.IO
+@using System.Net
 
 @using JobAgent.Data.Objects
 @using JobAgent.Models
@@ -57,8 +58,8 @@ else
                         <td>@(contract.SignedByUserId.FullName)</td>
                         @if (!string.IsNullOrEmpty(contract.ContractName))
                         {
-                            <td @onclick="@(path => OnClickOpen_Contract(GetLocationPath(contract.ContractName)))">
-                                <span class="table-icons" data-toggle="modal" data-target="#contractModal">
+                            <td>
+                                <span @onclick="@(mouseClickEvent => OnClickOpen_Contract(GetLocationPath(contract.ContractName)))" class="table-icons" data-toggle="modal" data-target="#contractModal">
                                     <i class="fas fa-file-invoice"></i>
                                 </span>
                             </td>
@@ -91,8 +92,17 @@ else
             </div>
 
             <div class="modal-body">
+                @if (!string.IsNullOrEmpty(ErrorMessage))
+                {
+                    <div class="container-fluid">
+                        <div class="alert alert-danger" role="alert">
+                            @(ErrorMessage)
+                        </div>
+                    </div>
+                }
+
                 <div class="container-fluid justify-content-center">
-                    <iframe src="data:application/pdf;base64,@(ContractPath)" height="500" width="1060" lang="da" title="Kontrakt Information" frameborder="1" allowtransparency="true">
+                    <iframe src="data:application/pdf;base64,@(ContractPath)" class="w-100" height="500" lang="da" title="Kontrakt Information" frameborder="1" allowtransparency="true">
                     </iframe>
                 </div>
             </div>
@@ -225,7 +235,7 @@ else
 
     private string GetLocationPath(string fileName)
     {
-        string contractDirectory = @"\\10.108.48.72\_shared\admin\contracts\";
+        string contractDirectory = @"\\10.108.48.72\contracts\";
 
         try
         {
@@ -238,11 +248,19 @@ else
                     Byte[] bytes = File.ReadAllBytes(currentFile);
 
                     return Convert.ToBase64String(bytes);
-
-                    //return currentFile;
                 }
             }
 
+            return string.Empty;
+        }
+        catch (IOException)
+        {
+            ErrorMessage = "Kunne ikke bekræfte legitimationsoplysninger.";
+            return string.Empty;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            ErrorMessage = $"Adgang nægtet.";
             return string.Empty;
         }
         catch (Exception)
