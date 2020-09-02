@@ -11,7 +11,7 @@
 <div class="d-flex">
     <PageDisplayName DisplayName="Administrer Kontrakter" />
     <div class="d-inline-block">
-        <a class="btn btn-sm btn-info" data-toggle="modal" data-target="#contractModalCreateNew">
+        <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#contractModalCreateNew">
             Opret ny Kontrakt
         </a>
     </div>
@@ -219,10 +219,15 @@ else
                 </div>
 
                 <div class="modal-body">
+
+                    <ValidationSummary />
+                    <DataAnnotationsValidator />
+
                     <div class="row">
                         <div class="col">
                             <label for="inputCompany" class="admin-label col-form-label col-form-label-sm">Kontrakt for :</label>
                             <select id="inputCompany" class="form-control form-control-sm" @bind="RegisterContractModel.SignedWithCompany">
+                                <option value="0" selected>---Vælg en virksomhed fra listen---</option>
                                 @foreach (var company in GetCompanies)
                                 {
                                     if (company.Id == ContractDetails.CompanyCVR.Id)
@@ -239,6 +244,7 @@ else
                         <div class="col">
                             <label for="inputSignedByUser" class="admin-label col-form-label col-form-label-sm">Underskrevet af :</label>
                             <select id="inputSignedByUser" class="form-control form-control-sm" @bind="RegisterContractModel.SignedByUser">
+                                <option value="0" selected>---Vælg en konsulent fra listen---</option>
                                 @foreach (var user in GetUsers)
                                 {
                                     if (user.Id == ContractDetails.SignedByUserId.Id)
@@ -259,10 +265,10 @@ else
                     <div class="row">
                         <div class="col">
                             <label for="inputContactPerson" class="admin-label col-form-label col-form-label-sm">Virksomheds Kontakt Person :</label>
-                            <input id="inputContactPerson" class="form-control form-control-sm" type="text" placeholder="Indtast en kontakt person.." @bind="RegisterContractModel.ContactPerson" />
+                            <input id="inputContactPerson" class="form-control form-control-sm" type="text" placeholder="Indtast navnet på kontakt personen.." @bind="RegisterContractModel.ContactPerson" />
                         </div>
                         <div class="col">
-                            <label for="inputContractName" class="admin-label col-form-label col-form-label-sm">Kontraktens Navn : <span class="font-italic small" style="color: red;">*Ikke ændre dette hvis navnet på kontrakten ikke bliver ændret.</span></label>
+                            <label for="inputContractName" class="admin-label col-form-label col-form-label-sm">Vælg Kontrakt : </label>
                             <p>@(Status)</p>
                             <InputFile OnChange="OnChange_HandleFileSelection" />
                         </div>
@@ -275,13 +281,13 @@ else
                             <label for="inputRegisteredDate" class="admin-label col-form-label col-form-label-sm">Kontrakt Registreret Dato :</label>
                             @*<input id="inputRegisteredDate" class="form-control form-control-sm" type="datetime" placeholder="Registrerings dato for kontrakt.." value="@(ContractDetails.RegistrationDate)" />*@
 
-                            <InputDate @bind-Value="@ContractDetails.RegistrationDate" TValue="DateTime" class="form-control form-control-sm"></InputDate>
+                            <InputDate TValue="DateTime" @bind-Value="@(RegisterContractModel.RegistrationDate)" class="form-control form-control-sm" />
                         </div>
                         <div class="col">
                             <label for="inputExpiryDate" class="admin-label col-form-label col-form-label-sm">Udløbsdato :</label>
                             @*<input id="inputExpiryDate" class="form-control form-control-sm" type="datetime" placeholder="Udløbsdato for kontrakt.." value="@(ContractDetails.ExpiryDate)" />*@
 
-                            <InputDate @bind-Value="@ContractDetails.ExpiryDate" TValue="DateTime" class="form-control form-control-sm"></InputDate>
+                            <InputDate TValue="DateTime" @bind-Value=@(RegisterContractModel.ExpiryDate) class="form-control form-control-sm" disabled />
                         </div>
                     </div>
 
