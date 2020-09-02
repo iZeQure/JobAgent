@@ -49,6 +49,14 @@ window.ContractModal = () => {
     });
 }
 
+window.ContractModalCreateNew = () => {
+    $('#contractModalCreateNew').modal({
+        backdrop: 'static',
+        keyboard: false,
+        show: false
+    });
+}
+
 window.ToggleUpdateVacancyModal = () => {
     $('#vacancyAdminDetails').modal('toggle');
 }
