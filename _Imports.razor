@@ -3,20 +3,25 @@
 @using System.Net.Http
 @using System.Security.Claims
 
+@using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Hosting
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
-@using Microsoft.AspNetCore.Components.Web
-@using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Components.Authorization
 
 @using JobAgent
 @using JobAgent.Shared
 @using JobAgent.Models
 @using JobAgent.Services
-@using JobAgent.Data.Interfaces
-@using JobAgent.Data.Security
 @using JobAgent.Data.Objects
+@using JobAgent.Data.Security
+@using JobAgent.Data.Interfaces
+@using JobAgent.Components.Job
+@using JobAgent.Components.Admin
+@using JobAgent.Components.Redirect
+@using JobAgent.Components.Notification
 
 @using BlazorStrap
 
