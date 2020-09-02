@@ -10,14 +10,9 @@ window.OnInformationChangeAnimation = (id) => {
     setTimeout(function () {
         $(`#${id}`).toggleClass('onInformationChangeAnimation');
     }, 6000);
-
-    //$(`#${id}`).toggleClass('animation', 3000);
 }
 
-window.HTMLBodyElement = (name, body, color) => {
-
-    console.log(color);
-
+window.PopoverInformation = (name, body, color) => {
     if (color == 'Danger') {
         $('.popover-danger').popover({
             title: name,
@@ -38,7 +33,7 @@ window.HTMLBodyElement = (name, body, color) => {
     }    
 }
 
-window.HTMLBodyElement = () => {
+window.JobVacancyModal = () => {
     $('#vacancyAdminDetails').modal({
         backdrop: 'static',
         keyboard: false,
@@ -46,7 +41,7 @@ window.HTMLBodyElement = () => {
     });
 }
 
-window.HTMLBodyElement = () => {
+window.ContractModal = () => {
     $('#contractDetails').modal({
         backdrop: 'static',
         keyboard: false,

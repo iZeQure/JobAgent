@@ -26,8 +26,8 @@ namespace JobAgent.Data.DB
 
                 if (string.IsNullOrEmpty(SqlConnection.ConnectionString))
                 {
-                    //SqlConnection.ConnectionString = "Server=10.108.48.72\\SQLJOBAGENT,2009;Database=JobAgentDB; User Id=sa; Password=PaSSw0rd;";
-                    SqlConnection.ConnectionString = "Server=GFUEL\\DEVSQLSERVER; Database=JobAgentDB; Integrated Security=true;";
+                    SqlConnection.ConnectionString = "Server=10.108.48.72\\SQLJOBAGENT,2009;Database=JobAgentDB; User Id=sa; Password=PaSSw0rd;";
+                    //SqlConnection.ConnectionString = "Server=GFUEL\\DEVSQLSERVER; Database=JobAgentDB; Integrated Security=true;";
                     //SqlConnection.ConnectionString = "Server=VIOLURREOT\\DEVELOPMENT; Database=JobAgentDB; Integrated Security=true;";
                 }
             }

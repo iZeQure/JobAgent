@@ -1,11 +1,5 @@
 ﻿@page "/admin/settings/job/vacancies"
 
-@using JobAgent.Data.Objects
-@using JobAgent.Models
-@using JobAgent.Services
-
-@using Syncfusion.Blazor.Calendars
-
 @inject AdminService AService
 @inject DataService DService
 @inject IJSRuntime JSRuntime
@@ -13,6 +7,8 @@
 @inherits ComponentBase
 
 @attribute [Authorize]
+
+<PageDisplayName DisplayName="Administrer Stillingsopslag" />
 
 @if (JobVacancyModel.Count == 0)
 {
@@ -151,15 +147,11 @@ else
                     <div class="row">
                         <div class="col">
                             <label for="inputRegisteredDate" class="admin-label col-form-label col-form-label-sm">Opslag Registeret :</label>
-                            <SfDateTimePicker ID="inputRegisteredDate" Locale="da" TValue="DateTime?" Value="JobVacancyModelDetails.JobAdvert.JobRegisteredDate" StrictMode="true" Min="@MinDateTime" WeekNumber="true" Placeholder="Vælg en dato">
-                                <DateTimePickerEvents TValue="DateTime?" ValueChange="@OnDateChange_Registered"></DateTimePickerEvents>
-                            </SfDateTimePicker>
+                            <InputDate id="inputRegisteredDate" @bind-Value="@JobVacancyModelDetails.JobAdvert.JobRegisteredDate" TValue="DateTime" class="form-control form-control-sm"></InputDate>
                         </div>
                         <div class="col">
                             <label for="inputDeadlineDate" class="admin-label col-form-label col-form-label-sm">Ansøgningsfrist :</label>
-                            <SfDateTimePicker ID="inputDeadlineDate" Locale="da" TValue="DateTime?" Value="JobVacancyModelDetails.JobAdvert.DeadlineDate" StrictMode="true" Min="@MinDateTime" WeekNumber="true" Placeholder="Vælg en ansøgningsfrist">
-                                <DateTimePickerEvents TValue="DateTime?" ValueChange="@OnDateChange_Deadline"></DateTimePickerEvents>
-                            </SfDateTimePicker>
+                            <InputDate id="inputDeadlineDate" @bind-Value="@JobVacancyModelDetails.JobAdvert.DeadlineDate" TValue="DateTime" class="form-control form-control-sm"></InputDate>
                         </div>
                     </div>
 
@@ -240,7 +232,6 @@ else
 
     public List<Specialization> SortedSpecialization { get; set; } = new List<Specialization>();
 
-    public DateTime MinDateTime { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 7, 0, 0, 0);
     public int ItemId { get; set; } = 0;
 
     protected override async Task OnInitializedAsync()
@@ -323,18 +314,6 @@ else
 
             StateHasChanged();
         });
-    }
-
-    private void OnDateChange_Registered(ChangedEventArgs<DateTime?> args)
-    {
-        JobVacancyModelDetails.JobAdvert.JobRegisteredDate = args.Value.Value;
-        StateHasChanged();
-    }
-
-    private void OnDateChange_Deadline(ChangedEventArgs<DateTime?> args)
-    {
-        JobVacancyModelDetails.JobAdvert.DeadlineDate = args.Value.Value;
-        StateHasChanged();
     }
 
     public void OnClick_StoreId(int id)

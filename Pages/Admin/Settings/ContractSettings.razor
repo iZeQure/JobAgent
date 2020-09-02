@@ -1,14 +1,5 @@
 ﻿@page "/admin/settings/contracts"
 
-@using System.IO
-@using System.Net
-
-@using JobAgent.Data.Objects
-@using JobAgent.Models
-@using JobAgent.Services
-
-@using Syncfusion.Blazor.Calendars
-
 @inject AdminService AService
 @inject DataService DService
 @inject IJSRuntime JSRuntime
@@ -16,6 +7,8 @@
 @inherits ComponentBase
 
 @attribute [Authorize]
+
+<PageDisplayName DisplayName="Administrer Kontrakter" />
 
 @if (GetContracts.Count == 0)
 {
@@ -104,8 +97,9 @@ else
                 }
 
                 <div class="container-fluid justify-content-center">
-                    <iframe src="data:application/pdf;base64,@(ContractPath)" class="w-100" height="500" lang="da" title="Kontrakt Information" frameborder="1" allowtransparency="true">
-                    </iframe>
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe src="data:application/pdf;base64,@(ContractPath)" class="embed-responsive-item" lang="da" title="Kontrakt Information" frameborder="1" allowtransparency="true"></iframe>
+                    </div>
                 </div>
             </div>
 
@@ -184,18 +178,12 @@ else
                             @*<input id="inputRegisteredDate" class="form-control form-control-sm" type="datetime" placeholder="Registrerings dato for kontrakt.." value="@(ContractDetails.RegistrationDate)" />*@
 
                             <InputDate @bind-Value="@ContractDetails.RegistrationDate" TValue="DateTime" class="form-control form-control-sm"></InputDate>
-                            @*<SfDateTimePicker ID="inputRegisteredDate" Locale="da" TValue="DateTime" Value="ContractDetails.RegistrationDate" StrictMode="true" Min="@MinDateTime" WeekNumber="true" Placeholder="Vælg en dato">
-                                    <DateTimePickerEvents TValue="DateTime" ValueChange="@OnDateChange_Registered"></DateTimePickerEvents>
-                                </SfDateTimePicker>*@
                         </div>
                         <div class="col">
                             <label for="inputExpiryDate" class="admin-label col-form-label col-form-label-sm">Udløbsdato :</label>
                             @*<input id="inputExpiryDate" class="form-control form-control-sm" type="datetime" placeholder="Udløbsdato for kontrakt.." value="@(ContractDetails.ExpiryDate)" />*@
 
                             <InputDate @bind-Value="@ContractDetails.ExpiryDate" TValue="DateTime" class="form-control form-control-sm"></InputDate>
-                            @*<SfDateTimePicker ID="inputExpiryDate" Locale="da" TValue="DateTime" Value="ContractDetails.ExpiryDate" StrictMode="true" Min="@MinDateTime" WeekNumber="true" Placeholder="Vælg en ansøgningsfrist">
-                                    <DateTimePickerEvents TValue="DateTime" ValueChange="@OnDateChange_Deadline"></DateTimePickerEvents>
-                                </SfDateTimePicker>*@
                         </div>
                     </div>
 
@@ -249,7 +237,7 @@ else
 
     private string GetLocationPath(string fileName)
     {
-        string contractDirectory = @"\\10.108.48.72\contracts\";
+        string contractDirectory = @"\\JOB-AGENT\contracts\";
 
         try
         {
@@ -281,11 +269,6 @@ else
         {
             throw;
         }
-    }
-
-    private void DocumentLoadFailed(LoadFailedEventArgs args)
-    {
-        ErrorMessage = args.DocumentName;
     }
 
     private void OnDateChange_Registered(DateTime args)

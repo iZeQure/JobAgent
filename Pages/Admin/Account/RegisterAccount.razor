@@ -1,10 +1,5 @@
 ﻿@page "/admin/account/register"
 
-@using JobAgent.Services
-@using JobAgent.Data.Objects
-@using JobAgent.Data.Interfaces
-@using JobAgent.Models
-
 @inject IUserService UserSerivce
 @inject DataService DataService
 @inject SecurityService SecurityService
@@ -13,6 +8,8 @@
 
 @* Page Title *@
 <PageTitle Title="Registrer Ny Konsulent" />
+
+<PageDisplayName DisplayName="Opret en ny praktikkonsulent i systemet" />
 
 <div class="container">
 

@@ -40,7 +40,7 @@
 
     private async Task SetPopover()
     {
-        await JSRunTime.InvokeVoidAsync("HTMLBodyElement", $"{Title}", $"{Body}", $"{Color}");
+        await JSRunTime.InvokeVoidAsync("PopoverInformation", $"{Title}", $"{Body}", $"{Color}");
         await InvokeAsync(() =>
         {
             StateHasChanged();
