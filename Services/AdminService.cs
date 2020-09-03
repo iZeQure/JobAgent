@@ -16,12 +16,14 @@ namespace JobAgent.Services
 
         private IRepository<JobAdvert> JobRepository { get; } = new JobAdvertRepository();
 
-        private IRepository<Contract> ContractRepository { get; } = new ContractRepository();        
+        private IRepository<Contract> ContractRepository { get; } = new ContractRepository();
+
+        private IRepository<Company> CompanyRepository { get; } = new CompanyRepository();
 
         public Task<User> GetUserByEmail(string userMail)
         {
             return Task.FromResult(((IUserRepository)UserRepository).GetUserByEmail(userMail));
-        }        
+        }
 
         public Task<bool> UpdateUserInformation(User user)
         {
@@ -85,7 +87,39 @@ namespace JobAgent.Services
         public Task<JobVacanciesAdminModel> GetJobVacancyDetailsById(int id)
         {
             return Task.FromResult(((IJobAdvertRepository)JobRepository).GetJobAdvertDetailsForAdminsById(id));
-        }            
+        }
+
+        public Task CreateJobVacancy(RegisterJobAdvertModel model)
+        {
+            JobAdvert jobAdvert =
+                new JobAdvert()
+                {
+                    Title = model.Title,
+                    Email = model.Email,
+                    PhoneNumber = model.PhoneNumber,
+                    JobDescription = model.Description,
+                    JobLocation = model.Location,
+                    JobRegisteredDate = model.RegistrationDate,
+                    DeadlineDate = model.DeadlineDate,
+                    SourceURL = model.SourceURL,
+                    CompanyCVR = new Company()
+                    {
+                        Id = model.CompanyId
+                    },
+                    Category = new Category()
+                    {
+                        Id = model.CategoryId
+                    },
+                    Specialization = new Specialization()
+                    {
+                        Id = model.SpecializationId
+                    }
+                };
+
+            JobRepository.Create(jobAdvert);
+
+            return Task.CompletedTask;
+        }
 
         public void RemoveJobVacancyById(int id)
         {
@@ -100,6 +134,23 @@ namespace JobAgent.Services
         public Task<Contract> GetContractById(int contractId)
         {
             return Task.FromResult(ContractRepository.GetById(contractId));
+        }
+
+        public Task UploadFileToServer(string fileName)
+        {
+            ((IContractRepository)ContractRepository).UploadContractFile(fileName);
+
+            return Task.CompletedTask;
+        }
+
+        public void UpdateCompany(Company update)
+        {
+            CompanyRepository.Update(update);
+        }
+
+        public void RemoveCompanyById(int id)
+        {
+            CompanyRepository.Remove(id);
         }
     }
 }

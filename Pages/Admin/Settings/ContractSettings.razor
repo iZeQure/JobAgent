@@ -318,6 +318,8 @@ else
 
     public string Status { get; set; }
 
+    public IFileListEntry UploadFile { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         GetContracts = await AService.GetContracts();
@@ -393,16 +395,8 @@ else
         StateHasChanged();
     }
 
-    private async Task OnChange_HandleFileSelection(IFileListEntry[] files)
+    private void OnChange_HandleFileSelection(IFileListEntry[] files)
     {
-        var file = files.FirstOrDefault();
-
-        if (file != null)
-        {
-            var ms = new MemoryStream();
-            await file.Data.CopyToAsync(ms);
-
-            Status = $"Finished loading {file.Size} bytes from {file.Name}";
-        }
+        UploadFile = files.FirstOrDefault();
     }
 }

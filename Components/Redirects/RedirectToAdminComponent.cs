@@ -4,16 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace JobAgent.Components.Redirect
+namespace JobAgent.Components.Redirects
 {
-    public class RedirectToLoginComponent : ComponentBase
+    public class RedirectToAdminComponent : ComponentBase
     {
         [Inject]
         protected NavigationManager NavigationManager { get; set; }
 
         protected override void OnInitialized()
         {
-            NavigationManager.NavigateTo("/login", true);
+            NavigationManager.NavigateTo("/admin", true);
         }
     }
 }

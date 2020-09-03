@@ -49,6 +49,11 @@ namespace JobAgent.Services
             return Task.FromResult(CompanyRepository.GetAll().ToList());
         }
 
+        public Task<Company> GetCompanyById(int id)
+        {
+            return Task.FromResult(CompanyRepository.GetById(id));
+        }
+
         public Task<List<User>> GetUsers()
         {
             return Task.FromResult(UserRepository.GetAll().ToList());

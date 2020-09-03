@@ -30,27 +30,35 @@ window.PopoverInformation = (name, body, color) => {
             placement: 'left',
             animation: true
         });
-    }    
+    }
 }
 
-window.JobVacancyModal = () => {
+window.HTMLBodyElement = () => {
     $('#vacancyAdminDetails').modal({
         backdrop: 'static',
         keyboard: false,
         show: false
     });
-}
 
-window.ContractModal = () => {
-    $('#contractDetails').modal({
+    $('#jobAdvertModalCreateNew').modal({
         backdrop: 'static',
         keyboard: false,
         show: false
     });
-}
 
-window.ContractModalCreateNew = () => {
+    $('#vacandyRemoveConfirmation').modal({
+        backdrop: 'static',
+        keyboard: false,
+        show: false
+    });
+
     $('#contractModalCreateNew').modal({
+        backdrop: 'static',
+        keyboard: false,
+        show: false
+    });
+
+    $('#contractDetails').modal({
         backdrop: 'static',
         keyboard: false,
         show: false
@@ -61,6 +69,18 @@ window.ToggleUpdateVacancyModal = () => {
     $('#vacancyAdminDetails').modal('toggle');
 }
 
+window.ToggleUpdateCompanyModal = () => {
+    $('#companyDetailsModal').modal('toggle');
+}
+
 window.ToggleRemoveVacancyModal = () => {
     $('#vacandyRemoveConfirmation').modal('toggle');
+}
+
+window.ToggleCreateJobAdvertModal = () => {
+    $('#jobAdvertModalCreateNew').modal('toggle');
+}
+
+window.ToggleRemoveCompanyConfirmationModal = () => {
+    $('#removeCompanyModal').modal('toggle');
 }

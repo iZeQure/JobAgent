@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace JobAgent.Data.Repository
@@ -128,6 +130,18 @@ namespace JobAgent.Data.Repository
         public void Update(Contract update)
         {
             throw new NotImplementedException();
+        }
+
+        public void UploadContractFile(string fileName)
+        {
+            WebClient webClient = new WebClient();
+
+            byte[] responseArray = webClient.UploadFile(@"\\10.108.48.72\contracts\", "POST", fileName);
+
+            Console.WriteLine(
+                "\nResponse Received. The contents of the file uploaded are:\n{0}",
+                Encoding.ASCII.GetString(responseArray));
+
         }
     }
 }

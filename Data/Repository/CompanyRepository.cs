@@ -143,7 +143,7 @@ namespace JobAgent.Data.Repository
         public void Update(Company update)
         {
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("UpdateCommand", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("UpdateCompany", Database.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };

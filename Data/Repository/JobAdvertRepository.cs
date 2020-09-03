@@ -15,7 +15,31 @@ namespace JobAgent.Data.Repository
     {
         public void Create(JobAdvert create)
         {
-            throw new NotImplementedException();
+            // Initialize command obj.
+            using SqlCommand c = new SqlCommand()
+            {
+                CommandText = "CreateJobAdvert",
+                CommandType = CommandType.StoredProcedure,
+                Connection = Database.Instance.SqlConnection
+            };
+
+            // Define data parameters.
+            c.Parameters.AddWithValue("@title", create.Title);
+            c.Parameters.AddWithValue("@email", create.Email);
+            c.Parameters.AddWithValue("@phoneNumber", create.PhoneNumber);
+            c.Parameters.AddWithValue("@jobDescription", create.JobDescription);
+            c.Parameters.AddWithValue("@jobLocation", create.JobLocation);
+            c.Parameters.AddWithValue("@regDate", create.JobRegisteredDate);
+            c.Parameters.AddWithValue("@deadlineDate", create.DeadlineDate);
+            c.Parameters.AddWithValue("@sourceURL", create.SourceURL);
+            c.Parameters.AddWithValue("@companyCVR", create.CompanyCVR.Id);
+            c.Parameters.AddWithValue("@categoryId", create.Category.Id);
+            c.Parameters.AddWithValue("@specializationId", create.Specialization.Id);
+
+            // Open database connection.
+            Database.Instance.OpenConnection();
+
+            c.ExecuteNonQuery();
         }
 
         public IEnumerable<JobAdvert> GetAll()

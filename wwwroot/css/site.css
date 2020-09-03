@@ -56,6 +56,20 @@ app {
             margin-left: 1.5rem;
         }
 
+#adminMenu a.active {
+    background: rgba(255,255,255, 0.075);
+    border-radius: 10px;
+    color: #17a2b8;
+    font-size: medium;
+}
+
+#adminMenu a:hover {
+    background: rgba(255,255,255, 0.075);
+    border-radius: 10px;
+    color: #17a2b8;
+    font-size: medium;
+}
+
 .sidebar {
     display: block !important;
     position: static;
@@ -219,7 +233,7 @@ ul.validation-errors {
     }
 }
 
- /*Small devices (landscape phones, less than 768px)*/ 
+/*Small devices (landscape phones, less than 768px)*/
 @media (min-width: 767.98px) {
     .card-columns {
         column-count: 2;
