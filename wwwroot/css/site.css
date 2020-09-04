@@ -212,6 +212,18 @@ ul.validation-errors {
 }
 
 /*
+    ## Custom File Input
+*/
+
+#contractFileInput .alert {
+    padding: 0;
+}
+
+#contractFileInput .alert-dismissible .close {
+    padding: 0 1.25rem 0 0;
+}
+
+/*
     ## Card Changes ##
 */
 

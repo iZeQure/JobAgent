@@ -65,12 +65,10 @@ window.HTMLBodyElement = () => {
     });
 }
 
+
+
 window.ToggleUpdateVacancyModal = () => {
     $('#vacancyAdminDetails').modal('toggle');
-}
-
-window.ToggleUpdateCompanyModal = () => {
-    $('#companyDetailsModal').modal('toggle');
 }
 
 window.ToggleRemoveVacancyModal = () => {
@@ -81,6 +79,26 @@ window.ToggleCreateJobAdvertModal = () => {
     $('#jobAdvertModalCreateNew').modal('toggle');
 }
 
+
+
+
+window.ToggleCreateCompanyModal = () => {
+    $('#companyModalCreateNew').modal('toggle');
+}
+
+window.ToggleUpdateCompanyModal = () => {
+    $('#companyDetailsModal').modal('toggle');
+}
+
 window.ToggleRemoveCompanyConfirmationModal = () => {
     $('#removeCompanyModal').modal('toggle');
+}
+
+
+window.ToggleUpdateContractModal = () => {
+    $('#contractDetails').modal('toggle');
+}
+
+window.TogglCreateContractModal = () => {
+    $('#contractModalCreateNew').modal('toggle');
 }

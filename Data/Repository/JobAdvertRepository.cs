@@ -32,7 +32,7 @@ namespace JobAgent.Data.Repository
             c.Parameters.AddWithValue("@regDate", create.JobRegisteredDate);
             c.Parameters.AddWithValue("@deadlineDate", create.DeadlineDate);
             c.Parameters.AddWithValue("@sourceURL", create.SourceURL);
-            c.Parameters.AddWithValue("@companyCVR", create.CompanyCVR.Id);
+            c.Parameters.AddWithValue("@companyId", create.Company.Id);
             c.Parameters.AddWithValue("@categoryId", create.Category.Id);
             c.Parameters.AddWithValue("@specializationId", create.Specialization.Id);
 
@@ -76,9 +76,9 @@ namespace JobAgent.Data.Repository
                         JobLocation = reader.GetString("JobLocation"),
                         JobRegisteredDate = reader.GetDateTime("JobRegisteredDate"),
                         DeadlineDate = reader.GetDateTime("DeadlineDate"),
-                        CompanyCVR = new Company()
+                        Company = new Company()
                         {
-                            Id = reader.GetInt32("CompanyCVR")
+                            Id = reader.GetInt32("CompanyId")
                         },
                         Category = new Category()
                         {
@@ -281,7 +281,7 @@ namespace JobAgent.Data.Repository
             c.Parameters.AddWithValue("@regDate", update.JobRegisteredDate);
             c.Parameters.AddWithValue("@deadlineDate", update.DeadlineDate);
             c.Parameters.AddWithValue("@sourceURL", update.SourceURL);
-            c.Parameters.AddWithValue("@companyCVR", update.CompanyCVR.Id);
+            c.Parameters.AddWithValue("@companyId", update.Company.Id);
             c.Parameters.AddWithValue("@categoryId", update.Category.Id);
             c.Parameters.AddWithValue("@specializationId", update.Specialization.Id);
 

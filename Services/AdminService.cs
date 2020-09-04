@@ -60,7 +60,7 @@ namespace JobAgent.Services
                 SourceURL = data.JobAdvert.SourceURL,
 
                 // Company Data
-                CompanyCVR = new Company()
+                Company = new Company()
                 {
                     Id = data.Company.Id
                 },
@@ -102,7 +102,7 @@ namespace JobAgent.Services
                     JobRegisteredDate = model.RegistrationDate,
                     DeadlineDate = model.DeadlineDate,
                     SourceURL = model.SourceURL,
-                    CompanyCVR = new Company()
+                    Company = new Company()
                     {
                         Id = model.CompanyId
                     },
@@ -126,6 +126,35 @@ namespace JobAgent.Services
             JobRepository.Remove(id);
         }
 
+        public Task<bool> CreateContract(ContractModel model)
+        {
+            ContractRepository.Create(
+                new Contract()
+                {
+                    ContactPerson = model.ContactPerson,
+                    ContractName = model.ContractFileName,
+                    ExpiryDate = model.ExpiryDate,
+                    RegistrationDate = model.RegistrationDate,
+                    SignedByUserId = new User()
+                    {
+                        Id = model.SignedByUser
+                    },
+                    Company = new Company()
+                    {
+                        Id = model.SignedWithCompany
+                    }
+                });
+
+            return Task.FromResult(true);
+        }
+
+        public Task<bool> UpdateContract(Contract contract)
+        {
+            ContractRepository.Update(contract);
+
+            return Task.FromResult(true);
+        }
+
         public Task<List<Contract>> GetContracts()
         {
             return Task.FromResult(ContractRepository.GetAll().ToList());
@@ -136,11 +165,15 @@ namespace JobAgent.Services
             return Task.FromResult(ContractRepository.GetById(contractId));
         }
 
-        public Task UploadFileToServer(string fileName)
+        public void CreateCompany(CompanyModel model)
         {
-            ((IContractRepository)ContractRepository).UploadContractFile(fileName);
-
-            return Task.CompletedTask;
+            CompanyRepository.Create(
+                new Company()
+                {
+                    CVR = model.CVR,
+                    Name = model.Name,
+                    URL = model.URL
+                });
         }
 
         public void UpdateCompany(Company update)

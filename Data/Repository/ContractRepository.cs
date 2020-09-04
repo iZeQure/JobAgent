@@ -14,9 +14,39 @@ namespace JobAgent.Data.Repository
 {
     public class ContractRepository : IContractRepository
     {
+        /// <summary>
+        /// Not Implemented
+        /// </summary>
+        /// <param name="create"></param>
         public void Create(Contract create)
         {
-            throw new NotImplementedException();
+            // Initialzie command obj.
+            using SqlCommand c = new SqlCommand()
+            {
+                CommandText = "CreateContract",
+                CommandType = CommandType.StoredProcedure,
+                Connection = Database.Instance.SqlConnection
+            };
+
+            // Parameters.
+            c.Parameters.AddWithValue("@contactPerson", create.ContactPerson);
+            c.Parameters.AddWithValue("@contractName", create.ContractName);
+            c.Parameters.AddWithValue("@expiryDate", create.ExpiryDate);
+            c.Parameters.AddWithValue("@registeredDate", create.RegistrationDate);
+            c.Parameters.AddWithValue("@signedByUserId", create.SignedByUserId.Id);
+            c.Parameters.AddWithValue("@companyId", create.Company.Id);
+
+            // Open connection to database.
+            Database.Instance.OpenConnection();
+
+            try
+            {
+                c.ExecuteNonQuery();
+            }
+            finally
+            {
+                Database.Instance.CloseConnection();
+            }
         }
 
         public IEnumerable<Contract> GetAll()
@@ -58,9 +88,10 @@ namespace JobAgent.Data.Repository
                                 FirstName = r.GetString("FirstName"),
                                 LastName = r.GetString("LastName")
                             },
-                            CompanyCVR = new Company()
+                            Company = new Company()
                             {
-                                Id = r.GetInt32("CVR"),
+                                Id = r.GetInt32("Id"),
+                                CVR = r.GetInt32("CVR"),
                                 Name = r.GetString("Name")
                             }
                         });
@@ -110,9 +141,10 @@ namespace JobAgent.Data.Repository
                             FirstName = r.GetString("FirstName"),
                             LastName = r.GetString("LastName")
                         },
-                        CompanyCVR = new Company()
+                        Company = new Company()
                         {
-                            Id = r.GetInt32("CVR"),
+                            Id = r.GetInt32("CompanyId"),
+                            CVR = r.GetInt32("CVR"),
                             Name = r.GetString("Name")
                         }
                     };
@@ -122,26 +154,48 @@ namespace JobAgent.Data.Repository
             return tempContract;
         }
 
+        /// <summary>
+        /// Not Implemented
+        /// </summary>
+        /// <param name="id"></param>
         public void Remove(int id)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Not Implemented
+        /// </summary>
+        /// <param name="update"></param>
         public void Update(Contract update)
         {
-            throw new NotImplementedException();
-        }
+            // Initialize command obj.
+            using SqlCommand c = new SqlCommand()
+            {
+                CommandText = "UpdateContract",
+                CommandType = CommandType.StoredProcedure,
+                Connection = Database.Instance.SqlConnection
+            };
 
-        public void UploadContractFile(string fileName)
-        {
-            WebClient webClient = new WebClient();
+            // Parameters.
+            c.Parameters.AddWithValue("@id", update.Id);
+            c.Parameters.AddWithValue("@companyId", update.Company.Id);
+            c.Parameters.AddWithValue("@signedByUserId", update.SignedByUserId.Id);
+            c.Parameters.AddWithValue("@contactPerson", update.ContactPerson);
+            c.Parameters.AddWithValue("@regDate", update.RegistrationDate);
+            c.Parameters.AddWithValue("@expiryDate", update.ExpiryDate);
 
-            byte[] responseArray = webClient.UploadFile(@"\\10.108.48.72\contracts\", "POST", fileName);
+            // Open connection to database.
+            Database.Instance.OpenConnection();
 
-            Console.WriteLine(
-                "\nResponse Received. The contents of the file uploaded are:\n{0}",
-                Encoding.ASCII.GetString(responseArray));
-
+            try
+            {
+                c.ExecuteNonQuery();
+            }
+            finally
+            {
+                Database.Instance.CloseConnection();
+            }
         }
     }
 }

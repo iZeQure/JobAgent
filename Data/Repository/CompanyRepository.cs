@@ -22,7 +22,7 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("@cvr", create.Id);
+            cmd.Parameters.AddWithValue("@cvr", create.CVR);
             cmd.Parameters.AddWithValue("@name", create.Name);
             cmd.Parameters.AddWithValue("@url", create.URL);
 
@@ -62,7 +62,8 @@ namespace JobAgent.Data.Repository
                 {
                     tempCompanies.Add(new Company()
                     {
-                        Id = reader.GetInt32("CVR"),
+                        Id = reader.GetInt32("Id"),
+                        CVR = reader.GetInt32("CVR"),
                         Name = reader.GetString("Name"),
                         URL = reader.GetString("URL")
                     });
@@ -90,7 +91,7 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("@cvr", id);
+            cmd.Parameters.AddWithValue("@id", id);
 
             // Open connection to database.
             Database.Instance.OpenConnection();
@@ -104,7 +105,8 @@ namespace JobAgent.Data.Repository
                 // Read data.
                 while (reader.Read())
                 {
-                    tempCompany.Id = reader.GetInt32("CVR");
+                    tempCompany.Id = reader.GetInt32("Id");
+                    tempCompany.CVR = reader.GetInt32("CVR");
                     tempCompany.Name = reader.GetString("Name");
                     tempCompany.URL = reader.GetString("URL");
                 }
@@ -127,7 +129,7 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("@cvr", id);
+            cmd.Parameters.AddWithValue("@id", id);
 
             // Open connection to database.
             Database.Instance.OpenConnection();
@@ -149,7 +151,8 @@ namespace JobAgent.Data.Repository
             };
 
             // Define input parameters.
-            cmd.Parameters.AddWithValue("@cvr", update.Id);
+            cmd.Parameters.AddWithValue("@id", update.Id);
+            cmd.Parameters.AddWithValue("@cvr", update.CVR);
             cmd.Parameters.AddWithValue("@name", update.Name);
             cmd.Parameters.AddWithValue("@url", update.URL);
 

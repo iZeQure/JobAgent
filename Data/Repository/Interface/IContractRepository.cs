@@ -8,6 +8,6 @@ namespace JobAgent.Data.Repository.Interface
 {
     interface IContractRepository : IRepository<Contract>
     {
-        void UploadContractFile(string fileName);
+
     }
 }

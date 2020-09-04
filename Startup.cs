@@ -60,11 +60,12 @@ namespace JobAgent
             });
 
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IFileUpload, FileService>();
             services.AddScoped<MyAuthStateProvider>();
             services.AddScoped<AuthenticationStateProvider>(provider =>
                 provider.GetRequiredService<MyAuthStateProvider>());
 
-            services.AddSingleton<Database>(); // Database Service.
+            services.AddSingleton<Database>(); // Database Service.            
             services.AddSingleton<SecurityService>(); // Security Service.
             services.AddSingleton<JobService>(); // Job Service.
             services.AddSingleton<DataService>(); // Data Service.

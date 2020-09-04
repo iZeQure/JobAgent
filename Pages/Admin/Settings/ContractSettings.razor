@@ -2,6 +2,7 @@
 
 @inject AdminService AService
 @inject DataService DService
+@inject IFileUpload FileService
 @inject IJSRuntime JSRuntime
 
 @inherits ComponentBase
@@ -55,7 +56,7 @@ else
                 {
                     <tr id="@(contract.Id)">
                         <th scope="row">@(contract.Id)</th>
-                        <td>@(contract.CompanyCVR.Name)</td>
+                        <td>@(contract.Company.Name)</td>
                         <td>@(contract.ContactPerson)</td>
                         <td>@(contract.SignedByUserId.FullName)</td>
                         @if (!string.IsNullOrEmpty(contract.ContractName))
@@ -128,14 +129,35 @@ else
                     <h5 class="modal-title">Kontrakt Information :</h5>
                 </div>
 
+                @if (!string.IsNullOrEmpty(MessageAlert))
+                {
+                    <div class="container-fluid">
+                        <div class="alert alert-info">
+                            <div class="d-flex align-items-center">
+
+                                <span>@MessageAlert</span>
+
+                                @if (IsProcessing)
+                                {
+                                    <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
+                                }
+                                else if (!IsProcessing && IsSuccess)
+                                {
+                                    <div class="ml-auto"><i class="fas fa-check"></i></div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
                 <div class="modal-body">
                     <div class="row">
                         <div class="col">
                             <label for="inputCompany" class="admin-label col-form-label col-form-label-sm">Kontrakt for :</label>
-                            <select id="inputCompany" class="form-control form-control-sm" @bind="ContractDetails.CompanyCVR.Id">
+                            <select id="inputCompany" class="form-control form-control-sm" @bind="ContractDetails.Company.Id">
                                 @foreach (var company in GetCompanies)
                                 {
-                                    if (company.Id == ContractDetails.CompanyCVR.Id)
+                                    if (company.Id == ContractDetails.Company.Id)
                                     {
                                         <option value="@company.Id" selected>@company.Name</option>
                                     }
@@ -197,7 +219,7 @@ else
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Annuller</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="ResetContractDetails" @onclick:preventDefault>Annuller</button>
                     <button class="btn btn-info text-light cursor-pointer" type="submit">Gem ændringer</button>
                 </div>
 
@@ -212,7 +234,7 @@ else
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
 
-            <EditForm Model="RegisterContractModel" OnValidSubmit="OnValidSubmit_CreateContract">
+            <EditForm Model="ContractModel" OnValidSubmit="OnValidSubmit_CreateContract">
 
                 <div class="modal-header">
                     <h5 class="modal-title">Ny Kontrakt Information :</h5>
@@ -220,17 +242,29 @@ else
 
                 <div class="modal-body">
 
+                    @if (!string.IsNullOrEmpty(MessageAlert))
+                    {
+                        <div class="container-fluid">
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                <strong>Fejl!</strong> @MessageAlert.
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div>
+                    }
+
                     <ValidationSummary />
                     <DataAnnotationsValidator />
 
                     <div class="row">
                         <div class="col">
                             <label for="inputCompany" class="admin-label col-form-label col-form-label-sm">Kontrakt for :</label>
-                            <select id="inputCompany" class="form-control form-control-sm" @bind="RegisterContractModel.SignedWithCompany">
+                            <select id="inputCompany" class="form-control form-control-sm" @bind="ContractModel.SignedWithCompany">
                                 <option value="0" selected>---Vælg en virksomhed fra listen---</option>
                                 @foreach (var company in GetCompanies)
                                 {
-                                    if (company.Id == ContractDetails.CompanyCVR.Id)
+                                    if (company.Id == ContractDetails.Company.Id)
                                     {
                                         <option value="@company.Id" selected>@company.Name</option>
                                     }
@@ -243,7 +277,7 @@ else
                         </div>
                         <div class="col">
                             <label for="inputSignedByUser" class="admin-label col-form-label col-form-label-sm">Underskrevet af :</label>
-                            <select id="inputSignedByUser" class="form-control form-control-sm" @bind="RegisterContractModel.SignedByUser">
+                            <select id="inputSignedByUser" class="form-control form-control-sm" @bind="ContractModel.SignedByUser">
                                 <option value="0" selected>---Vælg en konsulent fra listen---</option>
                                 @foreach (var user in GetUsers)
                                 {
@@ -265,11 +299,25 @@ else
                     <div class="row">
                         <div class="col">
                             <label for="inputContactPerson" class="admin-label col-form-label col-form-label-sm">Virksomheds Kontakt Person :</label>
-                            <input id="inputContactPerson" class="form-control form-control-sm" type="text" placeholder="Indtast navnet på kontakt personen.." @bind="RegisterContractModel.ContactPerson" />
+                            <input id="inputContactPerson" class="form-control form-control-sm" type="text" placeholder="Indtast navnet på kontakt personen.." @bind="ContractModel.ContactPerson" />
                         </div>
                         <div class="col">
-                            <label for="inputContractName" class="admin-label col-form-label col-form-label-sm">Vælg Kontrakt : </label>
-                            <InputFile OnChange="OnChange_HandleFileSelection" />
+                            <label for="inputContractFile" class="admin-label col-form-label col-form-label-sm">Vælg Kontrakt : </label>
+                            <div id="contractFileInput">
+                                @if (file == null)
+                                {
+                                    <InputFile OnChange="HandleFileSelected" accept=".pdf" />
+                                }
+                                else
+                                {
+                                    <div class="alert alert-light alert-dismissible fade show" role="alert">
+                                        @ContractModel.ContractFileName
+                                        <button type="button" class="close" data-dismiss="alert" @onclick="RemoveUploadedFile" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
                         </div>
                     </div>
 
@@ -280,21 +328,21 @@ else
                             <label for="inputRegisteredDate" class="admin-label col-form-label col-form-label-sm">Kontrakt Registreret Dato :</label>
                             @*<input id="inputRegisteredDate" class="form-control form-control-sm" type="datetime" placeholder="Registrerings dato for kontrakt.." value="@(ContractDetails.RegistrationDate)" />*@
 
-                            <InputDate TValue="DateTime" @bind-Value="@(RegisterContractModel.RegistrationDate)" class="form-control form-control-sm" />
+                            <InputDate TValue="DateTime" @bind-Value="@(ContractModel.RegistrationDate)" class="form-control form-control-sm" />
                         </div>
                         <div class="col">
                             <label for="inputExpiryDate" class="admin-label col-form-label col-form-label-sm">Udløbsdato :</label>
                             @*<input id="inputExpiryDate" class="form-control form-control-sm" type="datetime" placeholder="Udløbsdato for kontrakt.." value="@(ContractDetails.ExpiryDate)" />*@
 
-                            <InputDate TValue="DateTime" @bind-Value=@(RegisterContractModel.ExpiryDate) class="form-control form-control-sm" disabled />
+                            <InputDate TValue="DateTime" @bind-Value=@(ContractModel.ExpiryDate) class="form-control form-control-sm" disabled />
                         </div>
                     </div>
 
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Annuller</button>
-                    <button class="btn btn-info text-light cursor-pointer" type="submit">Gem ændringer</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="ResetCreateContract" @onclick:preventDefault>Annuller</button>
+                    <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@IsProcessing">Gem ændringer</button>
                 </div>
 
             </EditForm>
@@ -304,21 +352,25 @@ else
 </div>
 
 @code {
-    public RegisterContractModel RegisterContractModel { get; set; } = new RegisterContractModel();
+    public ContractModel ContractModel { get; set; } = new ContractModel();
 
     public List<User> GetUsers { get; set; } = new List<User>();
     public List<Company> GetCompanies { get; set; } = new List<Company>();
     public List<Contract> GetContracts { get; set; } = new List<Contract>();
 
-    public Contract ContractDetails = new Contract() { CompanyCVR = new Company(), SignedByUserId = new User() };
+    public Contract ContractDetails = new Contract() { Company = new Company(), SignedByUserId = new User() };
 
+    public string UncServerPath { get; protected set; } = @"C:\Users\iZeQure\Desktop\DestinationTest\";
+    //public string UncServerPath { get; protected set; } = @"\\JOB-AGENT\contracts\";
     public string ContractPath { get; set; } = string.Empty;
-
+    public string TempContractPath { get; set; } = string.Empty;
     public string ErrorMessage { get; set; } = string.Empty;
+    public string MessageAlert { get; set; } = string.Empty;
 
-    public string Status { get; set; }
+    public bool IsProcessing { get; set; } = false;
+    public bool IsSuccess { get; set; } = false;
 
-    public IFileListEntry UploadFile { get; set; }
+    private IFileListEntry file;
 
     protected override async Task OnInitializedAsync()
     {
@@ -327,33 +379,11 @@ else
         GetUsers = await DService.GetUsers();
     }
 
-    private async void OnClickEdit_GetContractDetailsById(int contractId)
-    {
-        ContractDetails = await AService.GetContractById(contractId);
-    }
-
-    private void OnClickOpen_Contract(string path)
-    {
-        ContractPath = path;
-    }
-
-    private async Task OnValidSubmit_UpdateContract()
-    {
-        await Task.FromResult(true);
-    }
-
-    private async Task OnValidSubmit_CreateContract()
-    {
-        await Task.FromResult(true);
-    }
-
     private string GetLocationPath(string fileName)
     {
-        string contractDirectory = @"\\JOB-AGENT\contracts\";
-
         try
         {
-            var pdfFiles = Directory.EnumerateFiles(contractDirectory, "*.pdf");
+            var pdfFiles = Directory.EnumerateFiles(UncServerPath, "*.pdf");
 
             foreach (string currentFile in pdfFiles)
             {
@@ -383,6 +413,11 @@ else
         }
     }
 
+    private void OnClickOpen_Contract(string path)
+    {
+        ContractPath = path;
+    }
+
     private void OnDateChange_Registered(DateTime args)
     {
         ContractDetails.RegistrationDate = args;
@@ -395,8 +430,92 @@ else
         StateHasChanged();
     }
 
-    private void OnChange_HandleFileSelection(IFileListEntry[] files)
+    private void RemoveUploadedFile(MouseEventArgs e)
     {
-        UploadFile = files.FirstOrDefault();
+        file = null;
+        ContractModel.ContractFileName = string.Empty;
+        TempContractPath = string.Empty;
+    }
+
+    private void ResetCreateContract()
+    {
+        ContractModel = new ContractModel();
+    }
+
+    private void ResetContractDetails()
+    {
+        ContractDetails = new Contract() { Company = new Company(), SignedByUserId = new User() };
+    }
+
+    private async void OnClickEdit_GetContractDetailsById(int contractId)
+    {
+        ContractDetails = await AService.GetContractById(contractId);
+    }
+
+    private async Task OnValidSubmit_UpdateContract()
+    {
+        IsProcessing = true;
+        MessageAlert = "Vent venligst..";
+
+        await AService.UpdateContract(ContractDetails);
+
+        IsSuccess = true;
+        IsProcessing = false;
+        MessageAlert = "Virksomhed blev opdateret!";
+
+        MessageAlert = string.Empty;
+
+        GetContracts = await AService.GetContracts();
+
+        await JSRuntime.InvokeVoidAsync("ToggleUpdateContractModal");
+        await JSRuntime.InvokeVoidAsync("OnInformationChangeAnimation", $"{ContractDetails.Id}");
+    }
+
+    private async Task OnValidSubmit_CreateContract()
+    {
+        IsProcessing = true;
+
+        if (file != null)
+        {
+            try
+            {
+                await AService.CreateContract(ContractModel);
+
+                await InvokeAsync(async () =>
+                {
+                    GetContracts = await AService.GetContracts();
+
+                    await JSRuntime.InvokeVoidAsync("TogglCreateContractModal");
+
+                    StateHasChanged();
+                });
+
+                ContractModel = new ContractModel();
+                file = null;
+            }
+            catch (Exception e)
+            {
+                MessageAlert = $"Kunne ikke oploade kontrakt..";
+                Console.WriteLine(e.Message);
+            }
+        }
+        else
+        {
+            MessageAlert = $"Vælg venligst en kontrakt!";
+        }
+
+        IsProcessing = false;
+    }
+
+    private async Task HandleFileSelected(IFileListEntry[] files)
+    {
+        file = files.FirstOrDefault();
+
+        if (file != null)
+        {
+            await FileService.UploadFileAsync(file);
+        }
+
+        ContractModel.ContractFileName = file.Name;
     }
 }

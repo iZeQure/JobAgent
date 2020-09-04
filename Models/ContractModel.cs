@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace JobAgent.Models
 {
-    public class RegisterContractModel
+    public class ContractModel
     {
         private DateTime registrationDateTime = DateTime.UtcNow;
         private DateTime expiryDate;
 
         [Required]
-        public string ContactPerson { get; set; }
+        public string ContactPerson { get; set; } = string.Empty;
 
         [Required]
-        public string ContractFileName { get; set; }
+        public string ContractFileName { get; set; } = string.Empty;
 
         [Required]
         [DataType(DataType.DateTime)]
