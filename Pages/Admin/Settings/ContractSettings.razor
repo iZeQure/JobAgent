@@ -304,19 +304,16 @@ else
                         <div class="col">
                             <label for="inputContractFile" class="admin-label col-form-label col-form-label-sm">Vælg Kontrakt : </label>
                             <div id="contractFileInput">
-                                @if (file == null)
+                                @if (true)
                                 {
                                     <InputFile OnChange="HandleFileSelected" accept=".pdf" />
                                 }
-                                else
-                                {
-                                    <div class="alert alert-light alert-dismissible fade show" role="alert">
-                                        @ContractModel.ContractFileName
-                                        <button type="button" class="close" data-dismiss="alert" @onclick="RemoveUploadedFile" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                }
+                                <div class="alert alert-light alert-dismissible fade show" role="alert">
+                                    @ContractModel.ContractFileName
+                                    <button type="button" class="close" data-dismiss="alert" @onclick="RemoveUploadedFile" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -360,8 +357,7 @@ else
 
     public Contract ContractDetails = new Contract() { Company = new Company(), SignedByUserId = new User() };
 
-    public string UncServerPath { get; protected set; } = @"C:\Users\iZeQure\Desktop\DestinationTest\";
-    //public string UncServerPath { get; protected set; } = @"\\JOB-AGENT\contracts\";
+    public string UncServerPath { get; protected set; } = @"\\JOB-AGENT\contracts\";
     public string ContractPath { get; set; } = string.Empty;
     public string TempContractPath { get; set; } = string.Empty;
     public string ErrorMessage { get; set; } = string.Empty;
@@ -514,8 +510,8 @@ else
         if (file != null)
         {
             await FileService.UploadFileAsync(file);
-        }
 
-        ContractModel.ContractFileName = file.Name;
+            ContractModel.ContractFileName = file.Name;
+        }
     }
 }

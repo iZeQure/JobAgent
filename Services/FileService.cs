@@ -12,7 +12,8 @@ namespace JobAgent.Services
     {
         public async Task<bool> UploadFileAsync(IFileListEntry fileEntry)
         {
-            var path = Path.Combine(@"C:\Users\iZeQure\Desktop\DestinationTest\", fileEntry.Name);
+            var path = Path.Combine(@"\\JOB-AGENT\contracts\", fileEntry.Name);
+            //var path = Path.Combine(@"C:\Users\Energy Formula\Desktop\Test\", fileEntry.Name);
 
             try
             {

@@ -122,33 +122,60 @@ namespace JobAgent.Data.Repository
             // Temporary contract.
             Contract tempContract = new Contract();
 
-            // Check for any data.
-            if (r.HasRows)
+            try
             {
-                // Read data.
-                while (r.Read())
+                // Check for any data.
+                if (r.HasRows)
                 {
-                    tempContract = new Contract()
+                    // Read data.
+                    while (r.Read())
                     {
-                        Id = r.GetInt32("Id"),
-                        ContactPerson = r.GetString("ContactPerson"),
-                        ContractName = r.GetString("ContractName"),
-                        ExpiryDate = r.GetDateTime("ExpiryDate"),
-                        RegistrationDate = r.GetDateTime("RegisteredDate"),
-                        SignedByUserId = new User()
-                        {
-                            Id = r.GetInt32("UserId"),
-                            FirstName = r.GetString("FirstName"),
-                            LastName = r.GetString("LastName")
-                        },
-                        Company = new Company()
-                        {
-                            Id = r.GetInt32("CompanyId"),
-                            CVR = r.GetInt32("CVR"),
-                            Name = r.GetString("Name")
-                        }
-                    };
+                        tempContract.Id = r.GetInt32("Id");
+                        tempContract.ContactPerson = r.GetString("ContactPerson");
+                        tempContract.ContractName = r.GetString("ContractName");
+                        tempContract.ExpiryDate = r.GetDateTime("ExpiryDate");
+                        tempContract.RegistrationDate = r.GetDateTime("RegisteredDate");
+                        tempContract.SignedByUserId =
+                            new User()
+                            {
+                                Id = r.GetInt32("UserId"),
+                                FirstName = r.GetString("FirstName"),
+                                LastName = r.GetString("LastName")
+                            };
+                        tempContract.Company =
+                            new Company()
+                            {
+                                Id = r.GetInt32("CompanyId"),
+                                CVR = r.GetInt32("CVR"),
+                                Name = r.GetString("Name")
+                            };
+
+                        //tempContract = new Contract()
+                        //{
+                        //    Id = r.GetInt32("Id"),
+                        //    ContactPerson = r.GetString("ContactPerson"),
+                        //    ContractName = r.GetString("ContractName"),
+                        //    ExpiryDate = r.GetDateTime("ExpiryDate"),
+                        //    RegistrationDate = r.GetDateTime("RegisteredDate"),
+                        //    SignedByUserId = new User()
+                        //    {
+                        //        Id = r.GetInt32("UserId"),
+                        //        FirstName = r.GetString("FirstName"),
+                        //        LastName = r.GetString("LastName")
+                        //    },
+                        //    Company = new Company()
+                        //    {
+                        //        Id = r.GetInt32("CompanyId"),
+                        //        CVR = r.GetInt32("CVR"),
+                        //        Name = r.GetString("Name")
+                        //    }
+                        //};
+                    }
                 }
+            }
+            finally
+            {
+                Database.Instance.CloseConnection();
             }
 
             return tempContract;
