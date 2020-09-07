@@ -61,6 +61,7 @@ namespace JobAgent
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IFileUpload, FileService>();
+            services.AddScoped<IRefresh, RefreshService>();
             services.AddScoped<MyAuthStateProvider>();
             services.AddScoped<AuthenticationStateProvider>(provider =>
                 provider.GetRequiredService<MyAuthStateProvider>());

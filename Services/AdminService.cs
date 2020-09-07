@@ -20,6 +20,8 @@ namespace JobAgent.Services
 
         private IRepository<Company> CompanyRepository { get; } = new CompanyRepository();
 
+        private ISourceLinkRepository SourceLinkRepository { get; } = new SourceLinkRepository();
+
         public Task<User> GetUserByEmail(string userMail)
         {
             return Task.FromResult(((IUserRepository)UserRepository).GetUserByEmail(userMail));
@@ -184,6 +186,36 @@ namespace JobAgent.Services
         public void RemoveCompanyById(int id)
         {
             CompanyRepository.Remove(id);
+        }
+
+        public Task<bool> CreateSourceLink(SourceLinkModel model)
+        {
+            return SourceLinkRepository.Create(
+                new SourceLink()
+                {
+                    Id = model.CompanyId,
+                    Link = model.Link
+                });
+        }
+
+        public Task<bool> RemoveSourceLink(SourceLink sourceLink)
+        {
+            return SourceLinkRepository.Remove(
+                new SourceLink()
+                {
+                    Id = sourceLink.Id,
+                    Link = sourceLink.Link
+                });
+        }
+
+        public Task<bool> UpdateSourceLink(SourceLinkModel model)
+        {
+            return SourceLinkRepository.Update(
+                new SourceLink()
+                {
+                    Id = model.CompanyId,
+                    Link = model.Link
+                });
         }
     }
 }

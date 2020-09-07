@@ -33,72 +33,18 @@ window.PopoverInformation = (name, body, color) => {
     }
 }
 
-window.HTMLBodyElement = () => {
-    $('#vacancyAdminDetails').modal({
-        backdrop: 'static',
-        keyboard: false,
-        show: false
-    });
-
-    $('#jobAdvertModalCreateNew').modal({
-        backdrop: 'static',
-        keyboard: false,
-        show: false
-    });
-
-    $('#vacandyRemoveConfirmation').modal({
-        backdrop: 'static',
-        keyboard: false,
-        show: false
-    });
-
-    $('#contractModalCreateNew').modal({
-        backdrop: 'static',
-        keyboard: false,
-        show: false
-    });
-
-    $('#contractDetails').modal({
+window.StaticModal = (elementId) => {
+    $(`#${elementId}`).modal({
         backdrop: 'static',
         keyboard: false,
         show: false
     });
 }
 
-
-
-window.ToggleUpdateVacancyModal = () => {
-    $('#vacancyAdminDetails').modal('toggle');
+window.confirmRemove = (elementId) => {
+    $(`#${elementId}`).modal('toggle');
 }
 
-window.ToggleRemoveVacancyModal = () => {
-    $('#vacandyRemoveConfirmation').modal('toggle');
-}
-
-window.ToggleCreateJobAdvertModal = () => {
-    $('#jobAdvertModalCreateNew').modal('toggle');
-}
-
-
-
-
-window.ToggleCreateCompanyModal = () => {
-    $('#companyModalCreateNew').modal('toggle');
-}
-
-window.ToggleUpdateCompanyModal = () => {
-    $('#companyDetailsModal').modal('toggle');
-}
-
-window.ToggleRemoveCompanyConfirmationModal = () => {
-    $('#removeCompanyModal').modal('toggle');
-}
-
-
-window.ToggleUpdateContractModal = () => {
-    $('#contractDetails').modal('toggle');
-}
-
-window.TogglCreateContractModal = () => {
-    $('#contractModalCreateNew').modal('toggle');
-}
+window.modalToggle = (elementId) => {
+    $(`#${elementId}`).modal('toggle');
+} 

@@ -15,6 +15,7 @@ namespace JobAgent.Services
         private protected IRepository<Location> LocationRepository { get; }
         private protected IRepository<Category> CategoryRepository { get; }
         private protected IRepository<Company> CompanyRepository { get; }
+        private protected ISourceLinkRepository SourceLinkRepository { get; set; }
 
         public DataService()
         {
@@ -23,6 +24,7 @@ namespace JobAgent.Services
             LocationRepository = new LocationRepository();
             CategoryRepository = new CategoryRepository();
             CompanyRepository = new CompanyRepository();
+            SourceLinkRepository = new SourceLinkRepository();
         }
 
         public Task<List<ConsultantArea>> GetAllConsultantAreasTask()
@@ -57,6 +59,19 @@ namespace JobAgent.Services
         public Task<List<User>> GetUsers()
         {
             return Task.FromResult(UserRepository.GetAll().ToList());
+        }
+
+        public Task<List<SourceLink>> GetAllSourceLinksAsync()
+        {
+            if (SourceLinkRepository.GetAll().Result != null)
+                return Task.FromResult(SourceLinkRepository.GetAll().Result.ToList());
+            else
+                return null;
+        }
+
+        public Task<SourceLink> GetSourceLinkById(SourceLink sourceLink)
+        {
+            return SourceLinkRepository.GetById(sourceLink);
         }
     }
 }

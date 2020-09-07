@@ -1,0 +1,106 @@
+﻿<div class="modal fade" id="CreateLinkModal" tabindex="-1" role="dialog" aria-labelledby="createLinkModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+
+            <EditForm Model="@(SourceLinkModel)" OnValidSubmit="OnValidSubmit_CreateSourceLink">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createLinkModalTitle">Opret nyt Link :</h5>
+                </div>
+
+                <div class="modal-body">
+
+                    @if (!string.IsNullOrEmpty(MessageAlert))
+                    {
+                        <div class="container-fluid">
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                <strong>Fejl!</strong> @MessageAlert.
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div>
+                    }
+
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="regLinkForCompany" class="admin-label">Virksomhed :</label>
+                            <select class="custom-select custom-select-sm" @bind="SourceLinkModel.CompanyId">
+                                <option value="0">--Vælg en virksomhed fra listen--</option>
+                                @foreach (var company in Companies)
+                                {
+                                    <option value="@(company.Id)">@(company.Name)</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="regLink" class="admin-label">Link til Stillingsopslag :</label>
+                            <input id="regLink" class="form-control form-control-sm" placeholder="Indtast link til stillingsopslaget.." @bind="SourceLinkModel.Link" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Annuller</button>
+                    <button type="submit" class="btn btn-info" disabled="@IsProcessing">Opret Link</button>
+                </div>
+
+            </EditForm>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject]
+    private DataService DataService { get; set; }
+    [Inject]
+    private AdminService AdminService { get; set; }
+    [Inject]
+    private IRefresh Refresh { get; set; }
+    [Inject]
+    private IJSRuntime JS { get; set; }
+    private SourceLinkModel SourceLinkModel { get; set; } = new SourceLinkModel();
+    private List<Company> Companies { get; set; }
+
+    private bool IsProcessing { get; set; }
+    private string MessageAlert { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Companies = await DataService.GetAllCompanies();
+    }
+
+    private void OnValidSubmit_CreateSourceLink()
+    {
+        IsProcessing = true;
+
+        InvokeAsync(async () =>
+        {
+            if (await AdminService.CreateSourceLink(SourceLinkModel))
+            {
+                MessageAlert = "Link successfuldt oprettet!";
+            }
+            else
+            {
+                MessageAlert = "Noget gik galt, prøv igen senere.";
+            }
+
+            Refresh.CallRefreshRequest();
+        });
+
+        IsProcessing = false;
+        MessageAlert = string.Empty;
+
+        JS.InvokeVoidAsync("modalToggle", "CreateLinkModal");
+        JS.InvokeVoidAsync("OnInformationChangeAnimation", SourceLinkModel.CompanyId);
+    }
+}

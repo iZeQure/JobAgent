@@ -1,0 +1,100 @@
+﻿@page "/admin/miscellaneous/links"
+
+<div class="d-flex">
+    <PageDisplayName DisplayName="Links til Web Crawleren" />
+    <div class="d-inline-block">
+        <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#CreateLinkModal">
+            Opret nyt Link
+        </a>
+    </div>
+</div>
+
+@if (SourceLinks.Count == 0 || SourceLinks == null)
+{
+    <div class="alert alert-info" role="alert">
+        <h4 class="alert-heading">System Besked!</h4>
+
+        <p>Fejl i Database.</p>
+        <hr>
+        <p>Der blev desværre ikke fundet nogen links i databasen.</p>
+        <p class="mb-0">Genindlæs siden eller prøv igen senere..</p>
+    </div>
+}
+else
+{
+    <div class="table-responsive table-responsive-sm table-responsive-md">
+        <table class="table table-sm table-striped table-hover">
+            <caption>Liste over virksomheders kontrakter..</caption>
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Virksomhed</th>
+                    <th scope="col">Link</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var link in SourceLinks)
+                {
+                    <tr id="@(link.Id)">
+                        <th scope="row">@(link.Id)</th>
+                        <td>@(link.Link)</td>
+
+                        <td>
+                            <span data-toggle="modal" data-target="#EditSourceLinkModal" @onclick="@(mouseEvent => OnClick_EditLink(link))">
+                                <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne kontrakt." Color="Popover.PopoverType.Info" />
+                            </span>
+                        </td>
+
+                        <td>
+                            <span data-toggle="modal" data-target="#">
+                                <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
+                            </span>
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+}
+
+<CreateLinkModal />
+
+<EditLinkModal Data="SourceLink" />
+
+@code {
+    [Inject]
+    private DataService DataService { get; set; }
+
+    [Inject]
+    private IRefresh RefreshService { get; set; }
+
+    private List<SourceLink> SourceLinks { get; set; } = new List<SourceLink>();
+    private SourceLink SourceLink { get; set; }
+
+    private int LinkId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        RefreshService.RefreshRequest += RefreshContent;
+
+        if (DataService.GetAllSourceLinksAsync() != null)
+            SourceLinks = await DataService.GetAllSourceLinksAsync();
+
+    }
+
+    private async void OnClick_EditLink(SourceLink link)
+    {
+        SourceLink = await DataService.GetSourceLinkById(link);
+    }
+
+    private async void RefreshContent()
+    {
+        SourceLinks = await DataService.GetAllSourceLinksAsync();
+
+        StateHasChanged();
+    }
+}
