@@ -441,7 +441,7 @@ else
 
         await JSRuntime.InvokeVoidAsync("OnInformationChangeAnimation", $"{JobVacancyModelDetails.JobAdvert.Id}");
 
-        await JSRuntime.InvokeVoidAsync("ToggleUpdateVacancyModal");
+        await JSRuntime.InvokeVoidAsync("modalToggle", "vacancyAdminDetails");
     }
 
     public async Task OnValidSubmit_CreateJobAdvert()
@@ -464,7 +464,7 @@ else
 
         IsProcessing = false;
         SystemMessage = string.Empty;
-        await JSRuntime.InvokeVoidAsync("ToggleCreateJobAdvertModal");
+        await JSRuntime.InvokeVoidAsync("modalToggle", "jobAdvertModalCreateNew");
         RegisterJobAdvertModel = new RegisterJobAdvertModel() { RegistrationDate = DateTime.UtcNow, DeadlineDate = DateTime.UtcNow.AddDays(1) };
     }
 
@@ -474,7 +474,7 @@ else
         {
             if (id != 0)
             {
-                await JSRuntime.InvokeVoidAsync("ToggleRemoveVacancyModal");
+                await JSRuntime.InvokeVoidAsync("modalToggle", "vacandyRemoveConfirmation");
 
                 await RemoveJobVancacy(id);
             }
@@ -500,10 +500,5 @@ else
     public void OnClick_StoreId(int id)
     {
         ItemId = id;
-    }
-
-    public async void SetModalOptions(string id)
-    {
-        await JSRuntime.InvokeVoidAsync("ModalOptions", id);
     }
 }

@@ -260,7 +260,7 @@ else
 
         Companies = await DataService.GetAllCompanies();
 
-        await JSRuntime.InvokeVoidAsync("ToggleUpdateCompanyModal");
+        await JSRuntime.InvokeVoidAsync("modalToggle", "companyDetailsModal");
         await JSRuntime.InvokeVoidAsync("OnInformationChangeAnimation", $"{CompanyDetails.Id}");
     }
 
@@ -280,7 +280,7 @@ else
 
         Companies = await DataService.GetAllCompanies();
 
-        await JSRuntime.InvokeVoidAsync("ToggleCreateCompanyModal");
+        await JSRuntime.InvokeVoidAsync("modalToggle", "companyModalCreateNew");
     }
 
     private async void OnClick_RemoveCompanyById(bool confirmation, int id)
@@ -289,7 +289,7 @@ else
         {
             if (id != 0)
             {
-                await JSRuntime.InvokeVoidAsync("ToggleRemoveCompanyConfirmationModal");
+                await JSRuntime.InvokeVoidAsync("confirmRemove", "removeCompanyModal");
 
                 AdminService.RemoveCompanyById(id);
 
@@ -309,7 +309,7 @@ else
     private void OnClick_CancelRemove(bool cancelation)
     {
         if (cancelation)
-            JSRuntime.InvokeVoidAsync("ToggleRemoveCompanyConfirmationModal");
+            JSRuntime.InvokeVoidAsync("confirmRemove", "removeCompanyModal");
 
         RemoveCompanyConfirmationId = 0;
     }
