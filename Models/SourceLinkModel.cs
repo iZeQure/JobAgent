@@ -8,6 +8,8 @@ namespace JobAgent.Models
 {
     public class SourceLinkModel
     {
+        public int Id { get; set; }
+
         [Required(ErrorMessage = "Vælg venligst en virksomhed fra listen.")]
         [Range(1, int.MaxValue, ErrorMessage = "Vælg venligst en virksomhed fra listen.")]
         public int CompanyId { get; set; }

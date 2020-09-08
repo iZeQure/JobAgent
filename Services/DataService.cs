@@ -69,9 +69,9 @@ namespace JobAgent.Services
                 return null;
         }
 
-        public Task<SourceLink> GetSourceLinkById(SourceLink sourceLink)
+        public Task<SourceLink> GetSourceLinkById(int id)
         {
-            return SourceLinkRepository.GetById(sourceLink);
+            return SourceLinkRepository.GetById(id);
         }
     }
 }

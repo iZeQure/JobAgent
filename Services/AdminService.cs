@@ -193,19 +193,17 @@ namespace JobAgent.Services
             return SourceLinkRepository.Create(
                 new SourceLink()
                 {
-                    Id = model.CompanyId,
+                    Company = new Company()
+                    {
+                        Id = model.CompanyId
+                    },
                     Link = model.Link
                 });
         }
 
-        public Task<bool> RemoveSourceLink(SourceLink sourceLink)
+        public Task<bool> RemoveSourceLink(int id)
         {
-            return SourceLinkRepository.Remove(
-                new SourceLink()
-                {
-                    Id = sourceLink.Id,
-                    Link = sourceLink.Link
-                });
+            return SourceLinkRepository.Remove(id);
         }
 
         public Task<bool> UpdateSourceLink(SourceLinkModel model)
@@ -213,7 +211,8 @@ namespace JobAgent.Services
             return SourceLinkRepository.Update(
                 new SourceLink()
                 {
-                    Id = model.CompanyId,
+                    Id = model.Id,
+                    Company = new Company() { Id = model.CompanyId },
                     Link = model.Link
                 });
         }

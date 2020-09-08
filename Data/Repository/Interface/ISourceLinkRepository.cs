@@ -10,8 +10,8 @@ namespace JobAgent.Data.Repository.Interface
     {
         Task<bool> Create(SourceLink obj);
         Task<bool> Update(SourceLink obj);
-        Task<bool> Remove(SourceLink obj);
-        Task<SourceLink> GetById(SourceLink obj);
+        Task<bool> Remove(int id);
+        Task<SourceLink> GetById(int id);
         Task<IEnumerable<SourceLink>> GetAll();
     }
 }

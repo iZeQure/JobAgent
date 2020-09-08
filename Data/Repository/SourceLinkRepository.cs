@@ -30,7 +30,7 @@ namespace JobAgent.Data.Repository
             };
 
             // Define paramters.
-            c.Parameters.AddWithValue("@companyId", sourceLink.Id);
+            c.Parameters.AddWithValue("@companyId", sourceLink.Company.Id);
             c.Parameters.AddWithValue("@link", sourceLink.Link);
 
             c.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.Output;
@@ -87,7 +87,12 @@ namespace JobAgent.Data.Repository
                         sourceLinks.Add(
                             new SourceLink()
                             {
-                                Id = r.GetInt32("CompanyId"),
+                                Id = r.GetInt32("Id"),
+                                Company = new Company()
+                                {
+                                    Id = r.GetInt32("CompanyId"),
+                                    Name = r.GetString("Name")
+                                },
                                 Link = r.GetString("Link")
                             });
                     }
@@ -110,7 +115,7 @@ namespace JobAgent.Data.Repository
         /// </summary>
         /// <param name="sourceLink">Used to get the specific object returned.</param>
         /// <returns>A source link, if the param is valid.</returns>
-        public Task<SourceLink> GetById(SourceLink sourceLink)
+        public Task<SourceLink> GetById(int id)
         {
             int output;
             SourceLink sourceLinkObj = null;
@@ -124,8 +129,7 @@ namespace JobAgent.Data.Repository
             };
 
             // Parameters.
-            c.Parameters.AddWithValue("@companyId", sourceLink.Id);
-            c.Parameters.AddWithValue("@link", sourceLink.Link);
+            c.Parameters.AddWithValue("@id", id);
 
             c.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.Output;
 
@@ -142,7 +146,12 @@ namespace JobAgent.Data.Repository
                     {
                         sourceLinkObj = new SourceLink()
                         {
-                            Id = r.GetInt32("CompanyId"),
+                            Id = r.GetInt32("Id"),
+                            Company = new Company()
+                            {
+                                Id = r.GetInt32("CompanyId"),
+                                Name = r.GetString("Name")
+                            },
                             Link = r.GetString("Link")
                         };
                     }
@@ -165,7 +174,7 @@ namespace JobAgent.Data.Repository
         /// </summary>
         /// <param name="sourceLink">Specifies the data to remove.</param>
         /// <returns>True if data was removed, but false if dataset isn't found.</returns>
-        public Task<bool> Remove(SourceLink sourceLink)
+        public Task<bool> Remove(int id)
         {
             int output;
 
@@ -178,8 +187,7 @@ namespace JobAgent.Data.Repository
             };
 
             // Parameters.
-            c.Parameters.AddWithValue("@companyId", sourceLink.Id);
-            c.Parameters.AddWithValue("@link", sourceLink.Link);
+            c.Parameters.AddWithValue("@id", id);
 
             c.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.Output;
 
@@ -216,7 +224,8 @@ namespace JobAgent.Data.Repository
             };
 
             // Parameters.
-            c.Parameters.AddWithValue("@companyId", sourceLink.Id);
+            c.Parameters.AddWithValue("@id", sourceLink.Id);
+            c.Parameters.AddWithValue("@companyId", sourceLink.Company.Id);
             c.Parameters.AddWithValue("@link", sourceLink.Link);
 
             c.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.Output;

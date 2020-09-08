@@ -36,14 +36,15 @@ else
             </thead>
             <tbody>
 
-                @foreach (var link in SourceLinks)
+                @foreach (var source in SourceLinks.OrderBy(x => x.Company.Name))
                 {
-                    <tr id="@(link.Id)">
-                        <th scope="row">@(link.Id)</th>
-                        <td>@(link.Link)</td>
+                    <tr id="@(source.Id)">
+                        <th scope="row">@(source.Id)</th>
+                        <td>@(source.Company.Name)</td>
+                        <td>@(source.Link)</td>
 
                         <td>
-                            <span data-toggle="modal" data-target="#EditSourceLinkModal" @onclick="@(mouseEvent => OnClick_EditLink(link))">
+                            <span data-toggle="modal" data-target="#EditSourceLinkModal" @onclick="@(mouseEvent => OnClick_EditLink(source.Id))">
                                 <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne kontrakt." Color="Popover.PopoverType.Info" />
                             </span>
                         </td>
@@ -63,7 +64,7 @@ else
 
 <CreateLinkModal />
 
-<EditLinkModal Data="SourceLink" />
+<EditLinkModal SourceLink="SourceLink" />
 
 @code {
     [Inject]
@@ -83,18 +84,16 @@ else
 
         if (DataService.GetAllSourceLinksAsync() != null)
             SourceLinks = await DataService.GetAllSourceLinksAsync();
-
     }
 
-    private async void OnClick_EditLink(SourceLink link)
+    private async void OnClick_EditLink(int id)
     {
-        SourceLink = await DataService.GetSourceLinkById(link);
+        SourceLink = await DataService.GetSourceLinkById(id);
     }
 
     private async void RefreshContent()
     {
         SourceLinks = await DataService.GetAllSourceLinksAsync();
-
         StateHasChanged();
     }
 }
