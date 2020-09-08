@@ -1,0 +1,67 @@
+﻿@namespace JobAgent.Components.Notification
+
+@if (!string.IsNullOrEmpty(Message))
+{
+    <div class="container-fluid">
+        @switch (Alert)
+        {
+            case AlertType.Info:
+                <div class="alert alert-info" role="alert">
+                    <h4 class="alert-heading">Information Besked!</h4>
+                    <p>@Message</p>
+                    @if (!string.IsNullOrEmpty(MessageOptional))
+                    {
+                        <hr />
+                        <p class="mb-0">@MessageOptional</p>
+                    }
+                </div>
+                break;
+            case AlertType.Error:
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-heading">Fejl Besked!</h4>
+                    <p>@Message</p>
+                    @if (!string.IsNullOrEmpty(MessageOptional))
+                    {
+                        <hr />
+                        <p class="mb-0">@MessageOptional</p>
+                    }
+                </div>
+                break;
+            case AlertType.System:
+                <div class="alert alert-warning" role="alert">
+                    <h4 class="alert-heading">System Besked!</h4>
+                    <p>@Message</p>
+                    @if (!string.IsNullOrEmpty(MessageOptional))
+                    {
+                        <hr />
+                        <p class="mb-0">@MessageOptional</p>
+                    }
+                </div>
+                break;
+            default:
+                break;
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Message { get; set; } = string.Empty;
+    [Parameter]
+    public string MessageOptional { get; set; } = string.Empty;
+
+    [Parameter]
+    public AlertType Alert { get; set; }
+
+    protected override void OnInitialized()
+    {
+        StateHasChanged();
+    }
+
+    public enum AlertType
+    {
+        Info,
+        Error,
+        System
+    }
+}

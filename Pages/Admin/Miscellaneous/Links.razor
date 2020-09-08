@@ -9,16 +9,12 @@
     </div>
 </div>
 
-@if (SourceLinks.Count == 0 || SourceLinks == null)
+@if (SourceLinks == null || SourceLinks.Count == 0)
 {
-    <div class="alert alert-info" role="alert">
-        <h4 class="alert-heading">System Besked!</h4>
-
-        <p>Fejl i Database.</p>
-        <hr>
-        <p>Der blev desværre ikke fundet nogen links i databasen.</p>
-        <p class="mb-0">Genindlæs siden eller prøv igen senere..</p>
-    </div>
+    <MessageAlert 
+                  Alert="MessageAlert.AlertType.System"
+                  Message="Der blev ikke fundet nogen links." 
+                  MessageOptional="Opret links, ved at trykke på knappen : Opret nyt Link." />
 }
 else
 {
@@ -50,7 +46,7 @@ else
                         </td>
 
                         <td>
-                            <span data-toggle="modal" data-target="#">
+                            <span data-toggle="modal" data-target="#RemoveConfirmationSourceLinkModal" @onclick="@(mouseEvent => ConfirmationWindow(source.Id))">
                                 <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
                             </span>
                         </td>
@@ -62,9 +58,9 @@ else
     </div>
 }
 
-<CreateLinkModal />
-
-<EditLinkModal SourceLink="SourceLink" />
+<CreateSourceLinkModal />
+<EditSourceLinkModal SourceLink="SourceLink" />
+<RemoveSourceLinkModal SourceLinkId="LinkId" />
 
 @code {
     [Inject]
@@ -86,6 +82,11 @@ else
             SourceLinks = await DataService.GetAllSourceLinksAsync();
     }
 
+    private void ConfirmationWindow(int id)
+    {
+        LinkId = id;
+    }
+
     private async void OnClick_EditLink(int id)
     {
         SourceLink = await DataService.GetSourceLinkById(id);
@@ -93,7 +94,16 @@ else
 
     private async void RefreshContent()
     {
-        SourceLinks = await DataService.GetAllSourceLinksAsync();
-        StateHasChanged();
+        try
+        {
+            if (DataService.GetAllSourceLinksAsync() != null)
+                SourceLinks = await DataService.GetAllSourceLinksAsync();
+            else
+                SourceLinks = null;
+        }
+        finally
+        {
+            StateHasChanged();
+        }
     }
 }

@@ -13,18 +13,9 @@
 
 @if (Companies.Count == 0)
 {
-    <div class="alert alert-info" role="alert">
-        <h4 class="alert-heading">System Besked!</h4>
-
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-
-        <p>Fejl i Database.</p>
-        <hr>
-        <p>Der blev desværre ikke fundet nogen virksomheder i databasen.</p>
-        <p class="mb-0">Genindlæs siden eller prøv igen senere..</p>
-    </div>
+    <MessageAlert Alert="MessageAlert.AlertType.System"
+                  Message="Der blev ikke fundet nogen virksomheder."
+                  MessageOptional="Opret virksomheder, ved at trykke på knappen : Opret ny Virksomhed." />
 }
 else
 {
