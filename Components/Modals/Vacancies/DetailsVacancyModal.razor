@@ -1,0 +1,31 @@
+﻿<div class="modal fade" id="DetailsVacancyModal" tabindex="-1" role="dialog" aria-labelledby="DetailsVacancyModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+        <div class="modal-content">
+            @if (Details != null)
+            {
+                <div class="modal-header">
+                    <h5 class="modal-title" id="DetailsVacancyModalTitle">@Details.Title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @Details.JobDescription
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Tilbage</button>
+                    <a class="btn btn-info text-light cursor-pointer" href="@(Details.SourceURL)" target="_blank">Søg Job Opslag</a>
+                </div>
+            }
+            else
+            {
+                <MessageAlert Alert="MessageAlert.AlertType.Error" Message="Kunne ikke hente detailjer på stillingsopslag!" MessageOptional="Indlæs siden igen, eller prøv igen senere." />
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public JobAdvert Details { get; set; }
+}

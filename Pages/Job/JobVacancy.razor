@@ -1,10 +1,9 @@
 ﻿@page "/job/{JobAdvertId:int}/{JobAdvertName}";
 @page "/job/{JobAdvertId:int}/{JobAdvertName}/{SpecializationId:int}/{SpecializationName}";
 
-@using JobAgent.Data.Objects
-@using JobAgent.Services
 @inject JobService JobService
 @inject NavigationManager NavigationManager
+
 @* Set Job as Page Title *@
 <PageTitle Title="@JobAdvertName" />
 
@@ -20,65 +19,26 @@
 else
 {
     <div class="card-columns">
-        @foreach (var j in jobAdverts)
+        @foreach (var j in jobAdverts.OrderBy(date => date.JobRegisteredDate))
         {
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">@j.Title</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@(j.Company.Name), @(j.JobLocation)</h6>
                     <p class="card-text">@j.JobDescription</p>
                     <p class="card-text">
-                        <small class="text-muted">
-                            @*<span style="display:none;">
-                                    @(DateTimeToSubstract = j.JobRegisteredDate)
-                                </span>
-                                Stillingsopslag opdateret
-                                @if (GetTimeDifference.TotalSeconds >= 60 * 60)
-                                {
-                                    <span>@Math.Round(GetTimeDifference.TotalHours) timer</span>
-                                }
-                                else if (GetTimeDifference.TotalSeconds >= 60)
-                                {
-                                    <span>@Math.Round(GetTimeDifference.TotalMinutes) minutter</span>
-                                }
-                                else
-                                {
-                                    <span>@Math.Round(GetTimeDifference.TotalSeconds) sekunder</span>
-                                }
-                                siden.*@
-
-                            @j.JobVacancyRegisteredAgo
+                        <small class="text-muted">                          
+                            @j.JobRegisteredDate.ToString("dddd, d MMM yyyy", CultureInfo.CreateSpecificCulture("da-DK"))
                         </small>
                     </p>
-                    <button @onclick="@(id => OnJobPostDetail(j.Id))" class="btn btn-info btn-sm d-block" type="button" data-toggle="modal" data-target="#jobPostingDetail">Se Detailjer</button>
+                    <button @onclick="@(id => OnJobPostDetail(j.Id))" class="btn btn-info btn-sm d-block" type="button" data-toggle="modal" data-target="#DetailsVacancyModal">Se Detailjer</button>
                 </div>
             </div>
-
         }
     </div>
 }
 
-@* Get detailed view for job advert. *@
-@* Job Detail Modal *@
-<div class="modal fade" id="jobPostingDetail" tabindex="-1" role="dialog" aria-labelledby="jobPostingDetailLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="jobPostingDetailLabel">@jobAdvert.Title</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-
-            </div>
-            <div class="modal-body">
-                @jobAdvert.JobDescription
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Tilbage</button>
-                <a class="btn btn-info text-light cursor-pointer">Søg Job Opslag</a>
-            </div>
-        </div>
-    </div>
-</div>
+<DetailsVacancyModal Details="jobAdvert" />
 
 @code {
     [Parameter]

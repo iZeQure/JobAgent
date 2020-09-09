@@ -255,6 +255,13 @@ ul.validation-errors {
 /*// Medium devices (tablets, less than 992px)*/
 @media (min-width: 991.98px) {
     .card-columns {
+        column-count: 2;
+    }
+}
+
+/*// Larger devices (tablets, less than 992px)*/
+@media (min-width: 1150.98px) {
+    .card-columns {
         column-count: 3;
     }
 }

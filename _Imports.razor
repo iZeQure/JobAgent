@@ -1,8 +1,11 @@
-﻿@using System.IO;
-@using System.Linq
+﻿@using System.IO
 @using System.Web
+@using System.Net
+@using System.Linq
 @using System.Net.Http
+@using System.Globalization
 @using System.Security.Claims
+@using System.Text.Encodings.Web 
 
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Hosting
@@ -21,8 +24,9 @@
 @using JobAgent.Data.Interfaces
 @using JobAgent.Components.Menus
 @using JobAgent.Components.Redirects
-@using JobAgent.Components.Modals.Links
 @using JobAgent.Components.Notification
+@using JobAgent.Components.Modals.Links
+@using JobAgent.Components.Modals.Vacancies
 
 @using BlazorStrap
 

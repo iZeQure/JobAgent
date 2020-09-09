@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace JobAgent.Data.Repository
@@ -78,15 +79,18 @@ namespace JobAgent.Data.Repository
                         DeadlineDate = reader.GetDateTime("DeadlineDate"),
                         Company = new Company()
                         {
-                            Id = reader.GetInt32("CompanyId")
+                            Id = reader.GetInt32("CompanyId"),
+                            Name = reader.GetString("CompanyName")
                         },
                         Category = new Category()
                         {
-                            Id = reader.GetInt32("CategoryId")
+                            Id = reader.GetInt32("CategoryId"),
+                            Name = reader.GetString("CategoryName")
                         },
                         Specialization = new Specialization()
                         {
-                            Id = reader.GetInt32("SpecializationId")
+                            Id = reader.GetInt32("SpecializationId"),
+                            Name = !DataReaderExtensions.IsDBNull(reader, "SpecializationName") ? reader.GetString("SpecializationName") : string.Empty
                         }
                     });
                 }
