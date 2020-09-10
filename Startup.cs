@@ -66,11 +66,11 @@ namespace JobAgent
             services.AddScoped<AuthenticationStateProvider>(provider =>
                 provider.GetRequiredService<MyAuthStateProvider>());
 
-            services.AddSingleton<Database>(); // Database Service.            
-            services.AddSingleton<SecurityService>(); // Security Service.
-            services.AddSingleton<JobService>(); // Job Service.
-            services.AddSingleton<DataService>(); // Data Service.
-            services.AddSingleton<AdminService>(); // Admin Service.            
+            services.AddSingleton<Database>(); // Database Service.
+            services.AddTransient<SecurityService>(); // Security Service.
+            services.AddTransient<JobService>(); // Job Service.
+            services.AddTransient<DataService>(); // Data Service.
+            services.AddTransient<AdminService>(); // Admin Service.            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

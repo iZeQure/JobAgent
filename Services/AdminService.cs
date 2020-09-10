@@ -12,15 +12,24 @@ namespace JobAgent.Services
 {
     public class AdminService
     {
-        private IRepository<User> UserRepository { get; } = new UserRepository();
+        private IRepository<User> UserRepository { get; }
 
-        private IRepository<JobAdvert> JobRepository { get; } = new JobAdvertRepository();
+        private IRepository<JobAdvert> JobRepository { get; }
 
-        private IRepository<Contract> ContractRepository { get; } = new ContractRepository();
+        private IRepository<Contract> ContractRepository { get; }
 
-        private IRepository<Company> CompanyRepository { get; } = new CompanyRepository();
+        private IRepository<Company> CompanyRepository { get; }
 
-        private ISourceLinkRepository SourceLinkRepository { get; } = new SourceLinkRepository();
+        private ISourceLinkRepository SourceLinkRepository { get; }
+
+        public AdminService()
+        {
+            UserRepository = new UserRepository();
+            JobRepository = new JobAdvertRepository();
+            ContractRepository = new ContractRepository();
+            CompanyRepository = new CompanyRepository();
+            SourceLinkRepository = new SourceLinkRepository();
+        }
 
         public Task<User> GetUserByEmail(string userMail)
         {
@@ -183,9 +192,16 @@ namespace JobAgent.Services
                 });
         }
 
-        public void UpdateCompany(Company update)
+        public void UpdateCompany(CompanyModel update)
         {
-            CompanyRepository.Update(update);
+            CompanyRepository.Update(
+                new Company()
+                {
+                    Id = update.Id,
+                    CVR = update.CVR,
+                    Name = update.Name,
+                    URL = update.URL
+                });
         }
 
         public void RemoveCompanyById(int id)

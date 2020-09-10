@@ -1,0 +1,140 @@
+﻿@attribute [Authorize]
+
+<div class="modal fade" id="EditContractModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+
+            <EditForm Model="ContractModel" OnValidSubmit="OnValidSubmit_UpdateContract">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Kontrakt Information :</h5>
+                </div>
+
+                @if (ShowError)
+                {
+                    <MessageAlert Alert="MessageAlert.AlertType.Error" Message="@ErrorMessage" />
+                }
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col">
+                            <label for="inputCompany" class="admin-label col-form-label col-form-label-sm">Kontrakt for :</label>
+                            <select id="inputCompany" class="form-control form-control-sm" @bind="ContractDetails.Company.Id">
+                                @foreach (var company in GetCompanies)
+                                {
+                                    if (company.Id == ContractDetails.Company.Id)
+                                    {
+                                        <option value="@company.Id" selected>@company.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@company.Id">@company.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label for="inputSignedByUser" class="admin-label col-form-label col-form-label-sm">Underskrevet af :</label>
+                            <select id="inputSignedByUser" class="form-control form-control-sm" @bind="ContractDetails.SignedByUserId.Id">
+                                @foreach (var user in GetUsers)
+                                {
+                                    if (user.Id == ContractDetails.SignedByUserId.Id)
+                                    {
+                                        <option value="@user.Id" selected>@user.FullName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@user.Id">@user.FullName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="inputContactPerson" class="admin-label col-form-label col-form-label-sm">Virksomheds Kontakt Person :</label>
+                            <input id="inputContactPerson" class="form-control form-control-sm" type="text" placeholder="Indtast en kontakt person.." @bind="ContractDetails.ContactPerson" />
+                        </div>
+                        <div class="col">
+                            <label for="inputContractName" class="admin-label col-form-label col-form-label-sm">Kontraktens Navn : <span class="font-italic small" style="color: red;">*Ikke ændre dette hvis navnet på kontrakten ikke bliver ændret.</span></label>
+                            <input id="inputContractName" class="form-control form-control-sm" type="text" placeholder="Indtast kontraktens fil navn / lokation.." disabled @bind="ContractDetails.ContractName" />
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="inputRegisteredDate" class="admin-label col-form-label col-form-label-sm">Kontrakt Registreret Dato :</label>
+                            @*<input id="inputRegisteredDate" class="form-control form-control-sm" type="datetime" placeholder="Registrerings dato for kontrakt.." value="@(ContractDetails.RegistrationDate)" />*@
+
+                            <InputDate @bind-Value="@ContractDetails.RegistrationDate" TValue="DateTime" class="form-control form-control-sm"></InputDate>
+                        </div>
+                        <div class="col">
+                            <label for="inputExpiryDate" class="admin-label col-form-label col-form-label-sm">Udløbsdato :</label>
+                            @*<input id="inputExpiryDate" class="form-control form-control-sm" type="datetime" placeholder="Udløbsdato for kontrakt.." value="@(ContractDetails.ExpiryDate)" />*@
+
+                            <InputDate @bind-Value="@ContractDetails.ExpiryDate" TValue="DateTime" class="form-control form-control-sm"></InputDate>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="CancelRequest" @onclick:preventDefault>Annuller</button>
+                    <button class="btn btn-info text-light cursor-pointer" type="submit">Gem ændringer</button>
+                </div>
+
+            </EditForm>
+
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public ContractModel ContractModel { get; set; }
+
+    [Inject]
+    protected DataService DataService { get; set; }
+
+    [Inject]
+    protected AdminService AdminService { get; set; }
+
+    [Inject]
+    protected IRefresh RefreshService { get; set; }
+
+    [Inject]
+    protected IJSRuntime JSRuntime { get; set; }
+
+    private bool IsProcessing { get; set; } = false;
+    private bool ShowError { get; set; } = false;
+
+    private string ErrorMessage { get; set; } = string.Empty;
+
+    private async void OnValidSubmit_UpdateContract()
+    {
+        IsProcessing = true;
+
+        await InvokeAsync(() =>
+        {
+            AdminService.UpdateContract(ContractModel);
+        });
+
+        IsProcessing = false;
+
+        RefreshService.CallRefreshRequest();
+
+        await JSRuntime.InvokeVoidAsync("modalToggle", "EditContractModal");
+        await JSRuntime.InvokeVoidAsync("OnInformationChangeAnimation", $"{}");
+    }
+
+    private void CancelRequest(MouseEventArgs e)
+    {
+        RefreshService.CallRefreshRequest();
+    }
+}

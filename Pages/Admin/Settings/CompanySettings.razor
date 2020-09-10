@@ -5,7 +5,7 @@
 <div class="d-flex">
     <PageDisplayName DisplayName="Administrer Virksomheder" />
     <div class="d-inline-block">
-        <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#companyModalCreateNew">
+        <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#CreateCompanyModal">
             Opret ny Virksomhed
         </a>
     </div>
@@ -42,12 +42,12 @@ else
                         <td>@(company.Name)</td>
                         <td>@(company.URL)</td>
                         <td>
-                            <span @onclick="(OnClickEvent => OnClick_EditCompanyById(company.Id))" data-toggle="modal" data-target="#companyDetailsModal">
+                            <span @onclick="(OnClickEvent => OnClick_OpenEditModal(company.Id))" data-toggle="modal" data-target="#EditCompanyModal">
                                 <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne virksomehd." Color="Popover.PopoverType.Info" />
                             </span>
                         </td>
                         <td>
-                            <span @onclick="(OnClickEvent => StoreCompanyId(company.Id))" data-toggle="modal" data-target="#removeCompanyModal">
+                            <span @onclick="(OnClickEvent => OnClick_RemoveCompanyModal(company.Id))" data-toggle="modal" data-target="#RemoveCompanyModal">
                                 <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
                             </span>
                         </td>
@@ -59,161 +59,11 @@ else
     </div>
 }
 
-@* Company Details Modal *@
-<div class="modal fade" id="companyDetailsModal" tabindex="-1" role="dialog" aria-labelledby="companyDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-        <div class="modal-content">
-            <EditForm Model="CompanyDetails" OnValidSubmit="OnValidSubmit_UpdateCompany">
+<CreateCompanyModal />
 
-                <div class="modal-header">
-                    <h5 class="modal-title">Virksommhedens Information :</h5>
-                </div>
+<EditCompanyModal CompanyModel="Model" />
 
-                @if (!string.IsNullOrEmpty(SystemMessage))
-                {
-                    <div class="container-fluid">
-                        <div class="alert alert-info">
-                            <div class="d-flex align-items-center">
-
-                                <span>@SystemMessage</span>
-
-                                @if (IsProcessing)
-                                {
-                                    <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
-                                }
-                                else if (!IsProcessing && IsSuccess)
-                                {
-                                    <div class="ml-auto"><i class="fas fa-check"></i></div>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                }
-
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col">
-                            <label for="inputCompanyIdentity" class="admin-label col-form-label col-form-label-sm">Virksomhedens CVR : <span class="font-italic small" style="color: lightcoral;">*Ændring af CVR kan muligvis skabe problemer.</span></label>
-                            <input id="inputCompanyIdentity" type="text" class="form-control form-control-sm" placeholder="Indtast CVR nr." @bind-value="CompanyDetails.CVR" />
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="inputName" class="admin-label col-form-label col-form-label-sm">Virksomhedens Navn :</label>
-                            <input id="inputName" type="text" class="form-control form-control-sm" placeholder="Indtast virksomhedens navn.." @bind="CompanyDetails.Name" />
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="inputCompanyUrl" class="admin-label col-form-label col-form-label-sm">Link til Virksomhedens hjemmeside :</label>
-                            <input id="inputCompanyUrl" type="text" class="form-control form-control-sm" placeholder="Indtast link til virksomhedens hjemmeside.." @bind-value="CompanyDetails.URL" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Annuller</button>
-                    <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@IsProcessing">Gem ændringer</button>
-                </div>
-            </EditForm>
-        </div>
-    </div>
-</div>
-
-@* Company Remove Confirmation Modal *@
-<div class="modal fade" id="removeCompanyModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Er du sikker på du vil slette dette opslag?</h5>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-info" data-dismiss="modal" @onclick="@(() => OnClick_CancelRemove(true))">Annuller</button>
-                <button type="button" class="btn btn-danger" @onclick="@(() => OnClick_RemoveCompanyById(true, RemoveCompanyConfirmationId))">Slet Virksomhed</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-@* Company Create New Modal *@
-<div class="modal fade" id="companyModalCreateNew" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-        <div class="modal-content">
-
-            <EditForm Model="CompanyModel" OnValidSubmit="OnValidSubmit_CreateCompany">
-
-                <div class="modal-header">
-                    <h5 class="modal-title">Opret ny Virksomhed</h5>
-                </div>
-
-                @if (!string.IsNullOrEmpty(SystemMessage))
-                {
-                    <div class="container-fluid">
-                        <div class="alert alert-info">
-                            <div class="d-flex align-items-center">
-
-                                <span>@SystemMessage</span>
-
-                                @if (IsProcessing)
-                                {
-                                    <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
-                                }
-                                else if (!IsProcessing && IsSuccess)
-                                {
-                                    <div class="ml-auto"><i class="fas fa-check"></i></div>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                }
-
-                <div class="modal-body">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="regInputCompanyIdentity" class="admin-label col-form-label col-form-label-sm">Virksomhedens CVR : <span class="font-italic small" style="color: lightcoral;">*Ændring af CVR efter oprettelse kan muligvis skabe problemer.</span></label>
-                            <input id="regInputCompanyIdentity" type="number" class="form-control form-control-sm" placeholder="Indtast CVR nr." @bind="CompanyModel.CVR" />
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="regInputName" class="admin-label col-form-label col-form-label-sm">Virksomhedens Navn :</label>
-                            <input id="regInputName" type="text" class="form-control form-control-sm" placeholder="Indtast virksomhedens navn.." @bind="CompanyModel.Name" />
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="regInputCompanyUrl" class="admin-label col-form-label col-form-label-sm">Link til Virksomhedens hjemmeside :</label>
-                            <input id="regInputCompanyUrl" type="text" class="form-control form-control-sm" placeholder="Indtast link til virksomhedens hjemmeside.." @bind="CompanyModel.URL" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Annuller</button>
-                    <button type="submit" class="btn btn-info" disabled="@IsProcessing">Opret Virksomhed</button>
-                </div>
-
-            </EditForm>
-
-        </div>
-    </div>
-</div>
+<RemoveCompanyModal CompanyId="CompanyId" />
 
 @code {
     [Inject]
@@ -225,97 +75,51 @@ else
     [Inject]
     protected IJSRuntime JSRuntime { get; set; }
 
-    public List<Company> Companies { get; set; } = new List<Company>();
-    public Company CompanyDetails { get; set; } = new Company();
-    public CompanyModel CompanyModel { get; set; } = new CompanyModel();
+    [Inject]
+    protected IRefresh RefreshService { get; set; }
 
-    public int RemoveCompanyConfirmationId { get; set; }
-    public string SystemMessage { get; set; } = string.Empty;
-    public bool IsProcessing { get; set; } = false;
-    public bool IsSuccess { get; set; } = false;
+    public List<Company> Companies { get; set; } = new List<Company>();
+
+    private CompanyModel Model { get; set; } = new CompanyModel();
+    private int CompanyId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         Companies = await DataService.GetAllCompanies();
+
+        RefreshService.RefreshRequest += UpdateContentAsync;
     }
 
-    private async void OnClick_EditCompanyById(int id)
+    private async void UpdateContentAsync()
     {
-        CompanyDetails = await DataService.GetCompanyById(id);
-    }
-
-    private async void OnValidSubmit_UpdateCompany()
-    {
-        IsSuccess = false;
-        IsProcessing = true;
-        SystemMessage = "Vent venligst..";
-
-        AdminService.UpdateCompany(CompanyDetails);
-
-        IsSuccess = true;
-        IsProcessing = false;
-        SystemMessage = "Virksomhed blev opdateret!";
-
-        SystemMessage = string.Empty;
-
-        Companies = await DataService.GetAllCompanies();
-
-        await JSRuntime.InvokeVoidAsync("modalToggle", "companyDetailsModal");
-        await JSRuntime.InvokeVoidAsync("OnInformationChangeAnimation", $"{CompanyDetails.Id}");
-    }
-
-    private async void OnValidSubmit_CreateCompany()
-    {
-        IsSuccess = false;
-        IsProcessing = true;
-        SystemMessage = "Vent venligst..";
-
-        AdminService.CreateCompany(CompanyModel);
-
-        IsSuccess = true;
-        IsProcessing = false;
-        SystemMessage = "Virksomhed blev oprettet!";
-
-        SystemMessage = string.Empty;
-
-        Companies = await DataService.GetAllCompanies();
-
-        await JSRuntime.InvokeVoidAsync("modalToggle", "companyModalCreateNew");
-    }
-
-    private async void OnClick_RemoveCompanyById(bool confirmation, int id)
-    {
-        if (confirmation)
+        try
         {
-            if (id != 0)
-            {
-                await JSRuntime.InvokeVoidAsync("confirmRemove", "removeCompanyModal");
-
-                AdminService.RemoveCompanyById(id);
-
-                await InvokeAsync(async () =>
-                {
-                    Companies = await DataService.GetAllCompanies();
-
-                    StateHasChanged();
-                });
-            }
+            if (DataService.GetAllCompanies() != null)
+                Companies = await DataService.GetAllCompanies();
+            else
+                Companies = null;
         }
-
-        RemoveCompanyConfirmationId = 0;
-        await Task.FromResult(confirmation);
+        finally
+        {
+            StateHasChanged();
+        }
     }
 
-    private void OnClick_CancelRemove(bool cancelation)
+    private async void OnClick_OpenEditModal(int id)
     {
-        if (cancelation)
-            JSRuntime.InvokeVoidAsync("confirmRemove", "removeCompanyModal");
+        var company = await DataService.GetCompanyById(id);
 
-        RemoveCompanyConfirmationId = 0;
+        Model = new CompanyModel()
+        {
+            Id = company.Id,
+            CVR = company.CVR,
+            Name = company.Name,
+            URL = company.URL
+        };
     }
 
-    private void StoreCompanyId(int id)
+    private void OnClick_RemoveCompanyModal(int id)
     {
-        RemoveCompanyConfirmationId = id;
+        CompanyId = id;
     }
 }

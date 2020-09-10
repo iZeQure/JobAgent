@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JobAgent.Data.Interfaces
 {
-    interface IFileUpload
+    public interface IFileUpload
     {
         Task<bool> UploadFileAsync(IFileListEntry file);
     }
