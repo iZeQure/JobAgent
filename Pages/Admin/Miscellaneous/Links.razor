@@ -1,5 +1,7 @@
 ﻿@page "/admin/miscellaneous/links"
 
+@attribute [Authorize]
+
 <div class="d-flex">
     <PageDisplayName DisplayName="Links til Web Crawleren" />
     <div class="d-inline-block">
@@ -11,9 +13,8 @@
 
 @if (SourceLinks == null || SourceLinks.Count == 0)
 {
-    <MessageAlert 
-                  Alert="MessageAlert.AlertType.System"
-                  Message="Der blev ikke fundet nogen links." 
+    <MessageAlert Alert="MessageAlert.AlertType.System"
+                  Message="Der blev ikke fundet nogen links."
                   MessageOptional="Opret links, ved at trykke på knappen : Opret nyt Link." />
 }
 else

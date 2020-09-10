@@ -1,4 +1,5 @@
 ﻿@inject JobService JobService
+@inject DataService DataService 
 
 @if (JobCategories.Any() || JobCategories != null)
 {
@@ -10,7 +11,7 @@
             {
                 <div class="dropdown py-1 px-2">
                     <a id="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu" class="dropdown-toggle btn btn-link btn-sm @MenuColor text-wrap text-left cursor-pointer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        @JobCategories[i].Name
+                        @JobCategories[i].Name <span class="badge badge-info">@GetCategoryCount(JobCategories[i].Specializations.Select(x => x.CategoryId).First()).Result</span>
                     </a>
 
                     <div class="dropdown-menu" aria-labelledby="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu">
@@ -29,7 +30,7 @@
                         {
                             // Link : {domain}/job/CategoryId/CategoryName/SpecializationId/SpecializationName
                             <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].Id/@JobCategories[i].Name/@JobCategories[i].Specializations[j].Id/@JobCategories[i].Specializations[j].Name">
-                                @JobCategories[i].Specializations[j].Name
+                                @JobCategories[i].Specializations[j].Name <span class="badge badge-info">@GetSpecializationCount(JobCategories[i].Specializations[j].Id).Result</span>
                             </a>
                         }
                     </div>
@@ -40,7 +41,7 @@
                 <div class="py-1 px-2">
                     @* Link : {domain}/job/CategoryId/CategoryName *@
                     <a class="btn btn-link btn-sm @MenuColor text-wrap text-left" href="/job/@JobCategories[i].Id/@JobCategories[i].Name">
-                        @JobCategories[i].Name
+                        @JobCategories[i].Name <span class="badge badge-info">@GetCategoryCount(JobCategories[i].Id).Result</span>
                     </a>
                 </div>
             }
@@ -89,6 +90,16 @@ else
             Console.WriteLine($"Job Menu Exception : {e.Message} - {e}");
             SystemMessage = "Kunne ikke indlæse menu, prøv og indlæs igen.";
         }
+    }
+
+    protected async Task<int> GetCategoryCount(int id)
+    {
+        return await DataService.GetCountOfJobAdvertsByCategory(id);
+    }
+
+    protected async Task<int> GetSpecializationCount(int id)
+    {
+        return await DataService.GetCountOfJobAdvertsBySpecializationId(id);
     }
 
     protected string RemoveWhitespace(string input)

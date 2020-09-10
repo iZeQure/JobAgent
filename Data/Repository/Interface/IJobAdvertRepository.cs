@@ -12,5 +12,9 @@ namespace JobAgent.Data.Repository.Interface
         public IEnumerable<JobVacanciesAdminModel> GetAllJobAdvertsForAdmins();
 
         public JobVacanciesAdminModel GetJobAdvertDetailsForAdminsById(int id);
+
+        public Task<int> GetCountOfJobAdvertsByCategoryId(int id);
+
+        public Task<int> GetCountOfJobAdvertsBySpecializationId(int id);
     }
 }

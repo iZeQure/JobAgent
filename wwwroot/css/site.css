@@ -212,6 +212,16 @@ ul.validation-errors {
 }
 
 /*
+    ## Vacancy Styling ##
+*/
+
+.vacancy-detais-icon {
+    color: #17a2b8;
+    font-size: 1rem;
+    vertical-align: middle;
+}
+
+/*
     ## Custom File Input
 */
 

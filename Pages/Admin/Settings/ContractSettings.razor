@@ -4,6 +4,7 @@
 @inject DataService DService
 @inject IFileUpload FileService
 @inject IJSRuntime JSRuntime
+@inject IRefresh RefreshService  
 
 @inherits ComponentBase
 
@@ -39,6 +40,7 @@ else
                     <th scope="col">Kontrakt Oprettet</th>
                     <th scope="col">Udløbsdato</th>
                     <th scope="col"></th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
@@ -69,6 +71,11 @@ else
                                 <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne kontrakt." Color="Popover.PopoverType.Info" />
                             </span>
                         </td>
+                        <td>
+                            <span data-toggle="modal" data-target="#RemoveContractModal" @onclick="@(mouseEvent => OnClick_StoreContractId(contract.Id))">
+                                <Popover Title="Forsigtig!" Body="Denne knap sletter den valgte kontrakt, forevigt!" Color="Popover.PopoverType.Danger" />
+                            </span>
+                        </td>
                     </tr>
                 }
 
@@ -76,6 +83,8 @@ else
         </table>
     </div>
 }
+
+<RemoveContractModal ContractId="ContractId" />
 
 @* Contract Modal *@
 <div class="modal fade" id="contractModal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -348,6 +357,8 @@ else
 
     public Contract ContractDetails = new Contract() { Company = new Company(), SignedByUserId = new User() };
 
+    public int ContractId { get; set; }
+
     public string UncServerPath { get; protected set; } = @"\\JOB-AGENT\contracts\";
     public string ContractPath { get; set; } = string.Empty;
     public string TempContractPath { get; set; } = string.Empty;
@@ -361,9 +372,26 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        RefreshService.RefreshRequest += RefreshContent;
+
         GetContracts = await AService.GetContracts();
         GetCompanies = await DService.GetAllCompanies();
         GetUsers = await DService.GetUsers();
+    }
+
+    private async void RefreshContent()
+    {
+        try
+        {
+            if (AService.GetContracts() != null)
+                GetContracts = await AService.GetContracts();
+            else
+                GetContracts = null;
+        }
+        finally
+        {
+            StateHasChanged();
+        }
     }
 
     private string GetLocationPath(string fileName)
@@ -398,6 +426,11 @@ else
         {
             throw;
         }
+    }
+
+    private void OnClick_StoreContractId(int id)
+    {
+        ContractId = id;
     }
 
     private void OnClickOpen_Contract(string path)

@@ -10,6 +10,7 @@ namespace JobAgent.Services
 {
     public class DataService
     {
+        private protected IRepository<JobAdvert> JobAdvertRepository { get; }
         private protected IRepository<User> UserRepository { get; }
         private protected IRepository<ConsultantArea> ConsultantAreaRepository { get; }
         private protected IRepository<Location> LocationRepository { get; }
@@ -19,12 +20,23 @@ namespace JobAgent.Services
 
         public DataService()
         {
+            JobAdvertRepository = new JobAdvertRepository();
             UserRepository = new UserRepository();
             ConsultantAreaRepository = new ConsultantAreaRepository();
             LocationRepository = new LocationRepository();
             CategoryRepository = new CategoryRepository();
             CompanyRepository = new CompanyRepository();
             SourceLinkRepository = new SourceLinkRepository();
+        }
+
+        public Task<int> GetCountOfJobAdvertsByCategory(int id)
+        {
+            return ((IJobAdvertRepository)JobAdvertRepository).GetCountOfJobAdvertsByCategoryId(id);
+        }
+
+        public Task<int> GetCountOfJobAdvertsBySpecializationId(int id)
+        {
+            return ((IJobAdvertRepository)JobAdvertRepository).GetCountOfJobAdvertsBySpecializationId(id);
         }
 
         public Task<List<ConsultantArea>> GetAllConsultantAreasTask()

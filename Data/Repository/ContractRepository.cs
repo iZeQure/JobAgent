@@ -187,7 +187,26 @@ namespace JobAgent.Data.Repository
         /// <param name="id"></param>
         public void Remove(int id)
         {
-            throw new NotImplementedException();
+            using SqlCommand c = new SqlCommand()
+            {
+                CommandText = "RemoveContract",
+                CommandTimeout = 15,
+                CommandType = CommandType.StoredProcedure,
+                Connection = Database.Instance.SqlConnection
+            };
+
+            c.Parameters.AddWithValue("@id", id);
+
+            try
+            {
+                Database.Instance.OpenConnection();
+
+                c.ExecuteNonQuery();
+            }
+            finally
+            {
+                Database.Instance.CloseConnection();
+            }
         }
 
         /// <summary>

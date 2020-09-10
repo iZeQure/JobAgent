@@ -77,6 +77,7 @@ namespace JobAgent.Data.Repository
                         JobLocation = reader.GetString("JobLocation"),
                         JobRegisteredDate = reader.GetDateTime("JobRegisteredDate"),
                         DeadlineDate = reader.GetDateTime("DeadlineDate"),
+                        SourceURL = reader.GetString("SourceURL"),
                         Company = new Company()
                         {
                             Id = reader.GetInt32("CompanyId"),
@@ -297,6 +298,80 @@ namespace JobAgent.Data.Repository
 
             // Close connection to db.
             Database.Instance.CloseConnection();
+        }
+
+        public Task<int> GetCountOfJobAdvertsByCategoryId(int id)
+        {
+            int count = 0;
+
+            // Initialize command obj.
+            using SqlCommand c = new SqlCommand()
+            {
+                CommandText = $"SELECT COUNT([CategoryId]) AS 'CategoryCount' FROM [JobAdvert] WHERE [CategoryId] = @id",
+                CommandType = CommandType.Text,
+                CommandTimeout = 15,
+                Connection = Database.Instance.SqlConnection
+            };
+
+            c.Parameters.AddWithValue("@id", id);
+
+            try
+            {
+                Database.Instance.OpenConnection();
+
+                using SqlDataReader r = c.ExecuteReader();
+
+                if (r.HasRows)
+                {
+                    while (r.Read())
+                    {
+                        count = r.GetInt32(0);
+                    }
+                }
+            }
+            finally
+            {
+                Database.Instance.CloseConnection();
+            }
+
+            return Task.FromResult(count);
+        }
+
+        public Task<int> GetCountOfJobAdvertsBySpecializationId(int id)
+        {
+            int count = 0;
+
+            // Initialize command obj.
+            using SqlCommand c = new SqlCommand()
+            {
+                CommandText = $"SELECT COUNT([SpecializationId]) AS 'SpecialCount' FROM [JobAdvert] WHERE [SpecializationId] = @id",
+                CommandType = CommandType.Text,
+                CommandTimeout = 15,
+                Connection = Database.Instance.SqlConnection
+            };
+
+            c.Parameters.AddWithValue("@id", id);
+
+            try
+            {
+                Database.Instance.OpenConnection();
+
+                using SqlDataReader r = c.ExecuteReader();
+
+                if (r.HasRows)
+                {
+                    while (r.Read())
+                    {
+                        count = r.GetInt32(0);
+                    }
+                }
+            }
+            finally
+            {
+                Database.Instance.CloseConnection();
+            }
+
+            return Task.FromResult(count);
         }
     }
 }

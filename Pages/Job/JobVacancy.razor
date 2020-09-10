@@ -53,7 +53,7 @@ else
     [Parameter]
     public string SpecializationName { get; set; }
 
-    JobAdvert jobAdvert = new JobAdvert();
+    JobAdvert jobAdvert = new JobAdvert() { Company = new Company(), Category = new Category(), Specialization = new Specialization() };
 
     List<JobAdvert> jobAdverts = new List<JobAdvert>();
 

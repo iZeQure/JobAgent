@@ -157,6 +157,11 @@ namespace JobAgent.Services
             return Task.FromResult(true);
         }
 
+        public void RemoveContract(int id)
+        {
+            ContractRepository.Remove(id);
+        }
+
         public Task<List<Contract>> GetContracts()
         {
             return Task.FromResult(ContractRepository.GetAll().ToList());
