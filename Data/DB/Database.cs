@@ -17,12 +17,12 @@ namespace JobAgent.Data.DB
         {
             try
             {
-                if (string.IsNullOrEmpty(SqlConnection.ConnectionString))
+                SqlConnection = new SqlConnection
                 {
-                    SqlConnection.ConnectionString = "Server=10.108.48.72\\SQLJOBAGENT,2009;Database=JobAgentDB; User Id=sa; Password=PaSSw0rd;";
-                    //SqlConnection.ConnectionString = "Server=GFUEL\\DEVSQLSERVER; Database=JobAgentDB; Integrated Security=true;";
+                    //SqlConnection.ConnectionString = "Server=10.108.48.72\\SQLJOBAGENT,2009;Database=JobAgentDB; User Id=sa; Password=PaSSw0rd;";
+                    ConnectionString = "Server=GFUEL\\DEVSQLSERVER; Database=JobAgentDB; Integrated Security=true;"
                     //SqlConnection.ConnectionString = "Server=VIOLURREOT\\DEVELOPMENT; Database=JobAgentDB; Integrated Security=true;";
-                }
+                };
             }
             catch (Exception e)
             {
@@ -40,6 +40,8 @@ namespace JobAgent.Data.DB
         public SqlConnection SqlConnection { get { return sqlConnection; } private set { sqlConnection = value; } }
 
         public static Database Instance { get { if (instance == null) instance = new Database(); return instance; } }
+
+        public IConfiguration Configuration { get; set; }
         #endregion        
 
         public void OpenConnection()

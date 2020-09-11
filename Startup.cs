@@ -27,6 +27,8 @@ namespace JobAgent
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            Database.Instance.Configuration = Configuration;
         }
 
         public IConfiguration Configuration { get; }
