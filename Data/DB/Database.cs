@@ -13,17 +13,10 @@ namespace JobAgent.Data.DB
     public class Database : IDatabase
     {
         #region Constructors
-        public Database(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
         public Database()
         {
             try
             {
-                SqlConnection = new SqlConnection(Configuration.GetConnectionString("DevDB"));
-
                 if (string.IsNullOrEmpty(SqlConnection.ConnectionString))
                 {
                     //SqlConnection.ConnectionString = "Server=10.108.48.72\\SQLJOBAGENT,2009;Database=JobAgentDB; User Id=sa; Password=PaSSw0rd;";
@@ -47,8 +40,6 @@ namespace JobAgent.Data.DB
         public SqlConnection SqlConnection { get { return sqlConnection; } private set { sqlConnection = value; } }
 
         public static Database Instance { get { if (instance == null) instance = new Database(); return instance; } }
-
-        public IConfiguration Configuration { get; set; }
         #endregion        
 
         public void OpenConnection()

@@ -10,7 +10,7 @@ using JobAgent.Data.Repository.Interface;
 
 namespace JobAgent.Data.Repository
 {
-    public class SourceLinkRepository : ISourceLinkRepository
+    public class SourceLinkRepository : ISourceLinkRepository<SourceLink>
     {
         /// <summary>
         /// Create new source link.

@@ -11,6 +11,8 @@ namespace JobAgent.Models
         private DateTime registrationDateTime = DateTime.UtcNow;
         private DateTime expiryDate;
 
+        public int Id { get; set; }
+
         [Required]
         public string ContactPerson { get; set; } = string.Empty;
 

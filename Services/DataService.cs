@@ -16,7 +16,7 @@ namespace JobAgent.Services
         private protected IRepository<Location> LocationRepository { get; }
         private protected IRepository<Category> CategoryRepository { get; }
         private protected IRepository<Company> CompanyRepository { get; }
-        private protected ISourceLinkRepository SourceLinkRepository { get; set; }
+        private protected ISourceLinkRepository<SourceLink> SourceLinkRepository { get; set; }
 
         public DataService()
         {
@@ -55,7 +55,7 @@ namespace JobAgent.Services
         }
         public Task<List<Specialization>> GetAllSpecializations()
         {
-            return Task.FromResult(((ISpecializationRepository)CategoryRepository).GetAllSpecializations());
+            return Task.FromResult(((ISpecializationRepository<Specialization>)CategoryRepository).GetAllSpecializations());
         }
 
         public Task<List<Company>> GetAllCompanies()

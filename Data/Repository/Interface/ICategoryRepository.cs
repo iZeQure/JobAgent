@@ -6,7 +6,7 @@ using JobAgent.Data.Objects;
 
 namespace JobAgent.Data.Repository.Interface
 {
-    interface ICategoryRepository : IRepository<Category>, ISpecializationRepository
+    interface ICategoryRepository : IRepository<Category>, ISpecializationRepository<Specialization>
     {
         /// <summary>
         /// Get all categories with specializations bound to.

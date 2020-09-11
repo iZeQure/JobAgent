@@ -47,7 +47,7 @@ else
                         @if (!string.IsNullOrEmpty(contract.ContractName))
                         {
                             <td>
-                                <span @onclick="@(mouseClickEvent => OnClickOpen_Contract(GetLocationPath(contract.ContractName)))" class="table-icons" data-toggle="modal" data-target="#contractModal">
+                                <span @onclick="@(mouseClickEvent => OnClick_ShowContractModal(contract.ContractName))" class="table-icons" data-toggle="modal" data-target="#ShowContractModal">
                                     <i class="fas fa-file-invoice"></i>
                                 </span>
                             </td>
@@ -59,12 +59,12 @@ else
                         <td>@(contract.RegistrationDate.ToString("D"))</td>
                         <td>@(contract.ExpiryDate.ToString("D"))</td>
                         <td>
-                            <span @onclick="(id => OnClickEdit_GetContractDetailsById(contract.Id))" data-toggle="modal" data-target="#EditContractModal">
+                            <span @onclick="(id => OnClick_OpenEditModal(contract.Id))" data-toggle="modal" data-target="#EditContractModal">
                                 <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne kontrakt." Color="Popover.PopoverType.Info" />
                             </span>
                         </td>
                         <td>
-                            <span data-toggle="modal" data-target="#RemoveContractModal" @onclick="@(mouseEvent => OnClick_StoreContractId(contract.Id))">
+                            <span @onclick="@(mouseEvent => OnClick_RemoveContractModal(contract.Id))" data-toggle="modal" data-target="#RemoveContractModal">
                                 <Popover Title="Forsigtig!" Body="Denne knap sletter den valgte kontrakt, forevigt!" Color="Popover.PopoverType.Danger" />
                             </span>
                         </td>
@@ -78,40 +78,11 @@ else
 
 <CreateContractModal />
 
+<EditContractModal ContractModel="ContractModel" />
+
 <RemoveContractModal ContractId="ContractId" />
 
-@* Contract Modal *@
-<div class="modal fade" id="contractModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Kontrakt</h5>
-            </div>
-
-            <div class="modal-body">
-                @if (!string.IsNullOrEmpty(ErrorMessage))
-                {
-                    <div class="container-fluid">
-                        <div class="alert alert-danger" role="alert">
-                            @(ErrorMessage)
-                        </div>
-                    </div>
-                }
-
-                <div class="container-fluid justify-content-center">
-                    <div class="embed-responsive embed-responsive-16by9">
-                        <iframe src="data:application/pdf;base64,@(ContractPath)" class="embed-responsive-item" lang="da" title="Kontrakt Information" frameborder="1" allowtransparency="true"></iframe>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-info" data-dismiss="modal">Luk kontrakt</button>
-            </div>
-        </div>
-    </div>
-</div>
-
+<ShowContractModal ContractName="@ContractName" />
 
 @code {
     [Inject]
@@ -120,24 +91,15 @@ else
     [Inject]
     protected AdminService AdminService { get; set; }
 
-    public ContractModel ContractModel { get; set; } = new ContractModel();
-
     public List<Contract> GetContracts { get; set; } = new List<Contract>();
 
-    public Contract ContractDetails = new Contract() { Company = new Company(), SignedByUserId = new User() };
+    private ContractModel ContractModel { get; set; } = new ContractModel();
 
-    public int ContractId { get; set; }
+    private int ContractId { get; set; }
 
-    public string UncServerPath { get; protected set; } = @"\\JOB-AGENT\contracts\";
-    public string ContractPath { get; set; } = string.Empty;
-    public string TempContractPath { get; set; } = string.Empty;
-    public string ErrorMessage { get; set; } = string.Empty;
-    public string MessageAlert { get; set; } = string.Empty;
+    private string ContractName { get; set; }
 
-    public bool IsProcessing { get; set; } = false;
-    public bool IsSuccess { get; set; } = false;
-
-    private IFileListEntry file;
+    private bool Validation { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -161,133 +123,29 @@ else
         }
     }
 
-    private string GetLocationPath(string fileName)
-    {
-        try
-        {
-            var pdfFiles = Directory.EnumerateFiles(UncServerPath, "*.pdf");
-
-            foreach (string currentFile in pdfFiles)
-            {
-                if (currentFile.Contains(fileName))
-                {
-                    Byte[] bytes = File.ReadAllBytes(currentFile);
-
-                    return Convert.ToBase64String(bytes);
-                }
-            }
-
-            return string.Empty;
-        }
-        catch (IOException)
-        {
-            ErrorMessage = "Kunne ikke bekræfte legitimationsoplysninger.";
-            return string.Empty;
-        }
-        catch (UnauthorizedAccessException)
-        {
-            ErrorMessage = $"Adgang nægtet.";
-            return string.Empty;
-        }
-        catch (Exception)
-        {
-            throw;
-        }
-    }
-
-    private void OnClick_StoreContractId(int id)
+    private void OnClick_RemoveContractModal(int id)
     {
         ContractId = id;
     }
 
-    private void OnClickOpen_Contract(string path)
+    private void OnClick_ShowContractModal(string name)
     {
-        ContractPath = path;
+        ContractName = name;
     }
 
-    private void OnDateChange_Registered(DateTime args)
+    private async void OnClick_OpenEditModal(int contractId)
     {
-        ContractDetails.RegistrationDate = args;
-        StateHasChanged();
-    }
+        var contract = await AdminService.GetContractById(contractId);
 
-    private void OnDateChange_Expiry(DateTime args)
-    {
-        ContractDetails.ExpiryDate = args;
-        StateHasChanged();
-    }
-
-
-
-    private void ResetCreateContract()
-    {
-        ContractModel = new ContractModel();
-    }
-
-    private void ResetContractDetails()
-    {
-        ContractDetails = new Contract() { Company = new Company(), SignedByUserId = new User() };
-    }
-
-    private async void OnClickEdit_GetContractDetailsById(int contractId)
-    {
-        ContractDetails = await AService.GetContractById(contractId);
-    }
-
-    private async Task OnValidSubmit_UpdateContract()
-    {
-        IsProcessing = true;
-        MessageAlert = "Vent venligst..";
-
-        await AService.UpdateContract(ContractDetails);
-
-        IsSuccess = true;
-        IsProcessing = false;
-        MessageAlert = "Virksomhed blev opdateret!";
-
-        MessageAlert = string.Empty;
-
-        GetContracts = await AService.GetContracts();
-
-        await JSRuntime.InvokeVoidAsync("modalToggle", "contractDetails");
-        await JSRuntime.InvokeVoidAsync("OnInformationChangeAnimation", $"{ContractDetails.Id}");
-    }
-
-    private async Task OnValidSubmit_CreateContract()
-    {
-        IsProcessing = true;
-
-        if (file != null)
+        ContractModel = new ContractModel()
         {
-            try
-            {
-                await AService.CreateContract(ContractModel);
-
-                await InvokeAsync(async () =>
-                {
-                    GetContracts = await AService.GetContracts();
-
-                    await JSRuntime.InvokeVoidAsync("modalToggle", "contractModalCreateNew");
-
-                    StateHasChanged();
-                });
-
-                ContractModel = new ContractModel();
-                file = null;
-            }
-            catch (Exception e)
-            {
-                MessageAlert = $"Kunne ikke oploade kontrakt..";
-                Console.WriteLine(e.Message);
-            }
-        }
-        else
-        {
-            MessageAlert = $"Vælg venligst en kontrakt!";
-        }
-
-        IsProcessing = false;
+            Id = contract.Id,
+            SignedWithCompany = contract.Company.Id,
+            SignedByUser = contract.SignedByUserId.Id,
+            ContactPerson = contract.ContactPerson,
+            ContractFileName = contract.ContractName,
+            RegistrationDate = contract.RegistrationDate,
+            ExpiryDate = contract.ExpiryDate
+        };
     }
-
-
 }

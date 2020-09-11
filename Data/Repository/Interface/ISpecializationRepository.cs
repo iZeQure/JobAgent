@@ -6,20 +6,20 @@ using System.Threading.Tasks;
 
 namespace JobAgent.Data.Repository.Interface
 {
-    interface ISpecializationRepository
+    public interface ISpecializationRepository<T> where T : BaseEntity
     {
         /// <summary>
         /// Create new category specialization.
         /// </summary>
         /// <param name="create">Used to indentify the specialization information.</param>
         /// <param name="categoryId">Used to specify the category, the specialization is owned by.</param>
-        void CreateSpecialization(Specialization create, int categoryId);
+        void CreateSpecialization(T create, int categoryId);
 
         /// <summary>
         /// Update an existing category specialization.
         /// </summary>
         /// <param name="update">Used to define the fields that needs an update - Leave empty if no new content.</param>
-        void UpdateSpecialization(Specialization update);
+        void UpdateSpecialization(T update);
 
         /// <summary>
         /// Remove an existing category specialization.
@@ -32,13 +32,13 @@ namespace JobAgent.Data.Repository.Interface
         /// </summary>
         /// <param name="categoryId">Used to identify the category that owns the specialization.</param>
         /// <param name="specializationId">Used to indicate the specialization to return.</param>
-        /// <returns>Returns <see cref="Specialization"/></returns>
-        Specialization GetSpecializationById(int id);
+        /// <returns>Returns <see cref="T"/></returns>
+        T GetSpecializationById(int id);
 
         /// <summary>
         /// Get all category specializations.
         /// </summary>
-        /// <returns>Returns a list of <see cref="Specialization"/></returns>
-        List<Specialization> GetAllSpecializations();
+        /// <returns>Returns a list of <see cref="T"/></returns>
+        List<T> GetAllSpecializations();
     }
 }

@@ -159,9 +159,25 @@ namespace JobAgent.Services
             return Task.FromResult(true);
         }
 
-        public Task<bool> UpdateContract(Contract contract)
+        public Task<bool> UpdateContract(ContractModel model)
         {
-            ContractRepository.Update(contract);
+            ContractRepository.Update(
+                new Contract()
+                {
+                    Id = model.Id,
+                    Company = new Company()
+                    {
+                        Id = model.SignedWithCompany
+                    },
+                    SignedByUserId = new User()
+                    {
+                        Id = model.SignedByUser
+                    },
+                    ContactPerson = model.ContactPerson,
+                    ContractName = model.ContractFileName,
+                    RegistrationDate = model.RegistrationDate,
+                    ExpiryDate = model.ExpiryDate
+                });
 
             return Task.FromResult(true);
         }

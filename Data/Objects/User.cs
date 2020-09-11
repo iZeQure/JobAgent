@@ -12,7 +12,6 @@ namespace JobAgent.Data.Objects
         private string lastName;
         private string email;
         private string password;
-        private string confirmPassword;
         private string salt;
         private ConsultantArea consultantArea;
         private Location location;
@@ -44,7 +43,6 @@ namespace JobAgent.Data.Objects
         public string Email { get { return email; } set { email = value; } }
 
         public string Password { get { return password; } set { password = value;} }
-        public string ConfirmPassword { get { return confirmPassword; } set { confirmPassword = value; } }
         public string Salt { get { return salt; } set { salt = value; } }
         public ConsultantArea ConsultantArea { get { return consultantArea; } set { consultantArea = value; } }
         public Location Location { get { return location; } set { location = value; } }

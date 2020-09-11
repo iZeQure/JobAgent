@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace JobAgent.Data.Repository.Interface
 {
-    interface ISourceLinkRepository
+    interface ISourceLinkRepository<T> where T : BaseEntity
     {
-        Task<bool> Create(SourceLink obj);
-        Task<bool> Update(SourceLink obj);
+        Task<bool> Create(T obj);
+        Task<bool> Update(T obj);
         Task<bool> Remove(int id);
-        Task<SourceLink> GetById(int id);
-        Task<IEnumerable<SourceLink>> GetAll();
+        Task<T> GetById(int id);
+        Task<IEnumerable<T>> GetAll();
     }
 }

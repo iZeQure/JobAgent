@@ -106,6 +106,9 @@
     [Inject]
     protected AdminService AdminService { get; set; }
 
+    [Inject]
+    protected DataService DataService { get; set; }
+
     protected private ContractModel ContractModel { get; set; } = new ContractModel();
     protected private List<User> Users { get; set; } = new List<User>();
     protected private List<Company> Companies { get; set; } = new List<Company>();
@@ -114,7 +117,14 @@
     private bool IsProcessing { get; set; } = false;
     private bool ShowError { get; set; } = false;
 
+    private string FileProgress { get; set; }
     private string ErrorMessage { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Companies = await DataService.GetAllCompanies();
+        Users = await DataService.GetUsers();
+    }
 
     private async void OnValidSubmit_CreateContract()
     {
@@ -125,12 +135,30 @@
         {
             try
             {
-                await InvokeAsync(() =>
+                if (FileProgress.Equals("Starting"))
                 {
-                    AdminService.CreateContract(ContractModel);
+                    ShowError = true;
+                    ErrorMessage = "Vent venligst.. behandler kontrakt.";
+                }
+                else if (!FileProgress.Equals("Starting"))
+                {
+                    if (FileProgress.Equals("Success"))
+                    {
+                        ShowError = false;
 
-                    ContractModel = new ContractModel();
-                });
+                        await InvokeAsync(() =>
+                        {
+                            AdminService.CreateContract(ContractModel);
+
+                            ContractModel = new ContractModel();
+                        });
+                    }
+                    else
+                    {
+                        ShowError = true;
+                        ErrorMessage = "Behandling af Kontrakt fejlede!";
+                    }
+                }
             }
             catch (Exception)
             {
@@ -149,6 +177,7 @@
     private async Task HandleFileSelected(IFileListEntry[] files)
     {
         ShowError = false;
+        FileProgress = "Starting";
         File = files.FirstOrDefault();
 
         if (File != null)
@@ -158,17 +187,21 @@
                 await FileService.UploadFileAsync(File);
 
                 ContractModel.ContractFileName = File.Name;
+
+                FileProgress = "Success";
             }
             catch (Exception)
             {
                 ErrorMessage = "Kunne ikke oploade fil.";
                 ShowError = true;
+                FileProgress = "Failed";
             }
         }
     }
 
     private void RemoveUploadedFile(MouseEventArgs e)
     {
+        FileProgress = string.Empty;
         File = null;
         ContractModel.ContractFileName = string.Empty;
     }

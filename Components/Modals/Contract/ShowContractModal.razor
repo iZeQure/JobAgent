@@ -1,0 +1,80 @@
+﻿@attribute [Authorize]
+
+<div class="modal fade" id="ShowContractModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Kontrakt</h5>
+            </div>
+
+            <div class="modal-body">
+
+                @if (!string.IsNullOrEmpty(ContractName))
+                {
+                    @if (ShowError)
+                    {
+                        <MessageAlert Alert="MessageAlert.AlertType.Error" Message="@ErrorMessage" />
+                    }
+
+                    @if (!ShowError)
+                    {
+                        <div class="container-fluid justify-content-center">
+                            <div class="embed-responsive embed-responsive-16by9">
+                                <iframe src="data:application/pdf;base64,@(ContractBase64String)" class="embed-responsive-item" lang="da" title="Kontrakt Information" frameborder="1" allowtransparency="true"></iframe>
+                            </div>
+                        </div>
+                    }
+                }
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" data-dismiss="modal">Luk kontrakt</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string ContractName { get; set; }
+
+    private bool ShowError { get; set; } = false;
+
+    private string ErrorMessage { get; set; } = string.Empty;
+    private string SharedServerPath { get; } = @"\\JOB-AGENT\contracts\";
+    private string ContractBase64String { get { return GetFullLocationOfContract(ContractName); } }
+
+    private string GetFullLocationOfContract(string contractName)
+    {
+        ShowError = false;
+
+        try
+        {
+            var pdfFiles = Directory.EnumerateFiles(SharedServerPath, "*.pdf");
+
+            foreach (string pdf in pdfFiles)
+            {
+                if (pdf.Contains(contractName))
+                {
+                    Byte[] bytes = File.ReadAllBytes(pdf);
+
+                    return Convert.ToBase64String(bytes);
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+        }
+        catch (Exception)
+        {
+            ShowError = true;
+            ErrorMessage = "Kunne ikke finde kontakt!";
+
+            return string.Empty;
+        }
+
+        return string.Empty;
+    }
+}
