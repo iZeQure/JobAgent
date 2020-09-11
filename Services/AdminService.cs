@@ -20,7 +20,7 @@ namespace JobAgent.Services
 
         private IRepository<Company> CompanyRepository { get; }
 
-        private ISourceLinkRepository SourceLinkRepository { get; }
+        private ISourceLinkRepository<SourceLink> SourceLinkRepository { get; }
 
         public AdminService()
         {
