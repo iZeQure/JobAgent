@@ -1,4 +1,4 @@
-﻿using JobAgent.Data.DB;
+﻿using JobAgent.Data.DataAccess;
 using JobAgent.Data.Objects;
 using JobAgent.Data.Repository.Interface;
 using System;
@@ -19,7 +19,7 @@ namespace JobAgent.Data.Repository
         public void Create(ConsultantArea create)
         {
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("CreateConsultantArea", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("CreateConsultantArea", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -30,7 +30,7 @@ namespace JobAgent.Data.Repository
             cmd.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.ReturnValue;
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Execute command.
             cmd.ExecuteNonQuery();
@@ -46,13 +46,13 @@ namespace JobAgent.Data.Repository
             List<ConsultantArea> tempConsultantAreas = new List<ConsultantArea>();
 
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("GetAllConsultantAreas", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("GetAllConsultantAreas", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialize data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
@@ -87,10 +87,10 @@ namespace JobAgent.Data.Repository
             ConsultantArea tempConsultantArea = new ConsultantArea();
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("GetConsultantAreaById", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("GetConsultantAreaById", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -134,7 +134,7 @@ namespace JobAgent.Data.Repository
             cmd.Parameters.AddWithValue("@id", id);
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Execute command, catch return code.
             cmd.ExecuteNonQuery();
@@ -147,7 +147,7 @@ namespace JobAgent.Data.Repository
         public void Update(ConsultantArea update)
         {
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("RemoveConsultantArea", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("RemoveConsultantArea", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -157,7 +157,7 @@ namespace JobAgent.Data.Repository
             cmd.Parameters.AddWithValue("@name", update.Name);
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Execute command, catch return code.
             cmd.ExecuteNonQuery();

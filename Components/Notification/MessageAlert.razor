@@ -2,13 +2,40 @@
 
 @if (!string.IsNullOrEmpty(Message))
 {
-    <div class="container-fluid">
+    <div class="@(Container)">
         @switch (Alert)
         {
             case AlertType.Info:
                 <div class="alert alert-info" role="alert">
-                    <h4 class="alert-heading">Information Besked!</h4>
-                    <p>@Message</p>
+                    <h4 class="alert-heading">Information!</h4>
+                    <div class="d-flex align-items-center">
+                        <span>@Message</span>
+
+                        @if (IsLoading)
+                        {
+                            <div class="spinner-border spinner-border-sm text-info ml-2" role="status"></div>
+                        }
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(MessageOptional))
+                    {
+                        <hr />
+                        <p class="mb-0">@MessageOptional</p>
+                    }
+                </div>
+                break;
+            case AlertType.Success:
+                <div class="alert alert-success" role="alert">
+                    <h4 class="alert-heading">Success!</h4>
+                    <div class="d-flex align-items-center">
+                        <span>@Message</span>
+
+                        @if (IsLoading)
+                        {
+                            <div class="spinner-border spinner-border-sm text-success ml-2" role="status"></div>
+                        }
+                    </div>
+
                     @if (!string.IsNullOrEmpty(MessageOptional))
                     {
                         <hr />
@@ -19,7 +46,15 @@
             case AlertType.Error:
                 <div class="alert alert-danger" role="alert">
                     <h4 class="alert-heading">Fejl Besked!</h4>
-                    <p>@Message</p>
+                    <div class="d-flex align-items-center">
+                        <span>@Message</span>
+
+                        @if (IsLoading)
+                        {
+                            <div class="spinner-border spinner-border-sm text-danger ml-2" role="status"></div>
+                        }
+                    </div>
+
                     @if (!string.IsNullOrEmpty(MessageOptional))
                     {
                         <hr />
@@ -27,10 +62,18 @@
                     }
                 </div>
                 break;
-            case AlertType.System:
+            case AlertType.Warning:
                 <div class="alert alert-warning" role="alert">
                     <h4 class="alert-heading">System Besked!</h4>
-                    <p>@Message</p>
+                    <div class="d-flex align-items-center">
+                        <span>@Message</span>
+
+                        @if (IsLoading)
+                        {
+                            <div class="spinner-border spinner-border-sm text-warning ml-2" role="status"></div>
+                        }
+                    </div>
+
                     @if (!string.IsNullOrEmpty(MessageOptional))
                     {
                         <hr />
@@ -49,19 +92,28 @@
     public string Message { get; set; } = string.Empty;
     [Parameter]
     public string MessageOptional { get; set; } = string.Empty;
-
     [Parameter]
     public AlertType Alert { get; set; }
+    [Parameter]
+    public bool IsLoading { get; set; } = false;
+    [Parameter]
+    public bool FullWidth { get; set; } = true;
+
+    public string Container
+    {
+        get
+        {
+            if (FullWidth)
+                return "container-fluid";
+            else
+                return "container";
+        }
+    }
 
     protected override void OnInitialized()
     {
         StateHasChanged();
     }
 
-    public enum AlertType
-    {
-        Info,
-        Error,
-        System
-    }
+    public enum AlertType { Info, Warning, Error, Success }
 }

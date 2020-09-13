@@ -4,7 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using JobAgent.Data.DB;
+using JobAgent.Data.DataAccess;
 using JobAgent.Data.Objects;
 using JobAgent.Data.Repository.Interface;
 
@@ -26,7 +26,7 @@ namespace JobAgent.Data.Repository
             {
                 CommandText = "CreateSourceLink",
                 CommandType = CommandType.StoredProcedure,
-                Connection = Database.Instance.SqlConnection
+                Connection = SqlDataAccess.Instance.SqlConnection
             };
 
             // Define paramters.
@@ -39,14 +39,14 @@ namespace JobAgent.Data.Repository
 
             try
             {
-                Database.Instance.OpenConnection();
+                SqlDataAccess.Instance.OpenConnection();
                 c.ExecuteNonQuery();
 
                 int.TryParse(c.Parameters["@output"].Value.ToString(), out output);
             }
             finally
             {
-                Database.Instance.CloseConnection();
+                SqlDataAccess.Instance.CloseConnection();
             }
 
             return CheckOutput(output);
@@ -66,14 +66,14 @@ namespace JobAgent.Data.Repository
             {
                 CommandText = "GetAllSourceLinks",
                 CommandType = CommandType.StoredProcedure,
-                Connection = Database.Instance.SqlConnection
+                Connection = SqlDataAccess.Instance.SqlConnection
             };
 
             c.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.Output;
 
             try
             {
-                Database.Instance.OpenConnection();
+                SqlDataAccess.Instance.OpenConnection();
 
                 // Initialzie data reader.
                 using SqlDataReader r = c.ExecuteReader();
@@ -101,7 +101,7 @@ namespace JobAgent.Data.Repository
             finally
             {
                 int.TryParse(c.Parameters["@output"].Value.ToString(), out output);
-                Database.Instance.CloseConnection();
+                SqlDataAccess.Instance.CloseConnection();
             }
 
             if (CheckOutput(output).Result)
@@ -125,7 +125,7 @@ namespace JobAgent.Data.Repository
             {
                 CommandText = "GetSourceLinkById",
                 CommandType = CommandType.StoredProcedure,
-                Connection = Database.Instance.SqlConnection
+                Connection = SqlDataAccess.Instance.SqlConnection
             };
 
             // Parameters.
@@ -135,7 +135,7 @@ namespace JobAgent.Data.Repository
 
             try
             {
-                Database.Instance.OpenConnection();
+                SqlDataAccess.Instance.OpenConnection();
 
                 // Initialize data reader.
                 using SqlDataReader r = c.ExecuteReader();
@@ -160,7 +160,7 @@ namespace JobAgent.Data.Repository
             finally
             {
                 int.TryParse(c.Parameters["@output"].Value.ToString(), out output);
-                Database.Instance.CloseConnection();
+                SqlDataAccess.Instance.CloseConnection();
             }
 
             if (CheckOutput(output).Result)
@@ -183,7 +183,7 @@ namespace JobAgent.Data.Repository
             {
                 CommandText = "RemoveSourceLink",
                 CommandType = CommandType.StoredProcedure,
-                Connection = Database.Instance.SqlConnection
+                Connection = SqlDataAccess.Instance.SqlConnection
             };
 
             // Parameters.
@@ -193,14 +193,14 @@ namespace JobAgent.Data.Repository
 
             try
             {
-                Database.Instance.OpenConnection();
+                SqlDataAccess.Instance.OpenConnection();
                 c.ExecuteNonQuery();
 
                 int.TryParse(c.Parameters["@output"].Value.ToString(), out output);
             }
             finally
             {
-                Database.Instance.CloseConnection();
+                SqlDataAccess.Instance.CloseConnection();
             }
 
             return CheckOutput(output);
@@ -220,7 +220,7 @@ namespace JobAgent.Data.Repository
             {
                 CommandText = "UpdateSourceLink",
                 CommandType = CommandType.StoredProcedure,
-                Connection = Database.Instance.SqlConnection
+                Connection = SqlDataAccess.Instance.SqlConnection
             };
 
             // Parameters.
@@ -232,14 +232,14 @@ namespace JobAgent.Data.Repository
 
             try
             {
-                Database.Instance.OpenConnection();
+                SqlDataAccess.Instance.OpenConnection();
                 c.ExecuteNonQuery();
 
                 int.TryParse(c.Parameters["@ouput"].Value.ToString(), out output);
             }
             finally
             {
-                Database.Instance.CloseConnection();
+                SqlDataAccess.Instance.CloseConnection();
             }
 
             return CheckOutput(output);

@@ -1,20 +1,10 @@
-﻿using JobAgent.Data.DB;
+﻿using JobAgent.Data.DataAccess;
 using JobAgent.Data.Objects;
 using JobAgent.Data.Repository.Interface;
-using JobAgent.Data.Security;
-using JobAgent.Models;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JobAgent.Data.Repository
 {
@@ -28,10 +18,10 @@ namespace JobAgent.Data.Repository
         public bool CheckUserExists(string email)
         {
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialzie command obj.
-            using SqlCommand cmd = new SqlCommand("CheckUserExists", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("CheckUserExists", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -57,7 +47,7 @@ namespace JobAgent.Data.Repository
         public void Create(User create)
         {
             // Initialzie command obj.
-            using SqlCommand cmd = new SqlCommand("CreateUser", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("CreateUser", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -73,7 +63,7 @@ namespace JobAgent.Data.Repository
             cmd.Parameters.AddWithValue("@locationId", create.Location.Id);
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Execute command.
             cmd.ExecuteNonQuery();
@@ -86,10 +76,10 @@ namespace JobAgent.Data.Repository
             {
                 CommandText = "GetAllUsers",
                 CommandType = CommandType.StoredProcedure,
-                Connection = Database.Instance.SqlConnection
+                Connection = SqlDataAccess.Instance.SqlConnection
             };
 
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialzie data reader.
             using SqlDataReader r = c.ExecuteReader();
@@ -133,10 +123,10 @@ namespace JobAgent.Data.Repository
             User tempUser = new User();
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialzie command obj.
-            using SqlCommand cmd = new SqlCommand("GetUserByEmail", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("GetUserByEmail", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -181,10 +171,10 @@ namespace JobAgent.Data.Repository
             User tempUser = new User();
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialzie command obj.
-            using SqlCommand cmd = new SqlCommand("GetUserByAccessToken", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("GetUserByAccessToken", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -237,10 +227,10 @@ namespace JobAgent.Data.Repository
         public string GetUserSaltByEmail(string email)
         {
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("GetUserSaltByEmail", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("GetUserSaltByEmail", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -271,10 +261,10 @@ namespace JobAgent.Data.Repository
             User tempUser = new User();
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("UserLogin", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("UserLogin", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -321,10 +311,10 @@ namespace JobAgent.Data.Repository
         public void Update(User update)
         {
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialzie command obj.
-            using SqlCommand cmd = new SqlCommand("UpdateUser", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("UpdateUser", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -349,10 +339,10 @@ namespace JobAgent.Data.Repository
         public bool ValidatePassword(string password)
         {
             // Open connection to datbase.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("ValidatePassword", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("ValidatePassword", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -378,10 +368,10 @@ namespace JobAgent.Data.Repository
         public void UpdateUserPassword(User authorization)
         {
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("UpdateUserPassword", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("UpdateUserPassword", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };

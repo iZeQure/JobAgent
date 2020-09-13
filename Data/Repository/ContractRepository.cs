@@ -1,4 +1,4 @@
-﻿using JobAgent.Data.DB;
+﻿using JobAgent.Data.DataAccess;
 using JobAgent.Data.Objects;
 using JobAgent.Data.Repository.Interface;
 using System;
@@ -25,7 +25,7 @@ namespace JobAgent.Data.Repository
             {
                 CommandText = "CreateContract",
                 CommandType = CommandType.StoredProcedure,
-                Connection = Database.Instance.SqlConnection
+                Connection = SqlDataAccess.Instance.SqlConnection
             };
 
             // Parameters.
@@ -37,7 +37,7 @@ namespace JobAgent.Data.Repository
             c.Parameters.AddWithValue("@companyId", create.Company.Id);
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             try
             {
@@ -45,7 +45,7 @@ namespace JobAgent.Data.Repository
             }
             finally
             {
-                Database.Instance.CloseConnection();
+                SqlDataAccess.Instance.CloseConnection();
             }
         }
 
@@ -56,11 +56,11 @@ namespace JobAgent.Data.Repository
             {
                 CommandText = "GetAllContracts",
                 CommandType = CommandType.StoredProcedure,
-                Connection = Database.Instance.SqlConnection
+                Connection = SqlDataAccess.Instance.SqlConnection
             };
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialzie data reader.
             using SqlDataReader r = c.ExecuteReader();
@@ -109,12 +109,12 @@ namespace JobAgent.Data.Repository
             {
                 CommandText = "GetContractById",
                 CommandType = CommandType.StoredProcedure,
-                Connection = Database.Instance.SqlConnection
+                Connection = SqlDataAccess.Instance.SqlConnection
             };
 
             c.Parameters.AddWithValue("@id", id);
 
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialzie data reader.
             using SqlDataReader r = c.ExecuteReader();
@@ -175,7 +175,7 @@ namespace JobAgent.Data.Repository
             }
             finally
             {
-                Database.Instance.CloseConnection();
+                SqlDataAccess.Instance.CloseConnection();
             }
 
             return tempContract;
@@ -192,20 +192,20 @@ namespace JobAgent.Data.Repository
                 CommandText = "RemoveContract",
                 CommandTimeout = 15,
                 CommandType = CommandType.StoredProcedure,
-                Connection = Database.Instance.SqlConnection
+                Connection = SqlDataAccess.Instance.SqlConnection
             };
 
             c.Parameters.AddWithValue("@id", id);
 
             try
             {
-                Database.Instance.OpenConnection();
+                SqlDataAccess.Instance.OpenConnection();
 
                 c.ExecuteNonQuery();
             }
             finally
             {
-                Database.Instance.CloseConnection();
+                SqlDataAccess.Instance.CloseConnection();
             }
         }
 
@@ -220,7 +220,7 @@ namespace JobAgent.Data.Repository
             {
                 CommandText = "UpdateContract",
                 CommandType = CommandType.StoredProcedure,
-                Connection = Database.Instance.SqlConnection
+                Connection = SqlDataAccess.Instance.SqlConnection
             };
 
             // Parameters.
@@ -232,7 +232,7 @@ namespace JobAgent.Data.Repository
             c.Parameters.AddWithValue("@expiryDate", update.ExpiryDate);
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             try
             {
@@ -240,7 +240,7 @@ namespace JobAgent.Data.Repository
             }
             finally
             {
-                Database.Instance.CloseConnection();
+                SqlDataAccess.Instance.CloseConnection();
             }
         }
     }

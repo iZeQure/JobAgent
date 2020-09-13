@@ -1,4 +1,4 @@
-﻿using JobAgent.Data.DB;
+﻿using JobAgent.Data.DataAccess;
 using JobAgent.Data.Objects;
 using JobAgent.Data.Repository.Interface;
 using System;
@@ -19,7 +19,7 @@ namespace JobAgent.Data.Repository
         public void Create(Location create)
         {
             // Prepare command obj.
-            using SqlCommand cmd = new SqlCommand("CreateLocation", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("CreateLocation", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -29,7 +29,7 @@ namespace JobAgent.Data.Repository
             cmd.Parameters.AddWithValue("@description", create.Description);
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Execute command
             cmd.ExecuteNonQuery();
@@ -45,13 +45,13 @@ namespace JobAgent.Data.Repository
             List<Location> tempLocations = new List<Location>();
 
             // Prepare command obj.
-            using SqlCommand cmd = new SqlCommand("GetAllLocations", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("GetAllLocations", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialize data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
@@ -89,7 +89,7 @@ namespace JobAgent.Data.Repository
             Location tempLocationObj = new Location();
 
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("GetLocationById", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("GetLocationById", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -98,7 +98,7 @@ namespace JobAgent.Data.Repository
             cmd.Parameters.AddWithValue("@id", id);
 
             // Open connetion to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialize data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
@@ -130,7 +130,7 @@ namespace JobAgent.Data.Repository
         public void Remove(int id)
         {
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("RemoveLocation", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("RemoveLocation", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -139,7 +139,7 @@ namespace JobAgent.Data.Repository
             cmd.Parameters.AddWithValue("@id", id);
 
             // Open connetion to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Execute command.
             cmd.ExecuteNonQuery();
@@ -152,7 +152,7 @@ namespace JobAgent.Data.Repository
         public void Update(Location update)
         {
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("UpdateLocation", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("UpdateLocation", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -163,7 +163,7 @@ namespace JobAgent.Data.Repository
             cmd.Parameters.AddWithValue("@description", update.Description);
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Execute update.
             cmd.ExecuteNonQuery();

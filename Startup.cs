@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using JobAgent.Services;
 using JobAgent.Data;
-using JobAgent.Data.DB;
+using JobAgent.Data.DataAccess;
 using JobAgent.Data.Security;
 using BlazorStrap;
 using Blazored.LocalStorage;
@@ -27,8 +27,6 @@ namespace JobAgent
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-
-            Database.Instance.Configuration = Configuration;
         }
 
         public IConfiguration Configuration { get; }
@@ -66,7 +64,7 @@ namespace JobAgent
             services.AddScoped<AuthenticationStateProvider>(provider =>
                 provider.GetRequiredService<MyAuthStateProvider>());
 
-            services.AddSingleton<Database>(); // Database Service.
+            services.AddSingleton<SqlDataAccess>(); // Database Service.
             services.AddTransient<SecurityService>(); // Security Service.
             services.AddTransient<JobService>(); // Job Service.
             services.AddTransient<DataService>(); // Data Service.

@@ -1,72 +1,53 @@
 ﻿@inject JobService JobService
-@inject DataService DataService 
+@inject DataService DataService
 
-@if (JobCategories.Any() || JobCategories != null)
+@if (!JobCategories.Any())
 {
-    if (JobCategories.Count != 0)
-    {
-        @for (int i = 0; i < JobCategories.Count; i++)
-        {
-            @if (JobCategories[i].Specializations != null)
-            {
-                <div class="dropdown py-1 px-2">
-                    <a id="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu" class="dropdown-toggle btn btn-link btn-sm @MenuColor text-wrap text-left cursor-pointer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        @JobCategories[i].Name <span class="badge badge-info">@GetCategoryCount(JobCategories[i].Specializations.Select(x => x.CategoryId).First()).Result</span>
-                    </a>
-
-                    <div class="dropdown-menu" aria-labelledby="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu">
-                        @if (JobCategories[i].Specializations.Count > 1)
-                        {
-                            <h6 class="dropdown-header">Uddannelses Specialer</h6>
-                        }
-                        else
-                        {
-                            <h6 class="dropdown-header">Uddannelses Speciale</h6>
-                        }
-
-                        <div class="dropdown-divider"></div>
-
-                        @for (int j = 0; j < JobCategories[i].Specializations.Count; j++)
-                        {
-                            // Link : {domain}/job/CategoryId/CategoryName/SpecializationId/SpecializationName
-                            <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].Id/@JobCategories[i].Name/@JobCategories[i].Specializations[j].Id/@JobCategories[i].Specializations[j].Name">
-                                @JobCategories[i].Specializations[j].Name <span class="badge badge-info">@GetSpecializationCount(JobCategories[i].Specializations[j].Id).Result</span>
-                            </a>
-                        }
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div class="py-1 px-2">
-                    @* Link : {domain}/job/CategoryId/CategoryName *@
-                    <a class="btn btn-link btn-sm @MenuColor text-wrap text-left" href="/job/@JobCategories[i].Id/@JobCategories[i].Name">
-                        @JobCategories[i].Name <span class="badge badge-info">@GetCategoryCount(JobCategories[i].Id).Result</span>
-                    </a>
-                </div>
-            }
-        }
-    }
-    else
-    {
-        <div class="container mt-2">
-            <div class="alert alert-danger">
-                <p>
-                    @SystemMessage
-                </p>
-            </div>
-        </div>
-    }
+    <MessageAlert Alert="@AlertType" Message="@SystemMessage" IsLoading="@IsLoading" />
 }
 else
 {
-    <div class="container mt-2">
-        <div class="alert alert-danger">
-            <p>
-                @SystemMessage
-            </p>
-        </div>
-    </div>
+    @for (int i = 0; i < JobCategories.Count; i++)
+    {
+        @if (JobCategories[i].Specializations != null)
+        {
+            <div class="dropdown py-1 px-2">
+                <a id="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu" class="dropdown-toggle btn btn-link btn-sm @MenuColor text-wrap text-left cursor-pointer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    @JobCategories[i].Name <span class="badge badge-info">@GetCategoryCount(JobCategories[i].Specializations.Select(x => x.CategoryId).First()).Result</span>
+                </a>
+
+                <div class="dropdown-menu" aria-labelledby="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu">
+                    @if (JobCategories[i].Specializations.Count > 1)
+                    {
+                        <h6 class="dropdown-header">Uddannelses Specialer</h6>
+                    }
+                    else
+                    {
+                        <h6 class="dropdown-header">Uddannelses Speciale</h6>
+                    }
+
+                    <div class="dropdown-divider"></div>
+
+                    @for (int j = 0; j < JobCategories[i].Specializations.Count; j++)
+                    {
+                        // Link : {domain}/job/CategoryId/CategoryName/SpecializationId/SpecializationName
+                        <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].Id/@JobCategories[i].Name/@JobCategories[i].Specializations[j].Id/@JobCategories[i].Specializations[j].Name">
+                            @JobCategories[i].Specializations[j].Name <span class="badge badge-info">@GetSpecializationCount(JobCategories[i].Specializations[j].Id).Result</span>
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="py-1 px-2">
+                @* Link : {domain}/job/CategoryId/CategoryName *@
+                <a class="btn btn-link btn-sm @MenuColor text-wrap text-left" href="/job/@JobCategories[i].Id/@JobCategories[i].Name">
+                    @JobCategories[i].Name <span class="badge badge-info">@GetCategoryCount(JobCategories[i].Id).Result</span>
+                </a>
+            </div>
+        }
+    }
 }
 
 @code {
@@ -75,21 +56,30 @@ else
 
     public string MenuColor { get; set; } = "text-light";
 
-    public string SystemMessage { get; set; }
+    public string SystemMessage { get; set; } = string.Empty;
+
+    private MessageAlert.AlertType AlertType { get; set; }
+    private bool IsLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            if (JobCategories == null || JobCategories.Count == 0) JobCategories = await JobService.GetJobMenuAsync();
+        IsLoading = true;
+        AlertType = MessageAlert.AlertType.Info;
+        SystemMessage = "Indlæser menu..";
+        await Task.Delay(1000);
 
-            if (JobCategories.Count == 0) SystemMessage = "Fandt ikke nogen kategorier..";
-        }
-        catch (Exception e)
+        if (!JobCategories.Any()) 
+            JobCategories = await JobService.GetJobMenuAsync();
+
+        if (JobCategories.Count == 0)
         {
-            Console.WriteLine($"Job Menu Exception : {e.Message} - {e}");
-            SystemMessage = "Kunne ikke indlæse menu, prøv og indlæs igen.";
+            AlertType = MessageAlert.AlertType.Warning;
+            SystemMessage = "Kunne ikke indlæse menu..";
         }
+
+        IsLoading = false;
+        SystemMessage = string.Empty;
+        await Task.Delay(750);
     }
 
     protected async Task<int> GetCategoryCount(int id)

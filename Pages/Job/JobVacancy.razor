@@ -2,18 +2,18 @@
 @page "/job/{JobAdvertId:int}/{JobAdvertName}/{SpecializationId:int}/{SpecializationName}";
 
 @inject JobService JobService
-@inject NavigationManager NavigationManager
-
 @* Set Job as Page Title *@
 <PageTitle Title="@JobAdvertName" />
 
 @if (jobAdverts == null || !jobAdverts.Any())
 {
-    <p><em>Indlæser @JobAdvertName ...</em></p>
-
-    @if (!jobAdverts.Any())
+    if (IsLoading)
     {
-        <p><em>Ingen Jobs fundet indenfor @JobAdvertName kategori...</em></p>
+        <MessageAlert Alert="MessageAlert.AlertType.Info" Message="Vent Venligst!" MessageOptional="Leder efter stillingsopslag" IsLoading="IsLoading" FullWidth="false" />
+    }
+    else
+    {
+        <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="Beklager! Job Agenten fandt ingen stillinger inden for denne kategori." FullWidth="false" />
     }
 }
 else
@@ -27,7 +27,7 @@ else
                     <h6 class="card-subtitle mb-2 text-muted">@(j.Company.Name), @(j.JobLocation)</h6>
                     <p class="card-text">@j.JobDescription</p>
                     <p class="card-text">
-                        <small class="text-muted">                          
+                        <small class="text-muted">
                             @j.JobRegisteredDate.ToString("dddd, d MMM yyyy", CultureInfo.CreateSpecificCulture("da-DK"))
                         </small>
                     </p>
@@ -57,18 +57,40 @@ else
 
     List<JobAdvert> jobAdverts = new List<JobAdvert>();
 
+    private bool IsLoading { get; set; } = false;
+
     protected override async Task OnInitializedAsync()
     {
-        if (SpecializationId == 0) jobAdverts = await JobService.GetJobVacanciesAsync(JobAdvertId, JobAdvertName);
+        IsLoading = true;
+        await Task.Delay(1500);
 
-        if (SpecializationId != 0) jobAdverts = await JobService.GetJobSpecialVacanciesAsync(SpecializationId, SpecializationName);
+        if (SpecializationId == 0)
+            jobAdverts = await JobService.GetJobVacanciesAsync(JobAdvertId, JobAdvertName);
+
+        if (SpecializationId != 0)
+            jobAdverts = await JobService.GetJobSpecialVacanciesAsync(SpecializationId, SpecializationName);
+        else if (SpecializationId > 0)
+            jobAdverts = await JobService.GetJobSpecialVacanciesAsync(SpecializationId, SpecializationName);
+
+        IsLoading = false;
+        await Task.Delay(500);
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        if (SpecializationId == 0) jobAdverts = await JobService.GetJobVacanciesAsync(JobAdvertId, JobAdvertName);
+        IsLoading = true;
+        await Task.Delay(1500);
 
-        if (SpecializationId != 0) jobAdverts = await JobService.GetJobSpecialVacanciesAsync(SpecializationId, SpecializationName);
+        if (SpecializationId == 0)
+            jobAdverts = await JobService.GetJobVacanciesAsync(JobAdvertId, JobAdvertName);
+
+        if (SpecializationId != 0)
+            jobAdverts = await JobService.GetJobSpecialVacanciesAsync(SpecializationId, SpecializationName);
+        else if (SpecializationId > 0)
+            jobAdverts = await JobService.GetJobSpecialVacanciesAsync(SpecializationId, SpecializationName);
+
+        IsLoading = false;
+        await Task.Delay(500);
     }
 
     void OnJobPostDetail(int id)

@@ -7,42 +7,46 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Security;
 using System.Threading.Tasks;
+using JobAgent.Data.Interfaces;
 
-namespace JobAgent.Data.DB
+namespace JobAgent.Data.DataAccess
 {
-    public class Database : IDatabase
+    public class SqlDataAccess : IDataAccess
     {
         #region Constructors
-        public Database()
+        public SqlDataAccess()
         {
-            try
-            {
-                SqlConnection = new SqlConnection
-                {
-                    //SqlConnection.ConnectionString = "Server=10.108.48.72\\SQLJOBAGENT,2009;Database=JobAgentDB; User Id=sa; Password=PaSSw0rd;";
-                    ConnectionString = "Server=GFUEL\\DEVSQLSERVER; Database=JobAgentDB; Integrated Security=true;"
-                    //SqlConnection.ConnectionString = "Server=VIOLURREOT\\DEVELOPMENT; Database=JobAgentDB; Integrated Security=true;";
-                };
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Unhandled Exception : {e.Message}");
-            }
+            //string connectionString = GetConnectionString("HomeDB");
+
+            //string connectionString = "Server=10.108.48.72\\SQLJOBAGENT,2009;SqlDataAccess=JobAgentDB; User Id=sa; Password=PaSSw0rd;";
+            //string connectionString = "Server=GFUEL\\DEVSQLSERVER; Database=JobAgentDB; Integrated Security=true;";
+            string connectionString = "Server=VIOLURREOT\\DEVELOPMENT; Database=JobAgentDB; Integrated Security=true;";
+
+            SqlConnection = new SqlConnection(connectionString);
+        }
+
+        public SqlDataAccess(IConfiguration config)
+        {
+            _config = config;
         }
         #endregion
 
         #region Attributes
-        private static Database instance = null;
+        private static SqlDataAccess instance = null;
         private SqlConnection sqlConnection;
+        private readonly IConfiguration _config;
         #endregion
 
         #region Properites
         public SqlConnection SqlConnection { get { return sqlConnection; } private set { sqlConnection = value; } }
 
-        public static Database Instance { get { if (instance == null) instance = new Database(); return instance; } }
-
-        public IConfiguration Configuration { get; set; }
+        public static SqlDataAccess Instance { get { if (instance == null) instance = new SqlDataAccess(); return instance; } }
         #endregion        
+
+        public string GetConnectionString(string name)
+        {
+            return _config.GetConnectionString(name);
+        }
 
         public void OpenConnection()
         {
@@ -102,6 +106,11 @@ namespace JobAgent.Data.DB
             {
                 throw;
             }
+        }
+
+        public void Dispose()
+        {
+            ((IDisposable)instance).Dispose();
         }
     }
 }

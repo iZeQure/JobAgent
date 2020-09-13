@@ -1,4 +1,4 @@
-﻿using JobAgent.Data.DB;
+﻿using JobAgent.Data.DataAccess;
 using JobAgent.Data.Objects;
 using JobAgent.Data.Repository.Interface;
 using JobAgent.Models;
@@ -21,7 +21,7 @@ namespace JobAgent.Data.Repository
             {
                 CommandText = "CreateJobAdvert",
                 CommandType = CommandType.StoredProcedure,
-                Connection = Database.Instance.SqlConnection
+                Connection = SqlDataAccess.Instance.SqlConnection
             };
 
             // Define data parameters.
@@ -38,7 +38,7 @@ namespace JobAgent.Data.Repository
             c.Parameters.AddWithValue("@specializationId", create.Specialization.Id);
 
             // Open database connection.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             c.ExecuteNonQuery();
         }
@@ -49,10 +49,10 @@ namespace JobAgent.Data.Repository
             List<JobAdvert> tempJobAdverts = new List<JobAdvert>();
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialzie command obj.
-            using SqlCommand cmd = new SqlCommand("GetAllJobAdverts", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("GetAllJobAdverts", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -113,12 +113,12 @@ namespace JobAgent.Data.Repository
             {
                 CommandText = "GetJobAdvertDetailsForAdminsById",
                 CommandType = CommandType.StoredProcedure,
-                Connection = Database.Instance.SqlConnection
+                Connection = SqlDataAccess.Instance.SqlConnection
             };
 
             c.Parameters.AddWithValue("@id", id);
 
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialize data reader.
             using SqlDataReader r = c.ExecuteReader();
@@ -170,7 +170,7 @@ namespace JobAgent.Data.Repository
                 }
             }
 
-            Database.Instance.CloseConnection();
+            SqlDataAccess.Instance.CloseConnection();
 
             return tempModel;
         }
@@ -182,11 +182,11 @@ namespace JobAgent.Data.Repository
             {
                 CommandText = "GetAllJobAdvertsForAdmins",
                 CommandType = CommandType.StoredProcedure,
-                Connection = Database.Instance.SqlConnection
+                Connection = SqlDataAccess.Instance.SqlConnection
             };
 
             // Open database connection.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Create temp list with job adverts.
             List<JobVacanciesAdminModel> dataList = new List<JobVacanciesAdminModel>();
@@ -235,7 +235,7 @@ namespace JobAgent.Data.Repository
             }
             finally
             {
-                Database.Instance.CloseConnection();
+                SqlDataAccess.Instance.CloseConnection();
             }
 
             return dataList;
@@ -248,7 +248,7 @@ namespace JobAgent.Data.Repository
             {
                 CommandText = "RemoveJobAdvert",
                 CommandType = CommandType.StoredProcedure,
-                Connection = Database.Instance.SqlConnection
+                Connection = SqlDataAccess.Instance.SqlConnection
             };
 
             // Define id to remove.
@@ -256,13 +256,13 @@ namespace JobAgent.Data.Repository
 
             try
             {
-                Database.Instance.OpenConnection();
+                SqlDataAccess.Instance.OpenConnection();
 
                 c.ExecuteNonQuery();
             }
             finally
             {
-                Database.Instance.CloseConnection();
+                SqlDataAccess.Instance.CloseConnection();
             }
         }
 
@@ -273,7 +273,7 @@ namespace JobAgent.Data.Repository
             {
                 CommandText = "UpdateJobAdvert",
                 CommandType = CommandType.StoredProcedure,
-                Connection = Database.Instance.SqlConnection
+                Connection = SqlDataAccess.Instance.SqlConnection
             };
 
             // Set parameters.
@@ -291,13 +291,13 @@ namespace JobAgent.Data.Repository
             c.Parameters.AddWithValue("@specializationId", update.Specialization.Id);
 
             // Open connection to db.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Update data.
             c.ExecuteNonQuery();
 
             // Close connection to db.
-            Database.Instance.CloseConnection();
+            SqlDataAccess.Instance.CloseConnection();
         }
 
         public Task<int> GetCountOfJobAdvertsByCategoryId(int id)
@@ -310,14 +310,14 @@ namespace JobAgent.Data.Repository
                 CommandText = $"SELECT COUNT([CategoryId]) AS 'CategoryCount' FROM [JobAdvert] WHERE [CategoryId] = @id",
                 CommandType = CommandType.Text,
                 CommandTimeout = 15,
-                Connection = Database.Instance.SqlConnection
+                Connection = SqlDataAccess.Instance.SqlConnection
             };
 
             c.Parameters.AddWithValue("@id", id);
 
             try
             {
-                Database.Instance.OpenConnection();
+                SqlDataAccess.Instance.OpenConnection();
 
                 using SqlDataReader r = c.ExecuteReader();
 
@@ -331,7 +331,7 @@ namespace JobAgent.Data.Repository
             }
             finally
             {
-                Database.Instance.CloseConnection();
+                SqlDataAccess.Instance.CloseConnection();
             }
 
             return Task.FromResult(count);
@@ -347,14 +347,14 @@ namespace JobAgent.Data.Repository
                 CommandText = $"SELECT COUNT([SpecializationId]) AS 'SpecialCount' FROM [JobAdvert] WHERE [SpecializationId] = @id",
                 CommandType = CommandType.Text,
                 CommandTimeout = 15,
-                Connection = Database.Instance.SqlConnection
+                Connection = SqlDataAccess.Instance.SqlConnection
             };
 
             c.Parameters.AddWithValue("@id", id);
 
             try
             {
-                Database.Instance.OpenConnection();
+                SqlDataAccess.Instance.OpenConnection();
 
                 using SqlDataReader r = c.ExecuteReader();
 
@@ -368,7 +368,7 @@ namespace JobAgent.Data.Repository
             }
             finally
             {
-                Database.Instance.CloseConnection();
+                SqlDataAccess.Instance.CloseConnection();
             }
 
             return Task.FromResult(count);

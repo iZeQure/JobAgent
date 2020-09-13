@@ -1,4 +1,4 @@
-﻿using JobAgent.Data.DB;
+﻿using JobAgent.Data.DataAccess;
 using JobAgent.Data.Objects;
 using JobAgent.Data.Repository.Interface;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace JobAgent.Data.Repository
         public void Create(Company create)
         {
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("CreateCompany", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("CreateCompany", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -27,7 +27,7 @@ namespace JobAgent.Data.Repository
             cmd.Parameters.AddWithValue("@url", create.URL);
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Execute command.
             cmd.ExecuteNonQuery();
@@ -43,13 +43,13 @@ namespace JobAgent.Data.Repository
             List<Company> tempCompanies = new List<Company>();
 
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("GetAllCompanies", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("GetAllCompanies", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialize data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
@@ -85,7 +85,7 @@ namespace JobAgent.Data.Repository
             Company tempCompany = new Company();
 
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("GetCompanyById", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("GetCompanyById", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -94,7 +94,7 @@ namespace JobAgent.Data.Repository
             cmd.Parameters.AddWithValue("@id", id);
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Initialize data reader.
             using SqlDataReader reader = cmd.ExecuteReader();
@@ -123,7 +123,7 @@ namespace JobAgent.Data.Repository
         public void Remove(int id)
         {
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("RemoveCompany", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("RemoveCompany", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -132,7 +132,7 @@ namespace JobAgent.Data.Repository
             cmd.Parameters.AddWithValue("@id", id);
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Execute command.
             cmd.ExecuteNonQuery();
@@ -145,7 +145,7 @@ namespace JobAgent.Data.Repository
         public void Update(Company update)
         {
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("UpdateCompany", Database.Instance.SqlConnection)
+            using SqlCommand cmd = new SqlCommand("UpdateCompany", SqlDataAccess.Instance.SqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -157,7 +157,7 @@ namespace JobAgent.Data.Repository
             cmd.Parameters.AddWithValue("@url", update.URL);
 
             // Open connection to database.
-            Database.Instance.OpenConnection();
+            SqlDataAccess.Instance.OpenConnection();
 
             // Execute command.
             cmd.ExecuteNonQuery();

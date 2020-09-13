@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace JobAgent.Data.DB
+namespace JobAgent.Data.Interfaces
 {
-    interface IDatabase
+    interface IDataAccess : IDisposable
     {
         void OpenConnection();
         void CloseConnection();
