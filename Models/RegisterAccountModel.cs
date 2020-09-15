@@ -34,9 +34,11 @@ namespace JobAgent.Models
         public string ConfirmPassword { get; set; }
 
         [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Vælg venligst et konsulent område.")]
         public int ConsultantAreaId { get; set; }
 
         [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Vælg venligst en lokation.")]
         public int LocationId { get; set; }
     }
 }

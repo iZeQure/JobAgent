@@ -18,9 +18,9 @@ namespace JobAgent.Data.DataAccess
         {
             //string connectionString = GetConnectionString("HomeDB");
 
-            //string connectionString = "Server=10.108.48.72\\SQLJOBAGENT,2009;SqlDataAccess=JobAgentDB; User Id=sa; Password=PaSSw0rd;";
-            //string connectionString = "Server=GFUEL\\DEVSQLSERVER; Database=JobAgentDB; Integrated Security=true;";
-            string connectionString = "Server=VIOLURREOT\\DEVELOPMENT; Database=JobAgentDB; Integrated Security=true;";
+            //string connectionString = "Server=10.108.48.72\\SQLJOBAGENT,2009;Database=JobAgentDB; User Id=sa; Password=PaSSw0rd;";
+            string connectionString = "Server=GFUEL\\DEVSQLSERVER; Database=JobAgentDB; Integrated Security=true;";
+            //string connectionString = "Server=VIOLURREOT\\DEVELOPMENT; Database=JobAgentDB; Integrated Security=true;";
 
             SqlConnection = new SqlConnection(connectionString);
         }

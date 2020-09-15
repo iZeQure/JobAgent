@@ -6,60 +6,47 @@
 @inject DataService DataService
 @inject AdminService AdminService
 @inject NavigationManager NavigationManager
-
 @* Set page title *@
 <PageTitle Title="Min Profil" />
 
 <PageDisplayName DisplayName="Min Bruger Profil" />
 
-@if (User != null)
+@if (AccountModel != null)
 {
-    <div class="container">
-        @if (AuthorizationMessage != String.Empty && AuthorizationMessage != null)
-        {
-            <div class="alert alert-info">
-                <div class="d-flex align-items-center">
+    <MessageAlert Message="@ErrorMessage" FullWidth="false" Alert="MessageAlert.AlertType.Error" />
+    <MessageAlert Message="@Message" FullWidth="false" Alert="MessageAlert.AlertType.Success" />
 
-                    <span>@AuthorizationMessage</span>
+    <EditForm Model="AccountModel" OnValidSubmit="@OnValidSubmit_ChangeUserInformation">
 
-                    @if (!IsSuccess)
-                    {
-                        <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
-                    }
+        <DataAnnotationsValidator />
 
-                </div>
-            </div>
-        }
-    </div>
-
-    <EditForm Model="User" OnValidSubmit="@OnValidSubmit_ChangeUserInformation">
         <div class="container">
             <div class="row">
                 <div class="col">
                     <label for="inputEmail" class="admin-label">Email Adresse :</label>
-                    <input id="inputEmail" type="email" class="form-control" placeholder="Email adresse" @bind-value="User.Email" />
+                    <input id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" @bind-value="AccountModel.Email" />
                 </div>
             </div>
             <hr />
             <div class="row">
                 <div class="col">
                     <label for="inputFirstName" class="admin-label">Fornavn :</label>
-                    <input id="inputFirstName" type="text" class="form-control" placeholder="Fornavn" @bind-value="User.FirstName" />
+                    <input id="inputFirstName" type="text" class="form-control form-control-sm" placeholder="Fornavn" @bind-value="AccountModel.FirstName" />
                 </div>
 
                 <div class="col">
                     <label for="inputLastName" class="admin-label">Efternavn :</label>
-                    <input id="inputLastName" type="text" class="form-control" placeholder="Efternavn" @bind-value="User.LastName" />
+                    <input id="inputLastName" type="text" class="form-control form-control-sm" placeholder="Efternavn" @bind-value="AccountModel.LastName" />
                 </div>
             </div>
             <hr />
             <div class="row">
                 <div class="col">
                     <label for="inputConsultantArea" class="admin-label">Konsulent Område :</label>
-                    <select class="form-control" @bind="User.ConsultantArea.Id">
-                        @foreach (ConsultantArea area in ConsultantAreas)
+                    <select class="form-control form-control-sm" @bind="AccountModel.ConsultantAreaId">
+                        @foreach (var area in ConsultantAreas)
                         {
-                            @if (area.Id == User.ConsultantArea.Id)
+                            @if (area.Id == AccountModel.ConsultantAreaId)
                             {
                                 <option value="@area.Id" selected>@area.Name</option>
                             }
@@ -73,10 +60,10 @@
 
                 <div class="col">
                     <label for="inputLocation" class="admin-label">Lokation :</label>
-                    <select class="form-control" @bind="User.Location.Id">
-                        @foreach (Location lctn in Locations)
+                    <select class="form-control form-control-sm" @bind="AccountModel.LocationId">
+                        @foreach (var lctn in Locations)
                         {
-                            @if (lctn.Id == User.Location.Id)
+                            @if (lctn.Id == AccountModel.LocationId)
                             {
                                 <option value="@lctn.Id" selected>@lctn.Name</option>
                             }
@@ -89,7 +76,17 @@
                 </div>
             </div>
             <hr />
-            <button type="submit" class="btn btn-info float-right ml-auto mt-5" disabled="@IsProcessing">Gem bruger oplysninger</button>
+            <button type="submit" class="btn btn-info float-right ml-auto mt-5" disabled="@IsProcessing">
+                @if (IsProcessing)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span>Gemmer oplysninger...</span>
+                }
+                else
+                {
+                    <span>Gem bruger oplysninger</span>
+                }
+            </button>
         </div>
 
     </EditForm>
@@ -99,14 +96,16 @@
     [CascadingParameter]
     protected Task<AuthenticationState> AuthState { get; set; }
 
+    private AccountModel AccountModel = new AccountModel();
+
     private List<ConsultantArea> ConsultantAreas { get; set; } = new List<ConsultantArea>();
     private List<Location> Locations { get; set; } = new List<Location>();
-    private User User { get; set; } = new User();
 
-    private string AuthorizationMessage { get; set; } = String.Empty;
+    private string ErrorMessage { get; set; }
+    private string Message { get; set; }
     private string UserEmail { get; set; }
-    private bool IsSuccess { get; set; } = false;
-    private bool IsProcessing { get; set; } = false;
+
+    private bool IsProcessing;
 
     private ClaimsPrincipal GetPrincipal;
 
@@ -131,7 +130,16 @@
     private async Task LoadInformation()
     {
         // Get user data, from the existing session data.
-        User = await AdminService.GetUserByEmail(UserEmail);
+        var user = await AdminService.GetUserByEmail(UserEmail);
+        AccountModel = new AccountModel()
+        {
+            AccountId = user.Id,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            ConsultantAreaId = user.ConsultantArea.Id,
+            LocationId = user.Location.Id
+        };
 
         // Get Consulent areas and locations.
         ConsultantAreas = await DataService.GetAllConsultantAreasTask();
@@ -140,21 +148,28 @@
 
     private async Task OnValidSubmit_ChangeUserInformation()
     {
-        IsSuccess = false;
         IsProcessing = true;
-        AuthorizationMessage = "Vent venligst..";
+        bool result = false;
 
-        await Task.Delay(TimeSpan.FromSeconds(5));
+        await Task.Delay(500);
 
         await InvokeAsync(async () =>
         {
-            await AdminService.UpdateUserInformation(User);
-            AuthorizationMessage = "Bruger oplsyninger blev opdateret!";
-            StateHasChanged();
+            result = await AdminService.UpdateUserInformation(AccountModel);
         });
 
-        NavigationManager.NavigateTo("/admin/account/myprofile", true);
-        IsSuccess = true;
+        if (result)
+        {
+            Message = "Din bruger blev opdateret!";
+            StateHasChanged();
+
+            await Task.Delay(1000);
+            NavigationManager.NavigateTo("/admin/account/myprofile", true);
+        }
+        else
+            ErrorMessage = "Kunne ikke opdatere dine oplysninger!";
+
         IsProcessing = false;
+        StateHasChanged();
     }
 }

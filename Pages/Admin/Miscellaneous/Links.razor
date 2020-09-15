@@ -2,12 +2,23 @@
 
 @attribute [Authorize]
 
+<PageTitle Title="Link til Robotten" />
+
 <div class="d-flex">
     <PageDisplayName DisplayName="Links til Web Crawleren" />
     <div class="d-inline-block">
-        <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#CreateLinkModal">
-            Opret nyt Link
-        </a>
+
+        @if (disabled)
+        {
+            <a class="btn btn-sm btn-info cursor-pointer text-white disabled">Ikke Aktiveret</a>
+        }
+        else
+        {
+            <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#CreateLinkModal">
+                Opret nyt Link
+            </a>
+        }
+
     </div>
 </div>
 
@@ -15,7 +26,7 @@
 {
     <MessageAlert Alert="MessageAlert.AlertType.Warning"
                   Message="Der blev ikke fundet nogen links."
-                  MessageOptional="Opret links, ved at trykke på knappen : Opret nyt Link." />
+                  MessageOptional="Opret links, ved at trykke på knappen : Opret nyt Link. - Hvis knappen ikke er aktiveret, er det fordi der ikke blev fundet nogen kontrakter." />
 }
 else
 {
@@ -59,13 +70,19 @@ else
     </div>
 }
 
-<CreateSourceLinkModal />
-<EditSourceLinkModal SourceLink="SourceLink" />
-<RemoveSourceLinkModal SourceLinkId="LinkId" />
+@if (!disabled)
+{
+    <CreateSourceLinkModal />
+    <EditSourceLinkModal SourceLink="SourceLink" />
+    <RemoveSourceLinkModal SourceLinkId="LinkId" />
+}
 
 @code {
     [Inject]
     private DataService DataService { get; set; }
+
+    [Inject]
+    private AdminService AdminService { get; set; }
 
     [Inject]
     private IRefresh RefreshService { get; set; }
@@ -74,6 +91,7 @@ else
     private SourceLink SourceLink { get; set; }
 
     private int LinkId { get; set; }
+    private bool disabled = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -81,6 +99,9 @@ else
 
         if (DataService.GetAllSourceLinksAsync() != null)
             SourceLinks = await DataService.GetAllSourceLinksAsync();
+
+        if ((await AdminService.GetContracts()).Count() == 0)
+            disabled = true;
     }
 
     private void ConfirmationWindow(int id)

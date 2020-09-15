@@ -36,14 +36,30 @@ namespace JobAgent.Services
             return Task.FromResult(((IUserRepository)UserRepository).GetUserByEmail(userMail));
         }
 
-        public Task<bool> UpdateUserInformation(User user)
+        public Task<bool> UpdateUserInformation(AccountModel user)
         {
-            UserRepository.Update(user);
+            try
+            {
+                UserRepository.Update(
+                        new User()
+                        {
+                            Id = user.AccountId,
+                            Email = user.Email,
+                            FirstName = user.FirstName,
+                            LastName = user.LastName,
+                            ConsultantArea = new ConsultantArea() { Id = user.ConsultantAreaId },
+                            Location = new Location() { Id = user.LocationId }
+                        });
 
-            return Task.FromResult(true);
+                return Task.FromResult(true);
+            }
+            catch (Exception)
+            {
+                return Task.FromResult(false);
+            }
         }
 
-        public async void UpdateUserPassword(User auth)
+        public async void UpdateUserPassword(ChangePasswordModel auth)
         {
             SecurityService securityService = new SecurityService();
 
@@ -52,7 +68,12 @@ namespace JobAgent.Services
 
             auth.Password = hashPassword.Result;
 
-            ((IUserRepository)UserRepository).UpdateUserPassword(auth);
+            ((IUserRepository)UserRepository).UpdateUserPassword(
+                new User()
+                {
+                    Email = auth.Email,
+                    Password = auth.Password
+                });
         }
 
         public void UpdateJobVacancy(JobVacanciesAdminModel data)
@@ -161,25 +182,32 @@ namespace JobAgent.Services
 
         public Task<bool> UpdateContract(ContractModel model)
         {
-            ContractRepository.Update(
-                new Contract()
-                {
-                    Id = model.Id,
-                    Company = new Company()
-                    {
-                        Id = model.SignedWithCompany
-                    },
-                    SignedByUserId = new User()
-                    {
-                        Id = model.SignedByUser
-                    },
-                    ContactPerson = model.ContactPerson,
-                    ContractName = model.ContractFileName,
-                    RegistrationDate = model.RegistrationDate,
-                    ExpiryDate = model.ExpiryDate
-                });
+            try
+            {
+                ContractRepository.Update(
+                        new Contract()
+                        {
+                            Id = model.Id,
+                            Company = new Company()
+                            {
+                                Id = model.SignedWithCompany
+                            },
+                            SignedByUserId = new User()
+                            {
+                                Id = model.SignedByUser
+                            },
+                            ContactPerson = model.ContactPerson,
+                            ContractName = model.ContractFileName,
+                            RegistrationDate = model.RegistrationDate,
+                            ExpiryDate = model.ExpiryDate
+                        });
 
-            return Task.FromResult(true);
+                return Task.FromResult(true);
+            }
+            catch (Exception)
+            {
+                return Task.FromResult(false);
+            }            
         }
 
         public void RemoveContract(int id)

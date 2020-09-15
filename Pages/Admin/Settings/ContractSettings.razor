@@ -5,9 +5,18 @@
 <div class="d-flex">
     <PageDisplayName DisplayName="Administrer Kontrakter" />
     <div class="d-inline-block">
-        <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#CreateContractModal">
-            Opret ny Kontrakt
-        </a>
+
+        @if (disabled)
+        {
+            <a class="btn btn-sm btn-info cursor-pointer text-white disabled">Ikke Aktiveret</a>
+        }
+        else
+        {
+            <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#CreateContractModal">
+                Opret ny Kontrakt
+            </a>
+        }
+
     </div>
 </div>
 
@@ -15,7 +24,7 @@
 {
     <MessageAlert Alert="Components.Notification.MessageAlert.AlertType.Warning"
                   Message="Der blev ikke fundet nogen kontrakter."
-                  MessageOptional="Opret kontrakter, ved at trykke på knappen : Opret ny Kontrakt." />
+                  MessageOptional="Opret kontrakter, ved at trykke på knappen : Opret ny Kontrakt. - Hvis knappen ikke er aktiveret, er det fordi der ikke blev fundet nogen virksomheder." />
 }
 else
 {
@@ -76,13 +85,16 @@ else
     </div>
 }
 
-<CreateContractModal />
+@if (!disabled)
+{
+    <CreateContractModal />
 
-<EditContractModal ContractModel="ContractModel" />
+    <EditContractModal ContractModel="ContractModel" />
 
-<RemoveContractModal ContractId="ContractId" />
+    <RemoveContractModal ContractId="ContractId" />
 
-<ShowContractModal ContractName="@ContractName" />
+    <ShowContractModal ContractName="@ContractName" />
+}
 
 @code {
     [Inject]
@@ -90,6 +102,9 @@ else
 
     [Inject]
     protected AdminService AdminService { get; set; }
+
+    [Inject]
+    protected DataService DataService { get; set; }
 
     public List<Contract> GetContracts { get; set; } = new List<Contract>();
 
@@ -100,10 +115,14 @@ else
     private string ContractName { get; set; }
 
     private bool Validation { get; set; }
+    private bool disabled = false;
 
     protected override async Task OnInitializedAsync()
     {
         RefreshService.RefreshRequest += RefreshContent;
+
+        if ((await DataService.GetAllCompanies()).Count() == 0)
+            disabled = true;
 
         GetContracts = await AdminService.GetContracts();
     }

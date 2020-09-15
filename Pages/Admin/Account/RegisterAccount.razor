@@ -5,63 +5,49 @@
 @inject SecurityService SecurityService
 
 @attribute [Authorize]
-
 @* Page Title *@
 <PageTitle Title="Registrer Ny Konsulent" />
 
 <PageDisplayName DisplayName="Opret en ny praktikkonsulent i systemet" />
 
+<MessageAlert Alert="MessageAlert.AlertType.Info" Message="@SystemMessage" FullWidth="false" />
+<MessageAlert Alert="MessageAlert.AlertType.Error" Message="@ErrorMessage" FullWidth="false" />
+<MessageAlert Alert="MessageAlert.AlertType.Success" Message="@Message" FullWidth="false" />
+
 <div class="container">
 
     @if (!IsLoadingInformation)
     {
-        @if (!string.IsNullOrEmpty(SystemMessage))
-        {
-            <div class="alert alert-info">
-                <div class="d-flex align-items-center">
+        <EditForm Model="RegisterAccountModel" OnValidSubmit="OnValidSubmit_RegisterAccountAsync" autocomplete="off">
 
-                    <span>@SystemMessage</span>
-
-                    @if (IsProcessing)
-                    {
-                        <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
-                    }
-                    else if (!IsProcessing && IsSuccess)
-                    {
-                        <div class="ml-auto"><i class="fas fa-check"></i></div>
-                    }
-                </div>
-            </div>
-        }
-
-        <EditForm Model="RegisterModel" OnValidSubmit="OnValidSubmit_RegisterAccountAsync" autocomplete="off">
-
-            <ValidationSummary />
             <DataAnnotationsValidator />
 
             <div class="row">
                 <div class="col">
                     <label for="inputEmail" class="admin-label">Email Adresse :</label>
-                    <input id="inputEmail" type="email" class="form-control" placeholder="Email adresse" @bind-value="RegisterModel.Email" />
+                    <input id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" @bind-value="RegisterAccountModel.Email" />
+                    <ValidationMessage For="@(() => RegisterAccountModel.Email)" />
                 </div>
             </div>
             <hr />
             <div class="row">
                 <div class="col">
                     <label for="inputFirstName" class="admin-label">Fornavn :</label>
-                    <input id="inputFirstName" type="text" class="form-control" placeholder="Fornavn" @bind-value="RegisterModel.FirstName" />
+                    <input id="inputFirstName" type="text" class="form-control form-control-sm" placeholder="Fornavn" @bind-value="RegisterAccountModel.FirstName" />
+                    <ValidationMessage For="@(() => RegisterAccountModel.FirstName)" />
                 </div>
 
                 <div class="col">
                     <label for="inputLastName" class="admin-label">Efternavn :</label>
-                    <input id="inputLastName" type="text" class="form-control" placeholder="Efternavn" @bind-value="RegisterModel.LastName" />
+                    <input id="inputLastName" type="text" class="form-control form-control-sm" placeholder="Efternavn" @bind-value="RegisterAccountModel.LastName" />
+                    <ValidationMessage For="@(() => RegisterAccountModel.LastName)" />
                 </div>
             </div>
             <hr />
             <div class="row">
                 <div class="col">
                     <label for="inputConsultantArea" class="admin-label">Konsulent Område :</label>
-                    <select class="form-control" @bind="RegisterModel.ConsultantAreaId">
+                    <select class="form-control form-control-sm" @bind="RegisterAccountModel.ConsultantAreaId">
                         @if (!GetConsultantAreas.Any())
                         {
                             <option value="0" selected>Fandt ikke nogen områder..</option>
@@ -70,17 +56,18 @@
                         {
                             <option value="0" selected>Vælg et konsulent område</option>
 
-                            @foreach (ConsultantArea c in GetConsultantAreas)
+                            @foreach (var c in GetConsultantAreas)
                             {
                                 <option value="@c.Id">@c.Name</option>
                             }
                         }
                     </select>
+                    <ValidationMessage For="@(() => RegisterAccountModel.ConsultantAreaId)" />
                 </div>
 
                 <div class="col">
                     <label for="inputLocation" class="admin-label">Lokation :</label>
-                    <select class="form-control" @bind="RegisterModel.LocationId">
+                    <select class="form-control form-control-sm" @bind="RegisterAccountModel.LocationId">
                         @if (!GetLocations.Any())
                         {
                             <option value="0" selected>Fandt ikke nogen lokationer..</option>
@@ -89,42 +76,48 @@
                         {
                             <option value="0" selected>Vælg en lokation</option>
 
-                            @foreach (Location l in GetLocations)
+                            @foreach (var l in GetLocations)
                             {
                                 <option value="@l.Id">@l.Name</option>
                             }
                         }
                     </select>
+                    <ValidationMessage For="@(() => RegisterAccountModel.LocationId)" />
                 </div>
             </div>
             <hr />
             <div class="row">
                 <div class="col">
                     <label for="inputPassword" class="admin-label">Adgangskode :</label>
-                    <input id="inputPassword" type="password" class="form-control" placeholder="Adgangskode" @bind="RegisterModel.Password" />
+                    <input id="inputPassword" type="password" class="form-control form-control-sm" placeholder="Adgangskode" @bind="RegisterAccountModel.Password" />
+                    <ValidationMessage For="@(() => RegisterAccountModel.Password)" />
                 </div>
 
                 <div class="col">
                     <label for="inputConfirmPassword" class="admin-label">Bekræft Adgangskode :</label>
-                    <input id="inputConfirmPassword" type="password" class="form-control" placeholder="Bekræft adgangskode" @bind="RegisterModel.ConfirmPassword" />
+                    <input id="inputConfirmPassword" type="password" class="form-control form-control-sm" placeholder="Bekræft adgangskode" @bind="RegisterAccountModel.ConfirmPassword" />
+                    <ValidationMessage For="@(() => RegisterAccountModel.ConfirmPassword)" />
+                    <ValidationSummary Model="RegisterAccountModel" />
                 </div>
             </div>
-            <button type="submit" class="btn btn-info float-right ml-auto mt-5" disabled="@IsProcessing">Opret Konsulent</button>
+            <button type="submit" class="btn btn-info float-right ml-auto mt-5" disabled="@IsProcessing">
+                @if (IsProcessing)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span>Opretter Praktikkonsulent...</span>
+                }
+                else
+                {
+                    <span>Opret Praktikkonsulent</span>
+                }
+            </button>
 
         </EditForm>
-    }
-    else
-    {
-        <div class="alert alert-info">
-            <div class="d-flex align-items-center">
-                <span>Henter oplysninger, vent venligst..</span>
-            </div>
-        </div>
     }
 </div>
 
 @code {
-    private RegisterAccountModel RegisterModel { get; set; } = new RegisterAccountModel();
+    private RegisterAccountModel RegisterAccountModel { get; set; } = new RegisterAccountModel();
 
     private User User { get; set; } = new User() { ConsultantArea = new ConsultantArea(), Location = new Location() };
 
@@ -132,8 +125,9 @@
     public IEnumerable<Location> GetLocations { get; protected set; } = new List<Location>();
 
     public string SystemMessage { get; set; } = string.Empty;
+    public string ErrorMessage { get; set; } = string.Empty;
+    public string Message { get; set; } = string.Empty;
     public bool IsLoadingInformation { get; set; } = true;
-    public bool IsSuccess { get; set; } = false;
     public bool IsProcessing { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
@@ -143,9 +137,17 @@
 
     private async Task LoadInformationForModel()
     {
+        IsLoadingInformation = true;
+        SystemMessage = "Henter nødvendig information..";
+
+        await Task.Delay(1250);
+
         GetConsultantAreas = await DataService.GetAllConsultantAreasTask();
         GetLocations = await DataService.GetAllLocationsTask();
 
+        await Task.Delay(1000);
+
+        SystemMessage = string.Empty;
         IsLoadingInformation = false;
     }
 
@@ -153,58 +155,36 @@
     {
         IsProcessing = true;
 
-        User.Email = RegisterModel.Email;
+        await Task.Delay(1750);
 
-        if (RegisterModel.ConsultantAreaId != 0 && RegisterModel.LocationId != 0)
+        if (UserSerivce is UserService service)
         {
-            if (UserSerivce is UserService service)
+            if (!service.CheckUserExistsAsync(RegisterAccountModel).Result)
             {
-                if (!service.CheckUserExistsAsync(User).Result)
+                await InvokeAsync(async () =>
                 {
-                    // Generate new salt.
-                    string salt = (await SecurityService.GetNewSaltAsync());
+                    var result = await service.RegisterUserAsync(RegisterAccountModel);
 
-                    // Hash user's password.
-                    string hashedSecret = (await SecurityService.HashPasswordAsync(RegisterModel.Password, salt));
-
-                    User.FirstName = RegisterModel.FirstName;
-                    User.LastName = RegisterModel.LastName;
-                    User.ConsultantArea.Id = RegisterModel.ConsultantAreaId;
-                    User.Location.Id = RegisterModel.LocationId;
-                    User.Salt = salt;
-                    User.Password = hashedSecret;
-
-                    string jwtToken = (await GenerateAccessToken(User));
-
-                    User.AccessToken = jwtToken;
-
-                    await InvokeAsync(async () =>
-                    {
-                        await service.RegisterUserAsync(User);
-
-                        SystemMessage = "Konsulent blev registreret.";
-                        IsSuccess = true;
-                        IsProcessing = false;
-
-                        StateHasChanged();
-                    });
-                }
-                else
-                {
-                    SystemMessage = "Fejl, konsulent eksistere allerede.";
-                }
+                    if (string.IsNullOrEmpty(result.Email))
+                        ErrorMessage = "Kunne ikke oprette Praktikkonsulent.";
+                    else
+                        Message = "Praktikkonsulent blev oprettet!";
+                });
+            }
+            else
+            {
+                ErrorMessage = "Fejl, Praktikkonsulent eksistere allerede.";
             }
         }
-        else
-        {
-            SystemMessage = "Vælg venligst et konsulent område eller lokation.";
-        }
+
+        StateHasChanged();
+        RegisterAccountModel = new RegisterAccountModel();
+
+        await Task.Delay(1250);
 
         IsProcessing = false;
-    }
-
-    public async Task<string> GenerateAccessToken(User user)
-    {
-        return await SecurityService.GenerateAccessTokenAsync(user);
+        SystemMessage = string.Empty;
+        ErrorMessage = string.Empty;
+        Message = string.Empty;
     }
 }

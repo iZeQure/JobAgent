@@ -4,6 +4,7 @@ using JobAgent.Data.Repository;
 using JobAgent.Data.Repository.Interface;
 using System;
 using System.Threading.Tasks;
+using JobAgent.Models;
 
 namespace JobAgent.Services
 {
@@ -38,7 +39,7 @@ namespace JobAgent.Services
 
                     // Validate password with server.
                     if (UserRepository.ValidatePassword(user.Password))
-                    {                        
+                    {
                         var returnedUser = UserRepository.LogIn(user.Email, user.Password);
                         returnedUser.IsAuthenticatedByServer = true;
                         returnedUser.AccessToken = returnedUser.AccessToken;
@@ -55,9 +56,9 @@ namespace JobAgent.Services
             return await Task.FromResult(user);
         }
 
-        public async Task<bool> CheckUserExistsAsync(User user)
+        public async Task<bool> CheckUserExistsAsync(RegisterAccountModel registerAccountModel)
         {
-            if (UserRepository.CheckUserExists(user.Email))
+            if (UserRepository.CheckUserExists(registerAccountModel.Email))
             {
                 return await Task.FromResult(true);
             }
@@ -65,11 +66,44 @@ namespace JobAgent.Services
             return await Task.FromResult(false);
         }
 
-        public async Task<User> RegisterUserAsync(User user)
+        public async Task<User> RegisterUserAsync(RegisterAccountModel registerAccountModel)
         {
-            UserRepository.Create(user);
+            // Generate new salt.
+            string salt = (await SecurityService.GetNewSaltAsync());
+
+            // Hash user's password.
+            string hashedSecret = (await SecurityService.HashPasswordAsync(registerAccountModel.Password, salt));
+
+            var user = new User()
+            {
+                Email = registerAccountModel.Email,
+                FirstName = registerAccountModel.FirstName,
+                LastName = registerAccountModel.LastName,
+                ConsultantArea = new ConsultantArea() { Id = registerAccountModel.ConsultantAreaId },
+                Location = new Location() { Id = registerAccountModel.LocationId },
+                Salt = salt,
+                Password = hashedSecret
+            };
+
+            string jwtToken = (await GenerateAccessTokenAsync(user));
+
+            user.AccessToken = jwtToken;
+
+            try
+            {
+                UserRepository.Create(user);
+            }
+            catch (Exception)
+            {
+                return await Task.FromResult(new User());
+            }
 
             return await Task.FromResult(user);
+        }
+
+        private async Task<string> GenerateAccessTokenAsync(User user)
+        {
+            return await SecurityService.GenerateAccessTokenAsync(user);
         }
     }
 }
