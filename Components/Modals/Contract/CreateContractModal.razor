@@ -122,7 +122,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Companies = await DataService.GetAllCompanies();
+        Companies = await DataService.GetCompaniesWithOutContract() as List<Company>;
         Users = await DataService.GetUsers();
     }
 

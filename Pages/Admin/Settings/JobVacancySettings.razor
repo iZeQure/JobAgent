@@ -1,10 +1,8 @@
 ﻿@page "/admin/settings/job/vacancies"
 
-@inject AdminService AService
-@inject DataService DService
-@inject IJSRuntime JSRuntime
-
 @attribute [Authorize]
+
+<PageTitle Title="Indstillinger for Stillingsopslag" />
 
 <div class="d-flex">
     <PageDisplayName DisplayName="Administrer Stillingsopslag" />
@@ -12,11 +10,14 @@
 
         @if (disabled)
         {
-            <a class="btn btn-sm btn-info cursor-pointer text-white disabled">Ikke Aktiveret</a>
+            <a class="btn btn-sm btn-info cursor-pointer text-white disabled">
+                <span>Ikke Aktiveret</span>
+            </a>
+            <span class="d-inline-block"><small class="text-danger font-weight-bolder">* Opret en Virksomhed for at benytte stillingsopslag.</small></span>
         }
         else
         {
-            <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#jobAdvertModalCreateNew">
+            <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#CreateJobVacancyModal">
                 Opret nyt Stillingsopslag
             </a>
         }
@@ -24,7 +25,7 @@
     </div>
 </div>
 
-@if (JobAdverts.Count == 0)
+@if (Adverts.Count == 0)
 {
     <MessageAlert Alert="MessageAlert.AlertType.Warning"
                   Message="Der blev ikke fundet nogen stillingsopslag."
@@ -49,11 +50,11 @@ else
             </thead>
             <tbody>
 
-                @foreach (var item in JobAdverts)
+                @foreach (var item in Adverts)
                 {
-                    <tr id="@item.JobAdvert.Id">
-                        <th scope="row">@item.JobAdvert.Id</th>
-                        <td class="text-truncate d-inline-block">@item.JobAdvert.Title</td>
+                    <tr id="@item.Id">
+                        <th scope="row">@item.Id</th>
+                        <td class="text-truncate d-inline-block">@item.Title</td>
                         @if (string.IsNullOrEmpty(item.Specialization.Name))
                         {
                             <td>@item.Category.Name</td>
@@ -63,456 +64,86 @@ else
                             <td>@item.Specialization.Name</td>
                         }
                         <td>@item.Company.Name</td>
-                        <td>@item.JobAdvert.JobRegisteredDate.ToString("D")</td>
-                        <td>@item.JobAdvert.DeadlineDate.ToString("D")</td>
+                        <td>@item.JobRegisteredDate.ToString("D")</td>
+                        <td>@item.DeadlineDate.ToString("D")</td>
                         <td>
-                            <span @onclick="(id => OnClickEdit_GetJobVacancyDetailsById(item.JobAdvert.Id))" data-toggle="modal" data-target="#vacancyAdminDetails">
+                            <span @onclick="(id => OnClickEdit_GetJobVacancyDetailsById(item.Id))" data-toggle="modal" data-target="#EditJobVacancyModal">
                                 <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette opslag." Color="Popover.PopoverType.Info" />
                             </span>
                         </td>
                         <td>
-                            <span @onclick="@(id => OnClick_StoreId(item.JobAdvert.Id))" data-toggle="modal" data-target="#vacandyRemoveConfirmation">
+                            <span @onclick="@(id => OnClick_StoreId(item.Id))" data-toggle="modal" data-target="#RemoveJobVacancyModal">
                                 <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
                             </span>
                         </td>
                     </tr>
                 }
+
             </tbody>
         </table>
     </div>
 }
 
-@* Job Detail Modal *@
-<div class="modal fade" id="vacancyAdminDetails" tabindex="-1" role="dialog" aria-labelledby="jobPostingDetailLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-        <div class="modal-content">
-            <EditForm Model="JobVacancyModelDetails" OnValidSubmit="OnValidSubmit_UpdateJobVacancy">
+<CreateJobVacancyModal />
 
-                <div class="modal-header">
-                    <input id="inputTitle" type="text" class="form-control form-control-sm" placeholder="Indtast titel" @bind-value="JobVacancyModelDetails.JobAdvert.Title" />
-                </div>
+<EditJobVacancyModal Model="JobVacancyModel" />
 
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col">
-                            <label for="inputEmail" class="admin-label col-form-label col-form-label-sm">Email Adresse :</label>
-                            <input id="inputEmail" class="form-control form-control-sm" type="email" placeholder="Indtast email adressse" @bind-value="JobVacancyModelDetails.JobAdvert.Email" />
-                        </div>
-                        <div class="col">
-                            <label for="inputPhoneNumber" class="admin-label col-form-label col-form-label-sm">Telefon nr. :</label>
-                            <input id="inputPhoneNumber" class="form-control form-control-sm" type="text" placeholder="Indtast telefon nr." @bind-value="JobVacancyModelDetails.JobAdvert.PhoneNumber" />
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="inputDesc" class="admin-label col-form-label col-form-label-sm">Beskrivelse :</label>
-                            <textarea id="inputDesc" class="form-control form-control-sm" style="max-height: 450px; min-height: 150px;" @bind="JobVacancyModelDetails.JobAdvert.JobDescription"></textarea>
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="inputLocation" class="admin-label col-form-label col-form-label-sm">Lokation :</label>
-                            <input id="inputLocation" class="form-control form-control-sm" placeholder="Indtast lokation" @bind-value="JobVacancyModelDetails.JobAdvert.JobLocation" />
-                        </div>
-                        <div class="col">
-                            <label for="inputCompany" class="admin-label col-form-label col-form-label-sm">Virksomhed :</label>
-                            <select class="form-control form-control-sm" @bind="JobVacancyModelDetails.Company.Id">
-                                @foreach (var comp in GetCompanies)
-                                {
-                                    @if (comp.Id == JobVacancyModelDetails.Company.Id)
-                                    {
-                                        <option value="@comp.Id" selected>@comp.Name</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@comp.Id">@comp.Name</option>
-                                    }
-                                }
-                            </select>
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="inputSourceUrl" class="admin-label col-form-label col-form-label-sm">Link til Stillingsopslag :</label>
-                            <input id="inputSourceUrl" class="form-control form-control-sm" placeholder="Indtast stillingsopslagets URL" @bind-value="JobVacancyModelDetails.JobAdvert.SourceURL" />
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="inputRegisteredDate" class="admin-label col-form-label col-form-label-sm">Opslag Registeret :</label>
-                            <InputDate id="inputRegisteredDate" @bind-Value="@JobVacancyModelDetails.JobAdvert.JobRegisteredDate" TValue="DateTime" class="form-control form-control-sm"></InputDate>
-                        </div>
-                        <div class="col">
-                            <label for="inputDeadlineDate" class="admin-label col-form-label col-form-label-sm">Ansøgningsfrist :</label>
-                            <InputDate id="inputDeadlineDate" @bind-Value="@JobVacancyModelDetails.JobAdvert.DeadlineDate" TValue="DateTime" class="form-control form-control-sm"></InputDate>
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="inputConsultantArea" class="admin-label col-form-label col-form-label-sm">Kategori :</label>
-                            <select class="form-control form-control-sm" @onchange="Details_OnCategoryChange_GetSpecializationBydCategoryId">
-                                @foreach (var cat in GetCategories)
-                                {
-                                    @if (cat.Id == JobVacancyModelDetails.Category.Id)
-                                    {
-                                        <option value="@cat.Id" selected>@cat.Name</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@cat.Id">@cat.Name</option>
-                                    }
-                                }
-                            </select>
-                        </div>
-                        @if (SortedSpecialization.Count != 0)
-                        {
-                            <div class="col">
-                                <label for="inputLocation" class="admin-label col-form-label col-form-label-sm">Kategori Speciale :</label>
-                                <select class="form-control form-control-sm" @bind="JobVacancyModelDetails.Specialization.Id">
-                                    @foreach (var spec in SortedSpecialization)
-                                    {
-                                        @if (spec.Id == JobVacancyModelDetails.Specialization.Id)
-                                        {
-                                            <option value="@spec.Id">@spec.Name</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@spec.Id">@spec.Name</option>
-                                        }
-                                    }
-                                </select>
-                            </div>
-                        }
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Annuller</button>
-                    <button class="btn btn-info text-light cursor-pointer" type="submit">Gem ændringer</button>
-                </div>
-            </EditForm>
-        </div>
-    </div>
-</div>
-
-@* Job Remove Confirmation Modal *@
-<div class="modal fade" id="vacandyRemoveConfirmation" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Er du sikker på du vil slette dette opslag?</h5>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-info" data-dismiss="modal" @onclick="@(() => OnClickRemove_ConfirmRemove(false, 0))">Annuller</button>
-                <button type="button" class="btn btn-danger" @onclick="@(id => OnClickRemove_ConfirmRemove(true, ItemId))">Slet Opslag</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-@* Job Modal Create New *@
-<div id="jobAdvertModalCreateNew" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-
-            <EditForm Model="RegisterJobAdvertModel" OnValidSubmit="OnValidSubmit_CreateJobAdvert">
-
-                <div class="modal-header">
-                    <h5 class="modal-title">Nyt Stillingsopslag :</h5>
-                </div>
-
-                <div class="modal-body">
-
-                    @if (!string.IsNullOrEmpty(SystemMessage))
-                    {
-                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                            <div class="d-flex align-items-center">
-                                <span>@(SystemMessage)</span>
-                                @if (!IsSuccess)
-                                {
-                                    <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
-                                }
-                            </div>
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                    }
-
-                    <ValidationSummary />
-                    <DataAnnotationsValidator />
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="regInputTitle" class="admin-label">Stillingsopslagets Titel :</label>
-                            <input id="regInputTitle" class="form-control form-control-sm" type="text" @bind="RegisterJobAdvertModel.Title" placeholder="Eksempel : Kager på en ny måde .." />
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="regInputEmail" class="admin-label">Email Adresse til Kontakt :</label>
-                            <input id="regInputEmail" class="form-control form-control-sm" type="email" @bind="RegisterJobAdvertModel.Email" placeholder="Eksempel : person123@virksomhed.dk .." />
-                        </div>
-                        <div class="col">
-                            <label for="regInputPhoneNumber" class="admin-label">Telefon nr. :</label>
-                            <input id="regInputPhoneNumber" class="form-control form-control-sm" type="tel" @bind="RegisterJobAdvertModel.PhoneNumber" placeholder="Eksempel : 12345678" />
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="regInputDesc" class="admin-label col-form-label col-form-label-sm">Stillingsopslags Beskrivelse :</label>
-                            <textarea id="regInputDesc" class="form-control form-control-sm" style="max-height: 450px; min-height: 150px;" @bind="RegisterJobAdvertModel.Description" placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."></textarea>
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="regInputLocation" class="admin-label col-form-label col-form-label-sm">Lokationen for virksomheden / stillignsopslaget :</label>
-                            <input id="regInputLocation" class="form-control form-control-sm" type="text" @bind="RegisterJobAdvertModel.Location" placeholder="Eksempel : Personsvej 14, 5500 Middelfart" />
-                        </div>
-                        <div class="col">
-                            <label for="regInputSourceUrl" class="admin-label col-form-label col-form-label-sm">Link til stillingsopslaget :</label>
-                            <input id="regInputSourceUrl" class="form-control form-control-sm" type="text" @bind="RegisterJobAdvertModel.SourceURL" placeholder="Eksempel : https://postnr.dk/5500-middelfart" />
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="regInputRegistrationDate" class="admin-label col-form-label col-form-label-sm">Kontrakt Registreret Dato :</label>
-                            <InputDate TValue="DateTime" @bind-Value="@(RegisterJobAdvertModel.RegistrationDate)" id="regInputRegistrationDate" class="form-control form-control-sm" />
-                        </div>
-                        <div class="col">
-                            <label for="regInputExpiryDate" class="admin-label col-form-label col-form-label-sm">Udløbsdato :</label>
-                            <InputDate TValue="DateTime" @bind-Value=@(RegisterJobAdvertModel.DeadlineDate) id="regInputExpiryDate" class="form-control form-control-sm" />
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="regInputCompany" class="admin-label col-form-label col-form-label-sm">Stillingsopslag Tilhører :</label>
-                            <select id="regInputCompany" class="form-control form-control-sm" @bind="RegisterJobAdvertModel.CompanyId">
-                                <option value="0" selected>---Vælg en virksomhed fra listen---</option>
-                                @foreach (var company in GetCompanies)
-                                {
-                                    <option value="@company.Id">@company.Name</option>
-                                }
-                            </select>
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="regInputCategory" class="admin-label col-form-label col-form-label-sm">Kategori :</label>
-                            <select id="regInputCategory" class="form-control form-control-sm" @onchange="Registration_OnCategoryChange_GetSpecializationBydCategoryId">
-                                <option value="0" selected>---Vælg en kateori fra listen---</option>
-                                @foreach (var cat in GetCategories)
-                                {
-                                    <option value="@cat.Id">@cat.Name</option>
-                                }
-                            </select>
-                        </div>
-                        @if (SortedSpecialization.Count != 0)
-                        {
-                            <div class="col">
-                                <label for="regInputSpecialization" class="admin-label col-form-label col-form-label-sm">Kategori Speciale :</label>
-                                <select id="regInputSpecialization" class="form-control form-control-sm" @bind="RegisterJobAdvertModel.SpecializationId">
-                                    <option value="0" selected>---Vælg et speciale fra listen---</option>
-                                    @foreach (var spec in SortedSpecialization)
-                                    {
-                                        <option value="@spec.Id">@spec.Name</option>
-                                    }
-                                </select>
-                            </div>
-                        }
-                    </div>
-
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Annuller</button>
-                    <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@IsProcessing">Gem ændringer</button>
-                </div>
-
-            </EditForm>
-
-        </div>
-    </div>
-</div>
+<RemoveJobVacancyModal Id="AdvertId" />
 
 @code {
-    public List<JobVacanciesAdminModel> JobAdverts { get; set; } = new List<JobVacanciesAdminModel>();
+    [Inject] private AdminService AdminService { get; set; }
+    [Inject] private DataService DataService { get; set; }
+    [Inject] private IJSRuntime JSRuntime { get; set; }
+    [Inject] private IRefresh Refresh { get; set; }
 
-    public JobVacanciesAdminModel JobVacancyModelDetails { get; set; } = new JobVacanciesAdminModel() { JobAdvert = new JobAdvert(), Category = new Category(), Company = new Company(), Specialization = new Specialization() };
-    public RegisterJobAdvertModel RegisterJobAdvertModel { get; set; } = new RegisterJobAdvertModel() { RegistrationDate = DateTime.UtcNow, DeadlineDate = DateTime.UtcNow.AddDays(1) };
+    private List<JobAdvert> Adverts = new List<JobAdvert>();
+    private JobVacancyModel JobVacancyModel;
 
-    public List<Category> GetCategories { get; set; } = new List<Category>();
-    public List<Specialization> GetSpecializations { get; set; } = new List<Specialization>();
-    public List<Company> GetCompanies { get; set; } = new List<Company>();
-
-    public List<Specialization> SortedSpecialization { get; set; } = new List<Specialization>();
-
-    public int ItemId { get; set; } = 0;
+    public int AdvertId { get; set; } = 0;
 
     public bool IsProcessing { get; set; } = false;
-    public bool IsSuccess { get; set; } = false;
-    public string SystemMessage { get; set; } = string.Empty;
 
     private bool disabled = false;
 
     protected override async Task OnInitializedAsync()
     {
-        if ((await DService.GetAllCompanies()).Count() == 0)
-            disabled = true;
+        Refresh.RefreshRequest += RefreshAsync;
 
-        JobAdverts = await AService.GetJobVacancies();
+        if (!(await DataService.GetAllCompanies()).Any()) disabled = true;
 
-        GetCategories = await DService.GetAllCategories();
-        GetSpecializations = await DService.GetAllSpecializations();
-        GetCompanies = await DService.GetAllCompanies();
+        Adverts = await AdminService.GetJobVacancies() as List<JobAdvert>;
     }
 
-    public void Details_OnCategoryChange_GetSpecializationBydCategoryId(ChangeEventArgs e)
+    private async void RefreshAsync()
     {
-        JobVacancyModelDetails.Category.Id = int.Parse(e.Value.ToString());
-        JobVacancyModelDetails.Specialization.Id = 0;
+        Adverts = await AdminService.GetJobVacancies() as List<JobAdvert>;
 
-        SortedSpecialization.Clear();
-
-        foreach (var item in GetSpecializations)
-        {
-            if (item.CategoryId == int.Parse(e.Value.ToString())) SortedSpecialization.Add(item);
-        }
-    }
-
-    public void Registration_OnCategoryChange_GetSpecializationBydCategoryId(ChangeEventArgs e)
-    {
-        RegisterJobAdvertModel.CategoryId = int.Parse(e.Value.ToString());
-        RegisterJobAdvertModel.SpecializationId = 0;
-
-        SortedSpecialization.Clear();
-
-        foreach (var item in GetSpecializations)
-        {
-            if (item.CategoryId == int.Parse(e.Value.ToString())) SortedSpecialization.Add(item);
-        }
+        StateHasChanged();
     }
 
     public async Task OnClickEdit_GetJobVacancyDetailsById(int id)
     {
-        // Get full details of job vacancy post.
+        var details = await AdminService.GetJobVacancyDetailsById(id);
 
-        JobVacancyModelDetails = new JobVacanciesAdminModel();
-
-        JobVacancyModelDetails = await AService.GetJobVacancyDetailsById(id);
-
-        SortedSpecialization.Clear();
-
-        foreach (var item in GetSpecializations)
+        JobVacancyModel = new JobVacancyModel()
         {
-            if (item.CategoryId == JobVacancyModelDetails.Specialization.CategoryId) SortedSpecialization.Add(item);
-        }
-    }
-
-    public async Task OnValidSubmit_UpdateJobVacancy()
-    {
-        AService.UpdateJobVacancy(JobVacancyModelDetails);
-
-        await InvokeAsync(async () =>
-        {
-            JobAdverts = await AService.GetJobVacancies();
-            StateHasChanged();
-        });
-
-        await JSRuntime.InvokeVoidAsync("OnInformationChangeAnimation", $"{JobVacancyModelDetails.JobAdvert.Id}");
-
-        await JSRuntime.InvokeVoidAsync("modalToggle", "vacancyAdminDetails");
-    }
-
-    public async Task OnValidSubmit_CreateJobAdvert()
-    {
-        IsProcessing = true;
-        IsSuccess = false;
-        SystemMessage = $"Vent Venligst..";
-        await Task.Delay(3000);
-
-        await InvokeAsync(async () =>
-        {
-            await AService.CreateJobVacancy(RegisterJobAdvertModel);
-
-            SystemMessage = $"Stillingsopslag blev oprettet!";
-            IsSuccess = true;
-
-            StateHasChanged();
-            JobAdverts = await AService.GetJobVacancies();
-        });
-
-        IsProcessing = false;
-        SystemMessage = string.Empty;
-        await JSRuntime.InvokeVoidAsync("modalToggle", "jobAdvertModalCreateNew");
-        RegisterJobAdvertModel = new RegisterJobAdvertModel() { RegistrationDate = DateTime.UtcNow, DeadlineDate = DateTime.UtcNow.AddDays(1) };
-    }
-
-    public async Task OnClickRemove_ConfirmRemove(bool confirmation, int id)
-    {
-        if (confirmation)
-        {
-            if (id != 0)
-            {
-                await JSRuntime.InvokeVoidAsync("modalToggle", "vacandyRemoveConfirmation");
-
-                await RemoveJobVancacy(id);
-            }
-        }
-
-        ItemId = 0;
-
-        await Task.FromResult(confirmation);
-    }
-
-    public async Task RemoveJobVancacy(int id)
-    {
-        AService.RemoveJobVacancyById(id);
-
-        await InvokeAsync(async () =>
-        {
-            JobAdverts = await AService.GetJobVacancies();
-
-            StateHasChanged();
-        });
+            Id = details.Id,
+            Title = details.Title,
+            Email = details.Email,
+            PhoneNumber = details.PhoneNumber,
+            Description = details.JobDescription,
+            Location = details.JobLocation,
+            CompanyId = details.Company.Id,
+            SourceURL = details.SourceURL,
+            RegisteredDate = details.JobRegisteredDate,
+            DeadlineDate = details.DeadlineDate,
+            CategoryId = details.Category.Id,
+            SpecializationId = details.Specialization.Id
+        };
     }
 
     public void OnClick_StoreId(int id)
     {
-        ItemId = id;
+        AdvertId = id;
     }
 }

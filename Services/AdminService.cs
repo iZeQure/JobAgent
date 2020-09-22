@@ -76,52 +76,59 @@ namespace JobAgent.Services
                 });
         }
 
-        public void UpdateJobVacancy(JobVacanciesAdminModel data)
+        public Task<bool> UpdateJobVacancy(JobVacancyModel data)
         {
-            JobAdvert jobData = new JobAdvert()
+            try
             {
-                // Job Data
-                Id = data.JobAdvert.Id,
-                Title = data.JobAdvert.Title,
-                Email = data.JobAdvert.Email,
-                PhoneNumber = data.JobAdvert.PhoneNumber,
-                JobDescription = data.JobAdvert.JobDescription,
-                JobLocation = data.JobAdvert.JobLocation,
-                JobRegisteredDate = data.JobAdvert.JobRegisteredDate,
-                DeadlineDate = data.JobAdvert.DeadlineDate,
-                SourceURL = data.JobAdvert.SourceURL,
+                JobRepository.Update(
+                    new JobAdvert()
+                    {
+                        Id = data.Id,
+                        Title = data.Title,
+                        Email = data.Email,
+                        PhoneNumber = data.PhoneNumber,
+                        JobDescription = data.Description,
+                        JobLocation = data.Location,
+                        JobRegisteredDate = data.RegisteredDate,
+                        DeadlineDate = data.DeadlineDate,
+                        SourceURL = data.SourceURL,
 
-                // Company Data
-                Company = new Company()
-                {
-                    Id = data.Company.Id
-                },
+                        // Company Data
+                        Company = new Company()
+                        {
+                            Id = data.CompanyId.Value
+                        },
 
-                // Category Data
-                Category = new Category()
-                {
-                    Id = data.Category.Id
-                },
-                Specialization = new Specialization()
-                {
-                    Id = data.Specialization.Id
-                }
-            };
+                        // Category Data
+                        Category = new Category()
+                        {
+                            Id = data.CategoryId
+                        },
+                        Specialization = new Specialization()
+                        {
+                            Id = data.SpecializationId.Value
+                        }
+                    });
 
-            JobRepository.Update(jobData);
+                return Task.FromResult(true);
+            }
+            catch (Exception)
+            {
+                return Task.FromResult(false);
+            }
         }
 
-        public Task<List<JobVacanciesAdminModel>> GetJobVacancies()
+        public Task<IEnumerable<JobAdvert>> GetJobVacancies()
         {
-            return Task.FromResult(((IJobAdvertRepository)JobRepository).GetAllJobAdvertsForAdmins().ToList());
+            return ((IJobAdvertRepository)JobRepository).GetAllJobAdvertsForAdmins();
         }
 
-        public Task<JobVacanciesAdminModel> GetJobVacancyDetailsById(int id)
+        public Task<JobAdvert> GetJobVacancyDetailsById(int id)
         {
-            return Task.FromResult(((IJobAdvertRepository)JobRepository).GetJobAdvertDetailsForAdminsById(id));
+            return ((IJobAdvertRepository) JobRepository).GetJobAdvertDetailsForAdminsById(id);
         }
 
-        public Task CreateJobVacancy(RegisterJobAdvertModel model)
+        public Task CreateJobVacancy(JobVacancyModel model)
         {
             JobAdvert jobAdvert =
                 new JobAdvert()
@@ -131,12 +138,12 @@ namespace JobAgent.Services
                     PhoneNumber = model.PhoneNumber,
                     JobDescription = model.Description,
                     JobLocation = model.Location,
-                    JobRegisteredDate = model.RegistrationDate,
+                    JobRegisteredDate = model.RegisteredDate,
                     DeadlineDate = model.DeadlineDate,
                     SourceURL = model.SourceURL,
                     Company = new Company()
                     {
-                        Id = model.CompanyId
+                        Id = model.CompanyId.Value
                     },
                     Category = new Category()
                     {
@@ -144,7 +151,7 @@ namespace JobAgent.Services
                     },
                     Specialization = new Specialization()
                     {
-                        Id = model.SpecializationId
+                        Id = model.SpecializationId.Value
                     }
                 };
 

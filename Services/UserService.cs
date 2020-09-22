@@ -56,9 +56,9 @@ namespace JobAgent.Services
             return await Task.FromResult(user);
         }
 
-        public async Task<bool> CheckUserExistsAsync(RegisterAccountModel registerAccountModel)
+        public async Task<bool> CheckUserExistsAsync(string email)
         {
-            if (UserRepository.CheckUserExists(registerAccountModel.Email))
+            if (UserRepository.CheckUserExists(email))
             {
                 return await Task.FromResult(true);
             }

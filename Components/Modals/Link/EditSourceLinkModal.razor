@@ -20,7 +20,6 @@
                         }
 
                         <DataAnnotationsValidator />
-                        <ValidationSummary />
 
                         <div class="row">
                             <div class="col">
@@ -41,6 +40,7 @@
                                             }
                                         }
                                     </select>
+                                    <ValidationMessage For="@(() => SourceLinkModel.CompanyId)" />
                                 }
                             </div>
                         </div>
@@ -51,6 +51,7 @@
                             <div class="col">
                                 <label for="editLink" class="admin-label">Link til Stillingsopslag :</label>
                                 <input id="editLink" class="form-control form-control-sm" placeholder="Indtast link til stillingsopslaget.." @bind="@(SourceLinkModel.Link = SourceLink.Link)" />
+                                <ValidationMessage For="@(() => SourceLinkModel.Link)" />
                             </div>
                         </div>
                     </div>
@@ -89,7 +90,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Companies = await DataService.GetAllCompanies();
+        Companies = await DataService.GetCompaniesWithContract() as List<Company>;
     }
 
     private void OnValidSubmit_EditSourceLink()

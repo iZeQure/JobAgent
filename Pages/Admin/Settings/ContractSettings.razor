@@ -2,13 +2,18 @@
 
 @attribute [Authorize]
 
+<PageTitle Title="Indstillinger for Kontrakter" />
+
 <div class="d-flex">
     <PageDisplayName DisplayName="Administrer Kontrakter" />
     <div class="d-inline-block">
 
         @if (disabled)
         {
-            <a class="btn btn-sm btn-info cursor-pointer text-white disabled">Ikke Aktiveret</a>
+            <a class="btn btn-sm btn-info cursor-pointer text-white disabled">
+                <span>Ikke Aktiveret</span>
+            </a>
+            <span class="d-inline-block"><small class="text-danger font-weight-bolder">* Opret en Virksomhed for at benytte kontrakter.</small></span>
         }
         else
         {

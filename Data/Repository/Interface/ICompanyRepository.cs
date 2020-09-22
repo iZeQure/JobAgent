@@ -8,5 +8,8 @@ namespace JobAgent.Data.Repository.Interface
 {
     interface ICompanyRepository : IRepository<Company>
     {
+        public Task<IEnumerable<Company>> GetCompaniesWithContract();
+
+        public Task<IEnumerable<Company>> GetCompaniesWithOutContract();
     }
 }

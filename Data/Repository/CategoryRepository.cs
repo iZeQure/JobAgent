@@ -112,7 +112,8 @@ namespace JobAgent.Data.Repository
             // Prepare sql command object with information.
             using SqlCommand cmd = new SqlCommand("GetAllCategoriesWithSpecialization", SqlDataAccess.Instance.SqlConnection)
             {
-                CommandType = CommandType.StoredProcedure
+                CommandType = CommandType.StoredProcedure,
+                CommandTimeout = 5
             };
 
             // Open connection to the database.

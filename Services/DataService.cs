@@ -39,6 +39,11 @@ namespace JobAgent.Services
             return ((IJobAdvertRepository)JobAdvertRepository).GetCountOfJobAdvertsBySpecializationId(id);
         }
 
+        public Task<int> GetCountOfJobAdvertsUncategorized()
+        {
+            return ((IJobAdvertRepository)JobAdvertRepository).GetCountOfJobAdvertsUncategorized();
+        }
+
         public Task<List<ConsultantArea>> GetAllConsultantAreasTask()
         {
             return Task.FromResult(ConsultantAreaRepository.GetAll().ToList());
@@ -61,6 +66,16 @@ namespace JobAgent.Services
         public Task<List<Company>> GetAllCompanies()
         {
             return Task.FromResult(CompanyRepository.GetAll().ToList());
+        }
+
+        public Task<IEnumerable<Company>> GetCompaniesWithContract()
+        {
+            return ((ICompanyRepository)CompanyRepository).GetCompaniesWithContract();
+        }
+
+        public Task<IEnumerable<Company>> GetCompaniesWithOutContract()
+        {
+            return ((ICompanyRepository)CompanyRepository).GetCompaniesWithOutContract();
         }
 
         public Task<Company> GetCompanyById(int id)

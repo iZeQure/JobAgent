@@ -1,9 +1,11 @@
 ﻿using JobAgent.Data.DataAccess;
 using JobAgent.Data.Objects;
 using JobAgent.Data.Repository.Interface;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace JobAgent.Data.Repository
 {
@@ -114,6 +116,87 @@ namespace JobAgent.Data.Repository
 
             // Return data.
             return tempCompany;
+        }
+
+        public Task<IEnumerable<Company>> GetCompaniesWithOutContract()
+        {
+            var tempCompanies = new List<Company>();
+
+            using SqlCommand c = new SqlCommand()
+            {
+                CommandText = "SELECT * FROM [Company] WHERE EXISTS (SELECT * FROM [Contract] WHERE [Contract].[CompanyId] != [Company].[Id])",
+                CommandType = CommandType.Text,
+                Connection = SqlDataAccess.Instance.SqlConnection
+            };
+
+            try
+            {
+                SqlDataAccess.Instance.OpenConnection();
+
+                using SqlDataReader r = c.ExecuteReader();
+
+                if (r.HasRows)
+                {
+                    while (r.Read())
+                    {
+                        tempCompanies.Add(
+                            new Company()
+                            {
+                                Id = r.GetInt32(0),
+                                CVR = r.GetOrdinal("CVR"),
+                                Name = r.GetString("Name"),
+                                URL = r.GetString("URL")
+                            }
+                        );
+                    }
+                }
+
+                return Task.FromResult(tempCompanies as IEnumerable<Company>);
+            }
+            finally
+            {
+                SqlDataAccess.Instance.CloseConnection();
+            }
+        }
+
+        public Task<IEnumerable<Company>> GetCompaniesWithContract()
+        {
+            var tempCompanies = new List<Company>();
+
+            using SqlCommand c = new SqlCommand()
+            {
+                CommandText = "SELECT * FROM [Company] WHERE EXISTS (SELECT * FROM [Contract] WHERE [Contract].[CompanyId] = [Company].[Id])",
+                CommandType = CommandType.Text,
+                Connection = SqlDataAccess.Instance.SqlConnection
+            };
+
+            try
+            {
+                SqlDataAccess.Instance.OpenConnection();
+
+                using SqlDataReader r = c.ExecuteReader();
+
+                if (r.HasRows)
+                {
+                    while (r.Read())
+                    {
+                        tempCompanies.Add(
+                            new Company()
+                            {
+                                Id = r.GetInt32(0),
+                                CVR = r.GetInt32(1),
+                                Name = r.GetString(2),
+                                URL = r.GetString(3)
+                            });
+                    }
+                }
+
+                return Task.FromResult(tempCompanies as IEnumerable<Company>);
+            }
+            finally
+            {
+                SqlDataAccess.Instance.CloseConnection();
+            }
         }
 
         /// <summary>

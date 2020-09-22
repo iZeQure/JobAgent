@@ -22,6 +22,18 @@ namespace JobAgent.Services
             return Task.FromResult(jobMenu);
         }
 
+        public async Task<List<JobAdvert>> GetUncategorizedJobVacancies()
+        {
+            var list = await Task.FromResult(AdvertRepository.GetAll());
+
+            var uncatedgorizedJobs = from job in list
+                                     where job.Category.Id == 0
+                                     orderby job.JobVacancyRegisteredAgo ascending
+                                     select job;
+
+            return await Task.FromResult(uncatedgorizedJobs.ToList());
+        }
+
         public async Task<List<JobAdvert>> GetJobVacanciesAsync(int id, string name)
         {
             JobAdverts = await Task.FromResult(AdvertRepository.GetAll().ToList());

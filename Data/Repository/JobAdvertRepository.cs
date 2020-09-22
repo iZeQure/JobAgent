@@ -86,7 +86,7 @@ namespace JobAgent.Data.Repository
                         Category = new Category()
                         {
                             Id = reader.GetInt32("CategoryId"),
-                            Name = reader.GetString("CategoryName")
+                            Name = !DataReaderExtensions.IsDBNull(reader, "CategoryName") ? reader.GetString("CategoryName") : "Ikke Kategoriseret"
                         },
                         Specialization = new Specialization()
                         {
@@ -106,7 +106,7 @@ namespace JobAgent.Data.Repository
             throw new NotImplementedException();
         }
 
-        public JobVacanciesAdminModel GetJobAdvertDetailsForAdminsById(int id)
+        public Task<JobAdvert> GetJobAdvertDetailsForAdminsById(int id)
         {
             // Initialize command obj.
             using SqlCommand c = new SqlCommand()
@@ -124,7 +124,7 @@ namespace JobAgent.Data.Repository
             using SqlDataReader r = c.ExecuteReader();
 
             // Initialize temporary obj.
-            JobVacanciesAdminModel tempModel = null;
+            JobAdvert tempJobAdvert = null;
 
             Specialization specialization = new Specialization();
 
@@ -134,23 +134,18 @@ namespace JobAgent.Data.Repository
                 // Read data.
                 while (r.Read())
                 {
-                    if (!DataReaderExtensions.IsDBNull(r, "SpecializationName")) specialization.Name = r.GetString("SpecializationName");
-                    else specialization.Name = string.Empty;
-
-                    tempModel = new JobVacanciesAdminModel()
+                    tempJobAdvert = new JobAdvert()
                     {
-                        JobAdvert = new JobAdvert()
-                        {
-                            Id = r.GetInt32("BaseId"),
-                            Title = r.GetString("Title"),
-                            Email = r.GetString("Email"),
-                            PhoneNumber = r.GetString("PhoneNumber"),
-                            JobDescription = r.GetString("Desc"),
-                            JobLocation = r.GetString("Loc"),
-                            JobRegisteredDate = r.GetDateTime("RegDate"),
-                            DeadlineDate = r.GetDateTime("DeadlineDate"),
-                            SourceURL = r.GetString("SourceURL")
-                        },
+                        Id = r.GetInt32("BaseId"),
+                        Title = r.GetString("Title"),
+                        Email = r.GetString("Email"),
+                        PhoneNumber = r.GetString("PhoneNumber"),
+                        JobDescription = r.GetString("Desc"),
+                        JobLocation = r.GetString("Loc"),
+                        JobRegisteredDate = r.GetDateTime("RegDate"),
+                        DeadlineDate = r.GetDateTime("DeadlineDate"),
+                        SourceURL = r.GetString("SourceURL"),
+
                         Company = new Company()
                         {
                             Id = r.GetInt32("CompanyId"),
@@ -159,12 +154,12 @@ namespace JobAgent.Data.Repository
                         Category = new Category()
                         {
                             Id = r.GetInt32("CategoryId"),
-                            Name = r.GetString("CategoryName")
+                            Name = !DataReaderExtensions.IsDBNull(r, "CategoryName") ? r.GetString("CategoryName") : "Ikke Kategoriseret"
                         },
                         Specialization = new Specialization()
                         {
                             Id = r.GetInt32("SpecializationId"),
-                            Name = specialization.Name
+                            Name = !DataReaderExtensions.IsDBNull(r, "SpecializationName") ? r.GetString("SpecializationName") : string.Empty
                         }
                     };
                 }
@@ -172,10 +167,10 @@ namespace JobAgent.Data.Repository
 
             SqlDataAccess.Instance.CloseConnection();
 
-            return tempModel;
+            return Task.FromResult(tempJobAdvert);
         }
 
-        public IEnumerable<JobVacanciesAdminModel> GetAllJobAdvertsForAdmins()
+        public Task<IEnumerable<JobAdvert>> GetAllJobAdvertsForAdmins()
         {
             // Initialize command obj.
             using SqlCommand c = new SqlCommand()
@@ -189,15 +184,12 @@ namespace JobAgent.Data.Repository
             SqlDataAccess.Instance.OpenConnection();
 
             // Create temp list with job adverts.
-            List<JobVacanciesAdminModel> dataList = new List<JobVacanciesAdminModel>();
+            List<JobAdvert> dataList = new List<JobAdvert>();
 
             try
             {
                 // Initialize data reader.
                 using SqlDataReader r = c.ExecuteReader();
-
-                // Temp objects.
-                Specialization specialization = new Specialization();
 
                 // Check for rows.
                 if (r.HasRows)
@@ -205,31 +197,28 @@ namespace JobAgent.Data.Repository
                     // Read data.
                     while (r.Read())
                     {
-                        if (!DataReaderExtensions.IsDBNull(r, "Specialization")) specialization.Name = r.GetString("Specialization");
-                        else specialization.Name = string.Empty;
-
-                        dataList.Add(new JobVacanciesAdminModel()
-                        {
-                            JobAdvert = new JobAdvert()
+                        dataList.Add(
+                            new JobAdvert()
                             {
                                 Id = r.GetInt32("JobId"),
                                 Title = r.GetString("Title"),
                                 JobRegisteredDate = r.GetDateTime("JobRegisteredDate"),
-                                DeadlineDate = r.GetDateTime("DeadlineDate")
-                            },
-                            Category = new Category()
-                            {
-                                Name = r.GetString("Category")
-                            },
-                            Specialization = new Specialization()
-                            {
-                                Name = specialization.Name
-                            },
-                            Company = new Company()
-                            {
-                                Name = r.GetString("Name")
+                                DeadlineDate = r.GetDateTime("DeadlineDate"),
+
+                                Category = new Category()
+                                {
+                                    Name = !DataReaderExtensions.IsDBNull(r, "Category") ? r.GetString("Category") : string.Empty
+                                },
+                                Specialization = new Specialization()
+                                {
+                                    Name = !DataReaderExtensions.IsDBNull(r, "Specialization") ? r.GetString("Specialization") : string.Empty
+                                },
+                                Company = new Company()
+                                {
+                                    Name = r.GetString("Name")
+                                }
                             }
-                        });
+                        );
                     }
                 }
             }
@@ -238,7 +227,7 @@ namespace JobAgent.Data.Repository
                 SqlDataAccess.Instance.CloseConnection();
             }
 
-            return dataList;
+            return Task.FromResult((IEnumerable<JobAdvert>)dataList);
         }
 
         public void Remove(int id)
@@ -351,6 +340,40 @@ namespace JobAgent.Data.Repository
             };
 
             c.Parameters.AddWithValue("@id", id);
+
+            try
+            {
+                SqlDataAccess.Instance.OpenConnection();
+
+                using SqlDataReader r = c.ExecuteReader();
+
+                if (r.HasRows)
+                {
+                    while (r.Read())
+                    {
+                        count = r.GetInt32(0);
+                    }
+                }
+            }
+            finally
+            {
+                SqlDataAccess.Instance.CloseConnection();
+            }
+
+            return Task.FromResult(count);
+        }
+
+        public Task<int> GetCountOfJobAdvertsUncategorized()
+        {
+            int count = 0;
+
+            using SqlCommand c = new SqlCommand()
+            {
+                CommandText = $"SELECT COUNT([CategoryId]) AS 'UncategorizedCount' FROM [JobAdvert] WHERE [CategoryId] = 0",
+                CommandType = CommandType.Text,
+                CommandTimeout = 15,
+                Connection = SqlDataAccess.Instance.SqlConnection
+            };
 
             try
             {

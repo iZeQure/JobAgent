@@ -1,9 +1,5 @@
 ﻿@page "/admin/account/register"
 
-@inject IUserService UserSerivce
-@inject DataService DataService
-@inject SecurityService SecurityService
-
 @attribute [Authorize]
 @* Page Title *@
 <PageTitle Title="Registrer Ny Konsulent" />
@@ -25,7 +21,11 @@
             <div class="row">
                 <div class="col">
                     <label for="inputEmail" class="admin-label">Email Adresse :</label>
-                    <input id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" @bind-value="RegisterAccountModel.Email" />
+                    @if (UserAlreadyExists)
+                    {
+                        <span class="d-inline-flex"><small class="text-danger font-weight-bolder">* Email er allerede tilknyttet en Praktikkonsulent.</small></span>
+                    }
+                    <input id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" @bind-value="RegisterAccountModel.Email" @onfocusout="OnFocusOut_CheckUserAlreadyExists" />
                     <ValidationMessage For="@(() => RegisterAccountModel.Email)" />
                 </div>
             </div>
@@ -100,7 +100,7 @@
                     <ValidationSummary Model="RegisterAccountModel" />
                 </div>
             </div>
-            <button type="submit" class="btn btn-info float-right ml-auto mt-5" disabled="@IsProcessing">
+            <button type="submit" class="btn btn-info float-right ml-auto mt-5" disabled="@(IsProcessing || UserAlreadyExists)">
                 @if (IsProcessing)
                 {
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -117,6 +117,10 @@
 </div>
 
 @code {
+    [Inject] private IUserService UserService { get; set; }
+    [Inject] private DataService DataService { get; set; }
+    [Inject] private SecurityService SecurityService { get; set; }
+
     private RegisterAccountModel RegisterAccountModel { get; set; } = new RegisterAccountModel();
 
     private User User { get; set; } = new User() { ConsultantArea = new ConsultantArea(), Location = new Location() };
@@ -129,6 +133,7 @@
     public string Message { get; set; } = string.Empty;
     public bool IsLoadingInformation { get; set; } = true;
     public bool IsProcessing { get; set; } = false;
+    public bool UserAlreadyExists = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -153,38 +158,49 @@
 
     private async Task OnValidSubmit_RegisterAccountAsync()
     {
-        IsProcessing = true;
-
-        await Task.Delay(1750);
-
-        if (UserSerivce is UserService service)
+        if (!UserAlreadyExists)
         {
-            if (!service.CheckUserExistsAsync(RegisterAccountModel).Result)
+            IsProcessing = true;
+
+            await Task.Delay(1750);
+
+            if (UserService is UserService service)
             {
-                await InvokeAsync(async () =>
+                if (!service.CheckUserExistsAsync(RegisterAccountModel.Email).Result)
                 {
-                    var result = await service.RegisterUserAsync(RegisterAccountModel);
+                    await InvokeAsync(async () =>
+                    {
+                        var result = await service.RegisterUserAsync(RegisterAccountModel);
 
-                    if (string.IsNullOrEmpty(result.Email))
-                        ErrorMessage = "Kunne ikke oprette Praktikkonsulent.";
-                    else
-                        Message = "Praktikkonsulent blev oprettet!";
-                });
+                        if (string.IsNullOrEmpty(result.Email))
+                            ErrorMessage = "Kunne ikke oprette Praktikkonsulent.";
+                        else
+                            Message = "Praktikkonsulent blev oprettet!";
+                    });
+                }
+                else
+                {
+                    ErrorMessage = "Fejl, Praktikkonsulent eksistere allerede.";
+                }
             }
-            else
-            {
-                ErrorMessage = "Fejl, Praktikkonsulent eksistere allerede.";
-            }
+
+            StateHasChanged();
+            RegisterAccountModel = new RegisterAccountModel();
+
+            await Task.Delay(1250);
+
+            IsProcessing = false;
+            SystemMessage = string.Empty;
+            ErrorMessage = string.Empty;
+            Message = string.Empty;
         }
+    }
 
-        StateHasChanged();
-        RegisterAccountModel = new RegisterAccountModel();
-
-        await Task.Delay(1250);
-
-        IsProcessing = false;
-        SystemMessage = string.Empty;
-        ErrorMessage = string.Empty;
-        Message = string.Empty;
+    private async void OnFocusOut_CheckUserAlreadyExists(FocusEventArgs e)
+    {
+        if (UserService is UserService service)
+        {
+            UserAlreadyExists = await service.CheckUserExistsAsync(RegisterAccountModel.Email);
+        }
     }
 }

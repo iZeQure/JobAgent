@@ -7,6 +7,12 @@
 }
 else
 {
+    <div class="py-1 px-2">
+        <a class="btn btn-link btn-sm text-wrap text-left @MenuColor" href="/job/uncategorized">
+            Ikke kategoriserert <span class="badge badge-info">@(GetUncategorizedCount().Result)</span>
+        </a>
+    </div>
+
     @for (int i = 0; i < JobCategories.Count; i++)
     {
         @if (JobCategories[i].Specializations != null)
@@ -63,23 +69,33 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        IsLoading = true;
-        AlertType = MessageAlert.AlertType.Info;
-        SystemMessage = "Indlæser menu..";
-        await Task.Delay(1000);
-
-        if (!JobCategories.Any()) 
-            JobCategories = await JobService.GetJobMenuAsync();
-
-        if (JobCategories.Count == 0)
+        try
         {
-            AlertType = MessageAlert.AlertType.Warning;
-            SystemMessage = "Kunne ikke indlæse menu..";
-        }
+            IsLoading = true;
+            AlertType = MessageAlert.AlertType.Info;
+            SystemMessage = "Indlæser menu..";
+            await Task.Delay(1000);
 
-        IsLoading = false;
-        SystemMessage = string.Empty;
-        await Task.Delay(750);
+            if (!JobCategories.Any())
+                JobCategories = await JobService.GetJobMenuAsync();
+
+            if (JobCategories.Count == 0)
+            {
+                AlertType = MessageAlert.AlertType.Warning;
+                SystemMessage = "Kunne ikke indlæse menu..";
+            }
+
+            IsLoading = false;
+            SystemMessage = string.Empty;
+            await Task.Delay(750);
+        }
+        catch (Exception)
+        {
+            AlertType = MessageAlert.AlertType.Error;
+
+            SystemMessage = "Uventet fejl.";
+            IsLoading = false;
+        }
     }
 
     protected async Task<int> GetCategoryCount(int id)
@@ -90,6 +106,11 @@ else
     protected async Task<int> GetSpecializationCount(int id)
     {
         return await DataService.GetCountOfJobAdvertsBySpecializationId(id);
+    }
+
+    protected async Task<int> GetUncategorizedCount()
+    {
+        return await DataService.GetCountOfJobAdvertsUncategorized();
     }
 
     protected string RemoveWhitespace(string input)
