@@ -124,7 +124,7 @@ namespace JobAgent.Data.Repository
 
             using SqlCommand c = new SqlCommand()
             {
-                CommandText = "SELECT * FROM [Company] WHERE EXISTS (SELECT * FROM [Contract] WHERE [Contract].[CompanyId] != [Company].[Id])",
+                CommandText = "SELECT * FROM [Company] WHERE NOT EXISTS (SELECT * FROM [Contract] WHERE [Contract].[CompanyId] = [Company].[Id])",
                 CommandType = CommandType.Text,
                 Connection = SqlDataAccess.Instance.SqlConnection
             };
