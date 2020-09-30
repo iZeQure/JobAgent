@@ -18,8 +18,8 @@ else
         @if (JobCategories[i].Specializations != null)
         {
             <div class="dropdown py-1 px-2">
-                <a id="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu" class="dropdown-toggle btn btn-link btn-sm @MenuColor text-wrap text-left cursor-pointer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    @JobCategories[i].Name <span class="badge badge-info">@GetCategoryCount(JobCategories[i].Specializations.Select(x => x.CategoryId).First()).Result</span>
+                <a id="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu" class="@MenuColor dropdown-toggle btn btn-link btn-sm text-wrap text-left cursor-pointer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    @JobCategories[i].Name <span class="badge badge-info">@GetCategoryCount(JobCategories[i].Specializations.Select(x => x.CategoryId).First()).GetAwaiter().GetResult()</span>
                 </a>
 
                 <div class="dropdown-menu" aria-labelledby="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu">
@@ -37,8 +37,8 @@ else
                     @for (int j = 0; j < JobCategories[i].Specializations.Count; j++)
                     {
                         // Link : {domain}/job/CategoryId/CategoryName/SpecializationId/SpecializationName
-                        <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].Id/@JobCategories[i].Name/@JobCategories[i].Specializations[j].Id/@JobCategories[i].Specializations[j].Name">
-                            @JobCategories[i].Specializations[j].Name <span class="badge badge-info">@GetSpecializationCount(JobCategories[i].Specializations[j].Id).Result</span>
+                        <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].Id/@JobCategories[i].Specializations[j].Id">
+                            @JobCategories[i].Specializations[j].Name <span class="badge badge-info">@GetSpecializationCount(JobCategories[i].Specializations[j].Id).GetAwaiter().GetResult()</span>
                         </a>
                     }
                 </div>
@@ -48,7 +48,7 @@ else
         {
             <div class="py-1 px-2">
                 @* Link : {domain}/job/CategoryId/CategoryName *@
-                <a class="btn btn-link btn-sm @MenuColor text-wrap text-left" href="/job/@JobCategories[i].Id/@JobCategories[i].Name">
+                <a class="@MenuColor btn btn-link btn-sm text-wrap text-left" href="/job/@JobCategories[i].Id">
                     @JobCategories[i].Name <span class="badge badge-info">@GetCategoryCount(JobCategories[i].Id).Result</span>
                 </a>
             </div>
@@ -57,7 +57,6 @@ else
 }
 
 @code {
-    // Testing
     List<Category> JobCategories = new List<Category>();
 
     public string MenuColor { get; set; } = "text-light";
@@ -69,32 +68,30 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadMenu();
+
+        if (JobCategories.Count == 0)
+        {
+            AlertType = MessageAlert.AlertType.Warning;
+            SystemMessage = $"Kunne ikke indlæse menu!";
+        }
+    }
+
+    protected async Task LoadMenu()
+    {
+        AlertType = MessageAlert.AlertType.Info;
+        SystemMessage = $"Indlæser menu..";
+        IsLoading = true;
+
         try
         {
-            IsLoading = true;
-            AlertType = MessageAlert.AlertType.Info;
-            SystemMessage = "Indlæser menu..";
-            await Task.Delay(1000);
-
-            if (!JobCategories.Any())
-                JobCategories = await JobService.GetJobMenuAsync();
-
-            if (JobCategories.Count == 0)
-            {
-                AlertType = MessageAlert.AlertType.Warning;
-                SystemMessage = "Kunne ikke indlæse menu..";
-            }
-
+            JobCategories = await JobService.GetJobMenuAsync();
+            await Task.CompletedTask;
+        }
+        finally
+        {
             IsLoading = false;
             SystemMessage = string.Empty;
-            await Task.Delay(750);
-        }
-        catch (Exception)
-        {
-            AlertType = MessageAlert.AlertType.Error;
-
-            SystemMessage = "Uventet fejl.";
-            IsLoading = false;
         }
     }
 
@@ -119,5 +116,4 @@ else
         .Where(c => !Char.IsWhiteSpace(c))
         .ToArray());
     }
-    // End Testing
 }

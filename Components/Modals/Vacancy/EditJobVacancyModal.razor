@@ -185,6 +185,7 @@
         await AdminService.UpdateJobVacancy(Model);
 
         Refresh.CallRefreshRequest();
+        IsProcessing = false;
 
         await JSRuntime.InvokeVoidAsync("modalToggle", "EditJobVacancyModal");
         await JSRuntime.InvokeVoidAsync("OnInformationChangeAnimation", $"{Model.Id}");

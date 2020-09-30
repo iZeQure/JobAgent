@@ -100,5 +100,10 @@ namespace JobAgent.Services
         {
             return SourceLinkRepository.GetById(id);
         }
+
+        public static string TruncateString(string value, int maxChars)
+        {
+            return value.Length <= maxChars ? value : value.Substring(0, maxChars) + " ...";
+        }
     }
 }

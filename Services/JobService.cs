@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using JobAgent.Data.Objects;
 using JobAgent.Data.Repository;
 using JobAgent.Data.Repository.Interface;
+using JobAgent.Models;
 
 namespace JobAgent.Services
 {
@@ -13,13 +14,26 @@ namespace JobAgent.Services
         private protected IRepository<Category> CategoryRepository { get; } = new CategoryRepository();
         private protected IRepository<JobAdvert> AdvertRepository { get; } = new JobAdvertRepository();
 
-        private List<JobAdvert> JobAdverts { get; set; } = new List<JobAdvert>();
+        public Task<JobAdvertPaginationModel> JobAdvertPagination(int page = 1)
+        {
+            var paginationModel = new JobAdvertPaginationModel
+            {
+                JobAdvertsPerPage = 25,
+                JobAdverts = AdvertRepository.GetAll().OrderBy(x => x.JobRegisteredDate),
+                CurrentPage = page
+            };
+
+            return Task.FromResult(paginationModel);
+        }
+
+        public Task<JobAdvert> GetJobVacancyById(int advertId)
+        {
+            return Task.FromResult(AdvertRepository.GetById(advertId));
+        }
 
         public Task<List<Category>> GetJobMenuAsync()
         {
-            var jobMenu = ((ICategoryRepository)CategoryRepository).GetAllCategoriesWithSpecializations();
-
-            return Task.FromResult(jobMenu);
+            return ((ICategoryRepository)CategoryRepository).GetAllCategoriesWithSpecializations();
         }
 
         public async Task<List<JobAdvert>> GetUncategorizedJobVacancies()
@@ -31,31 +45,35 @@ namespace JobAgent.Services
                                      orderby job.JobVacancyRegisteredAgo ascending
                                      select job;
 
-            return await Task.FromResult(uncatedgorizedJobs.ToList());
+            return await Task.FromResult(result: uncatedgorizedJobs as List<JobAdvert>);
         }
 
-        public async Task<List<JobAdvert>> GetJobVacanciesAsync(int id, string name)
+        public async Task<IEnumerable<JobAdvert>> GetJobVacanciesAsync(int id)
         {
-            JobAdverts = await Task.FromResult(AdvertRepository.GetAll().ToList());
+            return await ((IJobAdvertRepository)AdvertRepository).GetAllJobAdvertsSortedByCategoryId(id);
 
-            var sortJobs = from job in JobAdverts
-                           where job.Category.Id == id
-                           orderby job.JobRegisteredDate ascending
-                           select job;
+            //JobAdverts = await Task.FromResult(AdvertRepository.GetAll().ToList());
 
-            return await Task.FromResult(sortJobs.ToList());
+            //var sortJobs = from job in JobAdverts
+            //               where job.Category.Id == id
+            //               orderby job.JobRegisteredDate ascending
+            //               select job;
+
+            //return await Task.FromResult(result: sortJobs.ToList());
         }
 
-        public async Task<List<JobAdvert>> GetJobSpecialVacanciesAsync(int id, string name)
+        public async Task<IEnumerable<JobAdvert>> GetJobSpecialVacanciesAsync(int id)
         {
-            JobAdverts = await Task.FromResult(AdvertRepository.GetAll().ToList());
+            return await ((IJobAdvertRepository)AdvertRepository).GetAllJobAdvertsSortedBySpecializationId(id);
 
-            var sortJobs = from job in JobAdverts
-                           where job.Specialization.Id == id
-                           orderby job.JobRegisteredDate ascending
-                           select job;
+            //JobAdverts = await Task.FromResult(AdvertRepository.GetAll().ToList());
 
-            return await Task.FromResult(sortJobs.ToList());
+            //var sortJobs = from job in JobAdverts
+            //               where job.Specialization.Id == id
+            //               orderby job.JobRegisteredDate ascending
+            //               select job;
+
+            //return await Task.FromResult(result: sortJobs.ToList());
         }
     }
 }

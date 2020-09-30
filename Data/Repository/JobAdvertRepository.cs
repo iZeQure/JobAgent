@@ -2,12 +2,16 @@
 using JobAgent.Data.Objects;
 using JobAgent.Data.Repository.Interface;
 using JobAgent.Models;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 
 namespace JobAgent.Data.Repository
@@ -45,65 +49,131 @@ namespace JobAgent.Data.Repository
 
         public IEnumerable<JobAdvert> GetAll()
         {
-            // Initialzie temporay job advet collection.
-            List<JobAdvert> tempJobAdverts = new List<JobAdvert>();
-
-            // Open connection to database.
-            SqlDataAccess.Instance.OpenConnection();
-
-            // Initialzie command obj.
-            using SqlCommand cmd = new SqlCommand("GetAllJobAdverts", SqlDataAccess.Instance.SqlConnection)
+            try
             {
-                CommandType = CommandType.StoredProcedure
-            };
+                // Initialzie temporay job advet collection.
+                List<JobAdvert> tempJobAdverts = new List<JobAdvert>();
 
-            // Initialize data reader.
-            using SqlDataReader reader = cmd.ExecuteReader();
-
-            // Check for data.
-            if (reader.HasRows)
-            {
-                // Read data.
-                while (reader.Read())
+                // Initialzie command obj.
+                using SqlCommand cmd = new SqlCommand()
                 {
-                    // Add data to collection.
-                    tempJobAdverts.Add(new JobAdvert()
-                    {
-                        Id = reader.GetInt32("Id"),
-                        Title = reader.GetString("Title"),
-                        Email = reader.GetString("Email"),
-                        PhoneNumber = reader.GetString("PhoneNumber"),
-                        JobDescription = reader.GetString("JobDescription"),
-                        JobLocation = reader.GetString("JobLocation"),
-                        JobRegisteredDate = reader.GetDateTime("JobRegisteredDate"),
-                        DeadlineDate = reader.GetDateTime("DeadlineDate"),
-                        SourceURL = reader.GetString("SourceURL"),
-                        Company = new Company()
-                        {
-                            Id = reader.GetInt32("CompanyId"),
-                            Name = reader.GetString("CompanyName")
-                        },
-                        Category = new Category()
-                        {
-                            Id = reader.GetInt32("CategoryId"),
-                            Name = !DataReaderExtensions.IsDBNull(reader, "CategoryName") ? reader.GetString("CategoryName") : "Ikke Kategoriseret"
-                        },
-                        Specialization = new Specialization()
-                        {
-                            Id = reader.GetInt32("SpecializationId"),
-                            Name = !DataReaderExtensions.IsDBNull(reader, "SpecializationName") ? reader.GetString("SpecializationName") : string.Empty
-                        }
-                    });
-                }
-            }
+                    CommandType = CommandType.StoredProcedure,
+                    CommandText = "GetAllJobAdverts",
+                    Connection = SqlDataAccess.Instance.SqlConnection,
+                    CommandTimeout = 5
+                };
 
-            // Return data.
-            return tempJobAdverts;
+                // Open connection to database.
+                SqlDataAccess.Instance.OpenConnection();
+
+                // Initialize data reader.
+                using SqlDataReader reader = cmd.ExecuteReader();
+
+                // Check for data.
+                if (reader.HasRows)
+                {
+                    // Read data.
+                    while (reader.Read())
+                    {
+                        // Add data to collection.
+                        tempJobAdverts.Add(new JobAdvert()
+                        {
+                            Id = reader.GetInt32("Id"),
+                            Title = reader.GetString("Title"),
+                            Email = reader.GetString("Email"),
+                            PhoneNumber = reader.GetString("PhoneNumber"),
+                            JobDescription = reader.GetString("JobDescription"),
+                            JobLocation = reader.GetString("JobLocation"),
+                            JobRegisteredDate = reader.GetDateTime("JobRegisteredDate"),
+                            DeadlineDate = reader.GetDateTime("DeadlineDate"),
+                            SourceURL = reader.GetString("SourceURL"),
+                            Company = new Company()
+                            {
+                                Id = reader.GetInt32("CompanyId"),
+                                Name = reader.GetString("CompanyName")
+                            },
+                            Category = new Category()
+                            {
+                                Id = reader.GetInt32("CategoryId"),
+                                Name = !DataReaderExtensions.IsDBNull(reader, "CategoryName") ? reader.GetString("CategoryName") : "Ikke Kategoriseret"
+                            },
+                            Specialization = new Specialization()
+                            {
+                                Id = reader.GetInt32("SpecializationId"),
+                                Name = !DataReaderExtensions.IsDBNull(reader, "SpecializationName") ? reader.GetString("SpecializationName") : string.Empty
+                            }
+                        });
+                    }
+                }
+
+                // Return data.
+                return tempJobAdverts;
+            }
+            finally
+            {
+                SqlDataAccess.Instance.CloseConnection();
+            }
         }
 
         public JobAdvert GetById(int id)
         {
-            throw new NotImplementedException();
+            using SqlCommand c = new SqlCommand()
+            {
+                CommandText = "GetJobAdvertById",
+                CommandType = CommandType.StoredProcedure,
+                Connection = SqlDataAccess.Instance.SqlConnection,
+                CommandTimeout = 10
+            };
+
+            c.Parameters.AddWithValue("@id", id);
+
+            try
+            {
+                JobAdvert tempData = new JobAdvert();
+
+                SqlDataAccess.Instance.OpenConnection();
+
+                using SqlDataReader r = c.ExecuteReader();
+
+                if (r.HasRows)
+                {
+                    while (r.Read())
+                    {
+                        tempData = new JobAdvert()
+                        {
+                            Id = r.GetInt32(0),
+                            Title = r.GetString(1),
+                            Email = r.GetString(2),
+                            PhoneNumber = r.GetString(3),
+                            JobDescription = r.GetString(4),
+                            JobLocation = r.GetString(5),
+                            JobRegisteredDate = r.GetDateTime(6),
+                            DeadlineDate = r.GetDateTime(7),
+                            Company = new Company()
+                            {
+                                Id = r.GetInt32(8),
+                                Name = r.GetString(9)
+                            },
+                            Category = new Category()
+                            {
+                                Id = r.GetInt32(10),
+                                Name = !DataReaderExtensions.IsDBNull(r, "CategoryName") ? r.GetString(11) : string.Empty
+                            },
+                            Specialization = new Specialization()
+                            {
+                                Id = r.GetInt32(12),
+                                Name = !DataReaderExtensions.IsDBNull(r, "SpecializationName") ? r.GetString(13) : string.Empty
+                            }
+                        };
+                    }
+                }
+
+                return tempData;
+            }
+            finally
+            {
+                SqlDataAccess.Instance.CloseConnection();
+            }
         }
 
         public Task<JobAdvert> GetJobAdvertDetailsForAdminsById(int id)
@@ -395,6 +465,129 @@ namespace JobAgent.Data.Repository
             }
 
             return Task.FromResult(count);
+        }
+
+        public Task<IEnumerable<JobAdvert>> GetAllJobAdvertsSortedByCategoryId(int categoryId)
+        {
+            using SqlCommand c = new SqlCommand()
+            {
+                CommandText = "GetAllJobAdvertsSortedByCategoryId",
+                CommandType = CommandType.StoredProcedure,
+                Connection = SqlDataAccess.Instance.SqlConnection,
+                CommandTimeout = 15
+            };
+
+            c.Parameters.AddWithValue("@categoryId", categoryId).SqlDbType = SqlDbType.Int;
+
+            try
+            {
+                List<JobAdvert> data = new List<JobAdvert>();
+
+                SqlDataAccess.Instance.OpenConnection();
+
+                using SqlDataReader r = c.ExecuteReader();
+
+                if (r.HasRows)
+                {
+                    while (r.Read())
+                    {
+                        data.Add(
+                            new JobAdvert()
+                            {
+                                Id = r.GetInt32(0),
+                                Title = r.GetString(1),
+                                Email = r.GetString(2),
+                                PhoneNumber = r.GetString(3),
+                                JobDescription = r.GetString(4),
+                                JobLocation = r.GetString(5),
+                                JobRegisteredDate = r.GetDateTime(6),
+                                DeadlineDate = r.GetDateTime(7),
+                                SourceURL = r.GetString(8),
+                                Company = new Company()
+                                {
+                                    Id = r.GetInt32(9),
+                                    Name = r.GetString(10),
+                                    URL = r.GetString(11)
+                                },
+                                Category = new Category()
+                                {
+                                    Id = r.GetInt32(12),
+                                    Name = r.GetString(13)
+                                }
+                            });
+                    }
+                }
+
+                return Task.FromResult(data as IEnumerable<JobAdvert>);
+            }
+            finally
+            {
+                SqlDataAccess.Instance.CloseConnection();
+            }
+        }
+
+        public Task<IEnumerable<JobAdvert>> GetAllJobAdvertsSortedBySpecializationId(int specializationId)
+        {
+            using SqlCommand c = new SqlCommand()
+            {
+                CommandText = "GetAllJobAdvertsSortedBySpecializationId",
+                CommandType = CommandType.StoredProcedure,
+                Connection = SqlDataAccess.Instance.SqlConnection,
+                CommandTimeout = 15
+            };
+
+            c.Parameters.AddWithValue("@specialityId", specializationId).SqlDbType = SqlDbType.Int;
+
+            try
+            {
+                List<JobAdvert> data = new List<JobAdvert>();
+
+                SqlDataAccess.Instance.OpenConnection();
+
+                using SqlDataReader r = c.ExecuteReader();
+
+                if (r.HasRows)
+                {
+                    while (r.Read())
+                    {
+                        data.Add(
+                            new JobAdvert()
+                            {
+                                Id = r.GetInt32(0),
+                                Title = r.GetString(1),
+                                Email = r.GetString(2),
+                                PhoneNumber = r.GetString(3),
+                                JobDescription = r.GetString(4),
+                                JobLocation = r.GetString(5),
+                                JobRegisteredDate = r.GetDateTime(6),
+                                DeadlineDate = r.GetDateTime(7),
+                                SourceURL = r.GetString(8),
+                                Company = new Company()
+                                {
+                                    Id = r.GetInt32(9),
+                                    Name = r.GetString(10),
+                                    URL = r.GetString(11)
+                                },
+                                Category = new Category()
+                                {
+                                    Id = r.GetInt32(12),
+                                    Name = r.GetString(13)
+                                },
+                                Specialization = new Specialization()
+                                {
+                                    Id = r.GetInt32(14),
+                                    Name = r.GetString(15)
+                                }
+                            });
+                    }
+
+                }
+                return Task.FromResult(data as IEnumerable<JobAdvert>);
+            }
+            finally
+            {                
+                SqlDataAccess.Instance.CloseConnection();
+            }
         }
     }
 }

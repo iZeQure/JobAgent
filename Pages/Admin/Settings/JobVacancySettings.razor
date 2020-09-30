@@ -1,4 +1,5 @@
 ﻿@page "/admin/settings/job/vacancies"
+@*@page "/admin/settings/job/vacancies/{PageNumber:int}"*@
 
 @attribute [Authorize]
 
@@ -25,7 +26,7 @@
     </div>
 </div>
 
-@if (Adverts.Count == 0)
+@if (PaginationModel.PaginatedJobAdverts().Count() == 0)
 {
     <MessageAlert Alert="MessageAlert.AlertType.Warning"
                   Message="Der blev ikke fundet nogen stillingsopslag."
@@ -50,7 +51,7 @@ else
             </thead>
             <tbody>
 
-                @foreach (var item in Adverts)
+                @foreach (var item in PaginationModel.PaginatedJobAdverts())
                 {
                     <tr id="@item.Id">
                         <th scope="row">@item.Id</th>
@@ -82,6 +83,19 @@ else
             </tbody>
         </table>
     </div>
+
+    <nav aria-label="Page Navigation">
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= PaginationModel.PageCount(); i++)
+            {
+                var pageNumber = i;
+
+                <li class="@(i == PaginationModel.CurrentPage ? "page-item active" : "page-item")">
+                    <a class="page-link" href="/admin/settings/job/vacancies" @onclick="@(() => ReturnPage(pageNumber))">@(i)</a>
+                </li>
+            }
+        </ul>
+    </nav>
 }
 
 <CreateJobVacancyModal />
@@ -93,16 +107,16 @@ else
 @code {
     [Inject] private AdminService AdminService { get; set; }
     [Inject] private DataService DataService { get; set; }
+    [Inject] private JobService JobService { get; set; }
     [Inject] private IJSRuntime JSRuntime { get; set; }
     [Inject] private IRefresh Refresh { get; set; }
 
     private List<JobAdvert> Adverts = new List<JobAdvert>();
     private JobVacancyModel JobVacancyModel;
+    private JobAdvertPaginationModel PaginationModel;
 
     public int AdvertId { get; set; } = 0;
-
     public bool IsProcessing { get; set; } = false;
-
     private bool disabled = false;
 
     protected override async Task OnInitializedAsync()
@@ -111,12 +125,17 @@ else
 
         if (!(await DataService.GetAllCompanies()).Any()) disabled = true;
 
-        Adverts = await AdminService.GetJobVacancies() as List<JobAdvert>;
+        PaginationModel = await JobService.JobAdvertPagination();
+    }
+
+    private async void ReturnPage(int pageNumber)
+    {
+        PaginationModel = (await JobService.JobAdvertPagination(pageNumber));
     }
 
     private async void RefreshAsync()
     {
-        Adverts = await AdminService.GetJobVacancies() as List<JobAdvert>;
+        PaginationModel = await JobService.JobAdvertPagination();
 
         StateHasChanged();
     }

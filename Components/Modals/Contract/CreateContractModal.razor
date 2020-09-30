@@ -94,20 +94,11 @@
 </div>
 
 @code {
-    [Inject]
-    protected IJSRuntime JSRuntime { get; set; }
-
-    [Inject]
-    protected IRefresh RefreshService { get; set; }
-
-    [Inject]
-    protected IFileUpload FileService { get; set; }
-
-    [Inject]
-    protected AdminService AdminService { get; set; }
-
-    [Inject]
-    protected DataService DataService { get; set; }
+    [Inject] protected IJSRuntime JSRuntime { get; set; }
+    [Inject] protected IRefresh RefreshService { get; set; }
+    [Inject] protected IFileUpload FileService { get; set; }
+    [Inject] protected AdminService AdminService { get; set; }
+    [Inject] protected DataService DataService { get; set; }
 
     protected private ContractModel ContractModel { get; set; } = new ContractModel();
     protected private List<User> Users { get; set; } = new List<User>();

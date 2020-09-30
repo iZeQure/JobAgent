@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Data;
 using JobAgent.Data.Objects;
+using System.Threading.Tasks;
 
 namespace JobAgent.Data.Repository
 {
@@ -104,7 +105,7 @@ namespace JobAgent.Data.Repository
         /// Get all categories with associated specializations.
         /// </summary>
         /// <returns>A list of <see cref="Category" with a list of <see cref="Category.CategorySpecializations"/>/></returns>
-        public List<Category> GetAllCategoriesWithSpecializations()
+        public async Task<List<Category>> GetAllCategoriesWithSpecializations()
         {
             // Initialize a temporary list with categories.
             List<Category> tempCategories = new List<Category>();
@@ -120,7 +121,7 @@ namespace JobAgent.Data.Repository
             SqlDataAccess.Instance.OpenConnection();
 
             // Initialize a data reader.
-            using SqlDataReader reader = cmd.ExecuteReader();
+            using SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
             // Check if the reader has any rows.
             if (reader.HasRows)

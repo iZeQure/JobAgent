@@ -118,6 +118,10 @@ namespace JobAgent.Data.Repository
             return tempCompany;
         }
 
+        /// <summary>
+        /// Gets a collection of company without any associated contracts.
+        /// </summary>
+        /// <returns>An <see cref="IEnumerable{T}"/>.</returns>
         public Task<IEnumerable<Company>> GetCompaniesWithOutContract()
         {
             var tempCompanies = new List<Company>();
@@ -159,6 +163,10 @@ namespace JobAgent.Data.Repository
             }
         }
 
+        /// <summary>
+        /// Gets a collection of company where any contracts is associated.
+        /// </summary>
+        /// <returns>An <see cref="IEnumerable{T}"/>.</returns>
         public Task<IEnumerable<Company>> GetCompaniesWithContract()
         {
             var tempCompanies = new List<Company>();

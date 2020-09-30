@@ -12,6 +12,6 @@ namespace JobAgent.Data.Repository.Interface
         /// Get all categories with specializations bound to.
         /// </summary>
         /// <returns>Returns a list of <see cref="Category"/>, with a list of <see cref="Specialization"/>, if the category owns a specialization.</returns>
-        List<Category> GetAllCategoriesWithSpecializations();
+        Task<List<Category>> GetAllCategoriesWithSpecializations();
     }
 }

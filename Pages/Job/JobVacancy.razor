@@ -1,9 +1,8 @@
-﻿@page "/job/{JobAdvertId:int}/{JobAdvertName}";
-@page "/job/{JobAdvertId:int}/{JobAdvertName}/{SpecializationId:int}/{SpecializationName}";
+﻿@page "/job/uncategorized"
+@page "/job/{JobAdvertId:int}"
+@page "/job/{JobAdvertId:int}/{SpecializationId:int}"
 
-@inject JobService JobService
-@* Set Job as Page Title *@
-<PageTitle Title="@JobAdvertName" />
+<PageTitle Title="Job" />
 
 @if (jobAdverts == null || !jobAdverts.Any())
 {
@@ -23,82 +22,112 @@ else
         {
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">@j.Title</h5>
+                    <h5 class="card-title">
+                        <a class="card-link" href="@(AppendWorldWideWebToStringIfNotExists(j.SourceURL).GetAwaiter().GetResult())" target="_blank">
+                            @(j.Title)
+                        </a>
+                    </h5>
                     <h6 class="card-subtitle mb-2 text-muted">@(j.Company.Name), @(j.JobLocation)</h6>
-                    <p class="card-text">@j.JobDescription</p>
+                    <p class="card-text">@(DataService.TruncateString(j.JobDescription, 150))</p>
                     <p class="card-text">
                         <small class="text-muted">
-                            @j.JobRegisteredDate.ToString("dddd, d MMM yyyy", CultureInfo.CreateSpecificCulture("da-DK"))
+                            Oprettet: @j.JobRegisteredDate.ToString("dddd, d MMM yyyy", CultureInfo.CreateSpecificCulture("da-DK"))
                         </small>
                     </p>
-                    <button @onclick="@(id => OnJobPostDetail(j.Id))" class="btn btn-info btn-sm d-block" type="button" data-toggle="modal" data-target="#DetailsVacancyModal">Se Detailjer</button>
+                    <button @onclick="@(clickEvent => GetJobAdvertDetails(j.Id))" class="btn btn-info btn-sm d-block" type="button" data-toggle="modal" data-target="#DetailsVacancyModal">Se Detailjer</button>
                 </div>
             </div>
         }
     </div>
 }
 
-<DetailsVacancyModal Details="jobAdvert" />
+<DetailsVacancyModal Id="JobAdvertDetailsId" Details="AdvertDetails" />
 
 @code {
-    [Parameter]
-    public int JobAdvertId { get; set; }
+    [Parameter] public int JobAdvertId { get; set; }
+    [Parameter] public string JobAdvertName { get; set; }
+    [Parameter] public int SpecializationId { get; set; }
+    [Parameter] public string SpecializationName { get; set; }
 
-    [Parameter]
-    public string JobAdvertName { get; set; }
-
-    [Parameter]
-    public int SpecializationId { get; set; }
-
-    [Parameter]
-    public string SpecializationName { get; set; }
-
-    JobAdvert jobAdvert = new JobAdvert() { Company = new Company(), Category = new Category(), Specialization = new Specialization() };
+    [Inject] protected JobService JobService { get; set; }
+    [Inject] protected NavigationManager NavigationManager { get; set; }
 
     List<JobAdvert> jobAdverts = new List<JobAdvert>();
 
+    private JobAdvert AdvertDetails;
+
     private bool IsLoading { get; set; } = false;
 
-    protected override async Task OnInitializedAsync()
+    private int JobAdvertDetailsId;
+
+    protected override void OnInitialized()
     {
-        IsLoading = true;
-        await Task.Delay(1500);
-
-        if (SpecializationId == 0)
-            jobAdverts = await JobService.GetJobVacanciesAsync(JobAdvertId, JobAdvertName);
-
-        if (SpecializationId != 0)
-            jobAdverts = await JobService.GetJobSpecialVacanciesAsync(SpecializationId, SpecializationName);
-        else if (SpecializationId > 0)
-            jobAdverts = await JobService.GetJobSpecialVacanciesAsync(SpecializationId, SpecializationName);
-
-        IsLoading = false;
-        await Task.Delay(500);
+        NavigationManager.LocationChanged += HandleLocationChanged;
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        IsLoading = true;
-        await Task.Delay(1500);
+        await InvokeAsync(async () =>
+        {
+            await LoadJobVacancyData();
 
-        if (SpecializationId == 0)
-            jobAdverts = await JobService.GetJobVacanciesAsync(JobAdvertId, JobAdvertName);
+            StateHasChanged();
 
-        if (SpecializationId != 0)
-            jobAdverts = await JobService.GetJobSpecialVacanciesAsync(SpecializationId, SpecializationName);
-        else if (SpecializationId > 0)
-            jobAdverts = await JobService.GetJobSpecialVacanciesAsync(SpecializationId, SpecializationName);
-
-        IsLoading = false;
-        await Task.Delay(500);
+            await Task.CompletedTask;
+        });
     }
 
-    void OnJobPostDetail(int id)
+    private async void HandleLocationChanged(object sender, LocationChangedEventArgs e)
     {
-        // Get details for job advert.
+        await LoadJobVacancyData();
+    }
 
-        jobAdvert = (from job in jobAdverts
-                     where job.Id == id
-                     select job).FirstOrDefault();
+    private async void GetJobAdvertDetails(int advertId)
+    {
+        if (advertId != 0)
+        {
+            JobAdvertDetailsId = advertId;
+            AdvertDetails = await JobService.GetJobVacancyById(advertId);
+        }
+    }
+
+    private async Task LoadJobVacancyData()
+    {
+        IsLoading = true;
+
+        try
+        {
+            if (JobAdvertId == 0)
+            {
+                jobAdverts = (await JobService.GetUncategorizedJobVacancies());
+            }
+            else if (SpecializationId == 0)
+            {
+                jobAdverts = (await JobService.GetJobVacanciesAsync(JobAdvertId)).ToList();
+            }
+            else if (SpecializationId != 0)
+            {
+                jobAdverts = (await JobService.GetJobSpecialVacanciesAsync(SpecializationId)).ToList();
+            }
+        }
+        finally
+        {
+            IsLoading = false;
+            await Task.CompletedTask;
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task<string> AppendWorldWideWebToStringIfNotExists(string url)
+    {
+        if (string.IsNullOrEmpty(url))
+            return await Task.FromResult(string.Empty);
+
+        if (url.Contains("www"))
+            return await Task.FromResult(url);
+
+        else
+            return await Task.FromResult(string.Concat("https://www.", url));
     }
 }
