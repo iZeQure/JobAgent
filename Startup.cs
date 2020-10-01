@@ -35,6 +35,14 @@ namespace JobAgent
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            DataAccessOptions.ConnectionString = Configuration.GetConnectionString("HomeDB");
+
+            services.AddSingleton<SqlDataAccess>(); // Database Service.
+            services.AddTransient<SecurityService>(); // Security Service.
+            services.AddTransient<JobService>(); // Job Service.
+            services.AddTransient<DataService>(); // Data Service.
+            services.AddTransient<AdminService>(); // Admin Service.    
+
             services.AddRazorPages();
             services.AddBlazoredLocalStorage();
             services.AddServerSideBlazor().AddHubOptions(o => { o.MaximumReceiveMessageSize = 102400000; });
@@ -62,13 +70,7 @@ namespace JobAgent
             services.AddScoped<IRefresh, RefreshService>();
             services.AddScoped<MyAuthStateProvider>();
             services.AddScoped<AuthenticationStateProvider>(provider =>
-                provider.GetRequiredService<MyAuthStateProvider>());
-
-            services.AddSingleton<SqlDataAccess>(); // Database Service.
-            services.AddTransient<SecurityService>(); // Security Service.
-            services.AddTransient<JobService>(); // Job Service.
-            services.AddTransient<DataService>(); // Data Service.
-            services.AddTransient<AdminService>(); // Admin Service.            
+                provider.GetRequiredService<MyAuthStateProvider>());                  
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

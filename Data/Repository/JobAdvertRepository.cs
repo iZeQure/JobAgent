@@ -149,20 +149,21 @@ namespace JobAgent.Data.Repository
                             JobLocation = r.GetString(5),
                             JobRegisteredDate = r.GetDateTime(6),
                             DeadlineDate = r.GetDateTime(7),
+                            SourceURL = r.GetString(8),
                             Company = new Company()
                             {
-                                Id = r.GetInt32(8),
-                                Name = r.GetString(9)
+                                Id = r.GetInt32(9),
+                                Name = r.GetString(10)
                             },
                             Category = new Category()
                             {
-                                Id = r.GetInt32(10),
-                                Name = !DataReaderExtensions.IsDBNull(r, "CategoryName") ? r.GetString(11) : string.Empty
+                                Id = r.GetInt32(11),
+                                Name = !DataReaderExtensions.IsDBNull(r, "CategoryName") ? r.GetString(12) : string.Empty
                             },
                             Specialization = new Specialization()
                             {
-                                Id = r.GetInt32(12),
-                                Name = !DataReaderExtensions.IsDBNull(r, "SpecializationName") ? r.GetString(13) : string.Empty
+                                Id = r.GetInt32(13),
+                                Name = !DataReaderExtensions.IsDBNull(r, "SpecializationName") ? r.GetString(14) : string.Empty
                             }
                         };
                     }

@@ -3,7 +3,7 @@
 
 @inherits LayoutComponentBase
 
-<div class="sidebar overflow-auto" style="overflow-x: hidden !important">
+<div class="sidebar" style="overflow-x: hidden !important">
     <NavMenu />
 </div>
 
@@ -11,8 +11,6 @@
     <div class="top-row">
         <AuthorizeView>
             <NotAuthorized>
-
-                @*Not Authorized..*@
 
                 <div class="ml-auto mr-1">
                     <button type="button" class="btn btn-sm progress-bar progress-bar-striped bg-info @HoverAnimationCSS" @onmouseenter="(() => HoverMode())" @onmouseleave="(() => HoverMode())" @onclick='() => NavManager.NavigateTo("/login")'>Praktikkonsulent Log ind</button>

@@ -74,16 +74,14 @@ app {
     display: block !important;
     position: static;
     pointer-events: visiblestroke;
-    background: #303030;
-    /*background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);*/
+    /*background: #303030;*/
+    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
 }
 
     .sidebar .top-row {
-        position: sticky;
-        display: flex;
-        flex-direction: column;
         align-content: center;
-        background-color: rgba(0,0,0,0.4);
+        justify-content: space-evenly;
+        background-color: rgba(0,0,0,0.3);
     }
 
     .sidebar .navbar-brand {
@@ -237,17 +235,6 @@ ul.validation-errors {
 /*
     ## Card Changes ##
 */
-
-.card {
-    max-width: 100%;
-}
-
-.card-text {
-    word-break: break-word;
-    overflow-wrap: break-word;
-    overflow-y: hidden;
-    max-height: 25vh;
-}
 
 /*// Extra small devices (portrait phones, less than 576px)*/
 @media (min-width: 575.98px) {

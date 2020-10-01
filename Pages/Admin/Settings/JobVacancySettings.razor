@@ -26,11 +26,44 @@
     </div>
 </div>
 
+<section id="filterAdverts" class="mb-1">
+    <div class="d-flex flex-row-reverse">
+        <div class="filter">
+            <select class="custom-select-sm" @bind="CategoryId">
+                <option selected value="0">--- Vælg kategori ---</option>
+                @foreach (var category in Categories)
+                {
+                    var categoryId = category.Id;
+
+                    <option value="@(category.Id)">@(category.Name)</option>
+                }
+            </select>
+        </div>
+    </div>    
+</section>
+
+<section id="filterControls" class="mb-3">
+    <div class="d-flex flex-row-reverse">
+        <div class="action">
+            <button class="btn btn-sm btn-outline-info" @onclick="@(() => FilterContent())">Filtrér</button>
+            <button class="btn btn-sm btn-outline-dark" @onclick="@(() => ClearFilteredContent())">Ryd Filtrering</button>
+        </div>
+    </div>
+</section>
+
 @if (PaginationModel.PaginatedJobAdverts().Count() == 0)
 {
-    <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                  Message="Der blev ikke fundet nogen stillingsopslag."
-                  MessageOptional="Opret opslag, ved at trykke på knappen : Opret nyt Stillingsopslag. - Hvis knappen ikke er aktiveret, er det fordi der ikke blev fundet nogen virksomheder." />
+    if (!filteredContentFound)
+    {
+        <MessageAlert Alert="MessageAlert.AlertType.Warning"
+                      Message="Det angivne filter, gav ingen resultater."/>
+    }
+    else
+    {
+        <MessageAlert Alert="MessageAlert.AlertType.Warning"
+                      Message="Der blev ikke fundet nogen stillingsopslag."
+                      MessageOptional="Opret opslag, ved at trykke på knappen : Opret nyt Stillingsopslag. - Hvis knappen ikke er aktiveret, er det fordi der ikke blev fundet nogen virksomheder." />
+    }
 }
 else
 {
@@ -91,7 +124,7 @@ else
                 var pageNumber = i;
 
                 <li class="@(i == PaginationModel.CurrentPage ? "page-item active" : "page-item")">
-                    <a class="page-link" href="/admin/settings/job/vacancies" @onclick="@(() => ReturnPage(pageNumber))">@(i)</a>
+                    <a class="page-link" href="/admin/settings/job/vacancies" @onclick="@(() => FilterContent(pageNumber))">@(i)</a>
                 </li>
             }
         </ul>
@@ -114,10 +147,15 @@ else
     private List<JobAdvert> Adverts = new List<JobAdvert>();
     private JobVacancyModel JobVacancyModel;
     private JobAdvertPaginationModel PaginationModel;
+    private IList<Category> Categories;
 
     public int AdvertId { get; set; } = 0;
     public bool IsProcessing { get; set; } = false;
+
     private bool disabled = false;
+    private bool filteredContentFound;
+
+    private int CategoryId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -126,6 +164,8 @@ else
         if (!(await DataService.GetAllCompanies()).Any()) disabled = true;
 
         PaginationModel = await JobService.JobAdvertPagination();
+
+        Categories = await DataService.GetAllCategories();
     }
 
     private async void ReturnPage(int pageNumber)
@@ -164,5 +204,29 @@ else
     public void OnClick_StoreId(int id)
     {
         AdvertId = id;
+    }
+
+    public async Task FilterContent(int page = 1)
+    {
+        if (CategoryId == 0)
+        {
+            PaginationModel = await JobService.JobAdvertPagination(page);
+        }
+        if (CategoryId != 0)
+        {
+            PaginationModel = await JobService.FilterJobAdvertPagination(CategoryId, page);
+
+            if (PaginationModel.JobAdverts.Count() == 0)
+                filteredContentFound = false;
+            else
+                filteredContentFound = true;
+        }
+    }
+
+    public async Task ClearFilteredContent()
+    {
+        CategoryId = 0;
+
+        PaginationModel = await JobService.JobAdvertPagination();
     }
 }

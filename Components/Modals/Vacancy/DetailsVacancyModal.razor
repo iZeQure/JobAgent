@@ -32,7 +32,7 @@
 
                         <div class="float-right">
                             <section id="location" class="d-flex flex-column text-right mb-2">
-                                <div class="pl-2"><span class="text-muted">Lokation:</span> <span class="font-weight-light">@Details.JobLocation</span></div>
+                                <div class="pl-2"><span class="text-muted">Lokation:</span> <span class="font-weight-light"> <a class="card-link" href="@(GoogleMapsLinkUrl + HttpUtility.UrlEncode(Details.JobLocation))" target="_blank">@(Details.JobLocation)</a> </span></div>
                             </section>
 
                             <section id="dates" class="d-inline-flex flex-column text-right">
@@ -45,9 +45,9 @@
                     <hr />
 
                     <section id="description">
-                        <div>
+                        <span>
                             @(Details.JobDescription)
-                        </div>
+                        </span>
                     </section>
 
                 </div>
@@ -65,6 +65,8 @@
     [Parameter] public int Id { get; set; }
 
     [Inject] private JobService JobService { get; set; }
+
+    private string GoogleMapsLinkUrl { get; } = "https://www.google.com/maps/search/?api=1&query=";
 
     private async Task<string> AppendWorldWideWebToStringIfNotExists(string url)
     {

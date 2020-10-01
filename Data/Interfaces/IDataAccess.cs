@@ -7,6 +7,7 @@ namespace JobAgent.Data.Interfaces
 {
     interface IDataAccess : IDisposable
     {
+        string GetConnectionString();
         void OpenConnection();
         void CloseConnection();
     }

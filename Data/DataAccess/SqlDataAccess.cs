@@ -8,6 +8,9 @@ using System.Linq;
 using System.Security;
 using System.Threading.Tasks;
 using JobAgent.Data.Interfaces;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols;
+using System.Configuration;
 
 namespace JobAgent.Data.DataAccess
 {
@@ -16,37 +19,20 @@ namespace JobAgent.Data.DataAccess
         #region Constructors
         public SqlDataAccess()
         {
-            //string connectionString = GetConnectionString("HomeDB");
-
-            string connectionString = "Server=10.108.48.72\\SQLJOBAGENT,2009;Database=JobAgentDB; User Id=sa; Password=PaSSw0rd;";
-            //string connectionString = "Server=GFUEL\\DEVSQLSERVER; Database=JobAgentDB; Integrated Security=true;";
-            //string connectionString = "Server=VIOLURREOT\\DEVELOPMENT; Database=JobAgentDB; Integrated Security=true;";
-
-            SqlConnection = new SqlConnection(connectionString);
-        }
-
-        public SqlDataAccess(IConfiguration config)
-        {
-            _config = config;
+            SqlConnection = new SqlConnection(GetConnectionString());
         }
         #endregion
 
         #region Attributes
         private static SqlDataAccess instance = null;
         private SqlConnection sqlConnection;
-        private readonly IConfiguration _config;
         #endregion
 
         #region Properites
         public SqlConnection SqlConnection { get { return sqlConnection; } private set { sqlConnection = value; } }
 
         public static SqlDataAccess Instance { get { if (instance == null) instance = new SqlDataAccess(); return instance; } }
-        #endregion        
-
-        public string GetConnectionString(string name)
-        {
-            return _config.GetConnectionString(name);
-        }
+        #endregion
 
         public void OpenConnection()
         {
@@ -111,6 +97,12 @@ namespace JobAgent.Data.DataAccess
         public void Dispose()
         {
             ((IDisposable)instance).Dispose();
+        }
+
+        public string GetConnectionString()
+        {
+            return DataAccessOptions.ConnectionString;
+            //return ConfigurationManager.ConnectionStrings[name].ConnectionString;
         }
     }
 }
