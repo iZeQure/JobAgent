@@ -40,7 +40,11 @@
                 <div class="links">
                     <nav class="nav flex-column">
                         <NavLink Match="NavLinkMatch.All" class="nav-link my-1" href="/admin/miscellaneous/links"><span class="menu-icons"><i class="fas fa-robot"></i></span>Robot Links</NavLink>
-                        <NavLink Match="NavLinkMatch.All" class="nav-link my-1" href="/admin/miscellaneous/tests"><span class="menu-icons"><i class="fas fa-vial"></i></span>Test Miljø</NavLink>
+
+                        @if (context.User.Claims.Any(c => c.Type == ClaimTypes.Email && c.Value == "udvikler@ja.dk"))
+                        {
+                            <NavLink Match="NavLinkMatch.All" class="nav-link my-1" href="/admin/miscellaneous/tests"><span class="menu-icons"><i class="fas fa-vial"></i></span>Test Miljø</NavLink>
+                        }
                     </nav>
                 </div>
             </section>
