@@ -11,19 +11,28 @@
 
                 @if (!string.IsNullOrEmpty(ContractName))
                 {
-                    @if (ShowError)
+                    if (string.IsNullOrEmpty(ConvertFileToBase64String(ContractName).GetAwaiter().GetResult()))
                     {
-                        <MessageAlert Alert="MessageAlert.AlertType.Error" Message="@ErrorMessage" />
+                        <MessageAlert Alert="MessageAlert.AlertType.Warning" />
                     }
-
-                    @if (!ShowError)
+                    else
                     {
                         <div class="container-fluid justify-content-center">
                             <div class="embed-responsive embed-responsive-16by9">
-                                <iframe src="data:application/pdf;base64,@(ContractBase64String)" class="embed-responsive-item" lang="da" title="Kontrakt Information" frameborder="1" allowtransparency="true"></iframe>
+                                <iframe src="data:application/pdf;base64,@(ConvertFileToBase64String(ContractName).GetAwaiter().GetResult())"
+                                        class="embed-responsive-item"
+                                        lang="da"
+                                        title="Kontrakt Information"
+                                        frameborder="1"
+                                        allowtransparency="true">
+                                </iframe>
                             </div>
                         </div>
                     }
+                }
+                else
+                {
+                    <MessageAlert Alert="MessageAlert.AlertType.Error" Message="Kunne ikke hente kontrakt!" />
                 }
 
             </div>
@@ -39,42 +48,30 @@
     [Parameter]
     public string ContractName { get; set; }
 
-    private bool ShowError { get; set; } = false;
-
-    private string ErrorMessage { get; set; } = string.Empty;
+    private string errorMessage = string.Empty;
     private string SharedServerPath { get; } = @"\\JOB-AGENT\contracts\";
-    private string ContractBase64String { get { return GetFullLocationOfContract(ContractName); } }
 
-    private string GetFullLocationOfContract(string contractName)
+    private Task<string> ConvertFileToBase64String(string contract)
     {
-        ShowError = false;
-
         try
         {
-            var pdfFiles = Directory.EnumerateFiles(SharedServerPath, "*.pdf");
+            var files = Directory.EnumerateFiles(SharedServerPath);
 
-            foreach (string pdf in pdfFiles)
+            foreach (var file in files)
             {
-                if (pdf.Contains(contractName))
+                if (file.Contains(contract))
                 {
-                    Byte[] bytes = File.ReadAllBytes(pdf);
+                    byte[] bytes = File.ReadAllBytes(file);
 
-                    return Convert.ToBase64String(bytes);
-                }
-                else
-                {
-                    return string.Empty;
+                    return Task.FromResult(Convert.ToBase64String(bytes));
                 }
             }
         }
         catch (Exception)
         {
-            ShowError = true;
-            ErrorMessage = "Kunne ikke finde kontakt!";
-
-            return string.Empty;
+            errorMessage = $"Fik ikke svar fra server..";
         }
 
-        return string.Empty;
+        return Task.FromResult(string.Empty);
     }
 }
