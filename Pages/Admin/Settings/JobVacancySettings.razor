@@ -1,5 +1,4 @@
 ﻿@page "/admin/settings/job/vacancies"
-@*@page "/admin/settings/job/vacancies/{PageNumber:int}"*@
 
 @attribute [Authorize]
 
@@ -144,7 +143,6 @@ else
     [Inject] private IJSRuntime JSRuntime { get; set; }
     [Inject] private IRefresh Refresh { get; set; }
 
-    private List<JobAdvert> Adverts = new List<JobAdvert>();
     private JobVacancyModel JobVacancyModel;
     private JobAdvertPaginationModel PaginationModel;
     private IList<Category> Categories;
