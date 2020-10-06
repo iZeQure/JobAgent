@@ -70,10 +70,6 @@ else
         await InvokeAsync(async () =>
         {
             await LoadJobVacancyData();
-
-            StateHasChanged();
-
-            await Task.CompletedTask;
         });
     }
 
