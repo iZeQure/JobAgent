@@ -10,9 +10,13 @@ namespace JobAgent.Services
 {
     public class FileService : IFileUpload
     {
+        private readonly string _sharedPath = Environment.GetEnvironmentVariable("SHARED_PATH");
+
+        public string GetSharedPath { get { return _sharedPath; } }
+
         public async Task<bool> UploadFileAsync(IFileListEntry fileEntry)
         {
-            var path = Path.Combine(@"\\JOB-AGENT\contracts\", fileEntry.Name);
+            var path = Path.Combine(@"\\Jobagent\contracts\", fileEntry.Name);
 
             try
             {

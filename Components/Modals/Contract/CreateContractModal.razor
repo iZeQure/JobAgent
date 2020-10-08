@@ -181,9 +181,9 @@
 
                 FileProgress = "Success";
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                ErrorMessage = "Kunne ikke oploade fil.";
+                ErrorMessage = e.Message;/*ErrorMessage = "Kunne ikke oploade fil.";*/
                 ShowError = true;
                 FileProgress = "Failed";
             }

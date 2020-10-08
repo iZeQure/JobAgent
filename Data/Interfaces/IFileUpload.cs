@@ -8,6 +8,8 @@ namespace JobAgent.Data.Interfaces
 {
     public interface IFileUpload
     {
+        public string GetSharedPath { get; }
+
         Task<bool> UploadFileAsync(IFileListEntry file);
     }
 }

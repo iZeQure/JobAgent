@@ -35,7 +35,7 @@ namespace JobAgent
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            DataAccessOptions.ConnectionString = Configuration.GetConnectionString("HomeDB");
+            DataAccessOptions.ConnectionString = Configuration.GetConnectionString("Prod");
 
             services.AddSingleton<SqlDataAccess>(); // Database Service.
             services.AddTransient<SecurityService>(); // Security Service.

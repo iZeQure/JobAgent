@@ -48,14 +48,16 @@
     [Parameter]
     public string ContractName { get; set; }
 
+    [Inject]
+    private IFileUpload GetFileService { get; set; }
+
     private string errorMessage = string.Empty;
-    private string SharedServerPath { get; } = @"\\JOB-AGENT\contracts\";
 
     private Task<string> ConvertFileToBase64String(string contract)
     {
         try
         {
-            var files = Directory.EnumerateFiles(SharedServerPath);
+            var files = Directory.EnumerateFiles(@"\\Jobagent\contracts\");
 
             foreach (var file in files)
             {
