@@ -24,5 +24,23 @@ namespace DatabaseTests
             // Assertion
             Assert.True(openState == dbContext.GetConnection().State);
         }
+
+        [Fact]
+        public async void Database_ShouldClose_Connection()
+        {
+            // Arrange
+            var dbContext = SqlDatabaseAccess.SqlInstance;
+
+            await dbContext.OpenConnectionAsync();
+            dbContext.CloseConnection();
+
+            // Actual
+            var openState = ConnectionState.Closed;
+
+            // Assertion
+            Assert.True(openState == dbContext.GetConnection().State);
+
+        }
+
     }
 }

@@ -96,7 +96,13 @@ namespace Database.Access
             try
             {
                 if (_sqlConnection != null)
+                {
+                    if (_sqlConnection.State == System.Data.ConnectionState.Open) await Task.CompletedTask; 
+                    else
                     await _sqlConnection.OpenAsync();
+
+                }
+
             }
             catch (Exception)
             {
