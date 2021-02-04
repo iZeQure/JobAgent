@@ -1,24 +1,16 @@
-using System;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using JobAgent.Services;
-using JobAgent.Data;
-using JobAgent.Data.DataAccess;
-using JobAgent.Data.Security;
-using BlazorStrap;
-using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components.Authorization;
-using JobAgent.Data.Interfaces;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Syncfusion.Blazor;
 using System.Globalization;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Components.Authorization;
+using Blazored.LocalStorage;
+using JobAgent.Services;
+using JobAgent.Data.Security;
+using JobAgent.Data.Interfaces;
 
 namespace JobAgent
 {
@@ -35,9 +27,6 @@ namespace JobAgent
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            DataAccessOptions.ConnectionString = Configuration.GetConnectionString("Job.Agent.Database");
-
-            services.AddSingleton<SqlDataAccess>(); // Database Service.
             services.AddTransient<SecurityService>(); // Security Service.
             services.AddTransient<JobService>(); // Job Service.
             services.AddTransient<DataService>(); // Data Service.
@@ -46,7 +35,6 @@ namespace JobAgent
             services.AddRazorPages();
             services.AddBlazoredLocalStorage();
             services.AddServerSideBlazor().AddHubOptions(o => { o.MaximumReceiveMessageSize = 102400000; });
-            services.AddBootstrapCss();
 
             services.Configure<RequestLocalizationOptions>(options =>
             {

@@ -58,7 +58,7 @@
 
                             @foreach (var c in GetConsultantAreas)
                             {
-                                <option value="@c.Id">@c.Name</option>
+                                <option value="@c.Identifier">@c.Name</option>
                             }
                         }
                     </select>
@@ -78,7 +78,7 @@
 
                             @foreach (var l in GetLocations)
                             {
-                                <option value="@l.Id">@l.Name</option>
+                                <option value="@l.Identifier">@l.Name</option>
                             }
                         }
                     </select>

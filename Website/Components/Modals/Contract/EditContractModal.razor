@@ -26,13 +26,13 @@
                                     {
                                         @foreach (var company in Companies)
                                         {
-                                            if (company.Id == ContractModel.SignedWithCompany)
+                                            if (company.Identifier == ContractModel.SignedWithCompany)
                                             {
-                                                <option value="@company.Id" selected>@company.Name</option>
+                                                <option value="@company.Identifier" selected>@company.Name</option>
                                             }
                                             else
                                             {
-                                                <option value="@company.Id">@company.Name</option>
+                                                <option value="@company.Identifier">@company.Name</option>
                                             }
                                         }
                                     }
@@ -49,13 +49,13 @@
                                     {
                                         @foreach (var user in Users)
                                         {
-                                            if (user.Id == ContractModel.SignedByUser)
+                                            if (user.Identifier == ContractModel.SignedByUser)
                                             {
-                                                <option value="@user.Id" selected>@user.FullName</option>
+                                                <option value="@user.Identifier" selected>@user.FullName</option>
                                             }
                                             else
                                             {
-                                                <option value="@user.Id">@user.FullName</option>
+                                                <option value="@user.Identifier">@user.FullName</option>
                                             }
                                         }
                                     }

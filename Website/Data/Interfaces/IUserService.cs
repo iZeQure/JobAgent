@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using JobAgent.Data.Objects;
 using JobAgent.Models;
+using Pocos;
 
 namespace JobAgent.Data.Interfaces
 {

@@ -3,8 +3,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using JobAgent.Data.Interfaces;
-using JobAgent.Data.Objects;
 using Blazored.LocalStorage;
+using Pocos;
 
 namespace JobAgent.Data.Security
 {
@@ -123,12 +123,12 @@ namespace JobAgent.Data.Security
             if (user != null)
             {
                 // Check if the obj is correct.
-                if (user.Id != 0)
+                if (user.Identifier != 0)
                 {
                     identity = new ClaimsIdentity(
                                 new List<Claim>
                                 {
-                                    new Claim("UserId", $"{user.Id}"),
+                                    new Claim("UserId", $"{user.Identifier}"),
                                     new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
                                     new Claim(ClaimTypes.Email, user.Email),
                                     new Claim(ClaimTypes.Role, user.ConsultantArea.Name),

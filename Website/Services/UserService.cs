@@ -1,36 +1,35 @@
-﻿using JobAgent.Data.Objects;
-using JobAgent.Data.Interfaces;
-using JobAgent.Data.Repository;
-using JobAgent.Data.Repository.Interface;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using DataAccess;
+using Pocos;
 using JobAgent.Models;
+using JobAgent.Data.Interfaces;
 
 namespace JobAgent.Services
 {
     public class UserService : IUserService
     {
-        private IUserRepository UserRepository { get; }
+        private DataAccessManager DataAccessManager { get; }
         private SecurityService SecurityService { get; }
 
         public UserService()
         {
-            UserRepository = new UserRepository();
+            DataAccessManager = new DataAccessManager();
             SecurityService = new SecurityService();
         }
 
         public async Task<User> GetUserByAccessToken(string accessToken)
         {
-            return await Task.FromResult(UserRepository.GetUserByAccessToken(accessToken));
+            return await DataAccessManager.UserDataAccessManager().GetUserByAccessToken(accessToken);
         }
 
         public async Task<User> LoginAsync(User user)
         {
             // Check the user exists.
-            if (UserRepository.CheckUserExists(user.Email))
+            if (await DataAccessManager.UserDataAccessManager().CheckUserExists(user.Email))
             {
                 // Get salt to hash password.
-                user.Salt = UserRepository.GetUserSaltByEmail(user.Email);
+                user.Salt = await DataAccessManager.UserDataAccessManager().GetUserSaltByEmail(user.Email);
 
                 if (user.Salt != string.Empty)
                 {
@@ -38,14 +37,14 @@ namespace JobAgent.Services
                     user.Password = await SecurityService.HashPasswordAsync(user.Password, user.Salt);
 
                     // Validate password with server.
-                    if (UserRepository.ValidatePassword(user.Password))
+                    if (await DataAccessManager.UserDataAccessManager().ValidatePassword(user.Password))
                     {
-                        var returnedUser = UserRepository.LogIn(user.Email, user.Password);
+                        var returnedUser = await DataAccessManager.UserDataAccessManager().LogIn(user.Email, user.Password);
                         returnedUser.IsAuthenticatedByServer = true;
                         returnedUser.AccessToken = returnedUser.AccessToken;
 
                         // Return authenticated user.
-                        return await Task.FromResult(returnedUser);
+                        return returnedUser;
                     }
                 }
             }
@@ -53,17 +52,17 @@ namespace JobAgent.Services
             // Set authentication to false.
             user.IsAuthenticatedByServer = false;
 
-            return await Task.FromResult(user);
+            return user;
         }
 
         public async Task<bool> CheckUserExistsAsync(string email)
         {
-            if (UserRepository.CheckUserExists(email))
+            if (await DataAccessManager.UserDataAccessManager().CheckUserExists(email))
             {
-                return await Task.FromResult(true);
+                return true;
             }
 
-            return await Task.FromResult(false);
+            return false;
         }
 
         public async Task<User> RegisterUserAsync(RegisterAccountModel registerAccountModel)
@@ -79,8 +78,8 @@ namespace JobAgent.Services
                 Email = registerAccountModel.Email,
                 FirstName = registerAccountModel.FirstName,
                 LastName = registerAccountModel.LastName,
-                ConsultantArea = new ConsultantArea() { Id = registerAccountModel.ConsultantAreaId },
-                Location = new Location() { Id = registerAccountModel.LocationId },
+                ConsultantArea = new ConsultantArea() { Identifier = registerAccountModel.ConsultantAreaId },
+                Location = new Location() { Identifier = registerAccountModel.LocationId },
                 Salt = salt,
                 Password = hashedSecret
             };
@@ -91,14 +90,14 @@ namespace JobAgent.Services
 
             try
             {
-                UserRepository.Create(user);
+                DataAccessManager.UserDataAccessManager().Create(user);
             }
             catch (Exception)
             {
-                return await Task.FromResult(new User());
+                throw;
             }
 
-            return await Task.FromResult(user);
+            return user;
         }
 
         private async Task<string> GenerateAccessTokenAsync(User user)

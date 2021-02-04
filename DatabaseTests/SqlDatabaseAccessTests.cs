@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
-using Database.Access;
-using Database.Access.Interfaces;
+﻿using Xunit;
+using DataAccess.SqlAccess;
 using System.Data;
 
-namespace DatabaseTests
+namespace DataAccessTests
 {
     public class SqlDatabaseAccessTests
     {
@@ -39,8 +35,6 @@ namespace DatabaseTests
 
             // Assertion
             Assert.True(openState == dbContext.GetConnection().State);
-
         }
-
     }
 }

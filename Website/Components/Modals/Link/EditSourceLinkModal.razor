@@ -26,17 +26,17 @@
                                 <label for="editLinkForCompany" class="admin-label">Virksomhed : <span class="small font-italic" style="color: lightcoral">Ikke muligt at ændre virksomhed endnu!</span></label>
                                 @if (Companies != null)
                                 {
-                                    <select class="custom-select custom-select-sm" @bind="SourceLinkModel.CompanyId = SourceLink.Company.Id">
+                                    <select class="custom-select custom-select-sm" @bind="SourceLinkModel.CompanyId = SourceLink.Company.Identifier">
                                         <option value="0">--Vælg en virksomhed fra listen--</option>
                                         @foreach (var company in Companies)
                                         {
-                                            @if (SourceLinkModel.CompanyId == company.Id)
+                                            @if (SourceLinkModel.CompanyId == company.Identifier)
                                             {
-                                                <option value="@(company.Id)" selected>@(company.Name)</option>
+                                                <option value="@(company.Identifier)" selected>@(company.Name)</option>
                                             }
                                             else
                                             {
-                                                <option value="@(company.Id)">@(company.Name)</option>
+                                                <option value="@(company.Identifier)">@(company.Name)</option>
                                             }
                                         }
                                     </select>
@@ -96,7 +96,7 @@
     private void OnValidSubmit_EditSourceLink()
     {
         IsProcessing = true;
-        SourceLinkModel.Id = SourceLink.Id;
+        SourceLinkModel.Id = SourceLink.Identifier;
 
         InvokeAsync(async () =>
         {

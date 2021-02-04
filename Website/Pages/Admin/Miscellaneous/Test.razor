@@ -7,7 +7,7 @@
 @foreach (var advert in Model.PaginatedJobAdverts())
 {
     <div class="alert alert-secondary rounded-0">
-        <a href="#" class="link" target="_blank">@advert.Id @advert.Title</a> <span class="float-right text-primary"><i class="fa fa-calendar"></i> @advert.JobRegisteredDate.ToString("D")</span>
+        <a href="#" class="link" target="_blank">@advert.Identifier @advert.Title</a> <span class="float-right text-primary"><i class="fa fa-calendar"></i> @advert.JobRegisteredDate.ToString("D")</span>
     </div>
 }
 

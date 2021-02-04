@@ -32,9 +32,9 @@
                 <option selected value="0">--- Vælg kategori ---</option>
                 @foreach (var category in Categories)
                 {
-                    var categoryId = category.Id;
+                    var categoryId = category.Identifier;
 
-                    <option value="@(category.Id)">@(category.Name)</option>
+                    <option value="@(category.Identifier)">@(category.Name)</option>
                 }
             </select>
         </div>
@@ -85,8 +85,8 @@ else
 
                 @foreach (var item in PaginationModel.PaginatedJobAdverts())
                 {
-                    <tr id="@item.Id">
-                        <th scope="row">@item.Id</th>
+                    <tr id="@item.Identifier">
+                        <th scope="row">@item.Identifier</th>
                         <td class="text-truncate d-inline-block">@item.Title</td>
                         @if (string.IsNullOrEmpty(item.Specialization.Name))
                         {
@@ -100,12 +100,12 @@ else
                         <td>@item.JobRegisteredDate.ToString("D")</td>
                         <td>@item.DeadlineDate.ToString("D")</td>
                         <td>
-                            <span @onclick="(id => OnClickEdit_GetJobVacancyDetailsById(item.Id))" data-toggle="modal" data-target="#EditJobVacancyModal">
+                            <span @onclick="(id => OnClickEdit_GetJobVacancyDetailsById(item.Identifier))" data-toggle="modal" data-target="#EditJobVacancyModal">
                                 <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette opslag." Color="Popover.PopoverType.Info" />
                             </span>
                         </td>
                         <td>
-                            <span @onclick="@(id => OnClick_StoreId(item.Id))" data-toggle="modal" data-target="#RemoveJobVacancyModal">
+                            <span @onclick="@(id => OnClick_StoreId(item.Identifier))" data-toggle="modal" data-target="#RemoveJobVacancyModal">
                                 <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
                             </span>
                         </td>
@@ -184,18 +184,18 @@ else
 
         JobVacancyModel = new JobVacancyModel()
         {
-            Id = details.Id,
+            Id = details.Identifier,
             Title = details.Title,
             Email = details.Email,
             PhoneNumber = details.PhoneNumber,
             Description = details.JobDescription,
             Location = details.JobLocation,
-            CompanyId = details.Company.Id,
+            CompanyId = details.Company.Identifier,
             SourceURL = details.SourceURL,
             RegisteredDate = details.JobRegisteredDate,
             DeadlineDate = details.DeadlineDate,
-            CategoryId = details.Category.Id,
-            SpecializationId = details.Specialization.Id
+            CategoryId = details.Category.Identifier,
+            SpecializationId = details.Specialization.Identifier
         };
     }
 

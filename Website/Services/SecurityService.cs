@@ -1,13 +1,9 @@
-﻿using JobAgent.Data.Objects;
-using JobAgent.Data.Repository;
-using JobAgent.Data.Repository.Interface;
-using JobAgent.Data.Security;
+﻿using JobAgent.Data.Security;
 using JobAgent.Models;
 using Microsoft.IdentityModel.Tokens;
+using Pocos;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;

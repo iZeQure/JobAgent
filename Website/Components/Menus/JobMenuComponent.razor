@@ -37,8 +37,8 @@ else
                     @for (int j = 0; j < JobCategories[i].Specializations.Count; j++)
                     {
                         // Link : {domain}/job/CategoryId/CategoryName/SpecializationId/SpecializationName
-                        <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].Id/@JobCategories[i].Specializations[j].Id">
-                            @JobCategories[i].Specializations[j].Name <span class="badge badge-info">@GetSpecializationCount(JobCategories[i].Specializations[j].Id).GetAwaiter().GetResult()</span>
+                        <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].Identifier/@JobCategories[i].Specializations[j].Identifier">
+                            @JobCategories[i].Specializations[j].Name <span class="badge badge-info">@GetSpecializationCount(JobCategories[i].Specializations[j].Identifier).GetAwaiter().GetResult()</span>
                         </a>
                     }
                 </div>
@@ -48,8 +48,8 @@ else
         {
             <div class="py-1 px-2">
                 @* Link : {domain}/job/CategoryId/CategoryName *@
-                <a class="@MenuColor btn btn-link btn-sm text-wrap text-left" href="/job/@JobCategories[i].Id">
-                    @JobCategories[i].Name <span class="badge badge-info">@GetCategoryCount(JobCategories[i].Id).Result</span>
+                <a class="@MenuColor btn btn-link btn-sm text-wrap text-left" href="/job/@JobCategories[i].Identifier">
+                    @JobCategories[i].Name <span class="badge badge-info">@GetCategoryCount(JobCategories[i].Identifier).Result</span>
                 </a>
             </div>
         }

@@ -38,18 +38,18 @@ else
 
                 @foreach (var company in Companies)
                 {
-                    <tr id="@(company.Id)">
-                        <th scope="row">@(company.Id)</th>
+                    <tr id="@(company.Identifier)">
+                        <th scope="row">@(company.Identifier)</th>
                         <td>@(company.CVR)</td>
                         <td>@(company.Name)</td>
                         <td>@(company.URL)</td>
                         <td>
-                            <span @onclick="(OnClickEvent => OnClick_OpenEditModal(company.Id))" data-toggle="modal" data-target="#EditCompanyModal">
+                            <span @onclick="(OnClickEvent => OnClick_OpenEditModal(company.Identifier))" data-toggle="modal" data-target="#EditCompanyModal">
                                 <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne virksomehd." Color="Popover.PopoverType.Info" />
                             </span>
                         </td>
                         <td>
-                            <span @onclick="(OnClickEvent => OnClick_RemoveCompanyModal(company.Id))" data-toggle="modal" data-target="#RemoveCompanyModal">
+                            <span @onclick="(OnClickEvent => OnClick_RemoveCompanyModal(company.Identifier))" data-toggle="modal" data-target="#RemoveCompanyModal">
                                 <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
                             </span>
                         </td>
@@ -113,7 +113,7 @@ else
 
         Model = new CompanyModel()
         {
-            Id = company.Id,
+            Id = company.Identifier,
             CVR = company.CVR,
             Name = company.Name,
             URL = company.URL

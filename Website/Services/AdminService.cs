@@ -1,54 +1,40 @@
-﻿using JobAgent.Data.Objects;
-using JobAgent.Data.Repository;
-using JobAgent.Data.Repository.Interface;
+﻿using DataAccess;
 using JobAgent.Models;
+using Pocos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace JobAgent.Services
 {
     public class AdminService
     {
-        private IRepository<User> UserRepository { get; }
-
-        private IRepository<JobAdvert> JobRepository { get; }
-
-        private IRepository<Contract> ContractRepository { get; }
-
-        private IRepository<Company> CompanyRepository { get; }
-
-        private ISourceLinkRepository<SourceLink> SourceLinkRepository { get; }
+        private DataAccessManager DataAccessManager { get; }
 
         public AdminService()
         {
-            UserRepository = new UserRepository();
-            JobRepository = new JobAdvertRepository();
-            ContractRepository = new ContractRepository();
-            CompanyRepository = new CompanyRepository();
-            SourceLinkRepository = new SourceLinkRepository();
+            DataAccessManager = new DataAccessManager();
         }
 
-        public Task<User> GetUserByEmail(string userMail)
+        public async Task<User> GetUserByEmail(string userMail)
         {
-            return Task.FromResult(((IUserRepository)UserRepository).GetUserByEmail(userMail));
+            return await DataAccessManager.UserDataAccessManager().GetUserByEmail(userMail);
         }
 
         public Task<bool> UpdateUserInformation(AccountModel user)
         {
             try
             {
-                UserRepository.Update(
+                DataAccessManager.UserDataAccessManager().Update(
                         new User()
                         {
-                            Id = user.AccountId,
+                            Identifier = user.AccountId,
                             Email = user.Email,
                             FirstName = user.FirstName,
                             LastName = user.LastName,
-                            ConsultantArea = new ConsultantArea() { Id = user.ConsultantAreaId },
-                            Location = new Location() { Id = user.LocationId }
+                            ConsultantArea = new ConsultantArea() { Identifier = user.ConsultantAreaId },
+                            Location = new Location() { Identifier = user.LocationId }
                         });
 
                 return Task.FromResult(true);
@@ -63,12 +49,12 @@ namespace JobAgent.Services
         {
             SecurityService securityService = new SecurityService();
 
-            string userSalt = ((IUserRepository)UserRepository).GetUserSaltByEmail(auth.Email);
+            string userSalt = await DataAccessManager.UserDataAccessManager().GetUserSaltByEmail(auth.Email);
             var hashPassword = await Task.FromResult(securityService.HashPasswordAsync(auth.Password, userSalt));
 
             auth.Password = hashPassword.Result;
 
-            ((IUserRepository)UserRepository).UpdateUserPassword(
+            DataAccessManager.UserDataAccessManager().UpdateUserPassword(
                 new User()
                 {
                     Email = auth.Email,
@@ -80,10 +66,10 @@ namespace JobAgent.Services
         {
             try
             {
-                JobRepository.Update(
+                DataAccessManager.JobAdvertDataAccessManager().Update(
                     new JobAdvert()
                     {
-                        Id = data.Id,
+                        Identifier = data.Id,
                         Title = data.Title,
                         Email = data.Email,
                         PhoneNumber = data.PhoneNumber,
@@ -96,17 +82,17 @@ namespace JobAgent.Services
                         // Company Data
                         Company = new Company()
                         {
-                            Id = data.CompanyId.Value
+                            Identifier = data.CompanyId.Value
                         },
 
                         // Category Data
                         Category = new Category()
                         {
-                            Id = data.CategoryId
+                            Identifier = data.CategoryId
                         },
                         Specialization = new Specialization()
                         {
-                            Id = data.SpecializationId.Value
+                            Identifier = data.SpecializationId.Value
                         }
                     });
 
@@ -118,17 +104,17 @@ namespace JobAgent.Services
             }
         }
 
-        public Task<IEnumerable<JobAdvert>> GetJobVacancies()
+        public async Task<IEnumerable<JobAdvert>> GetJobVacancies()
         {
-            return ((IJobAdvertRepository)JobRepository).GetAllJobAdvertsForAdmins();
+            return await DataAccessManager.JobAdvertDataAccessManager().GetAllJobAdvertsForAdmins();
         }
 
-        public Task<JobAdvert> GetJobVacancyDetailsById(int id)
+        public async Task<JobAdvert> GetJobVacancyDetailsById(int id)
         {
-            return ((IJobAdvertRepository) JobRepository).GetJobAdvertDetailsForAdminsById(id);
+            return await DataAccessManager.JobAdvertDataAccessManager().GetJobAdvertDetailsForAdminsById(id);
         }
 
-        public Task CreateJobVacancy(JobVacancyModel model)
+        public void CreateJobVacancy(JobVacancyModel model)
         {
             JobAdvert jobAdvert =
                 new JobAdvert()
@@ -143,31 +129,29 @@ namespace JobAgent.Services
                     SourceURL = model.SourceURL,
                     Company = new Company()
                     {
-                        Id = model.CompanyId.Value
+                        Identifier = model.CompanyId.Value
                     },
                     Category = new Category()
                     {
-                        Id = model.CategoryId
+                        Identifier = model.CategoryId
                     },
                     Specialization = new Specialization()
                     {
-                        Id = model.SpecializationId.Value
+                        Identifier = model.SpecializationId.Value
                     }
                 };
 
-            JobRepository.Create(jobAdvert);
-
-            return Task.CompletedTask;
+            DataAccessManager.JobAdvertDataAccessManager().Create(jobAdvert);
         }
 
         public void RemoveJobVacancyById(int id)
         {
-            JobRepository.Remove(id);
+            DataAccessManager.JobAdvertDataAccessManager().Remove(id);
         }
 
         public Task<bool> CreateContract(ContractModel model)
         {
-            ContractRepository.Create(
+            DataAccessManager.ContractDataAccessManager().Create(
                 new Contract()
                 {
                     ContactPerson = model.ContactPerson,
@@ -176,11 +160,11 @@ namespace JobAgent.Services
                     RegistrationDate = model.RegistrationDate,
                     SignedByUserId = new User()
                     {
-                        Id = model.SignedByUser
+                        Identifier = model.SignedByUser
                     },
                     Company = new Company()
                     {
-                        Id = model.SignedWithCompany
+                        Identifier = model.SignedWithCompany
                     }
                 });
 
@@ -191,17 +175,17 @@ namespace JobAgent.Services
         {
             try
             {
-                ContractRepository.Update(
+                DataAccessManager.ContractDataAccessManager().Update(
                         new Contract()
                         {
-                            Id = model.Id,
+                            Identifier = model.Id,
                             Company = new Company()
                             {
-                                Id = model.SignedWithCompany
+                                Identifier = model.SignedWithCompany
                             },
                             SignedByUserId = new User()
                             {
-                                Id = model.SignedByUser
+                                Identifier = model.SignedByUser
                             },
                             ContactPerson = model.ContactPerson,
                             ContractName = model.ContractFileName,
@@ -219,22 +203,22 @@ namespace JobAgent.Services
 
         public void RemoveContract(int id)
         {
-            ContractRepository.Remove(id);
+            DataAccessManager.ContractDataAccessManager().Remove(id);
         }
 
-        public Task<List<Contract>> GetContracts()
+        public async Task<IEnumerable<Contract>> GetContracts()
         {
-            return Task.FromResult(ContractRepository.GetAll().ToList());
+            return await DataAccessManager.ContractDataAccessManager().GetAll();
         }
 
-        public Task<Contract> GetContractById(int contractId)
+        public async Task<Contract> GetContractById(int contractId)
         {
-            return Task.FromResult(ContractRepository.GetById(contractId));
+            return await DataAccessManager.ContractDataAccessManager().GetById(contractId);
         }
 
         public void CreateCompany(CompanyModel model)
         {
-            CompanyRepository.Create(
+            DataAccessManager.CompanyDataAccessManager().Create(
                 new Company()
                 {
                     CVR = model.CVR,
@@ -245,10 +229,10 @@ namespace JobAgent.Services
 
         public void UpdateCompany(CompanyModel update)
         {
-            CompanyRepository.Update(
+            DataAccessManager.CompanyDataAccessManager().Update(
                 new Company()
                 {
-                    Id = update.Id,
+                    Identifier = update.Id,
                     CVR = update.CVR,
                     Name = update.Name,
                     URL = update.URL
@@ -257,36 +241,41 @@ namespace JobAgent.Services
 
         public void RemoveCompanyById(int id)
         {
-            CompanyRepository.Remove(id);
+            DataAccessManager.CompanyDataAccessManager().Remove(id);
         }
 
         public Task<bool> CreateSourceLink(SourceLinkModel model)
         {
-            return SourceLinkRepository.Create(
+            DataAccessManager.SourceLinkDataAccessManager().Create(
                 new SourceLink()
                 {
                     Company = new Company()
                     {
-                        Id = model.CompanyId
+                        Identifier = model.CompanyId
                     },
                     Link = model.Link
                 });
+
+            return Task.FromResult(true);
         }
 
         public Task<bool> RemoveSourceLink(int id)
         {
-            return SourceLinkRepository.Remove(id);
+            DataAccessManager.SourceLinkDataAccessManager().Remove(id);
+            return Task.FromResult(true);
         }
 
         public Task<bool> UpdateSourceLink(SourceLinkModel model)
         {
-            return SourceLinkRepository.Update(
+            DataAccessManager.SourceLinkDataAccessManager().Update(
                 new SourceLink()
                 {
-                    Id = model.Id,
-                    Company = new Company() { Id = model.CompanyId },
+                    Identifier = model.Id,
+                    Company = new Company() { Identifier = model.CompanyId },
                     Link = model.Link
                 });
+
+            return Task.FromResult(true);
         }
     }
 }

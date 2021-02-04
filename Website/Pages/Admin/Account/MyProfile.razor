@@ -48,13 +48,13 @@
                     <select class="form-control form-control-sm" @bind="AccountModel.ConsultantAreaId">
                         @foreach (var area in ConsultantAreas)
                         {
-                            @if (area.Id == AccountModel.ConsultantAreaId)
+                            @if (area.Identifier == AccountModel.ConsultantAreaId)
                             {
-                                <option value="@area.Id" selected>@area.Name</option>
+                                <option value="@area.Identifier" selected>@area.Name</option>
                             }
                             else
                             {
-                                <option value="@area.Id">@area.Name</option>
+                                <option value="@area.Identifier">@area.Name</option>
                             }
                         }
                     </select>
@@ -66,13 +66,13 @@
                     <select class="form-control form-control-sm" @bind="AccountModel.LocationId">
                         @foreach (var lctn in Locations)
                         {
-                            @if (lctn.Id == AccountModel.LocationId)
+                            @if (lctn.Identifier == AccountModel.LocationId)
                             {
-                                <option value="@lctn.Id" selected>@lctn.Name</option>
+                                <option value="@lctn.Identifier" selected>@lctn.Name</option>
                             }
                             else
                             {
-                                <option value="@lctn.Id">@lctn.Name</option>
+                                <option value="@lctn.Identifier">@lctn.Name</option>
                             }
                         }
                     </select>
@@ -144,12 +144,12 @@
         var user = await AdminService.GetUserByEmail(UserEmail);
         AccountModel = new AccountModel()
         {
-            AccountId = user.Id,
+            AccountId = user.Identifier,
             Email = user.Email,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            ConsultantAreaId = user.ConsultantArea.Id,
-            LocationId = user.Location.Id
+            ConsultantAreaId = user.ConsultantArea.Identifier,
+            LocationId = user.Location.Identifier
         };
 
         // Get Consulent areas and locations.

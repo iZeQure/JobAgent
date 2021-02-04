@@ -53,8 +53,8 @@ else
 
                 @foreach (var contract in GetContracts)
                 {
-                    <tr id="@(contract.Id)">
-                        <th scope="row">@(contract.Id)</th>
+                    <tr id="@(contract.Identifier)">
+                        <th scope="row">@(contract.Identifier)</th>
                         <td>@(contract.Company.Name)</td>
                         <td>@(contract.ContactPerson)</td>
                         <td>@(contract.SignedByUserId.FullName)</td>
@@ -73,12 +73,12 @@ else
                         <td>@(contract.RegistrationDate.ToString("D"))</td>
                         <td>@(contract.ExpiryDate.ToString("D"))</td>
                         <td>
-                            <span @onclick="(id => OnClick_OpenEditModal(contract.Id))" data-toggle="modal" data-target="#EditContractModal">
+                            <span @onclick="(id => OnClick_OpenEditModal(contract.Identifier))" data-toggle="modal" data-target="#EditContractModal">
                                 <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne kontrakt." Color="Popover.PopoverType.Info" />
                             </span>
                         </td>
                         <td>
-                            <span @onclick="@(mouseEvent => OnClick_RemoveContractModal(contract.Id))" data-toggle="modal" data-target="#RemoveContractModal">
+                            <span @onclick="@(mouseEvent => OnClick_RemoveContractModal(contract.Identifier))" data-toggle="modal" data-target="#RemoveContractModal">
                                 <Popover Title="Forsigtig!" Body="Denne knap sletter den valgte kontrakt, forevigt!" Color="Popover.PopoverType.Danger" />
                             </span>
                         </td>
@@ -129,7 +129,7 @@ else
         if ((await DataService.GetAllCompanies()).Count() == 0)
             disabled = true;
 
-        GetContracts = await AdminService.GetContracts();
+        GetContracts = (await AdminService.GetContracts()).ToList();
     }
 
     private async void RefreshContent()
@@ -137,7 +137,7 @@ else
         try
         {
             if (AdminService.GetContracts() != null)
-                GetContracts = await AdminService.GetContracts();
+                GetContracts = (await AdminService.GetContracts()).ToList();
             else
                 GetContracts = null;
         }
@@ -163,9 +163,9 @@ else
 
         ContractModel = new ContractModel()
         {
-            Id = contract.Id,
-            SignedWithCompany = contract.Company.Id,
-            SignedByUser = contract.SignedByUserId.Id,
+            Id = contract.Identifier,
+            SignedWithCompany = contract.Company.Identifier,
+            SignedByUser = contract.SignedByUserId.Identifier,
             ContactPerson = contract.ContactPerson,
             ContractFileName = contract.ContractName,
             RegistrationDate = contract.RegistrationDate,

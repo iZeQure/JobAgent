@@ -1,11 +1,7 @@
-﻿using JobAgent.Data.Objects;
-using JobAgent.Data.Repository;
-using JobAgent.Data.Repository.Interface;
+﻿using Pocos;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace JobAgent.Models
 {
@@ -24,7 +20,7 @@ namespace JobAgent.Models
         {
             int start = (CurrentPage - 1) * JobAdvertsPerPage;
 
-            return JobAdverts.OrderBy(j => j.Id).Skip(start).Take(JobAdvertsPerPage);
+            return JobAdverts.OrderBy(j => j.Identifier).Skip(start).Take(JobAdvertsPerPage);
         }
     }
 }

@@ -1,7 +1,5 @@
-﻿using JobAgent.Data.Objects;
-using JobAgent.Data.Repository;
-using JobAgent.Data.Repository.Interface;
-using System;
+﻿using DataAccess;
+using Pocos;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,95 +8,84 @@ namespace JobAgent.Services
 {
     public class DataService
     {
-        private protected IRepository<JobAdvert> JobAdvertRepository { get; }
-        private protected IRepository<User> UserRepository { get; }
-        private protected IRepository<ConsultantArea> ConsultantAreaRepository { get; }
-        private protected IRepository<Location> LocationRepository { get; }
-        private protected IRepository<Category> CategoryRepository { get; }
-        private protected IRepository<Company> CompanyRepository { get; }
-        private protected ISourceLinkRepository<SourceLink> SourceLinkRepository { get; set; }
+        private DataAccessManager DataAccessManager { get; }
 
         public DataService()
         {
-            JobAdvertRepository = new JobAdvertRepository();
-            UserRepository = new UserRepository();
-            ConsultantAreaRepository = new ConsultantAreaRepository();
-            LocationRepository = new LocationRepository();
-            CategoryRepository = new CategoryRepository();
-            CompanyRepository = new CompanyRepository();
-            SourceLinkRepository = new SourceLinkRepository();
+            DataAccessManager = new DataAccessManager();
         }
 
-        public Task<int> GetCountOfJobAdvertsByCategory(int id)
+        public async Task<int> GetCountOfJobAdvertsByCategory(int id)
         {
-            return ((IJobAdvertRepository)JobAdvertRepository).GetCountOfJobAdvertsByCategoryId(id);
+            return await DataAccessManager.JobAdvertDataAccessManager().GetCountOfJobAdvertsByCategoryId(id);
         }
 
-        public Task<int> GetCountOfJobAdvertsBySpecializationId(int id)
+        public async Task<int> GetCountOfJobAdvertsBySpecializationId(int id)
         {
-            return ((IJobAdvertRepository)JobAdvertRepository).GetCountOfJobAdvertsBySpecializationId(id);
+            return await DataAccessManager.JobAdvertDataAccessManager().GetCountOfJobAdvertsBySpecializationId(id);
         }
 
-        public Task<int> GetCountOfJobAdvertsUncategorized()
+        public async Task<int> GetCountOfJobAdvertsUncategorized()
         {
-            return ((IJobAdvertRepository)JobAdvertRepository).GetCountOfJobAdvertsUncategorized();
+            return await DataAccessManager.JobAdvertDataAccessManager().GetCountOfJobAdvertsUncategorized();
         }
 
-        public Task<List<ConsultantArea>> GetAllConsultantAreasTask()
+        public async Task<List<ConsultantArea>> GetAllConsultantAreasTask()
         {
-            return Task.FromResult(ConsultantAreaRepository.GetAll().ToList());
+            return (await DataAccessManager.ConsultantAreaDataAccessManager().GetAll()).ToList();
         }
 
-        public Task<List<Location>> GetAllLocationsTask()
+        public async Task<List<Location>> GetAllLocationsTask()
         {
-            return Task.FromResult(LocationRepository.GetAll().ToList());
+            return (await DataAccessManager.LocationDataAccessManager().GetAll()).ToList();
         }
 
-        public Task<List<Category>> GetAllCategories()
+        public async Task<List<Category>> GetAllCategories()
         {
-            return Task.FromResult(CategoryRepository.GetAll().ToList());
-        }
-        public Task<List<Specialization>> GetAllSpecializations()
-        {
-            return Task.FromResult(((ISpecializationRepository<Specialization>)CategoryRepository).GetAllSpecializations());
+            return (await DataAccessManager.CategoryDataAccessManager().GetAllCategories()).ToList();
         }
 
-        public Task<List<Company>> GetAllCompanies()
+        public async Task<List<Specialization>> GetAllSpecializations()
         {
-            return Task.FromResult(CompanyRepository.GetAll().ToList());
+            return await DataAccessManager.CategoryDataAccessManager().GetAllSpecializations();
         }
 
-        public Task<IEnumerable<Company>> GetCompaniesWithContract()
+        public async Task<List<Company>> GetAllCompanies()
         {
-            return ((ICompanyRepository)CompanyRepository).GetCompaniesWithContract();
+            return (await DataAccessManager.CompanyDataAccessManager().GetAll()).ToList();
         }
 
-        public Task<IEnumerable<Company>> GetCompaniesWithOutContract()
+        public async Task<IEnumerable<Company>> GetCompaniesWithContract()
         {
-            return ((ICompanyRepository)CompanyRepository).GetCompaniesWithOutContract();
+            return await DataAccessManager.CompanyDataAccessManager().GetCompaniesWithContract();
         }
 
-        public Task<Company> GetCompanyById(int id)
+        public async Task<IEnumerable<Company>> GetCompaniesWithOutContract()
         {
-            return Task.FromResult(CompanyRepository.GetById(id));
+            return await DataAccessManager.CompanyDataAccessManager().GetCompaniesWithOutContract();
         }
 
-        public Task<List<User>> GetUsers()
+        public async Task<Company> GetCompanyById(int id)
         {
-            return Task.FromResult(UserRepository.GetAll().ToList());
+            return await DataAccessManager.CompanyDataAccessManager().GetById(id);
         }
 
-        public Task<List<SourceLink>> GetAllSourceLinksAsync()
+        public async Task<List<User>> GetUsers()
         {
-            if (SourceLinkRepository.GetAll().Result != null)
-                return Task.FromResult(SourceLinkRepository.GetAll().Result.ToList());
+            return (await DataAccessManager.UserDataAccessManager().GetAll()).ToList();
+        }
+
+        public async Task<List<SourceLink>> GetAllSourceLinksAsync()
+        {
+            if (await DataAccessManager.SourceLinkDataAccessManager().GetAll() != null)
+                return (await DataAccessManager.SourceLinkDataAccessManager().GetAll()).ToList();
             else
                 return null;
         }
 
-        public Task<SourceLink> GetSourceLinkById(int id)
+        public async Task<SourceLink> GetSourceLinkById(int id)
         {
-            return SourceLinkRepository.GetById(id);
+            return await DataAccessManager.SourceLinkDataAccessManager().GetById(id);
         }
 
         public static string TruncateString(string value, int maxChars)

@@ -56,13 +56,13 @@
                                 <select class="form-control form-control-sm" @bind="Model.CompanyId">
                                     @foreach (var comp in Companies)
                                     {
-                                        @if (comp.Id == Model.CompanyId)
+                                        @if (comp.Identifier == Model.CompanyId)
                                         {
-                                            <option value="@comp.Id" selected>@comp.Name</option>
+                                            <option value="@comp.Identifier" selected>@comp.Name</option>
                                         }
                                         else
                                         {
-                                            <option value="@comp.Id">@comp.Name</option>
+                                            <option value="@comp.Identifier">@comp.Name</option>
                                         }
                                     }
                                 </select>
@@ -108,13 +108,13 @@
 
                                     @foreach (var cat in Categories)
                                     {
-                                        @if (cat.Id == Model.CategoryId)
+                                        @if (cat.Identifier == Model.CategoryId)
                                         {
-                                            <option value="@cat.Id" selected>@cat.Name</option>
+                                            <option value="@cat.Identifier" selected>@cat.Name</option>
                                         }
                                         else
                                         {
-                                            <option value="@cat.Id">@cat.Name</option>
+                                            <option value="@cat.Identifier">@cat.Name</option>
                                         }
                                     }
                                 </select>
@@ -127,13 +127,13 @@
                                     <select class="form-control form-control-sm" @bind="Model.SpecializationId">
                                         @foreach (var spec in SortedSpecializations)
                                         {
-                                            @if (spec.Id == Model.SpecializationId)
+                                            @if (spec.Identifier == Model.SpecializationId)
                                             {
-                                                <option value="@spec.Id">@spec.Name</option>
+                                                <option value="@spec.Identifier">@spec.Name</option>
                                             }
                                             else
                                             {
-                                                <option value="@spec.Id">@spec.Name</option>
+                                                <option value="@spec.Identifier">@spec.Name</option>
                                             }
                                         }
                                     </select>

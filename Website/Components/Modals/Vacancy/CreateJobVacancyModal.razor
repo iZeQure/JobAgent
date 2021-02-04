@@ -94,7 +94,7 @@
                                         <option value="0" selected>---Vælg en virksomhed fra listen---</option>
                                         @foreach (var company in Companies)
                                         {
-                                            <option value="@company.Id">@company.Name</option>
+                                            <option value="@company.Identifier">@company.Name</option>
                                         }
                                     </select>
                                     <ValidationMessage For="@(() => JobVacancyModel.CompanyId)" />
@@ -110,7 +110,7 @@
                                         <option value="0" selected>---Vælg en kateori fra listen---</option>
                                         @foreach (var category in Categories)
                                         {
-                                            <option value="@category.Id">@category.Name</option>
+                                            <option value="@category.Identifier">@category.Name</option>
                                         }
                                     </select>
                                     <ValidationMessage For="@(() => JobVacancyModel.CategoryId)" />
@@ -123,7 +123,7 @@
                                             <option value="0" selected>---Vælg et speciale fra listen---</option>
                                             @foreach (var spec in SortedSpecializations)
                                             {
-                                                <option value="@spec.Id">@(spec.Name)</option>
+                                                <option value="@spec.Identifier">@(spec.Name)</option>
                                             }
                                         </select>
                                         <ValidationMessage For="@(() => JobVacancyModel.SpecializationId)" />
@@ -184,7 +184,7 @@
 
     private async void OnValidSubmit_CreateJobVacancy()
     {
-        await AdminService.CreateJobVacancy(JobVacancyModel);
+        AdminService.CreateJobVacancy(JobVacancyModel);
 
 
         Refresh.CallRefreshRequest();

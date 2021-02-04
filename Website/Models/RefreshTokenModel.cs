@@ -1,8 +1,5 @@
-﻿using JobAgent.Data.Objects;
+﻿using Pocos;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace JobAgent.Models
 {

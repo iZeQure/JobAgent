@@ -49,19 +49,19 @@ else
 
                 @foreach (var source in SourceLinks.OrderBy(x => x.Company.Name))
                 {
-                    <tr id="@(source.Id)">
-                        <th scope="row">@(source.Id)</th>
+                    <tr id="@(source.Identifier)">
+                        <th scope="row">@(source.Identifier)</th>
                         <td>@(source.Company.Name)</td>
                         <td>@(source.Link)</td>
 
                         <td>
-                            <span data-toggle="modal" data-target="#EditSourceLinkModal" @onclick="@(mouseEvent => OnClick_EditLink(source.Id))">
+                            <span data-toggle="modal" data-target="#EditSourceLinkModal" @onclick="@(mouseEvent => OnClick_EditLink(source.Identifier))">
                                 <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne kontrakt." Color="Popover.PopoverType.Info" />
                             </span>
                         </td>
 
                         <td>
-                            <span data-toggle="modal" data-target="#RemoveConfirmationSourceLinkModal" @onclick="@(mouseEvent => ConfirmationWindow(source.Id))">
+                            <span data-toggle="modal" data-target="#RemoveConfirmationSourceLinkModal" @onclick="@(mouseEvent => ConfirmationWindow(source.Identifier))">
                                 <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
                             </span>
                         </td>

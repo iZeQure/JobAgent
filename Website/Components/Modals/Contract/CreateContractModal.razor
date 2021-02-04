@@ -27,7 +27,7 @@
                                 <option value="0" selected>---Vælg en virksomhed fra listen---</option>
                                 @foreach (var company in Companies)
                                 {
-                                    <option value="@company.Id">@company.Name</option>
+                                    <option value="@company.Identifier">@company.Name</option>
                                 }
                             </select>
                         </div>
@@ -37,7 +37,7 @@
                                 <option value="0" selected>---Vælg en konsulent fra listen---</option>
                                 @foreach (var user in Users)
                                 {
-                                    <option value="@user.Id">@user.FullName</option>
+                                    <option value="@user.Identifier">@user.FullName</option>
                                 }
                             </select>
                         </div>
