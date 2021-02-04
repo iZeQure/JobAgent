@@ -35,7 +35,7 @@ namespace JobAgent
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            DataAccessOptions.ConnectionString = Configuration.GetConnectionString("JobAgentDb");
+            DataAccessOptions.ConnectionString = Configuration.GetConnectionString("Job.Agent.Database");
 
             services.AddSingleton<SqlDataAccess>(); // Database Service.
             services.AddTransient<SecurityService>(); // Security Service.
@@ -47,7 +47,6 @@ namespace JobAgent
             services.AddBlazoredLocalStorage();
             services.AddServerSideBlazor().AddHubOptions(o => { o.MaximumReceiveMessageSize = 102400000; });
             services.AddBootstrapCss();
-            //services.AddSyncfusionBlazor(true);
 
             services.Configure<RequestLocalizationOptions>(options =>
             {
@@ -76,9 +75,6 @@ namespace JobAgent
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            //Register Syncfusion license
-            //Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzA5ODQ4QDMxMzgyZTMyMmUzME4yRnNCVk9POTVFMW8vbElhWThWaEtzY2thUlB6emlQWGtaYTFMZ1Y5Nkk9");
-
             app.UseRequestLocalization();
 
             if (env.IsDevelopment())

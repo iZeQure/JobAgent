@@ -13,7 +13,7 @@
   },
   "profiles": {
     "IISX-Production": {
-      "commandName": "IISExpress",
+      "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
         "SHARED_PATH": "\\\\Jobagent\\contracts\\",
