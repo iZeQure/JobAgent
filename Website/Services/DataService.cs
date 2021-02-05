@@ -30,29 +30,29 @@ namespace JobAgent.Services
             return await DataAccessManager.JobAdvertDataAccessManager().GetCountOfJobAdvertsUncategorized();
         }
 
-        public async Task<List<ConsultantArea>> GetAllConsultantAreasTask()
+        public async Task<IEnumerable<ConsultantArea>> GetAllConsultantAreasTask()
         {
-            return (await DataAccessManager.ConsultantAreaDataAccessManager().GetAll()).ToList();
+            return await DataAccessManager.ConsultantAreaDataAccessManager().GetAll();
         }
 
-        public async Task<List<Location>> GetAllLocationsTask()
+        public async Task<IEnumerable<Location>> GetAllLocationsTask()
         {
-            return (await DataAccessManager.LocationDataAccessManager().GetAll()).ToList();
+            return await DataAccessManager.LocationDataAccessManager().GetAll();
         }
 
-        public async Task<List<Category>> GetAllCategories()
+        public async Task<IEnumerable<Category>> GetAllCategories()
         {
-            return (await DataAccessManager.CategoryDataAccessManager().GetAllCategories()).ToList();
+            return await DataAccessManager.CategoryDataAccessManager().GetAllCategories();
         }
 
-        public async Task<List<Specialization>> GetAllSpecializations()
+        public async Task<IEnumerable<Specialization>> GetAllSpecializations()
         {
             return await DataAccessManager.CategoryDataAccessManager().GetAllSpecializations();
         }
 
-        public async Task<List<Company>> GetAllCompanies()
+        public async Task<IEnumerable<Company>> GetAllCompanies()
         {
-            return (await DataAccessManager.CompanyDataAccessManager().GetAll()).ToList();
+            return await DataAccessManager.CompanyDataAccessManager().GetAll();
         }
 
         public async Task<IEnumerable<Company>> GetCompaniesWithContract()
@@ -70,17 +70,14 @@ namespace JobAgent.Services
             return await DataAccessManager.CompanyDataAccessManager().GetById(id);
         }
 
-        public async Task<List<User>> GetUsers()
+        public async Task<IEnumerable<User>> GetUsers()
         {
-            return (await DataAccessManager.UserDataAccessManager().GetAll()).ToList();
+            return await DataAccessManager.UserDataAccessManager().GetAll();
         }
 
-        public async Task<List<SourceLink>> GetAllSourceLinksAsync()
+        public async Task<IEnumerable<SourceLink>> GetAllSourceLinksAsync()
         {
-            if (await DataAccessManager.SourceLinkDataAccessManager().GetAll() != null)
-                return (await DataAccessManager.SourceLinkDataAccessManager().GetAll()).ToList();
-            else
-                return null;
+            return await DataAccessManager.SourceLinkDataAccessManager().GetAll();
         }
 
         public async Task<SourceLink> GetSourceLinkById(int id)

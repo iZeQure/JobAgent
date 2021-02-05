@@ -101,8 +101,8 @@
     [Inject] protected DataService DataService { get; set; }
 
     protected private ContractModel ContractModel { get; set; } = new ContractModel();
-    protected private List<User> Users { get; set; } = new List<User>();
-    protected private List<Company> Companies { get; set; } = new List<Company>();
+    protected private IEnumerable<User> Users { get; set; } = new List<User>();
+    protected private IEnumerable<Company> Companies { get; set; } = new List<Company>();
     protected private IFileListEntry File { get; set; }
 
     private bool IsProcessing { get; set; } = false;
@@ -113,8 +113,18 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Companies = await DataService.GetCompaniesWithOutContract() as List<Company>;
-        Users = await DataService.GetUsers();
+        await LoadData();
+    }
+
+    private Task LoadData()
+    {
+        Task.Run(async () =>
+        {
+            Companies = await DataService.GetCompaniesWithOutContract();
+            Users = await DataService.GetUsers();
+        });
+
+        return Task.CompletedTask;
     }
 
     private async void OnValidSubmit_CreateContract()
@@ -165,29 +175,34 @@
         await JSRuntime.InvokeVoidAsync("modalToggle", "CreateContractModal");
     }
 
-    private async Task HandleFileSelected(IFileListEntry[] files)
+    private Task HandleFileSelected(IFileListEntry[] files)
     {
-        ShowError = false;
-        FileProgress = "Starting";
-        File = files.FirstOrDefault();
-
-        if (File != null)
+        Task.Run(async () =>
         {
-            try
-            {
-                await FileService.UploadFileAsync(File);
+            ShowError = false;
+            FileProgress = "Starting";
+            File = files.FirstOrDefault();
 
-                ContractModel.ContractFileName = File.Name;
-
-                FileProgress = "Success";
-            }
-            catch (Exception e)
+            if (File != null)
             {
-                ErrorMessage = e.Message;/*ErrorMessage = "Kunne ikke oploade fil.";*/
-                ShowError = true;
-                FileProgress = "Failed";
+                try
+                {
+                    await FileService.UploadFileAsync(File);
+
+                    ContractModel.ContractFileName = File.Name;
+
+                    FileProgress = "Success";
+                }
+                catch (Exception e)
+                {
+                    ErrorMessage = e.Message;/*ErrorMessage = "Kunne ikke oploade fil.";*/
+                    ShowError = true;
+                    FileProgress = "Failed";
+                }
             }
-        }
+        });
+
+        return Task.CompletedTask;
     }
 
     private void RemoveUploadedFile(MouseEventArgs e)

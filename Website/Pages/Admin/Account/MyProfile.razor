@@ -108,8 +108,8 @@
 
     private AccountModel AccountModel = new AccountModel();
 
-    private List<ConsultantArea> ConsultantAreas { get; set; } = new List<ConsultantArea>();
-    private List<Location> Locations { get; set; } = new List<Location>();
+    private IEnumerable<ConsultantArea> ConsultantAreas { get; set; } = new List<ConsultantArea>();
+    private IEnumerable<Location> Locations { get; set; } = new List<Location>();
 
     private string ErrorMessage { get; set; }
     private string Message { get; set; }

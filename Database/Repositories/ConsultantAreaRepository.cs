@@ -5,35 +5,48 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using DataAccess.SqlAccess.Interfaces;
 
 namespace DataAccess.Repositories
 {
     public class ConsultantAreaRepository : IConsultantAreaRepository
     {
+        private readonly SqlDatabaseAccess _databaseAccess;
+
+        public ConsultantAreaRepository(IDatabaseAccess databaseAccess)
+        {
+            _databaseAccess = (SqlDatabaseAccess)databaseAccess;
+        }
+
         /// <summary>
         /// Create a consultant area.
         /// </summary>
         /// <param name="create">Used to specify the data set.</param>
         public async void Create(ConsultantArea create)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("CreateConsultantArea", db.GetConnection())
+            try
             {
-                CommandType = CommandType.StoredProcedure
-            };
+                // Initialize command obj.
+                using SqlCommand cmd = new SqlCommand("CreateConsultantArea", _databaseAccess.GetConnection())
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            // Define input parameters.
-            cmd.Parameters.AddWithValue("@name", create.Name);
+                // Define input parameters.
+                cmd.Parameters.AddWithValue("@name", create.Name);
 
-            cmd.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.ReturnValue;
+                cmd.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.ReturnValue;
 
-            // Open connection to database.
-            await db.OpenConnectionAsync();
+                // Open connection to database.
+                await _databaseAccess.OpenConnectionAsync();
 
-            // Execute command.
-            await cmd.ExecuteNonQueryAsync();
+                // Execute command.
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+                _databaseAccess.CloseConnection();
+            }
         }
 
         /// <summary>
@@ -42,40 +55,45 @@ namespace DataAccess.Repositories
         /// <returns>A list of <see cref="ConsultantArea"/>.</returns>
         public async Task<IEnumerable<ConsultantArea>> GetAll()
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Initialize temporary list.
-            List<ConsultantArea> tempConsultantAreas = new List<ConsultantArea>();
-
-            // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("GetAllConsultantAreas", db.GetConnection())
+            try
             {
-                CommandType = CommandType.StoredProcedure
-            };
+                // Initialize temporary list.
+                List<ConsultantArea> tempConsultantAreas = new List<ConsultantArea>();
 
-            // Open connection to database.
-            await db.OpenConnectionAsync();
-
-            // Initialize data reader.
-            using SqlDataReader reader = await cmd.ExecuteReaderAsync();
-
-            // Check if any data.
-            if (reader.HasRows)
-            {
-                // Read data.
-                while (await reader.ReadAsync())
+                // Initialize command obj.
+                using SqlCommand cmd = new SqlCommand("GetAllConsultantAreas", _databaseAccess.GetConnection())
                 {
-                    tempConsultantAreas.Add(
-                        new ConsultantArea()
-                        {
-                            Identifier = reader.GetInt32("Id"),
-                            Name = reader.GetString("Name")
-                        });
-                }
-            }
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            // Return dataset.
-            return tempConsultantAreas;
+                // Open connection to database.
+                await _databaseAccess.OpenConnectionAsync();
+
+                // Initialize data reader.
+                using SqlDataReader reader = cmd.ExecuteReader();
+
+                // Check if any data.
+                if (reader.HasRows)
+                {
+                    // Read data.
+                    while (reader.Read())
+                    {
+                        tempConsultantAreas.Add(
+                            new ConsultantArea()
+                            {
+                                Identifier = reader.GetInt32("Id"),
+                                Name = reader.GetString("Name")
+                            });
+                    }
+                }
+
+                // Return dataset.
+                return tempConsultantAreas;
+            }
+            finally
+            {
+                _databaseAccess.CloseConnection();
+            }
         }
 
         /// <summary>
@@ -85,41 +103,46 @@ namespace DataAccess.Repositories
         /// <returns>A <see cref="ConsultantArea"/>.</returns>
         public async Task<ConsultantArea> GetById(int id)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Initialize temporary obj.
-            ConsultantArea tempConsultantArea = new ConsultantArea();
-
-            // Open connection to database.
-            await db.OpenConnectionAsync();
-
-            // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("GetConsultantAreaById", db.GetConnection())
+            try
             {
-                CommandType = CommandType.StoredProcedure
-            };
+                // Initialize temporary obj.
+                ConsultantArea tempConsultantArea = new ConsultantArea();
 
-            // Define input parameters.
-            cmd.Parameters.AddWithValue("@id", id);
+                // Open connection to database.
+                await _databaseAccess.OpenConnectionAsync();
 
-            cmd.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.Output;
-
-            // Initialize data reader.
-            using SqlDataReader reader = await cmd.ExecuteReaderAsync();
-
-            // Check if any data.
-            if (reader.HasRows)
-            {
-                // Read dataset.
-                while (await reader.ReadAsync())
+                // Initialize command obj.
+                using SqlCommand cmd = new SqlCommand("GetConsultantAreaById", _databaseAccess.GetConnection())
                 {
-                    tempConsultantArea.Identifier = reader.GetInt32("Id");
-                    tempConsultantArea.Name = reader.GetString("Name");
-                }
-            }
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            // Return data obj.
-            return tempConsultantArea;
+                // Define input parameters.
+                cmd.Parameters.AddWithValue("@id", id);
+
+                cmd.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.Output;
+
+                // Initialize data reader.
+                using SqlDataReader reader = cmd.ExecuteReader();
+
+                // Check if any data.
+                if (reader.HasRows)
+                {
+                    // Read dataset.
+                    while (reader.Read())
+                    {
+                        tempConsultantArea.Identifier = reader.GetInt32("Id");
+                        tempConsultantArea.Name = reader.GetString("Name");
+                    }
+                }
+
+                // Return data obj.
+                return tempConsultantArea;
+            }
+            finally
+            {
+                _databaseAccess.CloseConnection();
+            }
         }
 
         /// <summary>
@@ -128,22 +151,27 @@ namespace DataAccess.Repositories
         /// <param name="id">Used to specify which dataset to remove.</param>
         public async void Remove(int id)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand()
+            try
             {
-                CommandType = CommandType.StoredProcedure
-            };
+                // Initialize command obj.
+                using SqlCommand cmd = new SqlCommand()
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            // Define input parameters.
-            cmd.Parameters.AddWithValue("@id", id);
+                // Define input parameters.
+                cmd.Parameters.AddWithValue("@id", id);
 
-            // Open connection to database.
-            await db.OpenConnectionAsync();
+                // Open connection to database.
+                await _databaseAccess.OpenConnectionAsync();
 
-            // Execute command, catch return code.
-            await cmd.ExecuteNonQueryAsync();
+                // Execute command, catch return code.
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+                _databaseAccess.CloseConnection();
+            }
         }
 
         /// <summary>
@@ -152,23 +180,28 @@ namespace DataAccess.Repositories
         /// <param name="update">Used to specify what dataset needs to update.</param>
         public async void Update(ConsultantArea update)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("RemoveConsultantArea", db.GetConnection())
+            try
             {
-                CommandType = CommandType.StoredProcedure
-            };
+                // Initialize command obj.
+                using SqlCommand cmd = new SqlCommand("RemoveConsultantArea", _databaseAccess.GetConnection())
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            // Define input parameters.
-            cmd.Parameters.AddWithValue("@id", update.Identifier);
-            cmd.Parameters.AddWithValue("@name", update.Name);
+                // Define input parameters.
+                cmd.Parameters.AddWithValue("@id", update.Identifier);
+                cmd.Parameters.AddWithValue("@name", update.Name);
 
-            // Open connection to database.
-            await db.OpenConnectionAsync();
+                // Open connection to database.
+                await _databaseAccess.OpenConnectionAsync();
 
-            // Execute command, catch return code.
-            await cmd.ExecuteNonQueryAsync();
+                // Execute command, catch return code.
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+                _databaseAccess.CloseConnection();
+            }
         }
     }
 }

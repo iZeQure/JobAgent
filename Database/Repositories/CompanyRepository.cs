@@ -5,35 +5,48 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using DataAccess.SqlAccess.Interfaces;
 
 namespace DataAccess.Repositories
 {
     public class CompanyRepository : ICompanyRepository
     {
+        private readonly SqlDatabaseAccess _databaseAccess;
+
+        public CompanyRepository(IDatabaseAccess databaseAccess)
+        {
+            _databaseAccess = (SqlDatabaseAccess)databaseAccess;
+        }
+
         /// <summary>
         /// Create a company.
         /// </summary>
         /// <param name="create">Used to specify the data to create.</param>
         public async void Create(Company create)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("CreateCompany", db.GetConnection())
+            try
             {
-                CommandType = CommandType.StoredProcedure
-            };
+                // Initialize command obj.
+                using SqlCommand cmd = new SqlCommand("CreateCompany", _databaseAccess.GetConnection())
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            // Define input parameters.
-            cmd.Parameters.AddWithValue("@cvr", create.CVR);
-            cmd.Parameters.AddWithValue("@name", create.Name);
-            cmd.Parameters.AddWithValue("@url", create.URL);
+                // Define input parameters.
+                cmd.Parameters.AddWithValue("@cvr", create.CVR);
+                cmd.Parameters.AddWithValue("@name", create.Name);
+                cmd.Parameters.AddWithValue("@url", create.URL);
 
-            // Open connection to database.
-            await db.OpenConnectionAsync();
+                // Open connection to database.
+                await _databaseAccess.OpenConnectionAsync();
 
-            // Execute command.
-            await cmd.ExecuteNonQueryAsync();
+                // Execute command.
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+                _databaseAccess.CloseConnection();
+            }
         }
 
         /// <summary>
@@ -42,41 +55,46 @@ namespace DataAccess.Repositories
         /// <returns>A list of <see cref="Company"/>.</returns>
         public async Task<IEnumerable<Company>> GetAll()
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Initialize a temporary list of companies.
-            List<Company> tempCompanies = new List<Company>();
-
-            // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("GetAllCompanies", db.GetConnection())
+            try
             {
-                CommandType = CommandType.StoredProcedure
-            };
+                // Initialize a temporary list of companies.
+                List<Company> tempCompanies = new List<Company>();
 
-            // Open connection to database.
-            await db.OpenConnectionAsync();
-
-            // Initialize data reader.
-            using SqlDataReader reader = await cmd.ExecuteReaderAsync();
-
-            // Check if any data.
-            if (reader.HasRows)
-            {
-                // Read data.
-                while (await reader.ReadAsync())
+                // Initialize command obj.
+                using SqlCommand cmd = new SqlCommand("GetAllCompanies", _databaseAccess.GetConnection())
                 {
-                    tempCompanies.Add(new Company()
-                    {
-                        Identifier = reader.GetInt32("Id"),
-                        CVR = reader.GetInt32("CVR"),
-                        Name = reader.GetString("Name"),
-                        URL = reader.GetString("URL")
-                    });
-                }
-            }
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            // Return dataset.
-            return tempCompanies;
+                // Open connection to database.
+                await _databaseAccess.OpenConnectionAsync();
+
+                // Initialize data reader.
+                using SqlDataReader reader = cmd.ExecuteReader();
+
+                // Check if any data.
+                if (reader.HasRows)
+                {
+                    // Read data.
+                    while (reader.Read())
+                    {
+                        tempCompanies.Add(new Company()
+                        {
+                            Identifier = reader.GetInt32("Id"),
+                            CVR = reader.GetInt32("CVR"),
+                            Name = reader.GetString("Name"),
+                            URL = reader.GetString("URL")
+                        });
+                    }
+                }
+
+                // Return dataset.
+                return tempCompanies;
+            }
+            finally
+            {
+                _databaseAccess.CloseConnection();
+            }
         }
 
         /// <summary>
@@ -86,41 +104,46 @@ namespace DataAccess.Repositories
         /// <returns>A <see cref="Company"/>.</returns>
         public async Task<Company> GetById(int id)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Initialize temporary obj.
-            Company tempCompany = new Company();
-
-            // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("GetCompanyById", db.GetConnection())
+            try
             {
-                CommandType = CommandType.StoredProcedure
-            };
+                // Initialize temporary obj.
+                Company tempCompany = new Company();
 
-            // Define input parameters.
-            cmd.Parameters.AddWithValue("@id", id);
-
-            // Open connection to database.
-            await db.OpenConnectionAsync();
-
-            // Initialize data reader.
-            using SqlDataReader reader = await cmd.ExecuteReaderAsync();
-
-            // Check for any data.
-            if (reader.HasRows)
-            {
-                // Read data.
-                while (await reader.ReadAsync())
+                // Initialize command obj.
+                using SqlCommand cmd = new SqlCommand("GetCompanyById", _databaseAccess.GetConnection())
                 {
-                    tempCompany.Identifier = reader.GetInt32("Id");
-                    tempCompany.CVR = reader.GetInt32("CVR");
-                    tempCompany.Name = reader.GetString("Name");
-                    tempCompany.URL = reader.GetString("URL");
-                }
-            }
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            // Return data.
-            return tempCompany;
+                // Define input parameters.
+                cmd.Parameters.AddWithValue("@id", id);
+
+                // Open connection to database.
+                await _databaseAccess.OpenConnectionAsync();
+
+                // Initialize data reader.
+                using SqlDataReader reader = cmd.ExecuteReader();
+
+                // Check for any data.
+                if (reader.HasRows)
+                {
+                    // Read data.
+                    while (reader.Read())
+                    {
+                        tempCompany.Identifier = reader.GetInt32("Id");
+                        tempCompany.CVR = reader.GetInt32("CVR");
+                        tempCompany.Name = reader.GetString("Name");
+                        tempCompany.URL = reader.GetString("URL");
+                    }
+                }
+
+                // Return data.
+                return tempCompany;
+            }
+            finally
+            {
+                _databaseAccess.CloseConnection();
+            }
         }
 
         /// <summary>
@@ -129,26 +152,24 @@ namespace DataAccess.Repositories
         /// <returns>An <see cref="IEnumerable{T}"/>.</returns>
         public async Task<IEnumerable<Company>> GetCompaniesWithOutContract()
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
             var tempCompanies = new List<Company>();
 
             using SqlCommand c = new SqlCommand()
             {
                 CommandText = "SELECT * FROM [Company] WHERE NOT EXISTS (SELECT * FROM [Contract] WHERE [Contract].[CompanyId] = [Company].[Id])",
                 CommandType = CommandType.Text,
-                Connection = db.GetConnection()
+                Connection = _databaseAccess.GetConnection()
             };
 
             try
             {
-                await db.OpenConnectionAsync();
+                await _databaseAccess.OpenConnectionAsync();
 
-                using SqlDataReader r = await c.ExecuteReaderAsync();
+                using SqlDataReader r = c.ExecuteReader();
 
                 if (r.HasRows)
                 {
-                    while (await r.ReadAsync())
+                    while (r.Read())
                     {
                         tempCompanies.Add(
                             new Company()
@@ -166,7 +187,7 @@ namespace DataAccess.Repositories
             }
             finally
             {
-                db.CloseConnection();
+                _databaseAccess.CloseConnection();
             }
         }
 
@@ -176,26 +197,24 @@ namespace DataAccess.Repositories
         /// <returns>An <see cref="IEnumerable{T}"/>.</returns>
         public async Task<IEnumerable<Company>> GetCompaniesWithContract()
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
             var tempCompanies = new List<Company>();
 
             using SqlCommand c = new SqlCommand()
             {
                 CommandText = "SELECT * FROM [Company] WHERE EXISTS (SELECT * FROM [Contract] WHERE [Contract].[CompanyId] = [Company].[Id])",
                 CommandType = CommandType.Text,
-                Connection = db.GetConnection()
+                Connection = _databaseAccess.GetConnection()
             };
 
             try
             {
-                await db.OpenConnectionAsync();
+                await _databaseAccess.OpenConnectionAsync();
 
-                using SqlDataReader r = await c.ExecuteReaderAsync();
+                using SqlDataReader r = c.ExecuteReader();
 
                 if (r.HasRows)
                 {
-                    while (await r.ReadAsync())
+                    while (r.Read())
                     {
                         tempCompanies.Add(
                             new Company()
@@ -212,7 +231,7 @@ namespace DataAccess.Repositories
             }
             finally
             {
-                db.CloseConnection();
+                _databaseAccess.CloseConnection();
             }
         }
 
@@ -222,22 +241,27 @@ namespace DataAccess.Repositories
         /// <param name="id">Used to identify the data to remove.</param>
         public async void Remove(int id)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("RemoveCompany", db.GetConnection())
+            try
             {
-                CommandType = CommandType.StoredProcedure
-            };
+                // Initialize command obj.
+                using SqlCommand cmd = new SqlCommand("RemoveCompany", _databaseAccess.GetConnection())
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            // Define input parameters.
-            cmd.Parameters.AddWithValue("@id", id);
+                // Define input parameters.
+                cmd.Parameters.AddWithValue("@id", id);
 
-            // Open connection to database.
-            await db.OpenConnectionAsync();
+                // Open connection to database.
+                await _databaseAccess.OpenConnectionAsync();
 
-            // Execute command.
-            await cmd.ExecuteNonQueryAsync();
+                // Execute command.
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+                _databaseAccess.CloseConnection();
+            }
         }
 
         /// <summary>
@@ -246,25 +270,30 @@ namespace DataAccess.Repositories
         /// <param name="update">Used to update the company information.</param>
         public async void Update(Company update)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("UpdateCompany", db.GetConnection())
+            try
             {
-                CommandType = CommandType.StoredProcedure
-            };
+                // Initialize command obj.
+                using SqlCommand cmd = new SqlCommand("UpdateCompany", _databaseAccess.GetConnection())
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            // Define input parameters.
-            cmd.Parameters.AddWithValue("@id", update.Identifier);
-            cmd.Parameters.AddWithValue("@cvr", update.CVR);
-            cmd.Parameters.AddWithValue("@name", update.Name);
-            cmd.Parameters.AddWithValue("@url", update.URL);
+                // Define input parameters.
+                cmd.Parameters.AddWithValue("@id", update.Identifier);
+                cmd.Parameters.AddWithValue("@cvr", update.CVR);
+                cmd.Parameters.AddWithValue("@name", update.Name);
+                cmd.Parameters.AddWithValue("@url", update.URL);
 
-            // Open connection to database.
-            await db.OpenConnectionAsync();
+                // Open connection to database.
+                await _databaseAccess.OpenConnectionAsync();
 
-            // Execute command.
-            await cmd.ExecuteNonQueryAsync();
+                // Execute command.
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+                _databaseAccess.CloseConnection();
+            }
         }
     }
 }

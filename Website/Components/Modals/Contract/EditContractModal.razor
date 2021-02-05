@@ -124,8 +124,8 @@
     [Inject]
     protected IJSRuntime JSRuntime { get; set; }
 
-    protected private List<Company> Companies { get; set; }
-    protected private List<User> Users { get; set; }
+    protected private IEnumerable<Company> Companies { get; set; }
+    protected private IEnumerable<User> Users { get; set; }
 
     private bool IsProcessing { get; set; } = false;
     private bool ShowError { get; set; } = false;
@@ -134,8 +134,18 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Companies = await DataService.GetAllCompanies() as List<Company>;
-        Users = await DataService.GetUsers();
+        await LoadData();
+    }
+
+    private Task LoadData()
+    {
+        Task.Run(async () =>
+        {
+            Companies = await DataService.GetAllCompanies();
+            Users = await DataService.GetUsers();
+        });
+
+        return Task.CompletedTask;
     }
 
     private async void OnValidSubmit_UpdateContract()

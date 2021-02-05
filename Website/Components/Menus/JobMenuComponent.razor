@@ -1,7 +1,7 @@
 ﻿@inject JobService JobService
 @inject DataService DataService
 
-@if (!JobCategories.Any())
+@if (JobCategories.Equals(null) || !JobCategories.Any() || JobCategories.Count().Equals(0))
 {
     <MessageAlert Alert="@AlertType" Message="@SystemMessage" IsLoading="@IsLoading" />
 }
@@ -13,17 +13,17 @@ else
         </a>
     </div>
 
-    @for (int i = 0; i < JobCategories.Count; i++)
+    @for (int i = 0; i < JobCategories.Count(); i++)
     {
-        @if (JobCategories[i].Specializations != null)
+        @if (JobCategories.ElementAtOrDefault(i).Specializations != null)
         {
             <div class="dropdown py-1 px-2">
-                <a id="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu" class="@MenuColor dropdown-toggle btn btn-link btn-sm text-wrap text-left cursor-pointer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    @JobCategories[i].Name <span class="badge badge-info">@GetCategoryCount(JobCategories[i].Specializations.Select(x => x.CategoryId).First()).GetAwaiter().GetResult()</span>
+                <a id="@RemoveWhitespace(JobCategories.ElementAtOrDefault(i).Name)DropdownMenu" class="@MenuColor dropdown-toggle btn btn-link btn-sm text-wrap text-left cursor-pointer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    @JobCategories.ElementAtOrDefault(i).Name <span class="badge badge-info">@(GetCategoryCount(JobCategories.ElementAtOrDefault(i).Specializations.Select(x => x.CategoryId).First()).Result)</span>
                 </a>
 
-                <div class="dropdown-menu" aria-labelledby="@RemoveWhitespace(JobCategories[i].Name)DropdownMenu">
-                    @if (JobCategories[i].Specializations.Count > 1)
+                <div class="dropdown-menu" aria-labelledby="@RemoveWhitespace(JobCategories.ElementAtOrDefault(i).Name)DropdownMenu">
+                    @if (JobCategories.ElementAtOrDefault(i).Specializations.Count > 1)
                     {
                         <h6 class="dropdown-header">Uddannelses Specialer</h6>
                     }
@@ -34,11 +34,11 @@ else
 
                     <div class="dropdown-divider"></div>
 
-                    @for (int j = 0; j < JobCategories[i].Specializations.Count; j++)
+                    @for (int j = 0; j < JobCategories.ElementAtOrDefault(i).Specializations.Count; j++)
                     {
                         // Link : {domain}/job/CategoryId/CategoryName/SpecializationId/SpecializationName
-                        <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories[i].Identifier/@JobCategories[i].Specializations[j].Identifier">
-                            @JobCategories[i].Specializations[j].Name <span class="badge badge-info">@GetSpecializationCount(JobCategories[i].Specializations[j].Identifier).GetAwaiter().GetResult()</span>
+                        <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories.ElementAtOrDefault(i).Identifier/@JobCategories.ElementAtOrDefault(i).Specializations[j].Identifier">
+                            @JobCategories.ElementAtOrDefault(i).Specializations[j].Name <span class="badge badge-info">@(GetSpecializationCount(JobCategories.ElementAtOrDefault(i).Specializations[j].Identifier).Result)</span>
                         </a>
                     }
                 </div>
@@ -48,8 +48,8 @@ else
         {
             <div class="py-1 px-2">
                 @* Link : {domain}/job/CategoryId/CategoryName *@
-                <a class="@MenuColor btn btn-link btn-sm text-wrap text-left" href="/job/@JobCategories[i].Identifier">
-                    @JobCategories[i].Name <span class="badge badge-info">@GetCategoryCount(JobCategories[i].Identifier).Result</span>
+                <a class="@MenuColor btn btn-link btn-sm text-wrap text-left" href="/job/@JobCategories.ElementAtOrDefault(i).Identifier">
+                    @JobCategories.ElementAtOrDefault(i).Name <span class="badge badge-info">@GetCategoryCount(JobCategories.ElementAtOrDefault(i).Identifier).Result</span>
                 </a>
             </div>
         }
@@ -57,7 +57,7 @@ else
 }
 
 @code {
-    List<Category> JobCategories = new List<Category>();
+    IEnumerable<Category> JobCategories = new List<Category>();
 
     public string MenuColor { get; set; } = "text-light";
 
@@ -70,7 +70,7 @@ else
     {
         await LoadMenu();
 
-        if (JobCategories.Count == 0)
+        if (JobCategories.Equals(null))
         {
             AlertType = MessageAlert.AlertType.Warning;
             SystemMessage = $"Kunne ikke indlæse menu!";
@@ -79,14 +79,13 @@ else
 
     protected async Task LoadMenu()
     {
-        AlertType = MessageAlert.AlertType.Info;
-        SystemMessage = $"Indlæser menu..";
-        IsLoading = true;
-
         try
         {
+            AlertType = MessageAlert.AlertType.Info;
+            SystemMessage = "Indlæser menu..";
+            IsLoading = true;
+
             JobCategories = await JobService.GetJobMenuAsync();
-            await Task.CompletedTask;
         }
         finally
         {
@@ -97,17 +96,23 @@ else
 
     protected async Task<int> GetCategoryCount(int id)
     {
-        return await DataService.GetCountOfJobAdvertsByCategory(id);
+        int output = await DataService.GetCountOfJobAdvertsByCategory(id);
+
+        return output;
     }
 
     protected async Task<int> GetSpecializationCount(int id)
     {
-        return await DataService.GetCountOfJobAdvertsBySpecializationId(id);
+        int output = await DataService.GetCountOfJobAdvertsBySpecializationId(id);
+
+        return output;
     }
 
     protected async Task<int> GetUncategorizedCount()
     {
-        return await DataService.GetCountOfJobAdvertsUncategorized();
+        int output = await DataService.GetCountOfJobAdvertsUncategorized();
+
+        return output;
     }
 
     protected string RemoveWhitespace(string input)

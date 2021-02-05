@@ -13,7 +13,7 @@
             <NotAuthorized>
 
                 <div class="ml-auto mr-1">
-                    <button type="button" class="btn btn-sm progress-bar progress-bar-striped bg-info @HoverAnimationCSS" @onmouseenter="(() => HoverMode())" @onmouseleave="(() => HoverMode())" @onclick='() => NavManager.NavigateTo("/login")'>Praktikkonsulent Log ind</button>
+                    <button type="button" class="btn btn-sm progress-bar progress-bar-striped bg-info @HoverAnimationCSS" @onmouseover="(() => HoverMode())" @onmouseout="(() => HoverMode())" @onclick='() => NavManager.NavigateTo("/login")'>Praktikkonsulent Log ind</button>
                 </div>
 
             </NotAuthorized>
@@ -35,7 +35,7 @@
                 </div>
 
                 <div class="float-right ml-auto mr-1">
-                    <button type="button" class="btn btn-sm progress-bar progress-bar-striped bg-danger @HoverAnimationCSS" @onclick="(() => LogOut())" @onmouseenter="(() => HoverMode())" @onmouseleave="(() => HoverMode())">Log ud</button>
+                    <button type="button" class="btn btn-sm progress-bar progress-bar-striped bg-danger @HoverAnimationCSS" @onclick="(() => LogOut())"  @onmouseover="(() => HoverMode())" @onmouseout="(() => HoverMode())">Log ud</button>
                 </div>
             </Authorized>
         </AuthorizeView>

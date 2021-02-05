@@ -38,6 +38,6 @@ namespace DataAccess.Repositories.Interfaces
         /// Get all category specializations.
         /// </summary>
         /// <returns>Returns a list of <see cref="Specialization"/></returns>
-        Task<List<Specialization>> GetAllSpecializations();
+        Task<IEnumerable<Specialization>> GetAllSpecializations();
     }
 }

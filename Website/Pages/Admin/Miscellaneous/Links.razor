@@ -25,7 +25,7 @@
     </div>
 </div>
 
-@if (SourceLinks == null || SourceLinks.Count == 0)
+@if (SourceLinks == null || SourceLinks.Count() == 0)
 {
     <MessageAlert Alert="MessageAlert.AlertType.Warning"
                   Message="Der blev ikke fundet nogen links."
@@ -90,7 +90,7 @@ else
     [Inject]
     private IRefresh RefreshService { get; set; }
 
-    private List<SourceLink> SourceLinks { get; set; } = new List<SourceLink>();
+    private IEnumerable<SourceLink> SourceLinks { get; set; } = new List<SourceLink>();
     private SourceLink SourceLink { get; set; }
 
     private int LinkId { get; set; }

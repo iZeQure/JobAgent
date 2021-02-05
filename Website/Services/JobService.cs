@@ -53,12 +53,12 @@ namespace JobAgent.Services
             return await DataAccessManager.JobAdvertDataAccessManager().GetById(advertId);
         }
 
-        public async Task<List<Category>> GetJobMenuAsync()
+        public async Task<IEnumerable<Category>> GetJobMenuAsync()
         {
             return await DataAccessManager.CategoryDataAccessManager().GetAllCategoriesWithSpecializations();
         }
 
-        public async Task<List<JobAdvert>> GetUncategorizedJobVacancies()
+        public async Task<IEnumerable<JobAdvert>> GetUncategorizedJobVacancies()
         {
             return (await DataAccessManager.JobAdvertDataAccessManager().GetAll()).Where(x => x.Category.Identifier == 0).ToList();
         }

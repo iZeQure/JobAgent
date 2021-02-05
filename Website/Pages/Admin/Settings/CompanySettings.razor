@@ -13,7 +13,7 @@
     </div>
 </div>
 
-@if (Companies.Count == 0)
+@if (Companies.Count() == 0)
 {
     <MessageAlert Alert="MessageAlert.AlertType.Warning"
                   Message="Der blev ikke fundet nogen virksomheder."
@@ -80,7 +80,7 @@ else
     [Inject]
     protected IRefresh RefreshService { get; set; }
 
-    public List<Company> Companies { get; set; } = new List<Company>();
+    public IEnumerable<Company> Companies { get; set; } = new List<Company>();
 
     private CompanyModel Model { get; set; } = new CompanyModel();
     private int CompanyId { get; set; }

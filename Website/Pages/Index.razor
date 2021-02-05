@@ -19,27 +19,27 @@
 </style>
 
 <AuthorizeView>
-        <Authorized>
-            <RedirectToAdminComponent />
-        </Authorized>
-        <NotAuthorized>
-            @* Set Page Title *@
-            <PageTitle Title="Forside" />
+    <Authorized>
+        <RedirectToAdminComponent />
+    </Authorized>
+    <NotAuthorized>
+        @* Set Page Title *@
+        <PageTitle Title="Forside" />
 
-            <article class="text-wrap">
-                <h1>Job Agenten er under udvikling!</h1>
-                <div>
-                    <p>
-                        Beklager ulejliheden, men vi udfører stadig operationer på hjemmesiden. Der er stadig mangel på funktionalitet,
-                        hvis du har brug for det, kan du altid
-                        <a href="mailto:nico9551@zbc.dk?bcc=tobi3686@zbc.dk;mich612i@zbc.dk;chri45i4@zbc.dk&subject=Job%20Agent%20Feedback&body=Goddag.">Kontakte Os</a>.
-                        Hjemmesiden opdateres regelmæssigt.
-                    </p>
-                    <p>&mdash; The Team</p>
-                </div>
-            </article>
-        </NotAuthorized>
-    </AuthorizeView>
+        <article class="text-wrap">
+            <h1>Job Agenten er under udvikling!</h1>
+            <div>
+                <p>
+                    Beklager ulejliheden, men vi udfører stadig operationer på hjemmesiden. Der er stadig mangel på funktionalitet,
+                    hvis du har brug for det, kan du altid
+                    <a href="mailto:nico9551@zbc.dk?bcc=tobi3686@zbc.dk;mich612i@zbc.dk;chri45i4@zbc.dk&subject=Job%20Agent%20Feedback&body=Goddag.">Kontakte Os</a>.
+                    Hjemmesiden opdateres regelmæssigt.
+                </p>
+                <p>&mdash; The Team</p>
+            </div>
+        </article>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
 

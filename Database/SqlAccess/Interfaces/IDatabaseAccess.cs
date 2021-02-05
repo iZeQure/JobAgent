@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.SqlAccess.Interfaces
 {
-    public interface IDatabaseAccess : IDisposable
+    public interface IDatabaseAccess
     {
         /// <summary>
         /// Open an asyncronous connection.

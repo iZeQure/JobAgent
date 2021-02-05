@@ -52,7 +52,7 @@ else
     [Inject] protected JobService JobService { get; set; }
     [Inject] protected NavigationManager NavigationManager { get; set; }
 
-    List<JobAdvert> jobAdverts = new List<JobAdvert>();
+    IEnumerable<JobAdvert> jobAdverts = new List<JobAdvert>();
 
     private JobAdvert AdvertDetails;
 

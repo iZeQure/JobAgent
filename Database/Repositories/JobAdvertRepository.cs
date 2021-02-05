@@ -5,46 +5,57 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using DataAccess.SqlAccess.Interfaces;
 
 namespace DataAccess.Repositories
 {
     public class JobAdvertRepository : IJobAdvertRepository
     {
+        private readonly SqlDatabaseAccess _databaseAccess;
+
+        public JobAdvertRepository(IDatabaseAccess databaseAccess)
+        {
+            _databaseAccess = (SqlDatabaseAccess)databaseAccess;
+        }
+
         public async void Create(JobAdvert create)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Initialize command obj.
-            using SqlCommand c = new SqlCommand()
+            try
             {
-                CommandText = "CreateJobAdvert",
-                CommandType = CommandType.StoredProcedure,
-                Connection = db.GetConnection()
-            };
+                // Initialize command obj.
+                using SqlCommand c = new SqlCommand()
+                {
+                    CommandText = "CreateJobAdvert",
+                    CommandType = CommandType.StoredProcedure,
+                    Connection = _databaseAccess.GetConnection()
+                };
 
-            // Define data parameters.
-            c.Parameters.AddWithValue("@title", create.Title);
-            c.Parameters.AddWithValue("@email", create.Email);
-            c.Parameters.AddWithValue("@phoneNumber", create.PhoneNumber);
-            c.Parameters.AddWithValue("@jobDescription", create.JobDescription);
-            c.Parameters.AddWithValue("@jobLocation", create.JobLocation);
-            c.Parameters.AddWithValue("@regDate", create.JobRegisteredDate);
-            c.Parameters.AddWithValue("@deadlineDate", create.DeadlineDate);
-            c.Parameters.AddWithValue("@sourceURL", create.SourceURL);
-            c.Parameters.AddWithValue("@companyId", create.Company.Identifier);
-            c.Parameters.AddWithValue("@categoryId", create.Category.Identifier);
-            c.Parameters.AddWithValue("@specializationId", create.Specialization.Identifier);
+                // Define data parameters.
+                c.Parameters.AddWithValue("@title", create.Title);
+                c.Parameters.AddWithValue("@email", create.Email);
+                c.Parameters.AddWithValue("@phoneNumber", create.PhoneNumber);
+                c.Parameters.AddWithValue("@jobDescription", create.JobDescription);
+                c.Parameters.AddWithValue("@jobLocation", create.JobLocation);
+                c.Parameters.AddWithValue("@regDate", create.JobRegisteredDate);
+                c.Parameters.AddWithValue("@deadlineDate", create.DeadlineDate);
+                c.Parameters.AddWithValue("@sourceURL", create.SourceURL);
+                c.Parameters.AddWithValue("@companyId", create.Company.Identifier);
+                c.Parameters.AddWithValue("@categoryId", create.Category.Identifier);
+                c.Parameters.AddWithValue("@specializationId", create.Specialization.Identifier);
 
-            // Open database connection.
-            await db.OpenConnectionAsync();
+                // Open database connection.
+                await _databaseAccess.OpenConnectionAsync();
 
-            await c.ExecuteNonQueryAsync();
+                await c.ExecuteNonQueryAsync();
+            }
+            finally
+            {
+                _databaseAccess.CloseConnection();
+            }
         }
 
         public async Task<IEnumerable<JobAdvert>> GetAll()
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
             try
             {
                 // Initialzie temporay job advet collection.
@@ -55,21 +66,21 @@ namespace DataAccess.Repositories
                 {
                     CommandType = CommandType.StoredProcedure,
                     CommandText = "GetAllJobAdverts",
-                    Connection = db.GetConnection(),
+                    Connection = _databaseAccess.GetConnection(),
                     CommandTimeout = 5
                 };
 
                 // Open connection to database.
-                await db.OpenConnectionAsync();
+                await _databaseAccess.OpenConnectionAsync();
 
                 // Initialize data reader.
-                using SqlDataReader reader = await cmd.ExecuteReaderAsync();
+                using SqlDataReader reader = cmd.ExecuteReader();
 
                 // Check for data.
                 if (reader.HasRows)
                 {
                     // Read data.
-                    while (await reader.ReadAsync())
+                    while (reader.Read())
                     {
                         // Add data to collection.
                         tempJobAdverts.Add(new JobAdvert()
@@ -107,35 +118,33 @@ namespace DataAccess.Repositories
             }
             finally
             {
-                db.CloseConnection();
+                _databaseAccess.CloseConnection();
             }
         }
 
         public async Task<JobAdvert> GetById(int id)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            using SqlCommand c = new SqlCommand()
-            {
-                CommandText = "GetJobAdvertById",
-                CommandType = CommandType.StoredProcedure,
-                Connection = db.GetConnection(),
-                CommandTimeout = 10
-            };
-
-            c.Parameters.AddWithValue("@id", id);
-
             try
             {
+                using SqlCommand c = new SqlCommand()
+                {
+                    CommandText = "GetJobAdvertById",
+                    CommandType = CommandType.StoredProcedure,
+                    Connection = _databaseAccess.GetConnection(),
+                    CommandTimeout = 10
+                };
+
+                c.Parameters.AddWithValue("@id", id);
+
                 JobAdvert tempData = new JobAdvert();
 
-                await db.OpenConnectionAsync();
+                await _databaseAccess.OpenConnectionAsync();
 
-                using SqlDataReader r = await c.ExecuteReaderAsync();
+                using SqlDataReader r = c.ExecuteReader();
 
                 if (r.HasRows)
                 {
-                    while (await r.ReadAsync())
+                    while (r.Read())
                     {
                         tempData = new JobAdvert()
                         {
@@ -171,104 +180,107 @@ namespace DataAccess.Repositories
             }
             finally
             {
-                db.CloseConnection();
+                _databaseAccess.CloseConnection();
             }
         }
 
         public async Task<JobAdvert> GetJobAdvertDetailsForAdminsById(int id)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Initialize command obj.
-            using SqlCommand c = new SqlCommand()
+            try
             {
-                CommandText = "GetJobAdvertDetailsForAdminsById",
-                CommandType = CommandType.StoredProcedure,
-                Connection = db.GetConnection()
-            };
-
-            c.Parameters.AddWithValue("@id", id);
-
-            await db.OpenConnectionAsync();
-
-            // Initialize data reader.
-            using SqlDataReader r = await c.ExecuteReaderAsync();
-
-            // Initialize temporary obj.
-            JobAdvert tempJobAdvert = null;
-
-            Specialization specialization = new Specialization();
-
-            // Check if the data reader has rows.
-            if (r.HasRows)
-            {
-                // Read data.
-                while (await r.ReadAsync())
+                // Initialize command obj.
+                using SqlCommand c = new SqlCommand()
                 {
-                    tempJobAdvert = new JobAdvert()
-                    {
-                        Identifier = r.GetInt32("BaseId"),
-                        Title = r.GetString("Title"),
-                        Email = r.GetString("Email"),
-                        PhoneNumber = r.GetString("PhoneNumber"),
-                        JobDescription = r.GetString("Desc"),
-                        JobLocation = r.GetString("Loc"),
-                        JobRegisteredDate = r.GetDateTime("RegDate"),
-                        DeadlineDate = r.GetDateTime("DeadlineDate"),
-                        SourceURL = r.GetString("SourceURL"),
+                    CommandText = "GetJobAdvertDetailsForAdminsById",
+                    CommandType = CommandType.StoredProcedure,
+                    Connection = _databaseAccess.GetConnection()
+                };
 
-                        Company = new Company()
+                c.Parameters.AddWithValue("@id", id);
+
+                await _databaseAccess.OpenConnectionAsync();
+
+                // Initialize data reader.
+                using SqlDataReader r = c.ExecuteReader();
+
+                // Initialize temporary obj.
+                JobAdvert tempJobAdvert = null;
+
+                Specialization specialization = new Specialization();
+
+                // Check if the data reader has rows.
+                if (r.HasRows)
+                {
+                    // Read data.
+                    while (r.Read())
+                    {
+                        tempJobAdvert = new JobAdvert()
                         {
-                            Identifier = r.GetInt32("CompanyId"),
-                            Name = r.GetString("CompanyName")
-                        },
-                        Category = new Category()
-                        {
-                            Identifier = r.GetInt32("CategoryId"),
-                            Name = !DataReaderExtensions.IsDBNull(r, "CategoryName") ? r.GetString("CategoryName") : "Ikke Kategoriseret"
-                        },
-                        Specialization = new Specialization()
-                        {
-                            Identifier = r.GetInt32("SpecializationId"),
-                            Name = !DataReaderExtensions.IsDBNull(r, "SpecializationName") ? r.GetString("SpecializationName") : string.Empty
-                        }
-                    };
+                            Identifier = r.GetInt32("BaseId"),
+                            Title = r.GetString("Title"),
+                            Email = r.GetString("Email"),
+                            PhoneNumber = r.GetString("PhoneNumber"),
+                            JobDescription = r.GetString("Desc"),
+                            JobLocation = r.GetString("Loc"),
+                            JobRegisteredDate = r.GetDateTime("RegDate"),
+                            DeadlineDate = r.GetDateTime("DeadlineDate"),
+                            SourceURL = r.GetString("SourceURL"),
+
+                            Company = new Company()
+                            {
+                                Identifier = r.GetInt32("CompanyId"),
+                                Name = r.GetString("CompanyName")
+                            },
+                            Category = new Category()
+                            {
+                                Identifier = r.GetInt32("CategoryId"),
+                                Name = !DataReaderExtensions.IsDBNull(r, "CategoryName") ? r.GetString("CategoryName") : "Ikke Kategoriseret"
+                            },
+                            Specialization = new Specialization()
+                            {
+                                Identifier = r.GetInt32("SpecializationId"),
+                                Name = !DataReaderExtensions.IsDBNull(r, "SpecializationName") ? r.GetString("SpecializationName") : string.Empty
+                            }
+                        };
+                    }
                 }
+
+                return tempJobAdvert;
+            }
+            finally
+            {
+                _databaseAccess.CloseConnection();
             }
 
-            db.CloseConnection();
 
-            return tempJobAdvert;
         }
 
         public async Task<IEnumerable<JobAdvert>> GetAllJobAdvertsForAdmins()
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Initialize command obj.
-            using SqlCommand c = new SqlCommand()
-            {
-                CommandText = "GetAllJobAdvertsForAdmins",
-                CommandType = CommandType.StoredProcedure,
-                Connection = db.GetConnection()
-            };
-
-            // Open database connection.
-            await db.OpenConnectionAsync();
-
-            // Create temp list with job adverts.
-            List<JobAdvert> dataList = new List<JobAdvert>();
-
             try
             {
+                // Initialize command obj.
+                using SqlCommand c = new SqlCommand()
+                {
+                    CommandText = "GetAllJobAdvertsForAdmins",
+                    CommandType = CommandType.StoredProcedure,
+                    Connection = _databaseAccess.GetConnection()
+                };
+
+                // Open database connection.
+                await _databaseAccess.OpenConnectionAsync();
+
+                // Create temp list with job adverts.
+                List<JobAdvert> dataList = new List<JobAdvert>();
+
                 // Initialize data reader.
-                using SqlDataReader r = await c.ExecuteReaderAsync();
+                using SqlDataReader r = c.ExecuteReader();
 
                 // Check for rows.
                 if (r.HasRows)
                 {
                     // Read data.
-                    while (await r.ReadAsync())
+                    while (r.Read())
                     {
                         dataList.Add(
                             new JobAdvert()
@@ -294,217 +306,208 @@ namespace DataAccess.Repositories
                         );
                     }
                 }
+                return dataList;
             }
             finally
             {
-                db.CloseConnection();
+                _databaseAccess.CloseConnection();
             }
 
-            return dataList;
         }
 
         public async void Remove(int id)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Initialize command obj.
-            using SqlCommand c = new SqlCommand()
-            {
-                CommandText = "RemoveJobAdvert",
-                CommandType = CommandType.StoredProcedure,
-                Connection = db.GetConnection()
-            };
-
-            // Define id to remove.
-            c.Parameters.AddWithValue("@id", id);
-
             try
             {
-                await db.OpenConnectionAsync();
+                // Initialize command obj.
+                using SqlCommand c = new SqlCommand()
+                {
+                    CommandText = "RemoveJobAdvert",
+                    CommandType = CommandType.StoredProcedure,
+                    Connection = _databaseAccess.GetConnection()
+                };
 
-                await c.ExecuteNonQueryAsync();
+                // Define id to remove.
+                c.Parameters.AddWithValue("@id", id);
+
+                await _databaseAccess.OpenConnectionAsync();
+
+                c.ExecuteNonQuery();
             }
             finally
             {
-                db.CloseConnection();
+                _databaseAccess.CloseConnection();
             }
         }
 
         public async void Update(JobAdvert update)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Initialzie command obj.
-            using SqlCommand c = new SqlCommand()
+            try
             {
-                CommandText = "UpdateJobAdvert",
-                CommandType = CommandType.StoredProcedure,
-                Connection = db.GetConnection()
-            };
+                // Initialzie command obj.
+                using SqlCommand c = new SqlCommand()
+                {
+                    CommandText = "UpdateJobAdvert",
+                    CommandType = CommandType.StoredProcedure,
+                    Connection = _databaseAccess.GetConnection()
+                };
 
-            // Set parameters.
-            c.Parameters.AddWithValue("@id", update.Identifier);
-            c.Parameters.AddWithValue("@title", update.Title);
-            c.Parameters.AddWithValue("@email", update.Email);
-            c.Parameters.AddWithValue("@phoneNumber", update.PhoneNumber);
-            c.Parameters.AddWithValue("@jobDescription", update.JobDescription);
-            c.Parameters.AddWithValue("@jobLocation", update.JobLocation);
-            c.Parameters.AddWithValue("@regDate", update.JobRegisteredDate);
-            c.Parameters.AddWithValue("@deadlineDate", update.DeadlineDate);
-            c.Parameters.AddWithValue("@sourceURL", update.SourceURL);
-            c.Parameters.AddWithValue("@companyId", update.Company.Identifier);
-            c.Parameters.AddWithValue("@categoryId", update.Category.Identifier);
-            c.Parameters.AddWithValue("@specializationId", update.Specialization.Identifier);
+                // Set parameters.
+                c.Parameters.AddWithValue("@id", update.Identifier);
+                c.Parameters.AddWithValue("@title", update.Title);
+                c.Parameters.AddWithValue("@email", update.Email);
+                c.Parameters.AddWithValue("@phoneNumber", update.PhoneNumber);
+                c.Parameters.AddWithValue("@jobDescription", update.JobDescription);
+                c.Parameters.AddWithValue("@jobLocation", update.JobLocation);
+                c.Parameters.AddWithValue("@regDate", update.JobRegisteredDate);
+                c.Parameters.AddWithValue("@deadlineDate", update.DeadlineDate);
+                c.Parameters.AddWithValue("@sourceURL", update.SourceURL);
+                c.Parameters.AddWithValue("@companyId", update.Company.Identifier);
+                c.Parameters.AddWithValue("@categoryId", update.Category.Identifier);
+                c.Parameters.AddWithValue("@specializationId", update.Specialization.Identifier);
 
-            // Open connection to db.
-            await db.OpenConnectionAsync();
+                // Open connection to _databaseAccess.
+                await _databaseAccess.OpenConnectionAsync();
 
-            // Update data.
-            await c.ExecuteNonQueryAsync();
-
-            // Close connection to db.
-            db.CloseConnection();
+                // Update data.
+                c.ExecuteNonQuery();
+            }
+            finally
+            {
+                _databaseAccess.CloseConnection();
+            }
         }
 
         public async Task<int> GetCountOfJobAdvertsByCategoryId(int id)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            int count = 0;
-
-            // Initialize command obj.
-            using SqlCommand c = new SqlCommand()
-            {
-                CommandText = $"SELECT COUNT([CategoryId]) AS 'CategoryCount' FROM [JobAdvert] WHERE [CategoryId] = @id",
-                CommandType = CommandType.Text,
-                CommandTimeout = 15,
-                Connection = db.GetConnection()
-            };
-
-            c.Parameters.AddWithValue("@id", id);
-
             try
             {
-                await db.OpenConnectionAsync();
+                int count = 0;
 
-                using SqlDataReader r = await c.ExecuteReaderAsync();
+                // Initialize command obj.
+                using SqlCommand c = new SqlCommand()
+                {
+                    CommandText = $"SELECT COUNT([CategoryId]) AS 'CategoryCount' FROM [JobAdvert] WHERE [CategoryId] = @id",
+                    CommandType = CommandType.Text,
+                    CommandTimeout = 15,
+                    Connection = _databaseAccess.GetConnection()
+                };
+
+                c.Parameters.AddWithValue("@id", id);
+
+                await _databaseAccess.OpenConnectionAsync();
+
+                using SqlDataReader r = c.ExecuteReader();
 
                 if (r.HasRows)
                 {
-                    while (await r.ReadAsync())
+                    while (r.Read())
                     {
                         count = r.GetInt32(0);
                     }
                 }
+                return count;
             }
             finally
             {
-                db.CloseConnection();
+                _databaseAccess.CloseConnection();
             }
-
-            return count;
         }
 
         public async Task<int> GetCountOfJobAdvertsBySpecializationId(int id)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            int count = 0;
-
-            // Initialize command obj.
-            using SqlCommand c = new SqlCommand()
-            {
-                CommandText = $"SELECT COUNT([SpecializationId]) AS 'SpecialCount' FROM [JobAdvert] WHERE [SpecializationId] = @id",
-                CommandType = CommandType.Text,
-                CommandTimeout = 15,
-                Connection = db.GetConnection()
-            };
-
-            c.Parameters.AddWithValue("@id", id);
-
             try
             {
-                await db.OpenConnectionAsync();
+                int count = 0;
 
-                using SqlDataReader r = await c.ExecuteReaderAsync();
+                // Initialize command obj.
+                using SqlCommand c = new SqlCommand()
+                {
+                    CommandText = $"SELECT COUNT([SpecializationId]) AS 'SpecialCount' FROM [JobAdvert] WHERE [SpecializationId] = @id",
+                    CommandType = CommandType.Text,
+                    CommandTimeout = 15,
+                    Connection = _databaseAccess.GetConnection()
+                };
+
+                c.Parameters.AddWithValue("@id", id);
+
+                await _databaseAccess.OpenConnectionAsync();
+
+                using SqlDataReader r = c.ExecuteReader();
 
                 if (r.HasRows)
                 {
-                    while (await r.ReadAsync())
+                    while (r.Read())
                     {
                         count = r.GetInt32(0);
                     }
                 }
+                return count;
             }
             finally
             {
-                db.CloseConnection();
+                _databaseAccess.CloseConnection();
             }
 
-            return count;
         }
 
         public async Task<int> GetCountOfJobAdvertsUncategorized()
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            int count = 0;
-
-            using SqlCommand c = new SqlCommand()
-            {
-                CommandText = $"SELECT COUNT([CategoryId]) AS 'UncategorizedCount' FROM [JobAdvert] WHERE [CategoryId] = 0",
-                CommandType = CommandType.Text,
-                CommandTimeout = 15,
-                Connection = db.GetConnection()
-            };
-
             try
             {
-                await db.OpenConnectionAsync();
+                int count = 0;
 
-                using SqlDataReader r = await c.ExecuteReaderAsync();
+                using SqlCommand c = new SqlCommand()
+                {
+                    CommandText = $"SELECT COUNT([CategoryId]) AS 'UncategorizedCount' FROM [JobAdvert] WHERE [CategoryId] = 0",
+                    CommandType = CommandType.Text,
+                    CommandTimeout = 15,
+                    Connection = _databaseAccess.GetConnection()
+                };
+
+                await _databaseAccess.OpenConnectionAsync();
+
+                using SqlDataReader r = c.ExecuteReader();
 
                 if (r.HasRows)
                 {
-                    while (await r.ReadAsync())
+                    while (r.Read())
                     {
                         count = r.GetInt32(0);
                     }
                 }
+                return count;
             }
             finally
             {
-                db.CloseConnection();
+                _databaseAccess.CloseConnection();
             }
 
-            return count;
         }
 
         public async Task<IEnumerable<JobAdvert>> GetAllJobAdvertsSortedByCategoryId(int categoryId)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            using SqlCommand c = new SqlCommand()
-            {
-                CommandText = "GetAllJobAdvertsSortedByCategoryId",
-                CommandType = CommandType.StoredProcedure,
-                Connection = db.GetConnection(),
-                CommandTimeout = 15
-            };
-
-            c.Parameters.AddWithValue("@categoryId", categoryId).SqlDbType = SqlDbType.Int;
-
             try
             {
+                using SqlCommand c = new SqlCommand()
+                {
+                    CommandText = "GetAllJobAdvertsSortedByCategoryId",
+                    CommandType = CommandType.StoredProcedure,
+                    Connection = _databaseAccess.GetConnection(),
+                    CommandTimeout = 15
+                };
+
+                c.Parameters.AddWithValue("@categoryId", categoryId).SqlDbType = SqlDbType.Int;
+
                 List<JobAdvert> data = new List<JobAdvert>();
 
-                await db.OpenConnectionAsync();
+                await _databaseAccess.OpenConnectionAsync();
 
-                using SqlDataReader r = await c.ExecuteReaderAsync();
+                using SqlDataReader r = c.ExecuteReader();
 
                 if (r.HasRows)
                 {
-                    while (await r.ReadAsync())
+                    while (r.Read())
                     {
                         data.Add(
                             new JobAdvert()
@@ -537,35 +540,33 @@ namespace DataAccess.Repositories
             }
             finally
             {
-                db.CloseConnection();
+                _databaseAccess.CloseConnection();
             }
         }
 
         public async Task<IEnumerable<JobAdvert>> GetAllJobAdvertsSortedBySpecializationId(int specializationId)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            using SqlCommand c = new SqlCommand()
-            {
-                CommandText = "GetAllJobAdvertsSortedBySpecializationId",
-                CommandType = CommandType.StoredProcedure,
-                Connection = db.GetConnection(),
-                CommandTimeout = 15
-            };
-
-            c.Parameters.AddWithValue("@specialityId", specializationId).SqlDbType = SqlDbType.Int;
-
             try
             {
+                using SqlCommand c = new SqlCommand()
+                {
+                    CommandText = "GetAllJobAdvertsSortedBySpecializationId",
+                    CommandType = CommandType.StoredProcedure,
+                    Connection = _databaseAccess.GetConnection(),
+                    CommandTimeout = 15
+                };
+
+                c.Parameters.AddWithValue("@specialityId", specializationId).SqlDbType = SqlDbType.Int;
+
                 List<JobAdvert> data = new List<JobAdvert>();
 
-                await db.OpenConnectionAsync();
+                await _databaseAccess.OpenConnectionAsync();
 
-                using SqlDataReader r = await c.ExecuteReaderAsync();
+                using SqlDataReader r = c.ExecuteReader();
 
                 if (r.HasRows)
                 {
-                    while (await r.ReadAsync())
+                    while (r.Read())
                     {
                         data.Add(
                             new JobAdvert()
@@ -603,7 +604,7 @@ namespace DataAccess.Repositories
             }
             finally
             {
-                db.CloseConnection();
+                _databaseAccess.CloseConnection();
             }
         }
     }

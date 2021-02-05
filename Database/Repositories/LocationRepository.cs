@@ -5,34 +5,47 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using DataAccess.SqlAccess.Interfaces;
 
 namespace DataAccess.Repositories
 {
     public class LocationRepository : ILocationRepository
     {
+        private readonly SqlDatabaseAccess _databaseAccess;
+
+        public LocationRepository(IDatabaseAccess databaseAccess)
+        {
+            _databaseAccess = (SqlDatabaseAccess)databaseAccess;
+        }
+
         /// <summary>
         /// Create a location.
         /// </summary>
         /// <param name="create">Used to specify the data.</param>
         public async void Create(Location create)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Prepare command obj.
-            using SqlCommand cmd = new SqlCommand("CreateLocation", db.GetConnection())
+            try
             {
-                CommandType = CommandType.StoredProcedure
-            };
+                // Prepare command obj.
+                using SqlCommand cmd = new SqlCommand("CreateLocation", _databaseAccess.GetConnection())
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            // Define input parameters
-            cmd.Parameters.AddWithValue("@name", create.Name);
-            cmd.Parameters.AddWithValue("@description", create.Description);
+                // Define input parameters
+                cmd.Parameters.AddWithValue("@name", create.Name);
+                cmd.Parameters.AddWithValue("@description", create.Description);
 
-            // Open connection to database.
-            await db.OpenConnectionAsync();
+                // Open connection to database.
+                await _databaseAccess.OpenConnectionAsync();
 
-            // Execute command
-            await cmd.ExecuteNonQueryAsync();
+                // Execute command
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+                _databaseAccess.CloseConnection();
+            }
         }
 
         /// <summary>
@@ -41,43 +54,48 @@ namespace DataAccess.Repositories
         /// <returns>A list of <see cref="Location"/>.</returns>
         public async Task<IEnumerable<Location>> GetAll()
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Initialize temporary list.
-            List<Location> tempLocations = new List<Location>();
-
-            // Prepare command obj.
-            using SqlCommand cmd = new SqlCommand("GetAllLocations", db.GetConnection())
+            try
             {
-                CommandType = CommandType.StoredProcedure
-            };
+                // Initialize temporary list.
+                List<Location> tempLocations = new List<Location>();
 
-            // Open connection to database.
-            await db.OpenConnectionAsync();
-
-            // Initialize data reader.
-            using SqlDataReader reader = await cmd.ExecuteReaderAsync();
-
-            Location location = new Location();
-
-            // Check if any data.
-            if (reader.HasRows)
-            {
-                // Read the data.
-                while (await reader.ReadAsync())
+                // Prepare command obj.
+                using SqlCommand cmd = new SqlCommand("GetAllLocations", _databaseAccess.GetConnection())
                 {
-                    tempLocations.Add(
-                        new Location()
-                        {
-                            Identifier = reader.GetInt32("Id"),
-                            Name = reader.GetString("Name"),
-                            Description = !DataReaderExtensions.IsDBNull(reader, "Description") ? reader.GetString("Description") : string.Empty
-                        });
-                }
-            }
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            // Return data.
-            return tempLocations;
+                // Open connection to database.
+                await _databaseAccess.OpenConnectionAsync();
+
+                // Initialize data reader.
+                using SqlDataReader reader = cmd.ExecuteReader();
+
+                Location location = new Location();
+
+                // Check if any data.
+                if (reader.HasRows)
+                {
+                    // Read the data.
+                    while (reader.Read())
+                    {
+                        tempLocations.Add(
+                            new Location()
+                            {
+                                Identifier = reader.GetInt32("Id"),
+                                Name = reader.GetString("Name"),
+                                Description = !DataReaderExtensions.IsDBNull(reader, "Description") ? reader.GetString("Description") : string.Empty
+                            });
+                    }
+                }
+
+                // Return data.
+                return tempLocations;
+            }
+            finally
+            {
+                _databaseAccess.CloseConnection();
+            }
         }
 
         /// <summary>
@@ -87,13 +105,13 @@ namespace DataAccess.Repositories
         /// <returns>A <see cref="Location"/> if exists.</returns>
         public async Task<Location> GetById(int id)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
+            var _databaseAccess = SqlDatabaseAccess.SqlInstance;
 
             // Initalize temporary obj.
             Location tempLocationObj = new Location();
 
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("GetLocationById", db.GetConnection())
+            using SqlCommand cmd = new SqlCommand("GetLocationById", _databaseAccess.GetConnection())
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -102,16 +120,16 @@ namespace DataAccess.Repositories
             cmd.Parameters.AddWithValue("@id", id);
 
             // Open connetion to database.
-            await db.OpenConnectionAsync();
+            await _databaseAccess.OpenConnectionAsync();
 
             // Initialize data reader.
-            using SqlDataReader reader = await cmd.ExecuteReaderAsync();
+            using SqlDataReader reader = cmd.ExecuteReader();
 
             // Check if reader has any data.
             if (reader.HasRows)
             {
                 // Read the data.
-                while (await reader.ReadAsync())
+                while (reader.Read())
                 {
                     tempLocationObj.Identifier = reader.GetInt32("Id");
                     tempLocationObj.Name = reader.GetString("Name");
@@ -133,22 +151,27 @@ namespace DataAccess.Repositories
         /// <param name="id">Used to specify the data to remove.</param>
         public async void Remove(int id)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("RemoveLocation", db.GetConnection())
+            try
             {
-                CommandType = CommandType.StoredProcedure
-            };
+                // Initialize command obj.
+                using SqlCommand cmd = new SqlCommand("RemoveLocation", _databaseAccess.GetConnection())
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            // Define input parameters.
-            cmd.Parameters.AddWithValue("@id", id);
+                // Define input parameters.
+                cmd.Parameters.AddWithValue("@id", id);
 
-            // Open connetion to database.
-            await db.OpenConnectionAsync();
+                // Open connetion to database.
+                await _databaseAccess.OpenConnectionAsync();
 
-            // Execute command.
-            await cmd.ExecuteNonQueryAsync();
+                // Execute command.
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+                _databaseAccess.CloseConnection();
+            }
         }
 
         /// <summary>
@@ -157,24 +180,29 @@ namespace DataAccess.Repositories
         /// <param name="update">Used to specify the data set to update.</param>
         public async void Update(Location update)
         {
-            using var db = SqlDatabaseAccess.SqlInstance;
-
-            // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("UpdateLocation", db.GetConnection())
+            try
             {
-                CommandType = CommandType.StoredProcedure
-            };
+                // Initialize command obj.
+                using SqlCommand cmd = new SqlCommand("UpdateLocation", _databaseAccess.GetConnection())
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            // Define input parameters.
-            cmd.Parameters.AddWithValue("@id", update.Identifier);
-            cmd.Parameters.AddWithValue("@name", update.Name);
-            cmd.Parameters.AddWithValue("@description", update.Description);
+                // Define input parameters.
+                cmd.Parameters.AddWithValue("@id", update.Identifier);
+                cmd.Parameters.AddWithValue("@name", update.Name);
+                cmd.Parameters.AddWithValue("@description", update.Description);
 
-            // Open connection to database.
-            await db.OpenConnectionAsync();
+                // Open connection to database.
+                await _databaseAccess.OpenConnectionAsync();
 
-            // Execute update.
-            await cmd.ExecuteNonQueryAsync();
+                // Execute update.
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+                _databaseAccess.CloseConnection();
+            }
         }
     }
 }

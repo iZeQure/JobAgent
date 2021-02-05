@@ -154,10 +154,10 @@
 
     private protected JobVacancyModel JobVacancyModel;
 
-    private List<Company> Companies = new List<Company>();
-    private List<Category> Categories = new List<Category>();
-    private List<Specialization> Specializations = new List<Specialization>();
-    private List<Specialization> SortedSpecializations = new List<Specialization>();
+    private IEnumerable<Company> Companies = new List<Company>();
+    private IEnumerable<Category> Categories = new List<Category>();
+    private IEnumerable<Specialization> Specializations = new List<Specialization>();
+    private IList<Specialization> SortedSpecializations = new List<Specialization>();
 
     private string Information = string.Empty;
 

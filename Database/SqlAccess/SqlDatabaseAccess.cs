@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
@@ -14,7 +15,7 @@ namespace DataAccess.SqlAccess
     /// <summary>
     /// This class handles the access to the database.
     /// </summary>
-    public class SqlDatabaseAccess : IDatabaseAccess
+    public class SqlDatabaseAccess : IDatabaseAccess, IDisposable
     {
         #region Fields
         private static readonly object _connectionLock = new object();
@@ -58,7 +59,11 @@ namespace DataAccess.SqlAccess
                         _connectionString = configuration.GetSection("ConnectionStrings").GetSection("Job.Agent.Database").Value;
 
                         if (string.IsNullOrEmpty(_connectionString) == false)
+                        {
                             _sqlConnection = new SqlConnection(_connectionString);
+
+                            _sqlConnection.Disposed += _sqlConnection_Disposed;
+                        }
                         else
                             throw new Exception($"Connection string couldn't be loaded.");
                     }
@@ -70,7 +75,7 @@ namespace DataAccess.SqlAccess
                     throw;
                 }
             }
-        }
+        }        
         #endregion
 
         /// <summary>
@@ -101,17 +106,22 @@ namespace DataAccess.SqlAccess
         /// <summary>
         /// Open connection
         /// </summary>
-        /// <returns>Awaits </returns>
+        /// <returns>Awaits to open the connection.</returns>
         public async Task OpenConnectionAsync()
         {
             try
             {
                 if (_sqlConnection != null)
                 {
-                    if (_sqlConnection.State == System.Data.ConnectionState.Open) await Task.CompletedTask; 
-                    else
-                    await _sqlConnection.OpenAsync();
+                    if (_sqlConnection.State != ConnectionState.Open)
+                    {
+                        await _sqlConnection.OpenAsync();
+                    }
 
+                    while (_sqlConnection.State.Equals(ConnectionState.Connecting))
+                    {
+                        await Task.Delay(2000);
+                    }
                 }
 
             }
@@ -123,6 +133,12 @@ namespace DataAccess.SqlAccess
 
         public void Dispose()
         {
+            _sqlConnection.Dispose();
+        }
+
+        private void _sqlConnection_Disposed(object sender, EventArgs e)
+        {
+            Console.WriteLine($"Sql Conn disposed : {e}");
         }
     }
 }
