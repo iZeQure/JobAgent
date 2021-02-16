@@ -1,13 +1,14 @@
 ﻿using Xunit;
 using DataAccess.SqlAccess;
 using System.Data;
+using System.Threading.Tasks;
 
 namespace DataAccessTests
 {
     public class SqlDatabaseAccessTests
     {
         [Fact]
-        public async void Database_ShouldOpen_Connection()
+        public async Task Database_Should_Return_OpenConnectionState()
         {
             // Arrange
             var dbContext = SqlDatabaseAccess.SqlInstance;
@@ -22,7 +23,7 @@ namespace DataAccessTests
         }
 
         [Fact]
-        public async void Database_ShouldClose_Connection()
+        public async Task Database_Should_Return_ClosedConnectionState()
         {
             // Arrange
             var dbContext = SqlDatabaseAccess.SqlInstance;
