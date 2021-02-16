@@ -75,7 +75,7 @@ namespace DataAccess.SqlAccess
                     throw;
                 }
             }
-        }        
+        }
         #endregion
 
         /// <summary>
@@ -118,10 +118,10 @@ namespace DataAccess.SqlAccess
                         await _sqlConnection.OpenAsync();
                     }
 
-                    while (_sqlConnection.State.Equals(ConnectionState.Connecting))
-                    {
-                        await Task.Delay(2000);
-                    }
+                    //while (_sqlConnection.State.Equals(ConnectionState.Connecting))
+                    //{
+                    //    await Task.Delay(25);
+                    //}
                 }
 
             }

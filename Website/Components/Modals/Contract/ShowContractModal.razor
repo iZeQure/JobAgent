@@ -9,31 +9,114 @@
 
             <div class="modal-body">
 
-                @if (!string.IsNullOrEmpty(ContractName))
+                @if (!string.IsNullOrEmpty(_errorMessage))
                 {
-                    if (string.IsNullOrEmpty(ConvertFileToBase64String(ContractName).GetAwaiter().GetResult()))
-                    {
-                        <MessageAlert Alert="MessageAlert.AlertType.Warning" />
-                    }
-                    else
-                    {
-                        <div class="container-fluid justify-content-center">
-                            <div class="embed-responsive embed-responsive-16by9">
-                                <iframe src="data:application/pdf;base64,@(ConvertFileToBase64String(ContractName).GetAwaiter().GetResult())"
-                                        class="embed-responsive-item"
-                                        lang="da"
-                                        title="Kontrakt Information"
-                                        frameborder="1"
-                                        allowtransparency="true">
-                                </iframe>
-                            </div>
-                        </div>
-                    }
+                    <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="@(_errorMessage)" />
+                }
+
+                @if (string.IsNullOrEmpty(ContractName))
+                {
+                    <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="Kunne ikke finde kontraktense navn." />
                 }
                 else
                 {
-                    <MessageAlert Alert="MessageAlert.AlertType.Error" Message="Kunne ikke hente kontrakt!" />
+                    @if (!_contractExists)
+                    {
+                        <MessageAlert Alert="MessageAlert.AlertType.Error" Message="Kunne ikke finde kontrakt." />
+                    }
+                    else
+                    {
+                        @if (string.IsNullOrEmpty(GetContractForView().Result))
+                        {
+                            <MessageAlert Alert="MessageAlert.AlertType.Error" Message="Kunne ikke indlæse kontraktens data." />
+                        }
+                        else
+                        {
+                            <div class="container-fluid justify-content-center">
+                                <div class="embed-responsive embed-responsive-16by9">
+                                    <iframe src="data:application/pdf;base64,@(GetContractForView().Result)"
+                                            class="embed-responsive-item"
+                                            lang="da"
+                                            title="Kontrakt Information"
+                                            frameborder="1"
+                                            allowtransparency="true">
+                                    </iframe>
+                                </div>
+                            </div>
+                        }
+                    }
                 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+                @*@if (string.IsNullOrEmpty(ContractName))
+                    {
+                        <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="Kunne ikke finde kontraktense navn." />
+                    }
+                    else
+                    {
+                        @if (_contractIsLoading)
+                        {
+                            <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="@_contractIsLoading" Message="Indlæser kontrakt data.." />
+                        }
+                        else
+                        {
+                            @if (string.IsNullOrEmpty(_encodedContract))
+                            {
+                                <MessageAlert Alert="MessageAlert.AlertType.Error" Message="Kunne ikke indlæse kontraktens data." />
+                            }
+                            else
+                            {
+                                <div class="container-fluid justify-content-center">
+                                    <div class="embed-responsive embed-responsive-16by9">
+                                        <iframe src="data:application/pdf;base64,@(_encodedContract)"
+                                                class="embed-responsive-item"
+                                                lang="da"
+                                                title="Kontrakt Information"
+                                                frameborder="1"
+                                                allowtransparency="true">
+                                        </iframe>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }*@
+
+                @*@if (!string.IsNullOrEmpty(ContractName))
+                    {
+                        if (string.IsNullOrEmpty(GetContractForView(ContractName).GetAwaiter().GetResult()))
+                        {
+                            <MessageAlert Alert="MessageAlert.AlertType.Warning" />
+                        }
+                        else
+                        {
+                            <div class="container-fluid justify-content-center">
+                                <div class="embed-responsive embed-responsive-16by9">
+                                    <iframe src="data:application/pdf;base64,@(GetContractForView(ContractName))"
+                                            class="embed-responsive-item"
+                                            lang="da"
+                                            title="Kontrakt Information"
+                                            frameborder="1"
+                                            allowtransparency="true">
+                                    </iframe>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <MessageAlert Alert="MessageAlert.AlertType.Error" Message="Kunne ikke hente kontrakt!" />
+                    }*@
 
             </div>
 
@@ -49,31 +132,51 @@
     public string ContractName { get; set; }
 
     [Inject]
-    private IFileUpload GetFileService { get; set; }
+    private IFileService FileService { get; set; }
 
-    private string errorMessage = string.Empty;
+    private string _errorMessage = string.Empty;
+    private bool _contractIsLoading = false;
+    private bool _contractExists = false;
 
-    private Task<string> ConvertFileToBase64String(string contract)
+    private async Task<string> GetContractForView()
     {
+        Console.WriteLine($"Contract File : {ContractName}");
+
         try
         {
-            var files = Directory.EnumerateFiles(@"\\Jobagent\contracts\");
-
-            foreach (var file in files)
+            if (string.IsNullOrEmpty(ContractName))
             {
-                if (file.Contains(contract))
-                {
-                    byte[] bytes = File.ReadAllBytes(file);
+                _errorMessage = "Kunne ikke hente navnet på kontrakten.";
 
-                    return Task.FromResult(Convert.ToBase64String(bytes));
+                return string.Empty;
+            }
+
+            _contractIsLoading = true;
+
+            _contractExists = FileService.CheckFileExists(ContractName);
+
+            Console.WriteLine($"Contract Exists : {_contractExists}");
+
+            if (_contractExists)
+            {
+                var fileBytes = await FileService.GetFileFromDirectoryAsync(ContractName);
+                var encodedFileInfo = FileService.EncodeFileToBase64(fileBytes);
+                _contractIsLoading = false;
+
+                if (string.IsNullOrEmpty(encodedFileInfo))
+                {
+                    _errorMessage = "Kontrakten havde ingen data.";
+                    return string.Empty;
                 }
+
+                return encodedFileInfo;
             }
         }
         catch (Exception)
         {
-            errorMessage = $"Fik ikke svar fra server..";
+            _errorMessage = $"Der skete en ukendt fejl.";
         }
 
-        return Task.FromResult(string.Empty);
+        return string.Empty;
     }
 }

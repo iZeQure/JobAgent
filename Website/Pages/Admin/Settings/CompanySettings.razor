@@ -13,59 +13,77 @@
     </div>
 </div>
 
-@if (Companies.Count() == 0)
+@if (Companies != null)
 {
-    <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                  Message="Der blev ikke fundet nogen virksomheder."
-                  MessageOptional="Opret virksomheder, ved at trykke på knappen : Opret ny Virksomhed." />
+    @if (_dataIsLoading)
+    {
+        <MessageAlert IsLoading="_dataIsLoading" Message="Indlæser data...">
+
+        </MessageAlert>
+    }
+    else
+    {
+        @if (Companies.Count() == 0)
+        {
+            <MessageAlert Alert="MessageAlert.AlertType.Warning"
+                          Message="Der blev ikke fundet nogen virksomheder."
+                          MessageOptional="Opret virksomheder, ved at trykke på knappen : Opret ny Virksomhed." />
+        }
+        else
+        {
+            <div class="table-responsive table-responsive-sm table-responsive-md">
+                <table class="table table-sm table-striped table-hover">
+                    <caption>Liste over virksomheders kontrakter..</caption>
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Virksomhedens CVR</th>
+                            <th scope="col">Navn</th>
+                            <th scope="col">Link til Virksomhed</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var company in Companies)
+                        {
+                            <tr id="@(company.Identifier)">
+                                <th scope="row">@(company.Identifier)</th>
+                                <td>@(company.CVR)</td>
+                                <td>@(company.Name)</td>
+                                <td>@(company.URL)</td>
+                                <td>
+                                    <span @onclick="(OnClickEvent => OnClick_OpenEditModal(company.Identifier))" data-toggle="modal" data-target="#EditCompanyModal">
+                                        <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne virksomehd." Color="Popover.PopoverType.Info" />
+                                    </span>
+                                </td>
+                                <td>
+                                    <span @onclick="(OnClickEvent => OnClick_RemoveCompanyModal(company.Identifier))" data-toggle="modal" data-target="#RemoveCompanyModal">
+                                        <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <CreateCompanyModal />
+
+        <EditCompanyModal CompanyModel="Model" />
+
+        <RemoveCompanyModal CompanyId="CompanyId" />
+    }
 }
 else
 {
-    <div class="table-responsive table-responsive-sm table-responsive-md">
-        <table class="table table-sm table-striped table-hover">
-            <caption>Liste over virksomheders kontrakter..</caption>
-            <thead class="thead-dark">
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Virksomhedens CVR</th>
-                    <th scope="col">Navn</th>
-                    <th scope="col">Link til Virksomhed</th>
-                    <th scope="col"></th>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
-            <tbody>
-
-                @foreach (var company in Companies)
-                {
-                    <tr id="@(company.Identifier)">
-                        <th scope="row">@(company.Identifier)</th>
-                        <td>@(company.CVR)</td>
-                        <td>@(company.Name)</td>
-                        <td>@(company.URL)</td>
-                        <td>
-                            <span @onclick="(OnClickEvent => OnClick_OpenEditModal(company.Identifier))" data-toggle="modal" data-target="#EditCompanyModal">
-                                <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne virksomehd." Color="Popover.PopoverType.Info" />
-                            </span>
-                        </td>
-                        <td>
-                            <span @onclick="(OnClickEvent => OnClick_RemoveCompanyModal(company.Identifier))" data-toggle="modal" data-target="#RemoveCompanyModal">
-                                <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
-                            </span>
-                        </td>
-                    </tr>
-                }
-
-            </tbody>
-        </table>
-    </div>
+    <MessageAlert Alert="MessageAlert.AlertType.Error"
+                  Message="Prøv at genindlæs siden."
+                  MessageOptional="@(_errorMessage)" />
 }
-
-<CreateCompanyModal />
-
-<EditCompanyModal CompanyModel="Model" />
-
-<RemoveCompanyModal CompanyId="CompanyId" />
 
 @code {
     [Inject]
@@ -84,27 +102,41 @@ else
 
     private CompanyModel Model { get; set; } = new CompanyModel();
     private int CompanyId { get; set; }
+    private string _errorMessage = string.Empty;
+    private bool _dataIsLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
-        Companies = await DataService.GetAllCompanies();
-
         RefreshService.RefreshRequest += UpdateContentAsync;
+
+        Companies = await LoadData();
+
+        _dataIsLoading = false;
     }
 
-    private async void UpdateContentAsync()
+    private async Task<IEnumerable<Company>> LoadData()
+    {
+        _dataIsLoading = true;
+
+        return await DataService.GetAllCompanies();
+    }
+
+    private async Task UpdateContentAsync()
     {
         try
         {
-            if (DataService.GetAllCompanies() != null)
-                Companies = await DataService.GetAllCompanies();
-            else
-                Companies = null;
+            var companies = await DataService.GetAllCompanies();
+
+            if (companies != null)
+            {
+                Companies = companies;
+                return;
+            }
+
+            Companies = null;
         }
-        finally
-        {
-            StateHasChanged();
-        }
+        catch (Exception) { _errorMessage = "Ukendt Fejl ved opdatering af virksomheder."; }
+        finally { StateHasChanged(); }
     }
 
     private async void OnClick_OpenEditModal(int id)

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using JobAgent.Models;
 using Pocos;
 
-namespace JobAgent.Data.Interfaces
+namespace JobAgent.Services.Interfaces
 {
     public interface IUserService
     {

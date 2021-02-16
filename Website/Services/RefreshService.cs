@@ -1,14 +1,12 @@
-﻿using JobAgent.Data.Interfaces;
+﻿using JobAgent.Services.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace JobAgent.Services
 {
     public class RefreshService : IRefresh
     {
-        public event Action RefreshRequest;
+        public event Func<Task> RefreshRequest;
 
         public void CallRefreshRequest()
         {

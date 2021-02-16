@@ -8,9 +8,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Components.Authorization;
 using Blazored.LocalStorage;
-using JobAgent.Services;
 using JobAgent.Data.Security;
-using JobAgent.Data.Interfaces;
+using JobAgent.Services;
+using JobAgent.Services.Interfaces;
 
 namespace JobAgent
 {
@@ -53,7 +53,7 @@ namespace JobAgent
             });
 
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IFileUpload, FileService>();
+            services.AddScoped<IFileService, FileService>();
             services.AddScoped<IRefresh, RefreshService>();
             services.AddScoped<MyAuthStateProvider>();
             services.AddScoped<AuthenticationStateProvider>(provider =>

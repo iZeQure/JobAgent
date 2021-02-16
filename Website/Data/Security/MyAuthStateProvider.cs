@@ -2,9 +2,9 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using JobAgent.Data.Interfaces;
 using Blazored.LocalStorage;
 using Pocos;
+using JobAgent.Services.Interfaces;
 
 namespace JobAgent.Data.Security
 {

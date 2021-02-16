@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using DataAccess.SqlAccess.Interfaces;
+using System;
 
 namespace DataAccess.Repositories
 {
@@ -61,36 +62,41 @@ namespace DataAccess.Repositories
                 List<Company> tempCompanies = new List<Company>();
 
                 // Initialize command obj.
-                using SqlCommand cmd = new SqlCommand("GetAllCompanies", _databaseAccess.GetConnection())
+                using (SqlCommand cmd = new SqlCommand()
                 {
+                    Connection = _databaseAccess.GetConnection(),
+                    CommandText = "GetAllCompanies",
                     CommandType = CommandType.StoredProcedure
-                };
-
-                // Open connection to database.
-                await _databaseAccess.OpenConnectionAsync();
-
-                // Initialize data reader.
-                using SqlDataReader reader = cmd.ExecuteReader();
-
-                // Check if any data.
-                if (reader.HasRows)
+                })
                 {
-                    // Read data.
-                    while (reader.Read())
-                    {
-                        tempCompanies.Add(new Company()
-                        {
-                            Identifier = reader.GetInt32("Id"),
-                            CVR = reader.GetInt32("CVR"),
-                            Name = reader.GetString("Name"),
-                            URL = reader.GetString("URL")
-                        });
-                    }
-                }
+                    // Open connection to database.
+                    await _databaseAccess.OpenConnectionAsync();
 
-                // Return dataset.
-                return tempCompanies;
+                    // Initialize data reader.
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        // Check if any data.
+                        if (reader.HasRows)
+                        {
+                            // Read data.
+                            while (await reader.ReadAsync())
+                            {
+                                tempCompanies.Add(new Company()
+                                {
+                                    Identifier = reader.GetInt32("Id"),
+                                    CVR = reader.GetInt32("CVR"),
+                                    Name = reader.GetString("Name"),
+                                    URL = reader.GetString("URL")
+                                });
+                            }
+                        }
+
+                        // Return dataset.
+                        return tempCompanies;
+                    }
+                };
             }
+            catch (Exception) { throw; }
             finally
             {
                 _databaseAccess.CloseConnection();
@@ -154,41 +160,48 @@ namespace DataAccess.Repositories
         {
             var tempCompanies = new List<Company>();
 
-            using SqlCommand c = new SqlCommand()
+            using (SqlCommand c = new SqlCommand()
             {
-                CommandText = "SELECT * FROM [Company] WHERE NOT EXISTS (SELECT * FROM [Contract] WHERE [Contract].[CompanyId] = [Company].[Id])",
-                CommandType = CommandType.Text,
+                //CommandText = "SELECT * FROM [Company] WHERE NOT EXISTS (SELECT * FROM [Contract] WHERE [Contract].[CompanyId] = [Company].[Id])",
+                CommandText = "GetCompaniesWithOutContract",
+                CommandType = CommandType.StoredProcedure,
                 Connection = _databaseAccess.GetConnection()
-            };
-
-            try
+            })
             {
-                await _databaseAccess.OpenConnectionAsync();
-
-                using SqlDataReader r = c.ExecuteReader();
-
-                if (r.HasRows)
+                try
                 {
-                    while (r.Read())
-                    {
-                        tempCompanies.Add(
-                            new Company()
-                            {
-                                Identifier = r.GetInt32(0),
-                                CVR = r.GetOrdinal("CVR"),
-                                Name = r.GetString("Name"),
-                                URL = r.GetString("URL")
-                            }
-                        );
-                    }
-                }
+                    await _databaseAccess.OpenConnectionAsync();
 
-                return tempCompanies;
-            }
-            finally
-            {
-                _databaseAccess.CloseConnection();
-            }
+                    SqlDataReader sqlDataReader = await c.ExecuteReaderAsync();
+
+                    using SqlDataReader r = sqlDataReader;
+
+                    if (r.HasRows)
+                    {
+                        while (await r.ReadAsync())
+                        {
+                            tempCompanies.Add(
+                                new Company()
+                                {
+                                    Identifier = r.GetInt32(0),
+                                    CVR = r.GetOrdinal("CVR"),
+                                    Name = r.GetString("Name"),
+                                    URL = r.GetString("URL")
+                                }
+                            );
+                        }
+                    }
+
+                    return tempCompanies;
+
+
+                }
+                finally
+                {
+                    _databaseAccess.CloseConnection();
+                    await c.DisposeAsync();
+                }
+            };
         }
 
         /// <summary>

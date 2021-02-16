@@ -25,131 +25,150 @@
     </div>
 </div>
 
-<section id="filterAdverts" class="mb-1">
-    <div class="d-flex flex-row-reverse">
-        <div class="filter">
-            <select class="custom-select-sm" @bind="CategoryId">
-                <option selected value="0">--- Vælg kategori ---</option>
-                @if (Categories == null)
-                {
-                    <option>Ingen Kategorier fundet!</option>
-                }
-                else
-                {
-                    @foreach (var category in Categories)
-                    {
-                        var categoryId = category.Identifier;
-
-                        <option value="@(category.Identifier)">@(category.Name)</option>
-                    }
-                }
-            </select>
-        </div>
-    </div>
-</section>
-
-<section id="filterControls" class="mb-3">
-    <div class="d-flex flex-row-reverse">
-        <div class="action">
-            <button class="btn btn-sm btn-outline-info" @onclick="@(() => FilterContent())">Filtrér</button>
-            <button class="btn btn-sm btn-outline-dark" @onclick="@(() => ClearFilteredContent())">Ryd Filtrering</button>
-        </div>
-    </div>
-</section>
-
-@if (PaginationModel == null)
+@if (_dataIsLoading)
 {
-    <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                  Message="Indlæser data, vent venligst!" />
+    <MessageAlert IsLoading="_dataIsLoading" Message="Indlæser data...">
+
+    </MessageAlert>
 }
 else
 {
-    @if (PaginationModel.PaginatedJobAdverts().Count() == 0)
+    @if (PaginationModel != null)
     {
-        if (filteredContentFound == false)
+
+        <section id="filterAdverts" class="mb-1">
+            <div class="d-flex flex-row-reverse">
+                <div class="filter">
+                    <select class="custom-select-sm" @bind="CategoryId">
+                        <option selected value="0">--- Vælg kategori ---</option>
+                        @if (Categories == null)
+                        {
+                            <option>Ingen Kategorier fundet!</option>
+                        }
+                        else
+                        {
+                            @foreach (var category in Categories)
+                            {
+                                var categoryId = category.Identifier;
+
+                                <option value="@(category.Identifier)">@(category.Name)</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section id="filterControls" class="mb-3">
+            <div class="d-flex flex-row-reverse">
+                <div class="action">
+                    <button class="btn btn-sm btn-outline-info" @onclick="@(() => FilterContent())">Filtrér</button>
+                    <button class="btn btn-sm btn-outline-dark" @onclick="@(() => ClearFilteredContent())">Ryd Filtrering</button>
+                </div>
+            </div>
+        </section>
+
+        @if (PaginationModel == null)
         {
             <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                          Message="Det angivne filter, gav ingen resultater." />
+                          Message="Indlæser data, vent venligst!" />
         }
         else
         {
-            <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                          Message="Der blev ikke fundet nogen stillingsopslag."
-                          MessageOptional="Opret opslag, ved at trykke på knappen : Opret nyt Stillingsopslag. - Hvis knappen ikke er aktiveret, er det fordi der ikke blev fundet nogen virksomheder." />
+            @if (PaginationModel.PaginatedJobAdverts().Count() == 0)
+            {
+                if (filteredContentFound == false)
+                {
+                    <MessageAlert Alert="MessageAlert.AlertType.Warning"
+                                  Message="Det angivne filter, gav ingen resultater." />
+                }
+                else
+                {
+                    <MessageAlert Alert="MessageAlert.AlertType.Warning"
+                                  Message="Der blev ikke fundet nogen stillingsopslag."
+                                  MessageOptional="Opret opslag, ved at trykke på knappen : Opret nyt Stillingsopslag. - Hvis knappen ikke er aktiveret, er det fordi der ikke blev fundet nogen virksomheder." />
+                }
+            }
+            else
+            {
+                <div class="table-responsive table-responsive-sm table-responsive-md">
+                    <table class="table table-sm table-striped table-hover">
+                        <caption>Liste over stillingsopslag..</caption>
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Titel</th>
+                                <th scope="col">Job Kategory</th>
+                                <th scope="col">Virksomhed</th>
+                                <th scope="col">Opslag Registeret</th>
+                                <th scope="col">Ansøgningsfrist</th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach (var item in PaginationModel.PaginatedJobAdverts())
+                            {
+                                <tr id="@item.Identifier">
+                                    <th scope="row">@item.Identifier</th>
+                                    <td class="text-truncate d-inline-block">@item.Title</td>
+                                    @if (string.IsNullOrEmpty(item.Specialization.Name))
+                                    {
+                                        <td>@item.Category.Name</td>
+                                    }
+                                    else
+                                    {
+                                        <td>@item.Specialization.Name</td>
+                                    }
+                                    <td>@item.Company.Name</td>
+                                    <td>@item.JobRegisteredDate.ToString("D")</td>
+                                    <td>@item.DeadlineDate.ToString("D")</td>
+                                    <td>
+                                        <span @onclick="(id => OnClickEdit_GetJobVacancyDetailsById(item.Identifier))" data-toggle="modal" data-target="#EditJobVacancyModal">
+                                            <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette opslag." Color="Popover.PopoverType.Info" />
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span @onclick="@(id => OnClick_StoreId(item.Identifier))" data-toggle="modal" data-target="#RemoveJobVacancyModal">
+                                            <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <nav aria-label="Page Navigation">
+                    <ul class="pagination justify-content-center">
+                        @for (int i = 1; i <= PaginationModel.PageCount(); i++)
+                        {
+                            var pageNumber = i;
+
+                            <li class="@(i == PaginationModel.CurrentPage ? "page-item active" : "page-item")">
+                                <a class="page-link" href="/admin/settings/job/vacancies" @onclick="@(() => FilterContent(pageNumber))">@(i)</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
         }
+
+        <CreateJobVacancyModal />
+
+        <EditJobVacancyModal Model="JobVacancyModel" />
+
+        <RemoveJobVacancyModal Id="AdvertId" />
     }
     else
     {
-        <div class="table-responsive table-responsive-sm table-responsive-md">
-            <table class="table table-sm table-striped table-hover">
-                <caption>Liste over stillingsopslag..</caption>
-                <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Titel</th>
-                        <th scope="col">Job Kategory</th>
-                        <th scope="col">Virksomhed</th>
-                        <th scope="col">Opslag Registeret</th>
-                        <th scope="col">Ansøgningsfrist</th>
-                        <th scope="col"></th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                    @foreach (var item in PaginationModel.PaginatedJobAdverts())
-                    {
-                        <tr id="@item.Identifier">
-                            <th scope="row">@item.Identifier</th>
-                            <td class="text-truncate d-inline-block">@item.Title</td>
-                            @if (string.IsNullOrEmpty(item.Specialization.Name))
-                            {
-                                <td>@item.Category.Name</td>
-                            }
-                            else
-                            {
-                                <td>@item.Specialization.Name</td>
-                            }
-                            <td>@item.Company.Name</td>
-                            <td>@item.JobRegisteredDate.ToString("D")</td>
-                            <td>@item.DeadlineDate.ToString("D")</td>
-                            <td>
-                                <span @onclick="(id => OnClickEdit_GetJobVacancyDetailsById(item.Identifier))" data-toggle="modal" data-target="#EditJobVacancyModal">
-                                    <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette opslag." Color="Popover.PopoverType.Info" />
-                                </span>
-                            </td>
-                            <td>
-                                <span @onclick="@(id => OnClick_StoreId(item.Identifier))" data-toggle="modal" data-target="#RemoveJobVacancyModal">
-                                    <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
-                                </span>
-                            </td>
-                        </tr>
-                    }
-
-                </tbody>
-            </table>
-        </div>
-
-        <nav aria-label="Page Navigation">
-            <ul class="pagination justify-content-center">
-                @for (int i = 1; i <= PaginationModel.PageCount(); i++)
-                {
-                    var pageNumber = i;
-
-                    <li class="@(i == PaginationModel.CurrentPage ? "page-item active" : "page-item")">
-                        <a class="page-link" href="/admin/settings/job/vacancies" @onclick="@(() => FilterContent(pageNumber))">@(i)</a>
-                    </li>
-                }
-            </ul>
-        </nav>
+        <MessageAlert Alert="MessageAlert.AlertType.Error"
+                      Message="Prøv at genindlæs siden."
+                      MessageOptional="@(_errorMessage)" />
     }
 }
-
-<CreateJobVacancyModal />
-
-<EditJobVacancyModal Model="JobVacancyModel" />
-
-<RemoveJobVacancyModal Id="AdvertId" />
 
 @code {
     [Inject] private AdminService AdminService { get; set; }
@@ -163,22 +182,42 @@ else
     private IEnumerable<Category> Categories;
 
     public int AdvertId { get; set; } = 0;
-    public bool IsProcessing { get; set; } = false;
+    private int CategoryId { get; set; }
 
     private bool disabled = false;
     private bool filteredContentFound = true;
-
-    private int CategoryId { get; set; }
+    private bool _dataIsLoading = false;
+    private string _errorMessage = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         Refresh.RefreshRequest += RefreshAsync;
 
-        PaginationModel = await JobService.JobAdvertPagination();
+        await LoadData();
 
-        Categories = await DataService.GetAllCategories();
+        _dataIsLoading = !_dataIsLoading;
+    }
 
-        if (!(await DataService.GetAllCompanies()).Any()) disabled = true;
+    private async Task LoadData()
+    {
+        _dataIsLoading = true;
+
+        var paginationModel = await JobService.JobAdvertPagination();
+        var categories = await DataService.GetAllCategories();
+        var companies = await DataService.GetAllCompanies();
+
+        if (companies.Any() == false)
+        {
+            disabled = true;
+        }
+
+        if (paginationModel != null && categories != null)
+        {
+            PaginationModel = paginationModel;
+            Categories = categories;
+
+            return;
+        }
     }
 
     private async void ReturnPage(int pageNumber)
@@ -186,11 +225,24 @@ else
         PaginationModel = (await JobService.JobAdvertPagination(pageNumber));
     }
 
-    private async void RefreshAsync()
+    private async Task RefreshAsync()
     {
-        PaginationModel = await JobService.JobAdvertPagination();
+        try
+        {
+            var pagination = await JobService.JobAdvertPagination();
 
-        StateHasChanged();
+            if (pagination != null)
+            {
+                PaginationModel = pagination;
+                return;
+            }
+
+            PaginationModel = null;
+
+            _errorMessage = "Kunne ikke indlæse stillingsopslag.";
+        }
+        catch (Exception) { _errorMessage = "Ukendt Fejl ved opdatering af stillingsopslag."; }
+        finally { StateHasChanged(); }
     }
 
     public async Task OnClickEdit_GetJobVacancyDetailsById(int id)

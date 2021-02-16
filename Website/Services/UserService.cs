@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using DataAccess;
 using Pocos;
 using JobAgent.Models;
-using JobAgent.Data.Interfaces;
+using JobAgent.Services.Interfaces;
 
 namespace JobAgent.Services
 {
