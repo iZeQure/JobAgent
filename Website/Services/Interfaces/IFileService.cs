@@ -10,7 +10,7 @@ namespace JobAgent.Services.Interfaces
     {
         public string GetSharedPath { get; }
 
-        Task<bool> UploadFileAsync(IFileListEntry file);
+        Task<string> UploadFileAsync(byte[] file);
 
         Task<byte[]> GetFileFromDirectoryAsync(string fileName);
 

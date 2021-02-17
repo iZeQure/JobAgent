@@ -4,9 +4,9 @@
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
 
-            @if (!_isLoadingData)
+            @if (!isLoadingData)
             {
-                <EditForm Model="ContractModel" OnValidSubmit="OnValidSubmit_CreateContract">
+                <EditForm Model="contractModel" OnValidSubmit="OnValidSubmit_CreateContract">
 
                     <div class="modal-header">
                         <h5 class="modal-title">Ny Kontrakt Information :</h5>
@@ -14,20 +14,15 @@
 
                     <div class="modal-body">
 
-                        @if (ShowError)
-                        {
-                            <MessageAlert Alert="MessageAlert.AlertType.Error" Message="@ErrorMessage" />
-                        }
-
                         <ValidationSummary />
                         <DataAnnotationsValidator />
 
                         <div class="row">
                             <div class="col">
                                 <label for="inputCompany" class="admin-label col-form-label col-form-label-sm">Kontrakt for :</label>
-                                <select id="inputCompany" class="form-control form-control-sm" @bind="ContractModel.SignedWithCompany">
+                                <select id="inputCompany" class="form-control form-control-sm" @bind="contractModel.SignedWithCompany">
                                     <option value="0" selected>---Vælg en virksomhed fra listen---</option>
-                                    @foreach (var company in Companies)
+                                    @foreach (var company in companies)
                                     {
                                         <option value="@company.Identifier">@company.Name</option>
                                     }
@@ -35,9 +30,9 @@
                             </div>
                             <div class="col">
                                 <label for="inputSignedByUser" class="admin-label col-form-label col-form-label-sm">Underskrevet af :</label>
-                                <select id="inputSignedByUser" class="form-control form-control-sm" @bind="ContractModel.SignedByUser">
+                                <select id="inputSignedByUser" class="form-control form-control-sm" @bind="contractModel.SignedByUser">
                                     <option value="0" selected>---Vælg en konsulent fra listen---</option>
-                                    @foreach (var user in Users)
+                                    @foreach (var user in users)
                                     {
                                         <option value="@user.Identifier">@user.FullName</option>
                                     }
@@ -50,18 +45,38 @@
                         <div class="row">
                             <div class="col">
                                 <label for="inputContactPerson" class="admin-label col-form-label col-form-label-sm">Virksomheds Kontakt Person :</label>
-                                <input id="inputContactPerson" class="form-control form-control-sm" type="text" placeholder="Indtast navnet på kontakt personen.." @bind="ContractModel.ContactPerson" />
+                                <input id="inputContactPerson" class="form-control form-control-sm" type="text" placeholder="Indtast navnet på kontakt personen.." @bind="contractModel.ContactPerson" />
                             </div>
                             <div class="col">
                                 <label for="inputContractFile" class="admin-label col-form-label col-form-label-sm">Vælg Kontrakt : </label>
                                 <div id="contractFileInput">
-                                    <InputFile OnChange="HandleFileSelected" accept=".pdf" />
-                                    <div class="alert alert-light alert-dismissible fade show" role="alert">
-                                        @ContractModel.ContractFileName
-                                        <button type="button" class="close" data-dismiss="alert" @onclick="RemoveUploadedFile" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
+                                    <Microsoft.AspNetCore.Components.Forms.InputFile OnChange="@OnInputFileChange" single />
+
+                                    @if (!string.IsNullOrEmpty(contractModel.ContractFileName))
+                                    {
+                                        <div class="alert alert-light alert-dismissible fade show" role="alert">
+                                            <p class="d-inline">@contractModel.ContractFileName</p>
+
+                                            <button type="button" class="close" data-dismiss="alert" @onclick="RemoveUploadedFile" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrEmpty(contractDataUrl))
+                                    {
+                                        <h4 class="small text-muted">Kontrakt Preview</h4>
+                                        <div class="container justify-content-center">
+                                            <iframe src="@contractDataUrl"
+                                                    class="embed-responsive-item"
+                                                    lang="da"
+                                                    title="Kontrakt Preview"
+                                                    frameborder="1"
+                                                    allowtransparency="true">
+                                            </iframe>
+                                        </div>
+                                    }
+
                                 </div>
                             </div>
                         </div>
@@ -71,11 +86,11 @@
                         <div class="row">
                             <div class="col">
                                 <label for="inputRegisteredDate" class="admin-label col-form-label col-form-label-sm">Kontrakt Registreret Dato :</label>
-                                <InputDate TValue="DateTime" @bind-Value="@(ContractModel.RegistrationDate)" class="form-control form-control-sm" />
+                                <InputDate TValue="DateTime" @bind-Value="@(contractModel.RegistrationDate)" class="form-control form-control-sm" />
                             </div>
                             <div class="col">
                                 <label for="inputExpiryDate" class="admin-label col-form-label col-form-label-sm">Udløbsdato :</label>
-                                <InputDate TValue="DateTime" @bind-Value=@(ContractModel.ExpiryDate) class="form-control form-control-sm" disabled />
+                                <InputDate TValue="DateTime" @bind-Value=@(contractModel.ExpiryDate) class="form-control form-control-sm" disabled />
                             </div>
                         </div>
 
@@ -83,7 +98,7 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="CancelRequest" @onclick:preventDefault>Annuller</button>
-                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@IsProcessing">Gem Ændringer</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@isProcessing">Gem Ændringer</button>
                     </div>
 
                 </EditForm>
@@ -100,115 +115,100 @@
     [Inject] protected AdminService AdminService { get; set; }
     [Inject] protected DataService DataService { get; set; }
 
-    protected private ContractModel ContractModel { get; set; } = new ContractModel();
-    protected private IEnumerable<User> Users { get; set; } = new List<User>();
-    protected private IEnumerable<Company> Companies { get; set; } = new List<Company>();
-    protected private IFileListEntry File { get; set; }
+    private ContractModel contractModel = new ContractModel();
+    private IEnumerable<User> users = new List<User>();
+    private IEnumerable<Company> companies = new List<Company>();
 
-    private bool IsProcessing { get; set; } = false;
-    private bool ShowError { get; set; } = false;
-    private bool _isLoadingData = false;
+    private bool isProcessing = false;
+    private bool isLoadingData = false;
 
-    private string FileProgress { get; set; }
-    private string ErrorMessage { get; set; } = string.Empty;
+    private string contractDataUrl = string.Empty;
+
+    private byte[] fileData = null;
 
     protected override async Task OnInitializedAsync()
     {
-        _isLoadingData = true;
+        isLoadingData = true;
 
         await Task.Delay(500);
 
-        Companies = await DataService.GetCompaniesWithOutContract();
-        Users = await DataService.GetUsers();
+        companies = await DataService.GetCompaniesWithOutContract();
+        users = await DataService.GetUsers();
 
         await Task.Delay(500);
 
-        _isLoadingData = false;
+        isLoadingData = false;
         StateHasChanged();
     }
 
-    private async void OnValidSubmit_CreateContract()
+    private async Task OnValidSubmit_CreateContract()
     {
-        ShowError = false;
-        IsProcessing = true;
+        isProcessing = true;
 
-        if (File != null)
+        if (fileData == null)
         {
-            try
-            {
-                if (FileProgress.Equals("Starting"))
-                {
-                    ShowError = true;
-                    ErrorMessage = "Vent venligst.. behandler kontrakt.";
-                }
-                else if (!FileProgress.Equals("Starting"))
-                {
-                    if (FileProgress.Equals("Success"))
-                    {
-                        ShowError = false;
-
-                        await InvokeAsync(() =>
-                        {
-                            AdminService.CreateContract(ContractModel);
-
-                            ContractModel = new ContractModel();
-                        });
-                    }
-                    else
-                    {
-                        ShowError = true;
-                        ErrorMessage = "Behandling af Kontrakt fejlede!";
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                ErrorMessage = "Kunne ikke oprette kontrakt.";
-                ShowError = true;
-            }
+            isProcessing = false;
+            return;
         }
 
-        IsProcessing = false;
+        string uploadedFileName = await FileService.UploadFileAsync(fileData);
+
+        if (string.IsNullOrEmpty(uploadedFileName))
+        {
+            isProcessing = false;
+            return;
+        }
+
+        // Process Contract Request.
+        contractModel.ContractFileName = uploadedFileName;
+        await AdminService.CreateContract(contractModel);
+
+        contractModel = new ContractModel();
+
+        isProcessing = false;
 
         RefreshService.CallRefreshRequest();
-
         await JSRuntime.InvokeVoidAsync("modalToggle", "CreateContractModal");
     }
 
-    private async Task HandleFileSelected(IFileListEntry[] files)
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
-        ShowError = false;
-        FileProgress = "Starting";
-        File = files.FirstOrDefault();
+        contractDataUrl = string.Empty;
 
-        if (File != null)
+        //var maxAllowedFiles = 1;
+        //var format = "image/png";
+        var cFormat = "application/pdf";
+
+        var contract = e.File;
+
+        if (contract != null)
         {
+            contractModel.ContractFileName = contract.Name;
+
+            fileData = new byte[contract.Size];
+
             try
             {
-                await FileService.UploadFileAsync(File);
+                await contract.OpenReadStream().ReadAsync(fileData);
+                var cUrl = $"data:{cFormat};base64,{FileService.EncodeFileToBase64(fileData)}";
 
-                ContractModel.ContractFileName = File.Name;
-
-                FileProgress = "Success";
+                contractDataUrl = cUrl;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                ErrorMessage = e.Message;/*ErrorMessage = "Kunne ikke oploade fil.";*/
-                ShowError = true;
-                FileProgress = "Failed";
+                throw;
             }
         }
     }
 
     private void RemoveUploadedFile(MouseEventArgs e)
     {
-        FileProgress = string.Empty;
-        File = null;
-        ContractModel.ContractFileName = string.Empty;
+        contractModel.ContractFileName = string.Empty;
+        contractDataUrl = string.Empty;
     }
 
     private void CancelRequest(MouseEventArgs e)
     {
-        ContractModel = new ContractModel();
+        contractModel = new ContractModel();
     }
 }

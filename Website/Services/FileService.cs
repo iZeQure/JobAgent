@@ -22,17 +22,31 @@ namespace JobAgent.Services
 
         public bool CheckFileExists(string fileName)
         {
+            Console.WriteLine($"Checking that {fileName} exists...");
+
             try
             {
-                if (string.IsNullOrEmpty(fileName)) return false;
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    Console.WriteLine($"File name was empty");
+                    return false;
+                }
 
                 foreach (string file in Directory.EnumerateFiles(_sharedPath))
                 {
-                    if (file.Equals(fileName))
+                    string fn = Path.GetFileName(file);
+
+                    Console.WriteLine($"Comparing this file => {fn} with {fileName}");
+
+                    if (fn.Equals(fileName, StringComparison.Ordinal))
                     {
+                        Console.WriteLine($"Found a match on => {fn}");
+
                         return true;
                     }
                 }
+
+                Console.WriteLine($"No matches found with => {fileName}");
 
                 return false;
             }
@@ -61,8 +75,12 @@ namespace JobAgent.Services
 
         public async Task<byte[]> GetFileFromDirectoryAsync(string fileName)
         {
+            Console.WriteLine($"Attemtps to get {fileName} from directory..");
+
             if (string.IsNullOrEmpty(fileName))
             {
+                Console.WriteLine($"File name wasn't specified.");
+
                 return null;
             }
 
@@ -70,13 +88,19 @@ namespace JobAgent.Services
             {
                 foreach (string file in Directory.EnumerateFiles(_sharedPath))
                 {
-                    if (file.Equals(fileName))
+                    string fn = Path.GetFileName(file);
+
+                    if (fn.Equals(fileName))
                     {
+                        Console.WriteLine($"Found a match on => {fn}");
+
                         byte[] bytes = await File.ReadAllBytesAsync(file);
 
                         return bytes;
                     }
                 }
+
+                Console.WriteLine($"No matches found with => {fileName}");
 
                 return null;
             }
@@ -86,27 +110,22 @@ namespace JobAgent.Services
             }
         }
 
-        public async Task<bool> UploadFileAsync(IFileListEntry fileEntry)
+        public async Task<string> UploadFileAsync(byte[] file)
         {
-            var path = Path.Combine(_sharedPath, fileEntry.Name);
+            string fileName = $"{Guid.NewGuid()}.pdf";
 
             try
             {
-                var memoryStream = new MemoryStream();
+                var contractPath = Path.Combine(_sharedPath, fileName);
 
-                await fileEntry.Data.CopyToAsync(memoryStream);
+                await File.WriteAllBytesAsync(contractPath, file);
 
-                using FileStream file = new FileStream(path, FileMode.Create, FileAccess.ReadWrite);
-
-                memoryStream.WriteTo(file);
+                return fileName;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
-                return await Task.FromResult(false);
+                return string.Empty;
             }
-
-            return await Task.FromResult(true);
         }
     }
 }

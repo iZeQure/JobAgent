@@ -84,9 +84,9 @@ namespace JobAgent.Services
                 Password = hashedSecret
             };
 
-            string jwtToken = (await GenerateAccessTokenAsync(user));
+            string accessToken = GenerateAccessToken(user);
 
-            user.AccessToken = jwtToken;
+            user.AccessToken = accessToken;
 
             try
             {
@@ -100,9 +100,9 @@ namespace JobAgent.Services
             return user;
         }
 
-        private async Task<string> GenerateAccessTokenAsync(User user)
+        private string GenerateAccessToken(User user)
         {
-            return await SecurityService.GenerateAccessTokenAsync(user);
+            return SecurityService.GenerateAccessToken(user);
         }
     }
 }

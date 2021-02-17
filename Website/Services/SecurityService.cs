@@ -1,9 +1,7 @@
 ﻿using JobAgent.Data.Security;
 using JobAgent.Models;
-using Microsoft.IdentityModel.Tokens;
 using Pocos;
 using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,11 +30,6 @@ namespace JobAgent.Services
             return Task.FromResult(Hash.Instance.GenerateHashedPassword(password, salt));
         }
 
-        public Task<string> GenerateAccessTokenAsync(User user)
-        {
-            return Task.FromResult(GenerateAccessToken(user));
-        }
-
         public RefreshTokenModel GenerateRefreshToken()
         {
             RefreshTokenModel refreshToken = new RefreshTokenModel();
@@ -56,22 +49,24 @@ namespace JobAgent.Services
         {
             MyAuthStateProvider myAuth = new MyAuthStateProvider();
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var claims = myAuth.GetClaimsIdentity(user);
+            //var tokenHandler = new JwtSecurityTokenHandler();
+            //var claims = myAuth.GetClaimsIdentity(user);
 
-            var token = tokenHandler.CreateJwtSecurityToken(
-                issuer: "jobagent.zbc.dk",
-                audience: "jobagent.zbc.dk",
-                subject: claims,
-                notBefore: DateTime.UtcNow,
-                expires: DateTime.UtcNow.Add(TimeSpan.FromDays(5)),
-                signingCredentials:
-                new SigningCredentials(
-                    new SymmetricSecurityKey(
-                        Encoding.Default.GetBytes("vK+DQL*Gpwks[ZaBxBG+x-bQahAB3HmtlnAKIAf5Wn5jogM;bcQms-NtobauCXZo")),
-                        SecurityAlgorithms.HmacSha256Signature));
+            //var token = tokenHandler.CreateJwtSecurityToken(
+            //    issuer: "jobagent.zbc.dk",
+            //    audience: "jobagent.zbc.dk",
+            //    subject: claims,
+            //    notBefore: DateTime.UtcNow,
+            //    expires: DateTime.UtcNow.Add(TimeSpan.FromDays(5)),
+            //    signingCredentials:
+            //    new SigningCredentials(
+            //        new SymmetricSecurityKey(
+            //            Encoding.Default.GetBytes("vK+DQL*Gpwks[ZaBxBG+x-bQahAB3HmtlnAKIAf5Wn5jogM;bcQms-NtobauCXZo")),
+            //            SecurityAlgorithms.HmacSha256Signature));
 
-            return tokenHandler.WriteToken(token);
+            //return tokenHandler.WriteToken(token);
+
+            return new Guid().ToString();
         }
     }
 }

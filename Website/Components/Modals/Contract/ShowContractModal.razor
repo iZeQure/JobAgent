@@ -1,40 +1,40 @@
 ﻿@attribute [Authorize]
 
-<div class="modal fade" id="ShowContractModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Kontrakt</h5>
-            </div>
+@if (Model != null)
+{
+    <div class="modal fade" id="ShowContractModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">               
 
-            <div class="modal-body">
-
-                @if (!string.IsNullOrEmpty(_errorMessage))
-                {
-                    <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="@(_errorMessage)" />
-                }
-
-                @if (string.IsNullOrEmpty(ContractName))
-                {
-                    <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="Kunne ikke finde kontraktense navn." />
-                }
-                else
-                {
-                    @if (!_contractExists)
+                <div class="modal-header">
+                    @if (!string.IsNullOrEmpty(Model.ContractForCompanyName))
                     {
-                        <MessageAlert Alert="MessageAlert.AlertType.Error" Message="Kunne ikke finde kontrakt." />
+                        <h5 class="modal-title">Kontrakt for @Model.ContractForCompanyName</h5>
                     }
                     else
                     {
-                        @if (string.IsNullOrEmpty(GetContractForView().Result))
+                        <h5 class="modal-title">Kontrakt</h5>
+                    }
+                </div>
+
+                <div class="modal-body">
+
+                    @if (Model.ContractIsLoading)
+                    {
+                        <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="Model.ContractIsLoading" Message="Indlæser kontrakten, vent venligst.." />
+                    }
+                    else
+                    {
+                        @if (!string.IsNullOrEmpty(Model.ViewContractMessage))
                         {
-                            <MessageAlert Alert="MessageAlert.AlertType.Error" Message="Kunne ikke indlæse kontraktens data." />
+                            <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="@(Model.ViewContractMessage)" />
                         }
-                        else
+
+                        @if (!string.IsNullOrEmpty(Model.EncodedContractData))
                         {
                             <div class="container-fluid justify-content-center">
                                 <div class="embed-responsive embed-responsive-16by9">
-                                    <iframe src="data:application/pdf;base64,@(GetContractForView().Result)"
+                                    <iframe src="data:application/pdf;base64,@(Model.EncodedContractData)"
                                             class="embed-responsive-item"
                                             lang="da"
                                             title="Kontrakt Information"
@@ -45,138 +45,17 @@
                             </div>
                         }
                     }
-                }
 
+                </div>
 
-
-
-
-
-
-
-
-
-
-
-
-                @*@if (string.IsNullOrEmpty(ContractName))
-                    {
-                        <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="Kunne ikke finde kontraktense navn." />
-                    }
-                    else
-                    {
-                        @if (_contractIsLoading)
-                        {
-                            <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="@_contractIsLoading" Message="Indlæser kontrakt data.." />
-                        }
-                        else
-                        {
-                            @if (string.IsNullOrEmpty(_encodedContract))
-                            {
-                                <MessageAlert Alert="MessageAlert.AlertType.Error" Message="Kunne ikke indlæse kontraktens data." />
-                            }
-                            else
-                            {
-                                <div class="container-fluid justify-content-center">
-                                    <div class="embed-responsive embed-responsive-16by9">
-                                        <iframe src="data:application/pdf;base64,@(_encodedContract)"
-                                                class="embed-responsive-item"
-                                                lang="da"
-                                                title="Kontrakt Information"
-                                                frameborder="1"
-                                                allowtransparency="true">
-                                        </iframe>
-                                    </div>
-                                </div>
-                            }
-                        }
-                    }*@
-
-                @*@if (!string.IsNullOrEmpty(ContractName))
-                    {
-                        if (string.IsNullOrEmpty(GetContractForView(ContractName).GetAwaiter().GetResult()))
-                        {
-                            <MessageAlert Alert="MessageAlert.AlertType.Warning" />
-                        }
-                        else
-                        {
-                            <div class="container-fluid justify-content-center">
-                                <div class="embed-responsive embed-responsive-16by9">
-                                    <iframe src="data:application/pdf;base64,@(GetContractForView(ContractName))"
-                                            class="embed-responsive-item"
-                                            lang="da"
-                                            title="Kontrakt Information"
-                                            frameborder="1"
-                                            allowtransparency="true">
-                                    </iframe>
-                                </div>
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <MessageAlert Alert="MessageAlert.AlertType.Error" Message="Kunne ikke hente kontrakt!" />
-                    }*@
-
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-info" data-dismiss="modal">Luk kontrakt</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal">Luk kontrakt</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+}
 
 @code {
-    [Parameter]
-    public string ContractName { get; set; }
-
-    [Inject]
-    private IFileService FileService { get; set; }
-
-    private string _errorMessage = string.Empty;
-    private bool _contractIsLoading = false;
-    private bool _contractExists = false;
-
-    private async Task<string> GetContractForView()
-    {
-        Console.WriteLine($"Contract File : {ContractName}");
-
-        try
-        {
-            if (string.IsNullOrEmpty(ContractName))
-            {
-                _errorMessage = "Kunne ikke hente navnet på kontrakten.";
-
-                return string.Empty;
-            }
-
-            _contractIsLoading = true;
-
-            _contractExists = FileService.CheckFileExists(ContractName);
-
-            Console.WriteLine($"Contract Exists : {_contractExists}");
-
-            if (_contractExists)
-            {
-                var fileBytes = await FileService.GetFileFromDirectoryAsync(ContractName);
-                var encodedFileInfo = FileService.EncodeFileToBase64(fileBytes);
-                _contractIsLoading = false;
-
-                if (string.IsNullOrEmpty(encodedFileInfo))
-                {
-                    _errorMessage = "Kontrakten havde ingen data.";
-                    return string.Empty;
-                }
-
-                return encodedFileInfo;
-            }
-        }
-        catch (Exception)
-        {
-            _errorMessage = $"Der skete en ukendt fejl.";
-        }
-
-        return string.Empty;
-    }
+    [Parameter] public ShowContractModel Model { get; set; }
 }

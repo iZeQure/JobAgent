@@ -69,7 +69,7 @@ else
                                 @if (!string.IsNullOrEmpty(contract.ContractName))
                                 {
                                     <td>
-                                        <span @onclick="@(mouseClickEvent => OnClick_ShowContractModal(contract.ContractName))" class="table-icons" data-toggle="modal" data-target="#ShowContractModal">
+                                        <span @onclick="@(mouseClickEvent => OnClick_ShowContractModal(contract.ContractName, contract.Company.Name))" class="table-icons" data-toggle="modal" data-target="#ShowContractModal">
                                             <i class="fas fa-file-invoice"></i>
                                         </span>
                                     </td>
@@ -110,22 +110,24 @@ else
 {
     <CreateContractModal />
 
-    <EditContractModal ContractModel="@(_contractModel)" />
+    <EditContractModal ContractModel="@contractModel" />
 
-    <RemoveContractModal ContractId="@(_contractId)" />
+    <RemoveContractModal ContractId="@_contractId" />
 
-    <ShowContractModal ContractName="@(_contractName)" />
+    <ShowContractModal Model="showContractModel" />
 }
 
 @code {
     [Inject] protected IRefresh RefreshService { get; set; }
     [Inject] protected AdminService AdminService { get; set; }
     [Inject] protected DataService DataService { get; set; }
+    [Inject] protected IFileService FileService { get; set; }
 
-    private ContractModel _contractModel = new ContractModel();
-    private IEnumerable<Contract> _contracts;
+    private ContractModel contractModel = new();
+    private ShowContractModel showContractModel = new();
+    private IEnumerable<Contract> _contracts = new List<Contract>();
+
     private int _contractId = 0;
-    private string _contractName = string.Empty;
     private string _errorMessage = string.Empty;
     private bool _disabled = false;
     private bool _dataIsloading = false;
@@ -188,16 +190,59 @@ else
         _contractId = id;
     }
 
-    private void OnClick_ShowContractModal(string name)
+    private async Task OnClick_ShowContractModal(string name, string companyName)
     {
-        _contractName = name;
+        showContractModel = new();
+
+        showContractModel.ContractIsLoading = true;
+        showContractModel.ViewContractMessage = "Verificere kontrakt.";
+
+        try
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                showContractModel.ViewContractMessage = "Kunne ikke hente navnet på kontrakten.";
+                showContractModel.ContractIsLoading = false;
+                return;
+            }
+
+            showContractModel.ContractExists = FileService.CheckFileExists(name);
+
+            if (!showContractModel.ContractExists)
+            {
+                showContractModel.ViewContractMessage = "Kontrakten eksitere ikke i systemet.";
+                showContractModel.ContractIsLoading = false;
+                return;
+            }
+
+            var fileBytes = await FileService.GetFileFromDirectoryAsync(name);
+            var encodedFileInfo = FileService.EncodeFileToBase64(fileBytes);
+
+            if (string.IsNullOrEmpty(encodedFileInfo))
+            {
+                showContractModel.ViewContractMessage = "Kunne ikke hente kontraktens data.";
+                showContractModel.ContractIsLoading = false;
+                return;
+            }
+
+            showContractModel.ViewContractMessage = string.Empty;
+            showContractModel.ContractIsLoading = false;
+
+            showContractModel.ContractForCompanyName = companyName;
+            showContractModel.EncodedContractData = encodedFileInfo;
+        }
+        catch (Exception)
+        {
+            showContractModel.ViewContractMessage = $"Der skete en ukendt fejl.";
+            showContractModel.ContractIsLoading = false;
+        }
     }
 
     private async Task OnClick_OpenEditModal(int contractId)
     {
         var contract = await AdminService.GetContractById(contractId);
 
-        _contractModel = new ContractModel()
+        contractModel = new ContractModel()
         {
             Id = contract.Identifier,
             SignedWithCompany = contract.Company.Identifier,

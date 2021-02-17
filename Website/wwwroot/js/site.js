@@ -1,18 +1,17 @@
 window.HTMLTitleElement = (title) => {
     document.title = title;
-}
+};
 
 window.OnInformationChangeAnimation = (id) => {
-    console.info(`Animating => ${id}`);
-
-    $(`#${id}`).toggleClass('onInformationChangeAnimation');
+    var animation = document.getElementById(`${id}`).toggleClass('onInformationChangeAnimation');
 
     setTimeout(function () {
-        $(`#${id}`).toggleClass('onInformationChangeAnimation');
+        var timeout = document.getElementById(`${id}`).toggleClass('onInformationChangeAnimation');
     }, 6000);
-}
+};
 
 window.PopoverInformation = (name, body, color) => {
+
     if (color == 'Danger') {
         $('.popover-danger').popover({
             title: name,
@@ -31,20 +30,39 @@ window.PopoverInformation = (name, body, color) => {
             animation: true
         });
     }
-}
+
+    //if (color == 'Danger') {
+    //    var popover = new bootstrap.Popover(document.querySelector('.popover-danger'), {
+    //        title: name,
+    //        content: body,
+    //        trigger: 'hover',
+    //        placement: 'left',
+    //        animation: true
+    //    });
+    //}
+    //else {
+    //    var popover = new bootstrap.Popover(document.querySelector('.popover-info'), {
+    //        title: name,
+    //        content: body,
+    //        trigger: 'hover',
+    //        placement: 'left',
+    //        animation: true
+    //    });
+    //}
+};
 
 window.StaticModal = (elementId) => {
-    $(`#${elementId}`).modal({
+    var sModal = document.getElementById(`${elementId}`).modal({
         backdrop: 'static',
         keyboard: false,
         show: false
     });
-}
+};
 
 window.confirmRemove = (elementId) => {
-    $(`#${elementId}`).modal('toggle');
-}
+    var confirmRemoval = document.getElementById(`${elementId}`).modal('toggle');
+};
 
 window.modalToggle = (elementId) => {
-    $(`#${elementId}`).modal('toggle');
-} 
+    var toggleModal = document.getElementById(`${elementId}`).modal('toggle');
+};
