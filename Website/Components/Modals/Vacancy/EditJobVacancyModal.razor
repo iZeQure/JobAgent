@@ -178,11 +178,11 @@
         StateHasChanged();
     }
 
-    private async void OnValidSubmit_EditJobVacancy()
+    private async Task OnValidSubmit_EditJobVacancy()
     {
         IsProcessing = true;
 
-        await AdminService.UpdateJobVacancy(Model);
+        await AdminService.UpdateJobVacancyAsync(Model);
 
         Refresh.CallRefreshRequest();
         IsProcessing = false;

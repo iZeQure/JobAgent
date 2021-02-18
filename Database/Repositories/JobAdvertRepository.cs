@@ -18,7 +18,7 @@ namespace DataAccess.Repositories
             _databaseAccess = (SqlDatabaseAccess)databaseAccess;
         }
 
-        public async void Create(JobAdvert create)
+        public async Task Create(JobAdvert create)
         {
             try
             {
@@ -315,7 +315,7 @@ namespace DataAccess.Repositories
 
         }
 
-        public async void Remove(int id)
+        public async Task Remove(int id)
         {
             try
             {
@@ -340,7 +340,7 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async void Update(JobAdvert update)
+        public async Task Update(JobAdvert update)
         {
             try
             {

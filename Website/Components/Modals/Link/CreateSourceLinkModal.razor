@@ -59,39 +59,36 @@
     [Inject] private IJSRuntime JS { get; set; }
 
     private SourceLinkModel SourceLinkModel { get; set; } = new SourceLinkModel();
-    private List<Company> Companies { get; set; }
+    private IEnumerable<Company> Companies { get; set; }
 
     private bool IsProcessing { get; set; }
     private string MessageAlert { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Companies = (await DataService.GetCompaniesWithContract() as List<Company>);
+        Companies = await DataService.GetCompaniesWithContract();
     }
 
-    private void OnValidSubmit_CreateSourceLink()
+    private async Task OnValidSubmit_CreateSourceLink()
     {
         IsProcessing = true;
 
-        InvokeAsync(async () =>
+        if (await AdminService.CreateSourceLinkAsync(SourceLinkModel))
         {
-            if (await AdminService.CreateSourceLink(SourceLinkModel))
-            {
-                MessageAlert = "Link successfuldt oprettet!";
-            }
-            else
-            {
-                MessageAlert = "Noget gik galt, prøv igen senere.";
-            }
+            MessageAlert = "Link successfuldt oprettet!";
+        }
+        else
+        {
+            MessageAlert = "Noget gik galt, prøv igen senere.";
+        }
 
-            Refresh.CallRefreshRequest();
-        });
+        Refresh.CallRefreshRequest();
 
         IsProcessing = false;
         MessageAlert = string.Empty;
 
-        JS.InvokeVoidAsync("modalToggle", "CreateLinkModal");
-        JS.InvokeVoidAsync("OnInformationChangeAnimation", SourceLinkModel.Id);
+        await JS.InvokeVoidAsync("modalToggle", "CreateLinkModal");
+        await JS.InvokeVoidAsync("OnInformationChangeAnimation", SourceLinkModel.Id);
 
         SourceLinkModel = new SourceLinkModel();
     }

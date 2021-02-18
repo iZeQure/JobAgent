@@ -182,9 +182,9 @@
         StateHasChanged();
     }
 
-    private async void OnValidSubmit_CreateJobVacancy()
+    private async Task OnValidSubmit_CreateJobVacancy()
     {
-        AdminService.CreateJobVacancy(JobVacancyModel);
+        await AdminService.CreateJobVacancyAsync(JobVacancyModel);
 
 
         Refresh.CallRefreshRequest();

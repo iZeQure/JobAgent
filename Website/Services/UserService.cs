@@ -34,7 +34,7 @@ namespace JobAgent.Services
                 if (user.Salt != string.Empty)
                 {
                     // Hash password with salt.
-                    user.Password = await SecurityService.HashPasswordAsync(user.Password, user.Salt);
+                    user.Password = SecurityService.HashPasswordAsync(user.Password, user.Salt);
 
                     // Validate password with server.
                     if (await DataAccessManager.UserDataAccessManager().ValidatePassword(user.Password))
@@ -57,21 +57,23 @@ namespace JobAgent.Services
 
         public async Task<bool> CheckUserExistsAsync(string email)
         {
-            if (await DataAccessManager.UserDataAccessManager().CheckUserExists(email))
+            var validation = await DataAccessManager.UserDataAccessManager().CheckUserExists(email);
+
+            if (validation)
             {
-                return true;
+                return validation;
             }
 
-            return false;
+            return validation;
         }
 
         public async Task<User> RegisterUserAsync(RegisterAccountModel registerAccountModel)
         {
             // Generate new salt.
-            string salt = (await SecurityService.GetNewSaltAsync());
+            string salt = SecurityService.GetNewSaltAsync();
 
             // Hash user's password.
-            string hashedSecret = (await SecurityService.HashPasswordAsync(registerAccountModel.Password, salt));
+            string hashedSecret = SecurityService.HashPasswordAsync(registerAccountModel.Password, salt);
 
             var user = new User()
             {
@@ -90,7 +92,7 @@ namespace JobAgent.Services
 
             try
             {
-                DataAccessManager.UserDataAccessManager().Create(user);
+                await DataAccessManager.UserDataAccessManager().Create(user);
             }
             catch (Exception)
             {

@@ -35,12 +35,12 @@
     [Inject]
     public IJSRuntime JS { get; set; }
 
-    protected void OnClick_RemoveContract(int id)
+    protected async Task OnClick_RemoveContract(int id)
     {
-        AdminService.RemoveContract(id);
+        await AdminService.RemoveContractAsync(id);
 
         RefreshService.CallRefreshRequest();
 
-        JS.InvokeVoidAsync("confirmRemove", "RemoveContractModal");
+        await JS.InvokeVoidAsync("confirmRemove", "RemoveContractModal");
     }
 }

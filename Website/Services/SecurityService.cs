@@ -13,10 +13,10 @@ namespace JobAgent.Services
         /// <summary>
         /// Generate new salt, on user account creation.
         /// </summary>
-        /// <returns>A new salt.</returns>
-        public Task<string> GetNewSaltAsync()
+        /// <returns>A salt in base64 format.</returns>
+        public string GetNewSaltAsync()
         {
-            return Task.FromResult(Convert.ToBase64String(Salt.Instance.GetSalt));
+            return Convert.ToBase64String(Salt.Instance.GetSalt);
         }
 
         /// <summary>
@@ -25,9 +25,9 @@ namespace JobAgent.Services
         /// <param name="password">Used to identify the password to hash.</param>
         /// <param name="salt">Used to secure the password hash.</param>
         /// <returns>A hashed password.</returns>
-        public Task<string> HashPasswordAsync(string password, string salt)
+        public string HashPasswordAsync(string password, string salt)
         {
-            return Task.FromResult(Hash.Instance.GenerateHashedPassword(password, salt));
+            return Hash.Instance.GenerateHashedPassword(password, salt);
         }
 
         public RefreshTokenModel GenerateRefreshToken()

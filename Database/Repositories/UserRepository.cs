@@ -60,7 +60,7 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async void Create(User create)
+        public async Task Create(User create)
         {
             try
             {
@@ -363,12 +363,12 @@ namespace DataAccess.Repositories
             }
         }
 
-        public void Remove(int id)
+        public Task Remove(int id)
         {
             throw new NotImplementedException();
         }
 
-        public async void Update(User update)
+        public async Task Update(User update)
         {
             try
             {
@@ -439,7 +439,7 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async void UpdateUserPassword(User authorization)
+        public async Task UpdateUserPassword(User authorization)
         {
             try
             {

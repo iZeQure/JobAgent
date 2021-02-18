@@ -171,7 +171,7 @@
 
         // Process Contract Request.
         contractModel.ContractFileName = uploadedFileName;
-        await AdminService.CreateContract(contractModel);
+        await AdminService.CreateContractAsync(contractModel);
 
         isProcessing = false;
 

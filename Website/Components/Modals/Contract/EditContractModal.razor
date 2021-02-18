@@ -148,14 +148,11 @@
         return Task.CompletedTask;
     }
 
-    private async void OnValidSubmit_UpdateContract()
+    private async Task OnValidSubmit_UpdateContract()
     {
         IsProcessing = true;
 
-        await InvokeAsync(() =>
-        {
-            AdminService.UpdateContract(ContractModel);
-        });
+        await AdminService.UpdateContractAsync(ContractModel);
 
         IsProcessing = false;
 

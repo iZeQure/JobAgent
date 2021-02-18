@@ -247,7 +247,7 @@ else
 
     public async Task OnClickEdit_GetJobVacancyDetailsById(int id)
     {
-        var details = await AdminService.GetJobVacancyDetailsById(id);
+        var details = await AdminService.GetJobVacancyDetailsByIdAsync(id);
 
         JobVacancyModel = new JobVacancyModel()
         {

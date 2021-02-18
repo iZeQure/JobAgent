@@ -39,14 +39,11 @@
 
     private bool IsProcessing { get; set; }
 
-    private async void OnClick_RemoveCompany(int id)
+    private async Task OnClick_RemoveCompany(int id)
     {
         IsProcessing = true;
 
-        await InvokeAsync(() =>
-       {
-           AdminService.RemoveCompanyById(id);
-       });
+        await AdminService.RemoveCompanyByIdAsync(id);
 
         IsProcessing = false;
 

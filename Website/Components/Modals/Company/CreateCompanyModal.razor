@@ -77,12 +77,9 @@
     {
         IsProcessing = true;
 
-        await InvokeAsync(() =>
-        {
-            AdminService.CreateCompany(CompanyModel);
+        await AdminService.CreateCompanyAsync(CompanyModel);
 
-            CompanyModel = new CompanyModel();
-        });
+        CompanyModel = new CompanyModel();
 
         IsProcessing = false;
 

@@ -22,7 +22,7 @@ namespace DataAccess.Repositories
         /// Create a consultant area.
         /// </summary>
         /// <param name="create">Used to specify the data set.</param>
-        public async void Create(ConsultantArea create)
+        public async Task Create(ConsultantArea create)
         {
             try
             {
@@ -149,7 +149,7 @@ namespace DataAccess.Repositories
         /// Remove consultant area.
         /// </summary>
         /// <param name="id">Used to specify which dataset to remove.</param>
-        public async void Remove(int id)
+        public async Task Remove(int id)
         {
             try
             {
@@ -178,7 +178,7 @@ namespace DataAccess.Repositories
         /// Update consultant area.
         /// </summary>
         /// <param name="update">Used to specify what dataset needs to update.</param>
-        public async void Update(ConsultantArea update)
+        public async Task Update(ConsultantArea update)
         {
             try
             {

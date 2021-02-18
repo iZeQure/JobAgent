@@ -147,7 +147,7 @@ else
         {
             _dataIsloading = true;
 
-            var contracts = await AdminService.GetContracts();
+            var contracts = await AdminService.GetContractsAsync();
 
             if (contracts.Count().Equals(0))
             {
@@ -171,7 +171,7 @@ else
 
         try
         {
-            var contracts = await AdminService.GetContracts();
+            var contracts = await AdminService.GetContractsAsync();
 
             if (contracts != null)
             {
@@ -240,7 +240,7 @@ else
 
     private async Task OnClick_OpenEditModal(int contractId)
     {
-        var contract = await AdminService.GetContractById(contractId);
+        var contract = await AdminService.GetContractByIdAsync(contractId);
 
         contractModel = new ContractModel()
         {

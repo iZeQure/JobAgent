@@ -31,11 +31,11 @@
 
     private bool IsProcessing = false;
 
-    private async void OnClick_RemoveJobVacancy(int id)
+    private async Task OnClick_RemoveJobVacancy(int id)
     {
         IsProcessing = true;
 
-        adminService.RemoveJobVacancyById(id);
+        await adminService.RemoveJobVacancyByIdAsync(id);
 
         IsProcessing = false;
 

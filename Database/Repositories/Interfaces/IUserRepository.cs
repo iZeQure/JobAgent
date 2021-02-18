@@ -17,6 +17,6 @@ namespace DataAccess.Repositories.Interfaces
         /// Update users password.
         /// </summary>
         /// <param name="authorization">Used to identify user with new password.</param>
-        void UpdateUserPassword(User authorization);
+        Task UpdateUserPassword(User authorization);
     }
 }

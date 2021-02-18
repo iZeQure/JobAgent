@@ -80,14 +80,11 @@
 
     private string ErrorMessage { get; set; } = string.Empty;
 
-    private async void OnValidSubmit_UpdateCompany()
+    private async Task OnValidSubmit_UpdateCompany()
     {
         IsProcessing = true;
 
-        await InvokeAsync(() =>
-        {
-            AdminService.UpdateCompany(CompanyModel);
-        });
+        await AdminService.UpdateCompanyAsync(CompanyModel);
 
         IsProcessing = false;
 

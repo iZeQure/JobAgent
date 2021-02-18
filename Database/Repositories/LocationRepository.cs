@@ -22,7 +22,7 @@ namespace DataAccess.Repositories
         /// Create a location.
         /// </summary>
         /// <param name="create">Used to specify the data.</param>
-        public async void Create(Location create)
+        public async Task Create(Location create)
         {
             try
             {
@@ -149,7 +149,7 @@ namespace DataAccess.Repositories
         /// Remove location by id.
         /// </summary>
         /// <param name="id">Used to specify the data to remove.</param>
-        public async void Remove(int id)
+        public async Task Remove(int id)
         {
             try
             {
@@ -178,7 +178,7 @@ namespace DataAccess.Repositories
         /// Update location.
         /// </summary>
         /// <param name="update">Used to specify the data set to update.</param>
-        public async void Update(Location update)
+        public async Task Update(Location update)
         {
             try
             {

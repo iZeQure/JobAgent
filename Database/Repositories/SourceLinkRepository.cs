@@ -23,7 +23,7 @@ namespace DataAccess.Repositories
         /// </summary>
         /// <param name="sourceLink">Used to create new data.</param>
         /// <returns>True if data was created, otherwise false.</returns>
-        public async void Create(SourceLink sourceLink)
+        public async Task Create(SourceLink sourceLink)
         {
             try
             {
@@ -173,7 +173,7 @@ namespace DataAccess.Repositories
         /// </summary>
         /// <param name="sourceLink">Specifies the data to remove.</param>
         /// <returns>True if data was removed, but false if dataset isn't found.</returns>
-        public async void Remove(int id)
+        public async Task Remove(int id)
         {
             try
             {
@@ -206,7 +206,7 @@ namespace DataAccess.Repositories
         /// </summary>
         /// <param name="sourceLink">Specifies the dataset to update.</param>
         /// <returns>True if data is updated, otherwise false.</returns>
-        public async void Update(SourceLink sourceLink)
+        public async Task Update(SourceLink sourceLink)
         {
             try
             {

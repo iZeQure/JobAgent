@@ -25,7 +25,7 @@ namespace DataAccess.Repositories
         /// Create a job advert category.
         /// </summary>
         /// <param name="create">Used to specify the data for the category.</param>
-        public async void Create(Category create)
+        public async Task Create(Category create)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async void Create(Specialization create)
+        public async Task Create(Specialization create)
         {
             try
             {
@@ -81,7 +81,7 @@ namespace DataAccess.Repositories
         /// </summary>
         /// <param name="create">Used to specify the data for the specialization.</param>
         /// <param name="categoryId">Used to bind the specialization to a specific category.</param>
-        public async void CreateSpecialization(Specialization create, int categoryId)
+        public async Task CreateSpecialization(Specialization create, int categoryId)
         {
             try
             {
@@ -426,7 +426,7 @@ namespace DataAccess.Repositories
         /// Delete a category by id, also deletes associated specializations.
         /// </summary>
         /// <param name="id"></param>
-        public async void Remove(int id)
+        public async Task Remove(int id)
         {
             try
             {
@@ -456,7 +456,7 @@ namespace DataAccess.Repositories
         /// Remove category specialization by id.
         /// </summary>
         /// <param name="id">Used to indentify the data to delete.</param>
-        public async void RemoveSpecialization(int id)
+        public async Task RemoveSpecialization(int id)
         {
             try
             {
@@ -485,7 +485,7 @@ namespace DataAccess.Repositories
         /// Update category.
         /// </summary>
         /// <param name="update">Used to update the current existing data with.</param>
-        public async void Update(Category update)
+        public async Task Update(Category update)
         {
             try
             {
@@ -511,7 +511,7 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async void Update(Specialization update)
+        public async Task Update(Specialization update)
         {
             try
             {
@@ -542,7 +542,7 @@ namespace DataAccess.Repositories
         /// Update category specialization.
         /// </summary>
         /// <param name="update">Used to update the existing data with new.</param>
-        public async void UpdateSpecialization(Specialization update)
+        public async Task UpdateSpecialization(Specialization update)
         {
             try
             {

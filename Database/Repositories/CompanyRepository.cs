@@ -23,7 +23,7 @@ namespace DataAccess.Repositories
         /// Create a company.
         /// </summary>
         /// <param name="create">Used to specify the data to create.</param>
-        public async void Create(Company create)
+        public async Task Create(Company create)
         {
             try
             {
@@ -252,7 +252,7 @@ namespace DataAccess.Repositories
         /// Remove company data by id.
         /// </summary>
         /// <param name="id">Used to identify the data to remove.</param>
-        public async void Remove(int id)
+        public async Task Remove(int id)
         {
             try
             {
@@ -281,7 +281,7 @@ namespace DataAccess.Repositories
         /// Update company information.
         /// </summary>
         /// <param name="update">Used to update the company information.</param>
-        public async void Update(Company update)
+        public async Task Update(Company update)
         {
             try
             {

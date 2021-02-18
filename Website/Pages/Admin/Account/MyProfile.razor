@@ -141,7 +141,7 @@
     private async Task LoadInformation()
     {
         // Get user data, from the existing session data.
-        var user = await AdminService.GetUserByEmail(UserEmail);
+        var user = await AdminService.GetUserByEmailAsync(UserEmail);
         AccountModel = new AccountModel()
         {
             AccountId = user.Identifier,
@@ -166,7 +166,7 @@
 
         await InvokeAsync(async () =>
         {
-            result = await AdminService.UpdateUserInformation(AccountModel);
+            result = await AdminService.UpdateUserInformationAsync(AccountModel);
         });
 
         if (result)

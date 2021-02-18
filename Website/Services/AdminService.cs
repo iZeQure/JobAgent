@@ -17,104 +17,107 @@ namespace JobAgent.Services
             DataAccessManager = new DataAccessManager();
         }
 
-        public async Task<User> GetUserByEmail(string userMail)
+        public async Task<User> GetUserByEmailAsync(string userMail)
         {
             return await DataAccessManager.UserDataAccessManager().GetUserByEmail(userMail);
         }
 
-        public Task<bool> UpdateUserInformation(AccountModel user)
+        public async Task<bool> UpdateUserInformationAsync(AccountModel accountModel)
         {
+            var user = new User()
+            {
+                Identifier = accountModel.AccountId,
+                Email = accountModel.Email,
+                FirstName = accountModel.FirstName,
+                LastName = accountModel.LastName,
+                ConsultantArea = new ConsultantArea() { Identifier = accountModel.ConsultantAreaId },
+                Location = new Location() { Identifier = accountModel.LocationId }
+            };
+
             try
             {
-                DataAccessManager.UserDataAccessManager().Update(
-                        new User()
-                        {
-                            Identifier = user.AccountId,
-                            Email = user.Email,
-                            FirstName = user.FirstName,
-                            LastName = user.LastName,
-                            ConsultantArea = new ConsultantArea() { Identifier = user.ConsultantAreaId },
-                            Location = new Location() { Identifier = user.LocationId }
-                        });
+                await DataAccessManager.UserDataAccessManager().Update(user);
 
-                return Task.FromResult(true);
+                return true;
             }
             catch (Exception)
             {
-                return Task.FromResult(false);
+                return false;
             }
         }
 
-        public async void UpdateUserPassword(ChangePasswordModel auth)
+        public async Task UpdateUserPasswordAsync(ChangePasswordModel auth)
         {
             SecurityService securityService = new SecurityService();
 
             string userSalt = await DataAccessManager.UserDataAccessManager().GetUserSaltByEmail(auth.Email);
             var hashPassword = await Task.FromResult(securityService.HashPasswordAsync(auth.Password, userSalt));
 
-            auth.Password = hashPassword.Result;
+            auth.Password = hashPassword;
 
-            DataAccessManager.UserDataAccessManager().UpdateUserPassword(
-                new User()
-                {
-                    Email = auth.Email,
-                    Password = auth.Password
-                });
+            var user = new User()
+            {
+                Email = auth.Email,
+                Password = auth.Password
+            };
+
+            await DataAccessManager.UserDataAccessManager().UpdateUserPassword(user);
         }
 
-        public Task<bool> UpdateJobVacancy(JobVacancyModel data)
+        public async Task<bool> UpdateJobVacancyAsync(JobVacancyModel data)
         {
+            var jobAdvert = new JobAdvert()
+            {
+                Identifier = data.Id,
+                Title = data.Title,
+                Email = data.Email,
+                PhoneNumber = data.PhoneNumber,
+                JobDescription = data.Description,
+                JobLocation = data.Location,
+                JobRegisteredDate = data.RegisteredDate,
+                DeadlineDate = data.DeadlineDate,
+                SourceURL = data.SourceURL,
+
+                // Company Data
+                Company = new Company()
+                {
+                    Identifier = data.CompanyId.Value
+                },
+
+                // Category Data
+                Category = new Category()
+                {
+                    Identifier = data.CategoryId
+                },
+                Specialization = new Specialization()
+                {
+                    Identifier = data.SpecializationId.Value
+                }
+            };
+
             try
             {
-                DataAccessManager.JobAdvertDataAccessManager().Update(
-                    new JobAdvert()
-                    {
-                        Identifier = data.Id,
-                        Title = data.Title,
-                        Email = data.Email,
-                        PhoneNumber = data.PhoneNumber,
-                        JobDescription = data.Description,
-                        JobLocation = data.Location,
-                        JobRegisteredDate = data.RegisteredDate,
-                        DeadlineDate = data.DeadlineDate,
-                        SourceURL = data.SourceURL,
+                await DataAccessManager.JobAdvertDataAccessManager().Update(jobAdvert);
 
-                        // Company Data
-                        Company = new Company()
-                        {
-                            Identifier = data.CompanyId.Value
-                        },
-
-                        // Category Data
-                        Category = new Category()
-                        {
-                            Identifier = data.CategoryId
-                        },
-                        Specialization = new Specialization()
-                        {
-                            Identifier = data.SpecializationId.Value
-                        }
-                    });
-
-                return Task.FromResult(true);
+                return true;
             }
             catch (Exception)
             {
-                return Task.FromResult(false);
+                return false;
             }
         }
 
-        public async Task<IEnumerable<JobAdvert>> GetJobVacancies()
+        public async Task<IEnumerable<JobAdvert>> GetJobVacanciesAsync()
         {
             return await DataAccessManager.JobAdvertDataAccessManager().GetAllJobAdvertsForAdmins();
         }
 
-        public async Task<JobAdvert> GetJobVacancyDetailsById(int id)
+        public async Task<JobAdvert> GetJobVacancyDetailsByIdAsync(int id)
         {
             return await DataAccessManager.JobAdvertDataAccessManager().GetJobAdvertDetailsForAdminsById(id);
         }
 
-        public void CreateJobVacancy(JobVacancyModel model)
+        public async Task CreateJobVacancyAsync(JobVacancyModel model)
         {
             JobAdvert jobAdvert =
                 new JobAdvert()
@@ -141,141 +144,176 @@ namespace JobAgent.Services
                     }
                 };
 
-            DataAccessManager.JobAdvertDataAccessManager().Create(jobAdvert);
+            await DataAccessManager.JobAdvertDataAccessManager().Create(jobAdvert);
         }
 
-        public void RemoveJobVacancyById(int id)
+        public async Task RemoveJobVacancyByIdAsync(int id)
         {
-            DataAccessManager.JobAdvertDataAccessManager().Remove(id);
+            await DataAccessManager.JobAdvertDataAccessManager().Remove(id);
         }
 
-        public Task<bool> CreateContract(ContractModel model)
+        public async Task<bool> CreateContractAsync(ContractModel contractModel)
         {
-            DataAccessManager.ContractDataAccessManager().Create(
-                new Contract()
+            var contract = new Contract()
+            {
+                ContactPerson = contractModel.ContactPerson,
+                ContractName = contractModel.ContractFileName,
+                ExpiryDate = contractModel.ExpiryDate,
+                RegistrationDate = contractModel.RegistrationDate,
+                SignedByUserId = new User()
                 {
-                    ContactPerson = model.ContactPerson,
-                    ContractName = model.ContractFileName,
-                    ExpiryDate = model.ExpiryDate,
-                    RegistrationDate = model.RegistrationDate,
-                    SignedByUserId = new User()
-                    {
-                        Identifier = model.SignedByUser
-                    },
-                    Company = new Company()
-                    {
-                        Identifier = model.SignedWithCompany
-                    }
-                });
+                    Identifier = contractModel.SignedByUser
+                },
+                Company = new Company()
+                {
+                    Identifier = contractModel.SignedWithCompany
+                }
+            };
 
-            return Task.FromResult(true);
-        }
-
-        public Task<bool> UpdateContract(ContractModel model)
-        {
             try
             {
-                DataAccessManager.ContractDataAccessManager().Update(
-                        new Contract()
-                        {
-                            Identifier = model.Id,
-                            Company = new Company()
-                            {
-                                Identifier = model.SignedWithCompany
-                            },
-                            SignedByUserId = new User()
-                            {
-                                Identifier = model.SignedByUser
-                            },
-                            ContactPerson = model.ContactPerson,
-                            ContractName = model.ContractFileName,
-                            RegistrationDate = model.RegistrationDate,
-                            ExpiryDate = model.ExpiryDate
-                        });
+                await DataAccessManager.ContractDataAccessManager().Create(contract);
 
-                return Task.FromResult(true);
+                return true;
             }
             catch (Exception)
             {
-                return Task.FromResult(false);
-            }            
+                return false;
+            }
         }
 
-        public void RemoveContract(int id)
+        public async Task<bool> UpdateContractAsync(ContractModel contractModel)
         {
-            DataAccessManager.ContractDataAccessManager().Remove(id);
+            var contract = new Contract()
+            {
+                Identifier = contractModel.Id,
+                Company = new Company()
+                {
+                    Identifier = contractModel.SignedWithCompany
+                },
+                SignedByUserId = new User()
+                {
+                    Identifier = contractModel.SignedByUser
+                },
+                ContactPerson = contractModel.ContactPerson,
+                ContractName = contractModel.ContractFileName,
+                RegistrationDate = contractModel.RegistrationDate,
+                ExpiryDate = contractModel.ExpiryDate
+            };
+
+            try
+            {
+                await DataAccessManager.ContractDataAccessManager().Update(contract);
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
-        public async Task<IEnumerable<Contract>> GetContracts()
+        public async Task RemoveContractAsync(int id)
+        {
+            await DataAccessManager.ContractDataAccessManager().Remove(id);
+        }
+
+        public async Task<IEnumerable<Contract>> GetContractsAsync()
         {
             return await DataAccessManager.ContractDataAccessManager().GetAll();
         }
 
-        public async Task<Contract> GetContractById(int contractId)
+        public async Task<Contract> GetContractByIdAsync(int contractId)
         {
             return await DataAccessManager.ContractDataAccessManager().GetById(contractId);
         }
 
-        public void CreateCompany(CompanyModel model)
+        public async Task CreateCompanyAsync(CompanyModel companyModel)
         {
-            DataAccessManager.CompanyDataAccessManager().Create(
-                new Company()
+            var company = new Company()
+            {
+                CVR = companyModel.CVR,
+                Name = companyModel.Name,
+                URL = companyModel.URL
+            };
+
+            await DataAccessManager.CompanyDataAccessManager().Create(company);
+        }
+
+        public async Task UpdateCompanyAsync(CompanyModel companyModel)
+        {
+            var company = new Company()
+            {
+                Identifier = companyModel.Id,
+                CVR = companyModel.CVR,
+                Name = companyModel.Name,
+                URL = companyModel.URL
+            };
+
+            await DataAccessManager.CompanyDataAccessManager().Update(company);
+        }
+
+        public async Task RemoveCompanyByIdAsync(int id)
+        {
+            await DataAccessManager.CompanyDataAccessManager().Remove(id);
+        }
+
+        public async Task<bool> CreateSourceLinkAsync(SourceLinkModel sourceLinkModel)
+        {
+            var sourceLink = new SourceLink()
+            {
+                Company = new Company()
                 {
-                    CVR = model.CVR,
-                    Name = model.Name,
-                    URL = model.URL
-                });
+                    Identifier = sourceLinkModel.CompanyId
+                },
+                Link = sourceLinkModel.Link
+            };
+
+            try
+            {
+                await DataAccessManager.SourceLinkDataAccessManager().Create(sourceLink);
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
-        public void UpdateCompany(CompanyModel update)
+        public async Task<bool> RemoveSourceLinkAsync(int id)
         {
-            DataAccessManager.CompanyDataAccessManager().Update(
-                new Company()
-                {
-                    Identifier = update.Id,
-                    CVR = update.CVR,
-                    Name = update.Name,
-                    URL = update.URL
-                });
+            try
+            {
+                await DataAccessManager.SourceLinkDataAccessManager().Remove(id);
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
-        public void RemoveCompanyById(int id)
+        public async Task<bool> UpdateSourceLinkAsync(SourceLinkModel sourceLinkModel)
         {
-            DataAccessManager.CompanyDataAccessManager().Remove(id);
-        }
+            var sourceLink = new SourceLink()
+            {
+                Identifier = sourceLinkModel.Id,
+                Company = new Company() { Identifier = sourceLinkModel.CompanyId },
+                Link = sourceLinkModel.Link
+            };
 
-        public Task<bool> CreateSourceLink(SourceLinkModel model)
-        {
-            DataAccessManager.SourceLinkDataAccessManager().Create(
-                new SourceLink()
-                {
-                    Company = new Company()
-                    {
-                        Identifier = model.CompanyId
-                    },
-                    Link = model.Link
-                });
+            try
+            {
+                await DataAccessManager.SourceLinkDataAccessManager().Update(sourceLink);
 
-            return Task.FromResult(true);
-        }
-
-        public Task<bool> RemoveSourceLink(int id)
-        {
-            DataAccessManager.SourceLinkDataAccessManager().Remove(id);
-            return Task.FromResult(true);
-        }
-
-        public Task<bool> UpdateSourceLink(SourceLinkModel model)
-        {
-            DataAccessManager.SourceLinkDataAccessManager().Update(
-                new SourceLink()
-                {
-                    Identifier = model.Id,
-                    Company = new Company() { Identifier = model.CompanyId },
-                    Link = model.Link
-                });
-
-            return Task.FromResult(true);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }

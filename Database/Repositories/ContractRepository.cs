@@ -22,7 +22,7 @@ namespace DataAccess.Repositories
         /// Not Implemented
         /// </summary>
         /// <param name="create"></param>
-        public async void Create(Contract create)
+        public async Task Create(Contract create)
         {
             // Initialzie command obj.
             using SqlCommand cmd = new SqlCommand()
@@ -175,7 +175,7 @@ namespace DataAccess.Repositories
         /// Not Implemented
         /// </summary>
         /// <param name="id"></param>
-        public async void Remove(int id)
+        public async Task Remove(int id)
         {
             try
             {
@@ -203,7 +203,7 @@ namespace DataAccess.Repositories
         /// Not Implemented
         /// </summary>
         /// <param name="update"></param>
-        public async void Update(Contract update)
+        public async Task Update(Contract update)
         {
             try
             {

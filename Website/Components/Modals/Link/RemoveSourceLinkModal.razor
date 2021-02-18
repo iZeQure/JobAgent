@@ -36,28 +36,24 @@
     private bool IsProcessing { get; set; }
     private string MessageAlert { get; set; }
 
-    private void OnConfirmation_RemoveSourceLink()
+    private async Task OnConfirmation_RemoveSourceLink()
     {
         IsProcessing = true;
 
-        InvokeAsync(async () =>
+        if (await AdminService.RemoveSourceLinkAsync(SourceLinkId))
         {
-            if (await AdminService.RemoveSourceLink(SourceLinkId))
-            {
-                MessageAlert = "Link successfuldt fjernet!";
-            }
-            else
-            {
-                MessageAlert = "Noget gik galt, prøv igen senere.";
-            }
-
-        });
+            MessageAlert = "Link successfuldt fjernet!";
+        }
+        else
+        {
+            MessageAlert = "Noget gik galt, prøv igen senere.";
+        }
 
         RefreshService.CallRefreshRequest();
 
         IsProcessing = false;
         MessageAlert = string.Empty;
 
-        JS.InvokeVoidAsync("modalToggle", "RemoveConfirmationSourceLinkModal");
+        await JS.InvokeVoidAsync("modalToggle", "RemoveConfirmationSourceLinkModal");
     }
 }

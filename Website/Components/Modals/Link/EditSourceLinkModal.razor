@@ -93,32 +93,28 @@
         Companies = await DataService.GetCompaniesWithContract() as List<Company>;
     }
 
-    private void OnValidSubmit_EditSourceLink()
+    private async Task OnValidSubmit_EditSourceLink()
     {
         IsProcessing = true;
         SourceLinkModel.Id = SourceLink.Identifier;
 
-        InvokeAsync(async () =>
+        ShowMessage = true;
+        if (await AdminService.UpdateSourceLinkAsync(SourceLinkModel))
         {
-            ShowMessage = true;
-            if (await AdminService.UpdateSourceLink(SourceLinkModel))
-            {
-                MessageAlert = "Link successfuldt opdateret!";
-            }
-            else
-            {
-                MessageAlert = "Noget gik galt, prøv igen senere.";
-            }
-
-        });
+            MessageAlert = "Link successfuldt opdateret!";
+        }
+        else
+        {
+            MessageAlert = "Noget gik galt, prøv igen senere.";
+        }
 
         Refresh.CallRefreshRequest();
 
         IsProcessing = false;
         MessageAlert = string.Empty;
 
-        JS.InvokeVoidAsync("modalToggle", "EditSourceLinkModal");
-        JS.InvokeVoidAsync("OnInformationChangeAnimation", SourceLinkModel.Id);
+        await JS.InvokeVoidAsync("modalToggle", "EditSourceLinkModal");
+        await JS.InvokeVoidAsync("OnInformationChangeAnimation", SourceLinkModel.Id);
 
         ShowMessage = false;
     }

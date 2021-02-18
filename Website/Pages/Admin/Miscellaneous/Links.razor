@@ -103,7 +103,7 @@ else
         if (DataService.GetAllSourceLinksAsync() != null)
             SourceLinks = await DataService.GetAllSourceLinksAsync();
 
-        if ((await AdminService.GetContracts()).Count() == 0)
+        if ((await AdminService.GetContractsAsync()).Count() == 0)
             disabled = true;
     }
 
@@ -112,7 +112,7 @@ else
         LinkId = id;
     }
 
-    private async void OnClick_EditLink(int id)
+    private async Task OnClick_EditLink(int id)
     {
         SourceLink = await DataService.GetSourceLinkById(id);
     }

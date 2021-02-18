@@ -12,19 +12,19 @@ namespace DataAccess.Repositories.Interfaces
         /// </summary>
         /// <param name="create">Used to indentify the specialization information.</param>
         /// <param name="categoryId">Used to specify the category, the specialization is owned by.</param>
-        void CreateSpecialization(Specialization create, int categoryId);
+        Task CreateSpecialization(Specialization create, int categoryId);
 
         /// <summary>
         /// Update an existing category specialization.
         /// </summary>
         /// <param name="update">Used to define the fields that needs an update - Leave empty if no new content.</param>
-        void UpdateSpecialization(Specialization update);
+        Task UpdateSpecialization(Specialization update);
 
         /// <summary>
         /// Remove an existing category specialization.
         /// </summary>
         /// <param name="id">Used to specify the data to remove.</param>
-        void RemoveSpecialization(int id);
+        Task RemoveSpecialization(int id);
 
         /// <summary>
         /// Get category specialization by id.
