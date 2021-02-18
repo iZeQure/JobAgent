@@ -13,13 +13,12 @@
                     </div>
 
                     <div class="modal-body">
-
-                        <ValidationSummary />
                         <DataAnnotationsValidator />
 
                         <div class="row">
                             <div class="col">
                                 <label for="inputCompany" class="admin-label col-form-label col-form-label-sm">Kontrakt for :</label>
+                                <ValidationMessage For="() => contractModel.SignedWithCompany" />
                                 <select id="inputCompany" class="form-control form-control-sm" @bind="contractModel.SignedWithCompany">
                                     <option value="0" selected>---Vælg en virksomhed fra listen---</option>
                                     @foreach (var company in companies)
@@ -30,6 +29,7 @@
                             </div>
                             <div class="col">
                                 <label for="inputSignedByUser" class="admin-label col-form-label col-form-label-sm">Underskrevet af :</label>
+                                <ValidationMessage For="() => contractModel.SignedByUser" />
                                 <select id="inputSignedByUser" class="form-control form-control-sm" @bind="contractModel.SignedByUser">
                                     <option value="0" selected>---Vælg en konsulent fra listen---</option>
                                     @foreach (var user in users)
@@ -45,12 +45,14 @@
                         <div class="row">
                             <div class="col">
                                 <label for="inputContactPerson" class="admin-label col-form-label col-form-label-sm">Virksomheds Kontakt Person :</label>
+                                <ValidationMessage For="() => contractModel.ContactPerson" />
                                 <input id="inputContactPerson" class="form-control form-control-sm" type="text" placeholder="Indtast navnet på kontakt personen.." @bind="contractModel.ContactPerson" />
                             </div>
                             <div class="col">
                                 <label for="inputContractFile" class="admin-label col-form-label col-form-label-sm">Vælg Kontrakt : </label>
                                 <div id="contractFileInput">
-                                    <Microsoft.AspNetCore.Components.Forms.InputFile OnChange="@OnInputFileChange" single />
+                                    <InputFile OnChange="@OnInputFileChange" single />
+                                    <ValidationMessage For="() => contractModel.Contract"/>
 
                                     @if (!string.IsNullOrEmpty(contractModel.ContractFileName))
                                     {
@@ -63,11 +65,11 @@
                                         </div>
                                     }
 
-                                    @if (!string.IsNullOrEmpty(contractDataUrl))
+                                    @if (!string.IsNullOrEmpty(contractDataUrlForPreview))
                                     {
                                         <h4 class="small text-muted">Kontrakt Preview</h4>
                                         <div class="container justify-content-center">
-                                            <iframe src="@contractDataUrl"
+                                            <iframe src="@contractDataUrlForPreview"
                                                     class="embed-responsive-item"
                                                     lang="da"
                                                     title="Kontrakt Preview"
@@ -86,10 +88,12 @@
                         <div class="row">
                             <div class="col">
                                 <label for="inputRegisteredDate" class="admin-label col-form-label col-form-label-sm">Kontrakt Registreret Dato :</label>
+                                <ValidationMessage For="() => contractModel.RegistrationDate" />
                                 <InputDate TValue="DateTime" @bind-Value="@(contractModel.RegistrationDate)" class="form-control form-control-sm" />
                             </div>
                             <div class="col">
                                 <label for="inputExpiryDate" class="admin-label col-form-label col-form-label-sm">Udløbsdato :</label>
+                                <ValidationMessage For="() => contractModel.ExpiryDate" />
                                 <InputDate TValue="DateTime" @bind-Value=@(contractModel.ExpiryDate) class="form-control form-control-sm" disabled />
                             </div>
                         </div>
@@ -115,19 +119,28 @@
     [Inject] protected AdminService AdminService { get; set; }
     [Inject] protected DataService DataService { get; set; }
 
-    private ContractModel contractModel = new ContractModel();
-    private IEnumerable<User> users = new List<User>();
-    private IEnumerable<Company> companies = new List<Company>();
+    private CancellationTokenSource cancelation;
+    private EditContext editContext;
+    private ContractModel contractModel;
+    private IEnumerable<User> users;
+    private IEnumerable<Company> companies;
+
+    long maxFileSize = 1024 * 1024 * 15;
 
     private bool isProcessing = false;
     private bool isLoadingData = false;
 
-    private string contractDataUrl = string.Empty;
-
-    private byte[] fileData = null;
+    private string contractDataUrlForPreview = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
+        cancelation = new();
+        contractModel = new();
+        editContext = new EditContext(contractModel);
+
+        users = new List<User>();
+        companies = new List<Company>();
+
         isLoadingData = true;
 
         await Task.Delay(500);
@@ -138,20 +151,17 @@
         await Task.Delay(500);
 
         isLoadingData = false;
-        StateHasChanged();
     }
 
     private async Task OnValidSubmit_CreateContract()
     {
         isProcessing = true;
 
-        if (fileData == null)
-        {
-            isProcessing = false;
-            return;
-        }
+        var buffer = new byte[contractModel.Contract.Size];
 
-        string uploadedFileName = await FileService.UploadFileAsync(fileData);
+        await contractModel.Contract.OpenReadStream(maxFileSize).ReadAsync(buffer, cancelation.Token);
+
+        string uploadedFileName = await FileService.UploadFileAsync(buffer);
 
         if (string.IsNullOrEmpty(uploadedFileName))
         {
@@ -163,52 +173,37 @@
         contractModel.ContractFileName = uploadedFileName;
         await AdminService.CreateContract(contractModel);
 
-        contractModel = new ContractModel();
-
         isProcessing = false;
 
         RefreshService.CallRefreshRequest();
         await JSRuntime.InvokeVoidAsync("modalToggle", "CreateContractModal");
+
+        contractModel = new();
+        contractDataUrlForPreview = string.Empty;
     }
 
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
-        contractDataUrl = string.Empty;
+        contractModel.Contract = e.File;
+        contractModel.ContractFileName = contractModel.Contract.Name;
 
-        //var maxAllowedFiles = 1;
-        //var format = "image/png";
-        var cFormat = "application/pdf";
+        var buffer = new byte[contractModel.Contract.Size];
 
-        var contract = e.File;
+        await contractModel.Contract.OpenReadStream().ReadAsync(buffer, cancelation.Token);
+        contractDataUrlForPreview = $"data:{contractModel.Contract.ContentType};base64,{FileService.EncodeFileToBase64(buffer)}";
 
-        if (contract != null)
-        {
-            contractModel.ContractFileName = contract.Name;
-
-            fileData = new byte[contract.Size];
-
-            try
-            {
-                await contract.OpenReadStream().ReadAsync(fileData);
-                var cUrl = $"data:{cFormat};base64,{FileService.EncodeFileToBase64(fileData)}";
-
-                contractDataUrl = cUrl;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+        editContext.NotifyFieldChanged(FieldIdentifier.Create(() => contractModel.Contract));
     }
 
     private void RemoveUploadedFile(MouseEventArgs e)
     {
         contractModel.ContractFileName = string.Empty;
-        contractDataUrl = string.Empty;
+        contractDataUrlForPreview = string.Empty;
     }
 
     private void CancelRequest(MouseEventArgs e)
     {
         contractModel = new ContractModel();
+        contractDataUrlForPreview = string.Empty;
     }
 }

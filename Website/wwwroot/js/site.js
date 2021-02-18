@@ -3,11 +3,19 @@ window.HTMLTitleElement = (title) => {
 };
 
 window.OnInformationChangeAnimation = (id) => {
-    var animation = document.getElementById(`${id}`).toggleClass('onInformationChangeAnimation');
+    $(`#${id}`).toggleClass('onInformationChangeAnimation');
 
     setTimeout(function () {
-        var timeout = document.getElementById(`${id}`).toggleClass('onInformationChangeAnimation');
+        $(`#${id}`).toggleClass('onInformationChangeAnimation');
     }, 6000);
+
+    //var animation = document.getElementById(`${id}`)
+    //animation.toggleClass('onInformationChangeAnimation');
+
+    //setTimeout(function () {
+    //    var timeout = document.getElementById(`${id}`)
+    //    timeout.toggleClass('onInformationChangeAnimation');
+    //}, 6000);
 };
 
 window.PopoverInformation = (name, body, color) => {
@@ -52,17 +60,31 @@ window.PopoverInformation = (name, body, color) => {
 };
 
 window.StaticModal = (elementId) => {
-    var sModal = document.getElementById(`${elementId}`).modal({
-        backdrop: 'static',
+    $(`#${elementId}`).modal({
+        backdrop: true,
         keyboard: false,
         show: false
     });
+
+    //var sModal = document.getElementById(`${elementId}`)
+
+    //sModal.modal({
+    //    backdrop: 'static',
+    //    keyboard: false,
+    //    show: false
+    //})
 };
 
 window.confirmRemove = (elementId) => {
-    var confirmRemoval = document.getElementById(`${elementId}`).modal('toggle');
+    $(`#${elementId}`).modal('toggle');
+
+    //var confirmRemoval = document.getElementById(`${elementId}`)
+    //confirmRemoval.modal('toggle')
 };
 
 window.modalToggle = (elementId) => {
-    var toggleModal = document.getElementById(`${elementId}`).modal('toggle');
+    $(`#${elementId}`).modal('toggle');
+
+    //var toggleModal = document.getElementById(`${elementId}`)
+    //toggleModal.modal('toggle')
 };

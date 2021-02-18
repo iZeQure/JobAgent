@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace JobAgent.Models
 
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Udfyld venligst et navn på kontraktens kontakt person.")]
         public string ContactPerson { get; set; } = string.Empty;
 
         [Required]
@@ -36,5 +37,33 @@ namespace JobAgent.Models
         [Required(ErrorMessage = "Vælg venligst en virksomhed fra listen.")]
         [Range(1, int.MaxValue, ErrorMessage = "Vælg venligst en virksomhed fra listen.")]
         public int SignedWithCompany { get; set; }
+
+        [Required(ErrorMessage = "Upload venlist en kontrakt.")]
+        [FileValidation(new[] { ".pdf" })]
+        public IBrowserFile Contract { get; set; }
+    }
+
+    class FileValidationAttribute : ValidationAttribute
+    {
+        public FileValidationAttribute(string[] allowedExtensions)
+        {
+            AllowedExtensions = allowedExtensions;
+        }
+
+        private string[] AllowedExtensions { get; }
+
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            var file = (IBrowserFile)value;
+
+            var extension = System.IO.Path.GetExtension(file.Name);
+
+            if (!AllowedExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
+            {
+                return new ValidationResult($"Filen skal være af en af disse udvidelser: {string.Join(", ", AllowedExtensions)}.", new[] { validationContext.MemberName });
+            }
+
+            return ValidationResult.Success;
+        }
     }
 }

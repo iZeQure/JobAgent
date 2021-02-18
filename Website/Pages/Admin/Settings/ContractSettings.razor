@@ -17,7 +17,7 @@
         }
         else
         {
-            <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#CreateContractModal">
+            <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#CreateContractModal" @onclick="RefreshContent">
                 Opret ny Kontrakt
             </a>
         }
@@ -167,6 +167,8 @@ else
 
     private async Task RefreshContent()
     {
+        showContractModel = new();
+
         try
         {
             var contracts = await AdminService.GetContracts();
@@ -192,8 +194,6 @@ else
 
     private async Task OnClick_ShowContractModal(string name, string companyName)
     {
-        showContractModel = new();
-
         showContractModel.ContractIsLoading = true;
         showContractModel.ViewContractMessage = "Verificere kontrakt.";
 
@@ -225,11 +225,11 @@ else
                 return;
             }
 
-            showContractModel.ViewContractMessage = string.Empty;
-            showContractModel.ContractIsLoading = false;
-
             showContractModel.ContractForCompanyName = companyName;
             showContractModel.EncodedContractData = encodedFileInfo;
+
+            showContractModel.ViewContractMessage = string.Empty;
+            showContractModel.ContractIsLoading = false;
         }
         catch (Exception)
         {

@@ -10,8 +10,8 @@ namespace JobAgent.Data.Security
 {
     public class MyAuthStateProvider : AuthenticationStateProvider
     {
-        private ILocalStorageService LocalStorageService;
-        private IUserService UserService;
+        private readonly ILocalStorageService _localStorageService;
+        private readonly IUserService _userService;
 
         /// <summary>
         /// Access the value for the access token in the memory.
@@ -28,8 +28,8 @@ namespace JobAgent.Data.Security
 
         public MyAuthStateProvider(ILocalStorageService localStorageService, IUserService userService)
         {
-            LocalStorageService = localStorageService;
-            UserService = userService;
+            _localStorageService = localStorageService;
+            _userService = userService;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -41,12 +41,12 @@ namespace JobAgent.Data.Security
             User user;
 
             // Get the access token, from current auth state.
-            string accessToken = await LocalStorageService.GetItemAsync<string>(ACCESS_TOKEN);
+            string accessToken = await _localStorageService.GetItemAsync<string>(ACCESS_TOKEN);
 
             if (!string.IsNullOrWhiteSpace(accessToken) && !string.IsNullOrEmpty(accessToken))
             {
                 // Get the user by access token.
-                user = await UserService.GetUserByAccessToken(accessToken);
+                user = await _userService.GetUserByAccessToken(accessToken);
 
                 // TODO : Call get claims identity, to store the user into.
                 // Get claims identity with the authenticated user.
@@ -70,7 +70,7 @@ namespace JobAgent.Data.Security
         public async Task MarkUserAsAuthenticated(User user)
         {
             // Set the access token in the local memory.
-            await LocalStorageService.SetItemAsync(ACCESS_TOKEN, user.AccessToken);
+            await _localStorageService.SetItemAsync(ACCESS_TOKEN, user.AccessToken);
 
             // Get current identity for the user.
             ClaimsIdentity identity = GetClaimsIdentity(user);
@@ -89,7 +89,7 @@ namespace JobAgent.Data.Security
         public async Task MarkUserAsLoggedOut()
         {
             // Remove access token from the memory.
-            await LocalStorageService.RemoveItemAsync(ACCESS_TOKEN);
+            await _localStorageService.RemoveItemAsync(ACCESS_TOKEN);
 
             // Initialize new identity.
             ClaimsIdentity identity = new ClaimsIdentity();
