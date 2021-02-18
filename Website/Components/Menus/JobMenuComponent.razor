@@ -1,29 +1,26 @@
-﻿@inject JobService JobService
-@inject DataService DataService
-
-@if (JobCategories.Equals(null) || !JobCategories.Any() || JobCategories.Count().Equals(0))
+﻿@if (menu.Equals(null) || !menu.Any())
 {
-    <MessageAlert Alert="@AlertType" Message="@SystemMessage" IsLoading="@IsLoading" />
+    <MessageAlert Alert="@alert" Message="@systemMessage" IsLoading="@dataIsLoading" />
 }
 else
 {
     <div class="py-1 px-2">
-        <a class="btn btn-link btn-sm text-wrap text-left @MenuColor" href="/job/uncategorized">
+        <a class="btn btn-link btn-sm text-wrap text-left @menuCssColor" href="/job/uncategorized">
             Ikke kategoriserert <span class="badge badge-info">@(GetUncategorizedCount().Result)</span>
         </a>
     </div>
 
-    @for (int i = 0; i < JobCategories.Count(); i++)
+    @for (int i = 0; i < menu.Count(); i++)
     {
-        @if (JobCategories.ElementAtOrDefault(i).Specializations != null)
+        @if (menu.ElementAtOrDefault(i).Specializations != null)
         {
             <div class="dropdown py-1 px-2">
-                <a id="@RemoveWhitespace(JobCategories.ElementAtOrDefault(i).Name)DropdownMenu" class="@MenuColor dropdown-toggle btn btn-link btn-sm text-wrap text-left cursor-pointer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    @JobCategories.ElementAtOrDefault(i).Name <span class="badge badge-info">@(GetCategoryCount(JobCategories.ElementAtOrDefault(i).Specializations.Select(x => x.CategoryId).First()).Result)</span>
+                <a id="@RemoveWhitespace(menu.ElementAtOrDefault(i).Name)DropdownMenu" class="@menuCssColor dropdown-toggle btn btn-link btn-sm text-wrap text-left cursor-pointer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    @menu.ElementAtOrDefault(i).Name <span class="badge badge-info">@(GetCategoryCount(menu.ElementAtOrDefault(i).Specializations.Select(x => x.CategoryId).First()).Result)</span>
                 </a>
 
-                <div class="dropdown-menu" aria-labelledby="@RemoveWhitespace(JobCategories.ElementAtOrDefault(i).Name)DropdownMenu">
-                    @if (JobCategories.ElementAtOrDefault(i).Specializations.Count > 1)
+                <div class="dropdown-menu" aria-labelledby="@RemoveWhitespace(menu.ElementAtOrDefault(i).Name)DropdownMenu">
+                    @if (menu.ElementAtOrDefault(i).Specializations.Count > 1)
                     {
                         <h6 class="dropdown-header">Uddannelses Specialer</h6>
                     }
@@ -34,11 +31,10 @@ else
 
                     <div class="dropdown-divider"></div>
 
-                    @for (int j = 0; j < JobCategories.ElementAtOrDefault(i).Specializations.Count; j++)
+                    @for (int j = 0; j < menu.ElementAtOrDefault(i).Specializations.Count; j++)
                     {
-                        // Link : {domain}/job/CategoryId/CategoryName/SpecializationId/SpecializationName
-                        <a class="dropdown-item text-wrap text-left" href="/job/@JobCategories.ElementAtOrDefault(i).Identifier/@JobCategories.ElementAtOrDefault(i).Specializations[j].Identifier">
-                            @JobCategories.ElementAtOrDefault(i).Specializations[j].Name <span class="badge badge-info">@(GetSpecializationCount(JobCategories.ElementAtOrDefault(i).Specializations[j].Identifier).Result)</span>
+                        <a class="dropdown-item text-wrap text-left" href="/job/@menu.ElementAtOrDefault(i).Identifier/@menu.ElementAtOrDefault(i).Specializations[j].Identifier">
+                            @menu.ElementAtOrDefault(i).Specializations[j].Name <span class="badge badge-info">@(GetSpecializationCount(menu.ElementAtOrDefault(i).Specializations[j].Identifier).Result)</span>
                         </a>
                     }
                 </div>
@@ -47,9 +43,8 @@ else
         else
         {
             <div class="py-1 px-2">
-                @* Link : {domain}/job/CategoryId/CategoryName *@
-                <a class="@MenuColor btn btn-link btn-sm text-wrap text-left" href="/job/@JobCategories.ElementAtOrDefault(i).Identifier">
-                    @JobCategories.ElementAtOrDefault(i).Name <span class="badge badge-info">@GetCategoryCount(JobCategories.ElementAtOrDefault(i).Identifier).Result</span>
+                <a class="@linkCssColor btn btn-link btn-sm text-wrap text-left" href="/job/@menu.ElementAtOrDefault(i).Identifier">
+                    @menu.ElementAtOrDefault(i).Name <span class="badge badge-info">@GetCategoryCount(menu.ElementAtOrDefault(i).Identifier).Result</span>
                 </a>
             </div>
         }
@@ -57,40 +52,55 @@ else
 }
 
 @code {
-    IEnumerable<Category> JobCategories = new List<Category>();
+    [Inject] JobService JobService { get; set; }
+    [Inject] DataService DataService { get; set; }
 
-    public string MenuColor { get; set; } = "text-light";
+    private IEnumerable<Category> menu;
+    private MessageAlert.AlertType alert;
 
-    public string SystemMessage { get; set; } = string.Empty;
+    private string menuCssColor = "text-light";
+    private string linkCssColor = "text-light";
+    private string systemMessage = string.Empty;
 
-    private MessageAlert.AlertType AlertType { get; set; }
-    private bool IsLoading = false;
+    private bool dataIsLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadMenu();
+        menu = new List<Category>();
 
-        if (JobCategories.Equals(null))
-        {
-            AlertType = MessageAlert.AlertType.Warning;
-            SystemMessage = $"Kunne ikke indlæse menu!";
-        }
+        await LoadMenu();
     }
 
     protected async Task LoadMenu()
     {
+        if (menu == null)
+        {
+            alert = MessageAlert.AlertType.Error;
+            systemMessage = $"Menu kunne ikke findes.";
+
+            return;
+        }
+
         try
         {
-            AlertType = MessageAlert.AlertType.Info;
-            SystemMessage = "Indlæser menu..";
-            IsLoading = true;
+            dataIsLoading = true;
 
-            JobCategories = await JobService.GetJobMenuAsync();
+            alert = MessageAlert.AlertType.Info;
+            systemMessage = "Henter menu oplysninger..";
+
+            menu = await JobService.GetJobMenuAsync();
+
+            dataIsLoading = false;
+        }
+        catch (Exception)
+        {
+            dataIsLoading = false;
+            systemMessage = "Ukendt fejl ved indlæsning af menu.";
         }
         finally
         {
-            IsLoading = false;
-            SystemMessage = string.Empty;
+            dataIsLoading = false;
+            systemMessage = string.Empty;
         }
     }
 
