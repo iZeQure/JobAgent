@@ -172,9 +172,9 @@
 
         JobVacancyModel = new JobVacancyModel();
 
-        Companies = await DataService.GetAllCompanies();
-        Categories = await DataService.GetAllCategories();
-        Specializations = await DataService.GetAllSpecializations();
+        Companies = await DataService.GetAllCompaniesAsync();
+        Categories = await DataService.GetAllCategoriesAsync();
+        Specializations = await DataService.GetAllSpecializationsAsync();
 
         await Task.Delay(500);
 

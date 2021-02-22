@@ -27,9 +27,7 @@
 
 @if (_dataIsLoading)
 {
-    <MessageAlert IsLoading="_dataIsLoading" Message="Indlæser data...">
-
-    </MessageAlert>
+    <MessageAlert IsLoading="_dataIsLoading" Message="Indlæser data..." />
 }
 else
 {
@@ -203,8 +201,8 @@ else
         _dataIsLoading = true;
 
         var paginationModel = await JobService.JobAdvertPagination();
-        var categories = await DataService.GetAllCategories();
-        var companies = await DataService.GetAllCompanies();
+        var categories = await DataService.GetAllCategoriesAsync();
+        var companies = await DataService.GetAllCompaniesAsync();
 
         if (companies.Any() == false)
         {

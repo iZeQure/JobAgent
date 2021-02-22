@@ -153,8 +153,8 @@
         };
 
         // Get Consulent areas and locations.
-        ConsultantAreas = await DataService.GetAllConsultantAreasTask();
-        Locations = await DataService.GetAllLocationsTask();
+        ConsultantAreas = await DataService.GetAllConsultantAreasAsync();
+        Locations = await DataService.GetAllLocationsAsync();
     }
 
     private async Task OnValidSubmit_ChangeUserInformation()

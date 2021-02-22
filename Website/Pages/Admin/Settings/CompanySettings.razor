@@ -118,14 +118,14 @@ else
     {
         _dataIsLoading = true;
 
-        return await DataService.GetAllCompanies();
+        return await DataService.GetAllCompaniesAsync();
     }
 
     private async Task UpdateContentAsync()
     {
         try
         {
-            var companies = await DataService.GetAllCompanies();
+            var companies = await DataService.GetAllCompaniesAsync();
 
             if (companies != null)
             {
@@ -141,7 +141,7 @@ else
 
     private async void OnClick_OpenEditModal(int id)
     {
-        var company = await DataService.GetCompanyById(id);
+        var company = await DataService.GetCompanyByIdAsync(id);
 
         Model = new CompanyModel()
         {

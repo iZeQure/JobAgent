@@ -106,21 +106,21 @@ else
 
     protected async Task<int> GetCategoryCount(int id)
     {
-        int output = await DataService.GetCountOfJobAdvertsByCategory(id);
+        int output = await DataService.GetCountOfJobAdvertsByCategoryAsync(id);
 
         return output;
     }
 
     protected async Task<int> GetSpecializationCount(int id)
     {
-        int output = await DataService.GetCountOfJobAdvertsBySpecializationId(id);
+        int output = await DataService.GetCountOfJobAdvertsBySpecializationIdAsync(id);
 
         return output;
     }
 
     protected async Task<int> GetUncategorizedCount()
     {
-        int output = await DataService.GetCountOfJobAdvertsUncategorized();
+        int output = await DataService.GetCountOfJobAdvertsUncategorizedAsync();
 
         return output;
     }

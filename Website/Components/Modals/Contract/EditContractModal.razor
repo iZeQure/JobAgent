@@ -141,8 +141,8 @@
     {
         Task.Run(async () =>
         {
-            Companies = await DataService.GetAllCompanies();
-            Users = await DataService.GetUsers();
+            Companies = await DataService.GetAllCompaniesAsync();
+            Users = await DataService.GetUsersAsync();
         });
 
         return Task.CompletedTask;

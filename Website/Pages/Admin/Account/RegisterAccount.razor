@@ -6,49 +6,67 @@
 
 <PageDisplayName DisplayName="Opret en ny praktikkonsulent i systemet" />
 
-<MessageAlert Alert="MessageAlert.AlertType.Info" Message="@SystemMessage" FullWidth="false" />
-<MessageAlert Alert="MessageAlert.AlertType.Error" Message="@ErrorMessage" FullWidth="false" />
-<MessageAlert Alert="MessageAlert.AlertType.Success" Message="@Message" FullWidth="false" />
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    @if (errorOcurred)
+    {
+        <MessageAlert Alert="MessageAlert.AlertType.Error" Message="@errorMessage" FullWidth="false" />
+    }
+    else
+    {
+        <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="@errorMessage" FullWidth="false" />
+    }
+
+}
+
+@if (!string.IsNullOrEmpty(infoMessage))
+{
+    <MessageAlert Alert="MessageAlert.AlertType.Success" Message="@infoMessage" FullWidth="false" />
+}
 
 <div class="container">
 
-    @if (!IsLoadingInformation)
+    @if (dataIsLoading)
     {
-        <EditForm Model="RegisterAccountModel" OnValidSubmit="OnValidSubmit_RegisterAccountAsync" autocomplete="off">
+        <MessageAlert Alert="MessageAlert.AlertType.Info" Message="Henter oplysninger.." IsLoading="@dataIsLoading" />
+    }
+    else
+    {
+        <EditForm Model="regAccModel" OnValidSubmit="OnValidSubmit_RegisterAccountAsync" autocomplete="off">
 
             <DataAnnotationsValidator />
 
             <div class="row">
                 <div class="col">
                     <label for="inputEmail" class="admin-label">Email Adresse :</label>
-                    @if (UserAlreadyExists)
+                    @if (emailExists)
                     {
-                        <span class="d-inline-flex"><small class="text-danger font-weight-bolder">* Email er allerede tilknyttet en Praktikkonsulent.</small></span>
+                        <span class="d-inline-flex ml-2"><small class="text-danger font-weight-bolder">* Email er allerede tilknyttet en Bruger.</small></span>
                     }
-                    <input id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" @bind-value="RegisterAccountModel.Email" @onfocusout="OnFocusOut_CheckUserAlreadyExists" />
-                    <ValidationMessage For="@(() => RegisterAccountModel.Email)" />
+                    <input id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" @bind-value="regAccModel.Email" @onfocusout="OnEmailFocusOut_CheckForExistence" />
+                    <ValidationMessage For="@(() => regAccModel.Email)" />
                 </div>
             </div>
             <hr />
             <div class="row">
                 <div class="col">
                     <label for="inputFirstName" class="admin-label">Fornavn :</label>
-                    <input id="inputFirstName" type="text" class="form-control form-control-sm" placeholder="Fornavn" @bind-value="RegisterAccountModel.FirstName" />
-                    <ValidationMessage For="@(() => RegisterAccountModel.FirstName)" />
+                    <input id="inputFirstName" type="text" class="form-control form-control-sm" placeholder="Fornavn" @bind-value="regAccModel.FirstName" />
+                    <ValidationMessage For="@(() => regAccModel.FirstName)" />
                 </div>
 
                 <div class="col">
                     <label for="inputLastName" class="admin-label">Efternavn :</label>
-                    <input id="inputLastName" type="text" class="form-control form-control-sm" placeholder="Efternavn" @bind-value="RegisterAccountModel.LastName" />
-                    <ValidationMessage For="@(() => RegisterAccountModel.LastName)" />
+                    <input id="inputLastName" type="text" class="form-control form-control-sm" placeholder="Efternavn" @bind-value="regAccModel.LastName" />
+                    <ValidationMessage For="@(() => regAccModel.LastName)" />
                 </div>
             </div>
             <hr />
             <div class="row">
                 <div class="col">
                     <label for="inputConsultantArea" class="admin-label">Konsulent Område :</label>
-                    <select class="form-control form-control-sm" @bind="RegisterAccountModel.ConsultantAreaId">
-                        @if (!GetConsultantAreas.Any())
+                    <select class="form-control form-control-sm" @bind="regAccModel.ConsultantAreaId">
+                        @if (!consultantAreas.Any())
                         {
                             <option value="0" selected>Fandt ikke nogen områder..</option>
                         }
@@ -56,19 +74,19 @@
                         {
                             <option value="0" selected>Vælg et konsulent område</option>
 
-                            @foreach (var c in GetConsultantAreas)
+                            @foreach (var c in consultantAreas)
                             {
                                 <option value="@c.Identifier">@c.Name</option>
                             }
                         }
                     </select>
-                    <ValidationMessage For="@(() => RegisterAccountModel.ConsultantAreaId)" />
+                    <ValidationMessage For="@(() => regAccModel.ConsultantAreaId)" />
                 </div>
 
                 <div class="col">
                     <label for="inputLocation" class="admin-label">Lokation :</label>
-                    <select class="form-control form-control-sm" @bind="RegisterAccountModel.LocationId">
-                        @if (!GetLocations.Any())
+                    <select class="form-control form-control-sm" @bind="regAccModel.LocationId">
+                        @if (!locations.Any())
                         {
                             <option value="0" selected>Fandt ikke nogen lokationer..</option>
                         }
@@ -76,32 +94,32 @@
                         {
                             <option value="0" selected>Vælg en lokation</option>
 
-                            @foreach (var l in GetLocations)
+                            @foreach (var l in locations)
                             {
                                 <option value="@l.Identifier">@l.Name</option>
                             }
                         }
                     </select>
-                    <ValidationMessage For="@(() => RegisterAccountModel.LocationId)" />
+                    <ValidationMessage For="@(() => regAccModel.LocationId)" />
                 </div>
             </div>
             <hr />
             <div class="row">
                 <div class="col">
                     <label for="inputPassword" class="admin-label">Adgangskode :</label>
-                    <input id="inputPassword" type="password" class="form-control form-control-sm" placeholder="Adgangskode" @bind="RegisterAccountModel.Password" />
-                    <ValidationMessage For="@(() => RegisterAccountModel.Password)" />
+                    <input id="inputPassword" type="password" class="form-control form-control-sm" placeholder="Adgangskode" @bind="regAccModel.Password" />
+                    <ValidationMessage For="@(() => regAccModel.Password)" />
                 </div>
 
                 <div class="col">
                     <label for="inputConfirmPassword" class="admin-label">Bekræft Adgangskode :</label>
-                    <input id="inputConfirmPassword" type="password" class="form-control form-control-sm" placeholder="Bekræft adgangskode" @bind="RegisterAccountModel.ConfirmPassword" />
-                    <ValidationMessage For="@(() => RegisterAccountModel.ConfirmPassword)" />
-                    <ValidationSummary Model="RegisterAccountModel" />
+                    <input id="inputConfirmPassword" type="password" class="form-control form-control-sm" placeholder="Bekræft adgangskode" @bind="regAccModel.ConfirmPassword" />
+                    <ValidationMessage For="@(() => regAccModel.ConfirmPassword)" />
+                    <ValidationSummary Model="regAccModel" />
                 </div>
             </div>
-            <button type="submit" class="btn btn-info float-right ml-auto mt-5" disabled="@(IsProcessing || UserAlreadyExists)">
-                @if (IsProcessing)
+            <button type="submit" class="btn btn-info float-right ml-auto mt-5" disabled="@(isProcessingRequest || emailExists)">
+                @if (isProcessingRequest)
                 {
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                     <span>Opretter Praktikkonsulent...</span>
@@ -114,6 +132,7 @@
 
         </EditForm>
     }
+
 </div>
 
 @code {
@@ -121,86 +140,120 @@
     [Inject] private DataService DataService { get; set; }
     [Inject] private SecurityService SecurityService { get; set; }
 
-    private RegisterAccountModel RegisterAccountModel { get; set; } = new RegisterAccountModel();
+    private RegisterAccountModel regAccModel;
+    private User User;
+    private IEnumerable<ConsultantArea> consultantAreas;
+    private IEnumerable<Location> locations;
 
-    private User User { get; set; } = new User() { ConsultantArea = new ConsultantArea(), Location = new Location() };
-
-    public IEnumerable<ConsultantArea> GetConsultantAreas { get; protected set; } = new List<ConsultantArea>();
-    public IEnumerable<Location> GetLocations { get; protected set; } = new List<Location>();
-
-    public string SystemMessage { get; set; } = string.Empty;
-    public string ErrorMessage { get; set; } = string.Empty;
-    public string Message { get; set; } = string.Empty;
-    public bool IsLoadingInformation { get; set; } = true;
-    public bool IsProcessing { get; set; } = false;
-    public bool UserAlreadyExists = false;
+    private bool isProcessingRequest = false;
+    private bool dataIsLoading = false;
+    private bool errorOcurred = false;
+    private bool emailExists = false;
+    private string errorMessage = string.Empty;
+    private string infoMessage = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadInformationForModel();
+        consultantAreas = new List<ConsultantArea>();
+        locations = new List<Location>();
+        regAccModel = new();
+        User = new User { ConsultantArea = new(), Location = new() };
+
+        await LoadInformation();
     }
 
-    private async Task LoadInformationForModel()
+    private async Task LoadInformation()
     {
-        IsLoadingInformation = true;
-        SystemMessage = "Henter nødvendig information..";
+        errorOcurred = false;
+        dataIsLoading = true;
 
-        await Task.Delay(1250);
-
-        GetConsultantAreas = await DataService.GetAllConsultantAreasTask();
-        GetLocations = await DataService.GetAllLocationsTask();
-
-        await Task.Delay(1000);
-
-        SystemMessage = string.Empty;
-        IsLoadingInformation = false;
+        try
+        {
+            consultantAreas = await DataService.GetAllConsultantAreasAsync();
+            locations = await DataService.GetAllLocationsAsync();
+        }
+        catch (Exception)
+        {
+            errorOcurred = true;
+            errorMessage = "Kunne ikke hente nødvendig information, prøv igen senere.";
+        }
+        finally
+        {
+            dataIsLoading = false;
+        }
     }
 
     private async Task OnValidSubmit_RegisterAccountAsync()
     {
-        if (!UserAlreadyExists)
+        ClearMessages();
+
+        errorOcurred = false;
+        isProcessingRequest = true;
+
+        try
         {
-            IsProcessing = true;
-
-            await Task.Delay(1750);
-
-            if (UserService is UserService service)
+            if (emailExists)
             {
-                if (!service.CheckUserExistsAsync(RegisterAccountModel.Email).Result)
-                {
-                    await InvokeAsync(async () =>
-                    {
-                        var result = await service.RegisterUserAsync(RegisterAccountModel);
-
-                        if (string.IsNullOrEmpty(result.Email))
-                            ErrorMessage = "Kunne ikke oprette Praktikkonsulent.";
-                        else
-                            Message = "Praktikkonsulent blev oprettet!";
-                    });
-                }
-                else
-                {
-                    ErrorMessage = "Fejl, Praktikkonsulent eksistere allerede.";
-                }
+                CancelRegistrationRequest();
+                return;
             }
 
-            StateHasChanged();
-            RegisterAccountModel = new RegisterAccountModel();
+            var userService = (UserService)UserService;
 
-            await Task.Delay(1250);
+            var userResult = await userService.RegisterUserAsync(regAccModel);
 
-            IsProcessing = false;
-            SystemMessage = string.Empty;
-            ErrorMessage = string.Empty;
-            Message = string.Empty;
+            if (string.IsNullOrEmpty(userResult.Email))
+            {
+                errorMessage = "Ukendt fejl, Praktikkonsulent blev ikke oprettet.";
+                return;
+            }
+
+            infoMessage = "Praktikkonsulent blev oprettet succesfuldt";
+        }
+        catch (Exception)
+        {
+            errorOcurred = true;
+            errorMessage = "Ukendt Fejl.";
+        }
+        finally
+        {
+            isProcessingRequest = false;
+            regAccModel = new();
         }
     }
 
-    private async void OnFocusOut_CheckUserAlreadyExists(FocusEventArgs e)
+    private async Task OnEmailFocusOut_CheckForExistence(FocusEventArgs e)
     {
-        if (UserService is UserService service)
+        try
         {
-            UserAlreadyExists = await service.CheckUserExistsAsync(RegisterAccountModel.Email);
+            var userService = (UserService)UserService;
+
+            if (userService != null)
+            {
+                if (string.IsNullOrEmpty(regAccModel.Email) || string.IsNullOrWhiteSpace(regAccModel.Email))
+                {
+                    emailExists = false;
+                    return;
+                }
+
+                emailExists = await userService.CheckUserExistsAsync(regAccModel.Email);
+            }
         }
+        catch (Exception)
+        {
+            errorMessage = "Fejl ved tjek om email findes.";
+        }
+    }
+
+    private void CancelRegistrationRequest()
+    {
+        errorMessage = "Praktikkonsulent eksitere allerede.";
+        regAccModel.Email = string.Empty;
+    }
+
+    private void ClearMessages()
+    {
+        infoMessage = string.Empty;
+        errorMessage = string.Empty;
     }
 }

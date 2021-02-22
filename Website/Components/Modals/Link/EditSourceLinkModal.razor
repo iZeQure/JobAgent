@@ -90,7 +90,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Companies = await DataService.GetCompaniesWithContract() as List<Company>;
+        Companies = await DataService.GetCompaniesWithContractAsync() as List<Company>;
     }
 
     private async Task OnValidSubmit_EditSourceLink()

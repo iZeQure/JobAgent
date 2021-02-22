@@ -114,7 +114,7 @@ else
 
     private async Task OnClick_EditLink(int id)
     {
-        SourceLink = await DataService.GetSourceLinkById(id);
+        SourceLink = await DataService.GetSourceLinkByIdAsync(id);
     }
 
     private async Task RefreshContent()

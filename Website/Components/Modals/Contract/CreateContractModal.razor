@@ -145,8 +145,8 @@
 
         await Task.Delay(500);
 
-        companies = await DataService.GetCompaniesWithOutContract();
-        users = await DataService.GetUsers();
+        companies = await DataService.GetCompaniesWithOutContractAsync();
+        users = await DataService.GetUsersAsync();
 
         await Task.Delay(500);
 
