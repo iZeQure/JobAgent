@@ -27,7 +27,7 @@ function global:deactivate ([switch]$NonDestructive) {
 
 deactivate -nondestructive
 
-$env:VIRTUAL_ENV="C:\Users\chri45i4\PycharmProjects\JobAhentCrawler\venv"
+$env:VIRTUAL_ENV="F:\Projects\github_repos\work\JobAgent\PythonBot\venv"
 
 if (! $env:VIRTUAL_ENV_DISABLE_PROMPT) {
     # Set the prompt to include the env name
