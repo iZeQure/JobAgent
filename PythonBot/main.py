@@ -1,10 +1,10 @@
 import requests
 import pyodbc
+import dateparser
+import re
 from bs4 import BeautifulSoup
 from datetime import date
 from dateutil.relativedelta import relativedelta
-import dateparser
-import re
 
 title_list = ["title", "article__title", "article_title", "md-headline", "h1", "h2"]
 companyEmail_list = []
