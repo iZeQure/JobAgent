@@ -25,106 +25,152 @@
     </div>
 </div>
 
-@if (SourceLinks == null || SourceLinks.Count() == 0)
+@if (dataIsLoading)
 {
-    <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                  Message="Der blev ikke fundet nogen links."
-                  MessageOptional="Opret links, ved at trykke på knappen : Opret nyt Link. - Hvis knappen ikke er aktiveret, er det fordi der ikke blev fundet nogen kontrakter." />
+    <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="dataIsLoading" Message="Indlæser robot links.." />
 }
 else
 {
-    <div class="table-responsive table-responsive-sm table-responsive-md">
-        <table class="table table-sm table-striped table-hover">
-            <caption>Liste over virksomheders kontrakter..</caption>
-            <thead class="thead-dark">
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Virksomhed</th>
-                    <th scope="col">Link</th>
-                    <th scope="col"></th>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
-            <tbody>
+    @if (sourceLinks == null)
+    {
+        <MessageAlert Alert="MessageAlert.AlertType.Info"
+                      Message="Indlæser robot links.." IsLoading="true" />
+    }
+    else
+    {
+        @if (sourceLinks.Count().Equals(0))
+        {
+            <MessageAlert Alert="MessageAlert.AlertType.Warning"
+                          Message="Der blev ikke fundet nogen links."
+                          MessageOptional="Opret links, ved at trykke på knappen : Opret nyt Link. - Hvis knappen ikke er aktiveret, er det fordi der ikke blev fundet nogen kontrakter." />
+        }
+        else
+        {
+            <div class="table-responsive table-responsive-sm table-responsive-md">
+                <table class="table table-sm table-striped table-hover">
+                    <caption>Liste over virksomheders kontrakter..</caption>
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Virksomhed</th>
+                            <th scope="col">Link</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-                @foreach (var source in SourceLinks.OrderBy(x => x.Company.Name))
-                {
-                    <tr id="@(source.Identifier)">
-                        <th scope="row">@(source.Identifier)</th>
-                        <td>@(source.Company.Name)</td>
-                        <td>@(source.Link)</td>
+                        @foreach (var source in sourceLinks.OrderBy(x => x.Company.Name))
+                        {
+                            <tr id="@(source.Identifier)">
+                                <th scope="row">@(source.Identifier)</th>
+                                <td>@(source.Company.Name)</td>
+                                <td>@(source.Link)</td>
 
-                        <td>
-                            <span data-toggle="modal" data-target="#EditSourceLinkModal" @onclick="@(mouseEvent => OnClick_EditLink(source.Identifier))">
-                                <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne kontrakt." Color="Popover.PopoverType.Info" />
-                            </span>
-                        </td>
+                                <td>
+                                    <span data-toggle="modal" data-target="#EditsourceLinkModal" @onclick="@(mouseEvent => OnClick_EditLink(source.Identifier))">
+                                        <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne kontrakt." Color="Popover.PopoverType.Info" />
+                                    </span>
+                                </td>
 
-                        <td>
-                            <span data-toggle="modal" data-target="#RemoveConfirmationSourceLinkModal" @onclick="@(mouseEvent => ConfirmationWindow(source.Identifier))">
-                                <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
-                            </span>
-                        </td>
-                    </tr>
-                }
+                                <td>
+                                    <span data-toggle="modal" data-target="#RemoveConfirmationsourceLinkModal" @onclick="@(mouseEvent => ConfirmationWindow(source.Identifier))">
+                                        <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
+                                    </span>
+                                </td>
+                            </tr>
+                        }
 
-            </tbody>
-        </table>
-    </div>
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
 }
 
 @if (!disabled)
 {
     <CreateSourceLinkModal />
-    <EditSourceLinkModal SourceLink="SourceLink" />
-    <RemoveSourceLinkModal SourceLinkId="LinkId" />
+    <EditSourceLinkModal SourceLink="sourceLink" />
+    <RemoveSourceLinkModal SourceLinkId="sourceLinkId" />
 }
 
 @code {
-    [Inject]
-    private DataService DataService { get; set; }
+    [Inject] private DataService DataService { get; set; }
+    [Inject] private AdminService AdminService { get; set; }
+    [Inject] private IRefresh RefreshService { get; set; }
 
-    [Inject]
-    private AdminService AdminService { get; set; }
+    private IEnumerable<SourceLink> sourceLinks;
+    private SourceLink sourceLink;
 
-    [Inject]
-    private IRefresh RefreshService { get; set; }
-
-    private IEnumerable<SourceLink> SourceLinks { get; set; } = new List<SourceLink>();
-    private SourceLink SourceLink { get; set; }
-
-    private int LinkId { get; set; }
+    private int sourceLinkId = 0;
     private bool disabled = false;
+    private bool dataIsLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
         RefreshService.RefreshRequest += RefreshContent;
 
-        if (DataService.GetAllSourceLinksAsync() != null)
-            SourceLinks = await DataService.GetAllSourceLinksAsync();
+        sourceLinks = new List<SourceLink>();
+        sourceLink = new();
 
-        if ((await AdminService.GetContractsAsync()).Count() == 0)
-            disabled = true;
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        dataIsLoading = true;
+
+        try
+        {
+            var links = await DataService.GetAllSourceLinksAsync();
+            var contracts = await AdminService.GetContractsAsync();
+
+            if (links != null)
+            {
+                sourceLinks = links;
+            }
+
+            if (contracts.Count().Equals(0))
+            {
+                disabled = true;
+                return;
+            }
+
+            disabled = false;
+        }
+        catch (Exception)
+        {
+
+        }
+        finally
+        {
+            dataIsLoading = false;
+        }
     }
 
     private void ConfirmationWindow(int id)
     {
-        LinkId = id;
+        sourceLinkId = id;
     }
 
     private async Task OnClick_EditLink(int id)
     {
-        SourceLink = await DataService.GetSourceLinkByIdAsync(id);
+        sourceLink = await DataService.GetSourceLinkByIdAsync(id);
     }
 
     private async Task RefreshContent()
     {
         try
         {
-            if (DataService.GetAllSourceLinksAsync() != null)
-                SourceLinks = await DataService.GetAllSourceLinksAsync();
-            else
-                SourceLinks = null;
+            var links = await DataService.GetAllSourceLinksAsync();
+
+            if (links == null)
+            {
+                return;
+            }
+
+            sourceLinks = links;
         }
         finally
         {

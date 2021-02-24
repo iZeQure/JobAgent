@@ -4,9 +4,14 @@
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
 
-            @if (SourceLink != null)
+            @if (SourceLink == null)
             {
-                <EditForm Model="@(SourceLinkModel)" OnValidSubmit="OnValidSubmit_EditSourceLink">
+                <MessageAlert Alert="Notification.MessageAlert.AlertType.Warning"
+                              Message="Fejl ved indlæsning af robot link." />
+            }
+            else
+            {
+                <EditForm Model="@(model)" OnValidSubmit="OnValidSubmit_EditSourceLink">
 
                     <div class="modal-header">
                         <h5 class="modal-title" id="EditSourceLinkModalTitle">Ændre Oplysninger for Link :</h5>
@@ -24,13 +29,13 @@
                         <div class="row">
                             <div class="col">
                                 <label for="editLinkForCompany" class="admin-label">Virksomhed : <span class="small font-italic" style="color: lightcoral">Ikke muligt at ændre virksomhed endnu!</span></label>
-                                @if (Companies != null)
+                                @if (companies != null && SourceLink.Company != null)
                                 {
-                                    <select class="custom-select custom-select-sm" @bind="SourceLinkModel.CompanyId = SourceLink.Company.Identifier">
+                                    <select class="custom-select custom-select-sm" @bind="model.CompanyId = SourceLink.Company.Identifier">
                                         <option value="0">--Vælg en virksomhed fra listen--</option>
-                                        @foreach (var company in Companies)
+                                        @foreach (var company in companies)
                                         {
-                                            @if (SourceLinkModel.CompanyId == company.Identifier)
+                                            @if (model.CompanyId == company.Identifier)
                                             {
                                                 <option value="@(company.Identifier)" selected>@(company.Name)</option>
                                             }
@@ -40,7 +45,7 @@
                                             }
                                         }
                                     </select>
-                                    <ValidationMessage For="@(() => SourceLinkModel.CompanyId)" />
+                                    <ValidationMessage For="@(() => model.CompanyId)" />
                                 }
                             </div>
                         </div>
@@ -50,8 +55,8 @@
                         <div class="row">
                             <div class="col">
                                 <label for="editLink" class="admin-label">Link til Stillingsopslag :</label>
-                                <input id="editLink" class="form-control form-control-sm" placeholder="Indtast link til stillingsopslaget.." @bind="@(SourceLinkModel.Link = SourceLink.Link)" />
-                                <ValidationMessage For="@(() => SourceLinkModel.Link)" />
+                                <input id="editLink" class="form-control form-control-sm" placeholder="Indtast link til stillingsopslaget.." @bind="@(model.Link = SourceLink.Link)" />
+                                <ValidationMessage For="@(() => model.Link)" />
                             </div>
                         </div>
                     </div>
@@ -69,37 +74,55 @@
 </div>
 
 @code {
-    [Parameter]
-    public SourceLink SourceLink { get; set; } = new SourceLink() { Company = new Company() };
+    [Parameter] public SourceLink SourceLink { get; set; }
 
-    [Inject]
-    private DataService DataService { get; set; }
-    [Inject]
-    private AdminService AdminService { get; set; }
-    [Inject]
-    private IRefresh Refresh { get; set; }
-    [Inject]
-    private IJSRuntime JS { get; set; }
-    private SourceLinkModel SourceLinkModel { get; set; } = new SourceLinkModel();
-    private List<Company> Companies { get; set; }
+    [Inject] private DataService DataService { get; set; }
+    [Inject] private AdminService AdminService { get; set; }
+    [Inject] private IRefresh Refresh { get; set; }
+    [Inject] private IJSRuntime JS { get; set; }
 
-    private bool IsProcessing { get; set; }
-    private bool ShowMessage { get; set; }
+    private SourceLinkModel model;
+    private IEnumerable<Company> companies;
 
-    private string MessageAlert { get; set; }
+    private bool IsProcessing = false;
+    private bool ShowMessage = false;
+
+    private string MessageAlert = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        Companies = await DataService.GetCompaniesWithContractAsync() as List<Company>;
+        model = new();
+        companies = new List<Company>();
+
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            var companies = await DataService.GetCompaniesWithContractAsync();
+
+            if (companies == null)
+            {
+                return;
+            }
+
+            companies = this.companies;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     private async Task OnValidSubmit_EditSourceLink()
     {
         IsProcessing = true;
-        SourceLinkModel.Id = SourceLink.Identifier;
+        model.Id = SourceLink.Identifier;
 
         ShowMessage = true;
-        if (await AdminService.UpdateSourceLinkAsync(SourceLinkModel))
+        if (await AdminService.UpdateSourceLinkAsync(model))
         {
             MessageAlert = "Link successfuldt opdateret!";
         }
@@ -114,7 +137,7 @@
         MessageAlert = string.Empty;
 
         await JS.InvokeVoidAsync("modalToggle", "EditSourceLinkModal");
-        await JS.InvokeVoidAsync("OnInformationChangeAnimation", SourceLinkModel.Id);
+        await JS.InvokeVoidAsync("OnInformationChangeAnimation", model.Id);
 
         ShowMessage = false;
     }
