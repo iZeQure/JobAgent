@@ -1,3 +1,4 @@
+from objects.jobadvert import JobAdvert
 import pyodbc
 
 
@@ -32,3 +33,17 @@ class DatabaseAccess:
 
         output = conn.cursor().execute('SELECT [SourceURL] FROM [JobAdvert]')
         return output
+
+    def save_dataset(self, dataset: JobAdvert):
+        conn = pyodbc.connect('Driver={SQL Server Native Client 11.0};'
+                              f'Server={self.serverName};'
+                              f'Database={self.database};'
+                              f'UID={self.userId};'
+                              f'PWD={self.userPwd};')
+
+        sql = f"EXEC [CreateJobAdvert] '{str(dataset.title)}', '{str(dataset.email)}', '{str(dataset.phone_number)}'," \
+              f"'{str(dataset.description)}', '{str(dataset.location)}', '{str(dataset.reg_date)}', " \
+              f"'{str(dataset.deadline_date)}', '{str(dataset.source_url)}'," \
+              f"{str(dataset.company_id)}, {int(dataset.category_id)}, {int(dataset.category_specialization_id)}"
+        conn.cursor().execute(sql)
+        conn.cursor().commit()

@@ -1,4 +1,5 @@
 from access.databaseaccess import DatabaseAccess
+from objects.jobadvert import JobAdvert
 
 
 class DataService:
@@ -10,7 +11,16 @@ class DataService:
         self.data_access = DatabaseAccess()
 
     def initialize_crawler(self) -> bool:
-        self.source_links = self.data_access.get_source_links()
-        self.existing_source_links = self.data_access.get_existing_jobadvert_source_links()
+        try:
+            self.source_links = self.data_access.get_source_links()
+            self.existing_source_links = self.data_access.get_existing_jobadvert_source_links()
 
-        return True
+            return True
+        except ValueError:
+            return False
+
+    def save_dataset(self, dataset: JobAdvert):
+        try:
+            self.data_access.save_dataset(dataset)
+        except ValueError:
+            return

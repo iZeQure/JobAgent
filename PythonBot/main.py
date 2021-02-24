@@ -17,9 +17,12 @@ if is_initialized:
 
     raw_data = algorithm.get_raw_data(source_links=service.source_links)
 
-    jobadvert = algorithm.find_jobadvert_match(raw_data[0])
+    jobadvert_data_list = []
+    for raw in raw_data:
+        jobadvert_data_list.append(algorithm.find_jobadvert_match(raw))
 
-    print(jobadvert)
+    # for dataset in jobadvert_data_list:
+    #     service.save_dataset(dataset)
 
 else:
     print('Initializing Failed.')

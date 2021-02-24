@@ -1,4 +1,4 @@
-import datetime
+from datetime import date
 
 
 class JobAdvert:
@@ -8,8 +8,8 @@ class JobAdvert:
     phone_number = str
     description = str
     location = str
-    registered_date = datetime
-    deadline_date = datetime
+    registered_date = date
+    deadline_date = date
     source_url = str
     company_id= int
     category_id = int
@@ -36,7 +36,7 @@ class JobAdvert:
         """
         self.company_id = company_id
         self.deadline_date = deadline_date
-        self.reg_date = reg_date
+        self.registered_date = reg_date
         self.location = location
         self.description = description
         self.phone_number = phone_number
@@ -47,3 +47,7 @@ class JobAdvert:
         self.title = title
         self.id = jobadvert_id
 
+    def print(self):
+        print(f"{self.id} {self.title} {self.email} {self.phone_number} \n{self.description}\n"
+              f"{self.location} {self.registered_date} {self.deadline_date} {self.source_url} {self.company_id}"
+              f"{self.category_id} {self.category_specialization_id}")
