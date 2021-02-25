@@ -1,4 +1,4 @@
-from datetime import date
+import datetime
 
 
 class JobAdvert:
@@ -8,17 +8,17 @@ class JobAdvert:
     phone_number = str
     description = str
     location = str
-    registered_date = date
-    deadline_date = date
+    registered_date = datetime
+    deadline_date = datetime
     source_url = str
-    company_id= int
+    company_id = int
     category_id = int
     category_specialization_id = int
 
-    def __init__(self, jobadvert_id, title, email, phone_number,
-                 description, location, reg_date,
-                 deadline_date, source_url, company_id,
-                 category_id, category_specialization_id):
+    def __init__(self, jobadvert_id: int, title: str, email: str, phone_number: str,
+                 description: str, location: str, reg_date: datetime,
+                 deadline_date: datetime, source_url: str, company_id: int,
+                 category_id: int, category_specialization_id: int):
         """
         Initializes a new job advert class.
         @param jobadvert_id: an identifier of the object.
@@ -49,5 +49,5 @@ class JobAdvert:
 
     def print(self):
         print(f"{self.id} {self.title} {self.email} {self.phone_number} \n{self.description}\n"
-              f"{self.location} {self.registered_date} {self.deadline_date} {self.source_url} {self.company_id}"
-              f"{self.category_id} {self.category_specialization_id}")
+              f"{self.location} {self.registered_date} {self.deadline_date} \n{self.source_url}\n"
+              f"{self.company_id} {self.category_id} {self.category_specialization_id}")

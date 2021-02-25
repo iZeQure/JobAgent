@@ -1,52 +1,79 @@
 from time import sleep
 from re import match
-from requests import request
-from datetime import date
-from dateutil.relativedelta import relativedelta
 from selenium import webdriver
-
 from objects.jobadvert import JobAdvert
 from providers.searchalgorithmprovider import SearchAlgorithmProvider
+from services.dataservice import DataService
 
 
 class AlgorithmService:
+    """
+    Handles the communication with the available URLs for the raw data.
+    """
+    data_service: DataService
     raw_data = []
 
+    def __init__(self, data_service: DataService):
+        self.data_service = data_service
+
     def get_raw_data(self, source_links: []) -> []:
+        """
+        Achieves the raw data, from an URL.
+        @param source_links: A list of URLs.
+        @return: A dataset of raw html data.
+        """
         driver = webdriver.Firefox(executable_path='C:\\VirtualEnvironment\\geckodriver.exe')
         driver.minimize_window()
 
-        for url in source_links:
-            formatted_url = self.format_url(url[1])
+        for link in source_links:
+            try:
+                formatted_url = self.format_url(link[1])
 
-            # page_response_body = request("get", formatted_url)
-            # html_data = page_response_body.text
+                driver.get(formatted_url)
+                sleep(1)
 
-            driver.get(formatted_url)
-            sleep(1)
-            self.raw_data.append(str(driver.page_source))
+                self.raw_data.append((str(driver.page_source), str(formatted_url), int(link[0])))
+            except ValueError:
+                driver.close()
+                return None
 
         driver.quit()
         return self.raw_data
 
     @staticmethod
     def format_url(url: str):
+        """
+        Formats an URL, if it doesn't contain http | ftp | https.
+        @param url: The URL to format.
+        @return: A formatted URL.
+        """
         if not match('(?:http|ftp|https)://', url):
             return 'https://{}'.format(url)
         return url
 
-    @staticmethod
-    def find_jobadvert_match(raw_data: str) -> JobAdvert:
-        provider = SearchAlgorithmProvider(raw_data)
+    def find_jobadvert_match(self, raw_data: [str, str, int]) -> JobAdvert:
+        """
+        Algorithm to find jobadvert information, specified by the object.
+        @param raw_data: Raw HTML data.
+        @return: An JobAdvert object, containing the match of data.
+        """
+        provider = SearchAlgorithmProvider(raw_data[0], self.data_service)
 
-        jobadvert = JobAdvert(0, '', '', '', '', '', date.today(), date.today() + relativedelta(years=5), '', 0, 0, 0)
+        if provider is not None:
+            jobadvert = JobAdvert(
+                0,
+                provider.find_title(),
+                provider.find_email(),
+                provider.find_phone_number(),
+                provider.find_description(),
+                provider.find_location(),
+                provider.find_registration_date(),
+                provider.find_deadline_date(),
+                raw_data[1],
+                raw_data[2],
+                provider.find_category(),
+                provider.find_specialization()
+            )
 
-        jobadvert.title = provider.find_title()
-        jobadvert.email = provider.find_email()
-        jobadvert.phone_number = provider.find_phone_number()
-        jobadvert.description = provider.find_description()
-        jobadvert.location = provider.find_location()
-
-        print(jobadvert.print())
-
-        return jobadvert
+            return jobadvert
+        return None
