@@ -3,10 +3,8 @@ from services.algorithmservice import AlgorithmService
 from providers.searchalgorithmprovider import SearchAlgorithmProvider
 
 """
-Initializes Job Agent Crawler v1.0
+Starts Job Agent Crawler
 """
-
-jobadvert_data_list: []
 
 """ Initialize Services """
 print("Starting Services..")
@@ -23,22 +21,20 @@ try:
         print('Initializing Failed.')
         exit(501)
 
-    print(f'{initialized_information[1]} Initialized -> {initialized_information[2]}')
+    print(f'{initialized_information[1]} Initialized on v{initialized_information[3]}\n'
+          f'Responsibility: {initialized_information[2]}')
 
     print("Acquiring Source Data..")
     raw_data = algorithm_service.get_raw_data(source_links=data_service.get_source_links())
-    print("Done.")
 
-    print(f"Compiling [{len(jobadvert_data_list) + 1}] Job Adverts")
     jobadvert_data_list = []
+    print(f"Compiling Job Adverts..")
     for raw in raw_data:
         jobadvert_data_list.append(algorithm_service.find_jobadvert_match(raw))
-    print("Done.")
 
-    print(f"Saving Job Adverts.")
+    print(f"Saving <{len(jobadvert_data_list)}> compiled job advert(s).")
     for dataset in jobadvert_data_list:
         data_service.save_dataset(dataset)
-    print("Done.")
 
     print("Shutting Down.")
     exit(code=1)

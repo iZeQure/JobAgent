@@ -7,19 +7,15 @@ class DataService:
     Handles the data from and to the database.
     """
     data_access: DatabaseAccess
-    source_links: []
-    existing_source_links: []
     categories: []
     specializations: []
 
     def __init__(self):
         self.data_access = DatabaseAccess()
-        self.source_links = []
-        self.existing_source_links = []
-        self.categories = []
-        self.specializations = []
+        self.categories = self.data_access.get_categories()
+        self.specializations = self.data_access.get_category_specializations()
 
-    def initialize_crawler(self) -> [bool, str, str]:
+    def initialize_crawler(self) -> []:
         """
         Initializes the Crawler, with needed data from the database.
         @return: True on no errors.
@@ -28,19 +24,23 @@ class DataService:
             information = self.data_access.get_initialization_information()
 
             if information is not None:
-                values = [str, str]
+                values = [str, str, str]
 
                 for arg in information:
                     values[0] = arg[0]
                     values[1] = arg[1]
+                    values[2] = arg[2]
                     break
 
-                return True, values[0], values[1]
+                return True, values[0], values[1], values[2]
 
             return False
 
         except ValueError:
             return False
+
+    def get_keys_by_value(self, key_value: str) -> []:
+        return self.data_access.get_keys_by_value(key_value)
 
     def save_dataset(self, dataset: JobAdvert):
         """

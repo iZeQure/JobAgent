@@ -28,9 +28,23 @@ class DatabaseAccess:
     def get_initialization_information(self) -> []:
         self.connect(database="ZombieCrawlerDB")
 
-        sql = f"SELECT [Name], [Description] FROM [Crawler] WHERE [Name] LIKE '%Zombie%';"
+        sql = """
+        SELECT 
+            [Name], [Description], 
+            CONCAT([VersionControl].[Major],'.',[VersionControl].[Minor],'.',[VersionControl].[Patch]) AS VERSION  
+        FROM [Crawler] 
+        INNER JOIN [VersionControl]
+            ON [Crawler].[Id] = [VersionControl].[CrawlerId]
+        WHERE 
+            [Name] LIKE '%Zombie%';
+        """
 
         return self.cursor.execute(sql)
+
+    def get_keys_by_value(self, key_value: str) -> []:
+        self.connect(database="ZombieCrawlerDB")
+        sp_sql = f"EXEC [GetKeysByKeyValue] @key_value=?"
+        return self.cursor.execute(sp_sql, key_value)
 
     def get_source_links(self) -> []:
         self.connect()
