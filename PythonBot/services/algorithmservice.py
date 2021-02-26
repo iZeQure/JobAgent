@@ -3,18 +3,17 @@ from re import match
 from selenium import webdriver
 from objects.jobadvert import JobAdvert
 from providers.searchalgorithmprovider import SearchAlgorithmProvider
-from services.dataservice import DataService
 
 
 class AlgorithmService:
     """
     Handles the communication with the available URLs for the raw data.
     """
-    data_service: DataService
+    provider: SearchAlgorithmProvider
     raw_data = []
 
-    def __init__(self, data_service: DataService):
-        self.data_service = data_service
+    def __init__(self, algorithm_provider: SearchAlgorithmProvider):
+        self.provider = algorithm_provider
 
     def get_raw_data(self, source_links: []) -> []:
         """
@@ -57,22 +56,23 @@ class AlgorithmService:
         @param raw_data: Raw HTML data.
         @return: An JobAdvert object, containing the match of data.
         """
-        provider = SearchAlgorithmProvider(raw_data[0], self.data_service)
 
-        if provider is not None:
+        self.provider.set_page_source(raw_data[0])
+
+        if self.provider is not None:
             jobadvert = JobAdvert(
                 0,
-                provider.find_title(),
-                provider.find_email(),
-                provider.find_phone_number(),
-                provider.find_description(),
-                provider.find_location(),
-                provider.find_registration_date(),
-                provider.find_deadline_date(),
+                self.provider.find_title(),
+                self.provider.find_email(),
+                self.provider.find_phone_number(),
+                self.provider.find_description(),
+                self.provider.find_location(),
+                self.provider.find_registration_date(),
+                self.provider.find_deadline_date(),
                 raw_data[1],
                 raw_data[2],
-                provider.find_category(),
-                provider.find_specialization()
+                self.provider.find_category(),
+                self.provider.find_specialization()
             )
 
             return jobadvert

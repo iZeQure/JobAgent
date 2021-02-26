@@ -22,8 +22,10 @@ class SearchAlgorithmProvider:
 
     soup = str
 
-    def __init__(self, page_html: str, data_service: DataService):
+    def __init__(self, data_service: DataService):
         self.data_service = data_service
+
+    def set_page_source(self, page_html: str):
         self.soup = BeautifulSoup(page_html, 'html.parser')
 
     def find_title(self) -> str:

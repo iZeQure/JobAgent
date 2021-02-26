@@ -1,37 +1,47 @@
 from services.dataservice import DataService
 from services.algorithmservice import AlgorithmService
+from providers.searchalgorithmprovider import SearchAlgorithmProvider
 
 """
 Initializes Job Agent Crawler v1.0
 """
-print('Initializing Crawler..')
 
-service = DataService()
+jobadvert_data_list: []
 
-is_initialized = service.initialize_crawler()
+""" Initialize Services """
+print("Starting Services..")
+data_service = DataService()
+algorithm_provider = SearchAlgorithmProvider(data_service=data_service)
+algorithm_service = AlgorithmService(algorithm_provider=algorithm_provider)
 
-if is_initialized:
-    print('Crawler Initialized.')
+try:
+    print('Initializing Crawler..')
+    initialized_information = data_service.initialize_crawler()
 
-    jobadvert_data_list = []
-    algorithm = AlgorithmService(service)
+    """ Shutdown Crawler, if init failed. """
+    if initialized_information[0] is False:
+        print('Initializing Failed.')
+        exit(501)
+
+    print(f'{initialized_information[1]} Initialized -> {initialized_information[2]}')
 
     print("Acquiring Source Data..")
-    raw_data = algorithm.get_raw_data(source_links=service.source_links)
+    raw_data = algorithm_service.get_raw_data(source_links=data_service.get_source_links())
     print("Done.")
 
-    print(f"Compiling [{len(jobadvert_data_list)}] Job Adverts")
+    print(f"Compiling [{len(jobadvert_data_list) + 1}] Job Adverts")
+    jobadvert_data_list = []
     for raw in raw_data:
-        jobadvert_data_list.append(algorithm.find_jobadvert_match(raw))
+        jobadvert_data_list.append(algorithm_service.find_jobadvert_match(raw))
     print("Done.")
 
     print(f"Saving Job Adverts.")
     for dataset in jobadvert_data_list:
-        service.save_dataset(dataset)
+        data_service.save_dataset(dataset)
     print("Done.")
 
-else:
-    print('Initializing Failed.')
-
-print("Shutting Down.")
-exit(code=1)
+    print("Shutting Down.")
+    exit(code=1)
+except ValueError:
+    print("Error: 40 - Uncaught Exception.")
+    exit(code=40)

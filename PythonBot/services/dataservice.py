@@ -19,19 +19,26 @@ class DataService:
         self.categories = []
         self.specializations = []
 
-    def initialize_crawler(self) -> bool:
+    def initialize_crawler(self) -> [bool, str, str]:
         """
         Initializes the Crawler, with needed data from the database.
         @return: True on no errors.
         """
         try:
-            self.source_links = self.data_access.get_source_links()
-            self.existing_source_links = self.data_access.get_existing_jobadvert_source_links()
+            information = self.data_access.get_initialization_information()
 
-            self.categories = self.data_access.get_categories()
-            self.specializations = self.data_access.get_category_specializations()
+            if information is not None:
+                values = [str, str]
 
-            return True
+                for arg in information:
+                    values[0] = arg[0]
+                    values[1] = arg[1]
+                    break
+
+                return True, values[0], values[1]
+
+            return False
+
         except ValueError:
             return False
 
@@ -45,3 +52,6 @@ class DataService:
             self.data_access.save_dataset(dataset)
         except ValueError:
             return
+
+    def get_source_links(self) -> []:
+        return self.data_access.get_source_links()
