@@ -1,43 +1,55 @@
-from services.dataservice import DataService
-from services.algorithmservice import AlgorithmService
-from providers.searchalgorithmprovider import SearchAlgorithmProvider
+import logging
+import time
+
+from scriptdir.providers.searchalgorithmprovider import SearchAlgorithmProvider
+from scriptdir.services.algorithmservice import AlgorithmService
+from scriptdir.services.dataservice import DataService
+
+# logging.basicConfig(level=logging.INFO,
+#                     filename='zombie.log',
+#                     filemode='w',
+#                     format='%(asctime)s [%(levelname)s] - %(message)s',
+#                     datefmt='%m/%d/%Y %I:%M:%S %p')
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s [%(levelname)s] - %(message)s',
+                    datefmt='%m/%d/%Y %I:%M:%S %p')
 
 """
 Starts Job Agent Crawler
 """
 
 """ Initialize Services """
-print("Starting Services..")
+logging.info("Starting Services..")
+
 data_service = DataService()
 algorithm_provider = SearchAlgorithmProvider(data_service=data_service)
 algorithm_service = AlgorithmService(algorithm_provider=algorithm_provider)
 
 try:
-    print('Initializing Crawler..')
+    logging.info('Initializing Crawler..')
     initialized_information = data_service.initialize_crawler()
 
     """ Shutdown Crawler, if init failed. """
     if initialized_information[0] is False:
-        print('Initializing Failed.')
-        exit(501)
+        logging.error('Initializing Failed.')
+        logging.error('Initializing Failed.')
+    else:
+        logging.info(f'{initialized_information[1]} Initialized on v{initialized_information[3]}')
+        logging.info(f'Responsibility: {initialized_information[2]}')
 
-    print(f'{initialized_information[1]} Initialized on v{initialized_information[3]}\n'
-          f'Responsibility: {initialized_information[2]}')
+        logging.info("Acquiring Source Data..")
+        raw_data = algorithm_service.get_raw_data(source_links=data_service.get_source_links())
 
-    print("Acquiring Source Data..")
-    raw_data = algorithm_service.get_raw_data(source_links=data_service.get_source_links())
+        jobadvert_data_list = []
+        logging.info(f"Compiling Job Adverts..")
+        for raw in raw_data:
+            jobadvert_data_list.append(algorithm_service.find_jobadvert_match(raw))
 
-    jobadvert_data_list = []
-    print(f"Compiling Job Adverts..")
-    for raw in raw_data:
-        jobadvert_data_list.append(algorithm_service.find_jobadvert_match(raw))
+        logging.info(f"Saving <{len(jobadvert_data_list)}> compiled job advert(s).")
+        for dataset in jobadvert_data_list:
+            data_service.save_dataset(dataset)
 
-    print(f"Saving <{len(jobadvert_data_list)}> compiled job advert(s).")
-    for dataset in jobadvert_data_list:
-        data_service.save_dataset(dataset)
-
-    print("Shutting Down.")
-    exit(code=1)
+        logging.warning('Exiting in 10 seconds.')
+        time.sleep(10)
 except ValueError:
-    print("Error: 40 - Uncaught Exception.")
-    exit(code=40)
+    logging.exception("Error: 40 - Uncaught Exception.")
