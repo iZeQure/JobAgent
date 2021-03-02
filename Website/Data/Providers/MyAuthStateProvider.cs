@@ -5,13 +5,15 @@ using System.Collections.Generic;
 using Blazored.LocalStorage;
 using Pocos;
 using JobAgent.Services.Interfaces;
+using SecurityAccess.Acess;
 
-namespace JobAgent.Data.Security
+namespace JobAgent.Data.Providers
 {
     public class MyAuthStateProvider : AuthenticationStateProvider
     {
         private readonly ILocalStorageService _localStorageService;
         private readonly IUserService _userService;
+        private readonly IAccess _access;
 
         /// <summary>
         /// Access the value for the access token in the memory.
@@ -30,6 +32,7 @@ namespace JobAgent.Data.Security
         {
             _localStorageService = localStorageService;
             _userService = userService;
+            _access = new TokenAccess();
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -116,28 +119,7 @@ namespace JobAgent.Data.Security
         /// <returns>An identity with the user.</returns>
         public ClaimsIdentity GetClaimsIdentity(User user)
         {
-            // Initialize new identity.
-            ClaimsIdentity identity = new ClaimsIdentity();
-
-            // Check if the object isn't initialized.
-            if (user != null)
-            {
-                // Check if the obj is correct.
-                if (user.Identifier != 0)
-                {
-                    identity = new ClaimsIdentity(
-                                new List<Claim>
-                                {
-                                    new Claim("UserId", $"{user.Identifier}"),
-                                    new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
-                                    new Claim(ClaimTypes.Email, user.Email),
-                                    new Claim(ClaimTypes.Role, user.ConsultantArea.Name),
-                                    new Claim("LocationName", $"{user.Location.Name}")
-                                }, $"{user.AccessToken}");
-                }
-            }
-
-            return identity;
+            return _access.GetClaimsIdentity(user);
         }
     }
 }

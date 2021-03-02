@@ -1,7 +1,5 @@
 ﻿@page "/admin"
 
-@inject SecurityService SecurityService
-
 @attribute [Authorize]
 
 <AuthorizeView>
@@ -16,8 +14,7 @@
 </AuthorizeView>
 
 @code {
-    [CascadingParameter]
-    private Task<AuthenticationState> AuthenticationState { get; set; }
+    [CascadingParameter] private Task<AuthenticationState> AuthenticationState { get; set; }
 
     private string AdminUserMessage { get; set; }
     private string AdminName { get; set; }

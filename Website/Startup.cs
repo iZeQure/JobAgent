@@ -8,9 +8,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Components.Authorization;
 using Blazored.LocalStorage;
-using JobAgent.Data.Security;
+using JobAgent.Data.Providers;
 using JobAgent.Services;
 using JobAgent.Services.Interfaces;
+using SecurityAccess.Acess;
 
 namespace JobAgent
 {
@@ -27,7 +28,6 @@ namespace JobAgent
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<SecurityService>(); // Security Service.
             services.AddTransient<JobService>(); // Job Service.
             services.AddTransient<DataService>(); // Data Service.
             services.AddTransient<AdminService>(); // Admin Service.    
@@ -55,9 +55,10 @@ namespace JobAgent
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IRefresh, RefreshService>();
+            services.AddScoped<SecurityProvider>();
             services.AddScoped<MyAuthStateProvider>();
             services.AddScoped<AuthenticationStateProvider>(provider =>
-                provider.GetRequiredService<MyAuthStateProvider>());                  
+                provider.GetRequiredService<MyAuthStateProvider>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

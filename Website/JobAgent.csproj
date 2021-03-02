@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Database\DataAccess.csproj" />
     <ProjectReference Include="..\Pocos\Pocos.csproj" />
+    <ProjectReference Include="..\SecurityAccess\SecurityAccess.csproj" />
   </ItemGroup>
 
   <ItemGroup>

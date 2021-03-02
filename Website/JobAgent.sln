@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "..\Database\D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessTests", "..\DatabaseTests\DataAccessTests.csproj", "{E55DF47B-8068-4D9A-AFAC-E953CFDBEEBA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pocos", "..\Pocos\Pocos.csproj", "{EC3E9FED-79A0-4E31-A097-871C9C2BA75F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pocos", "..\Pocos\Pocos.csproj", "{EC3E9FED-79A0-4E31-A097-871C9C2BA75F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecurityAccess", "..\SecurityAccess\SecurityAccess.csproj", "{4CA88E54-131C-49D7-9EE0-8602475F331E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{EC3E9FED-79A0-4E31-A097-871C9C2BA75F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC3E9FED-79A0-4E31-A097-871C9C2BA75F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC3E9FED-79A0-4E31-A097-871C9C2BA75F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CA88E54-131C-49D7-9EE0-8602475F331E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CA88E54-131C-49D7-9EE0-8602475F331E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CA88E54-131C-49D7-9EE0-8602475F331E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CA88E54-131C-49D7-9EE0-8602475F331E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

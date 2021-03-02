@@ -4,42 +4,43 @@ using DataAccess;
 using Pocos;
 using JobAgent.Models;
 using JobAgent.Services.Interfaces;
+using JobAgent.Data.Providers;
 
 namespace JobAgent.Services
 {
     public class UserService : IUserService
     {
-        private DataAccessManager DataAccessManager { get; }
-        private SecurityService SecurityService { get; }
+        private readonly DataAccessManager _dataAccessManager;
+        private readonly SecurityProvider _securityProvider;
 
         public UserService()
         {
-            DataAccessManager = new DataAccessManager();
-            SecurityService = new SecurityService();
+            _dataAccessManager = new();
+            _securityProvider = new();
         }
 
         public async Task<User> GetUserByAccessToken(string accessToken)
         {
-            return await DataAccessManager.UserDataAccessManager().GetUserByAccessToken(accessToken);
+            return await _dataAccessManager.UserDataAccessManager().GetUserByAccessToken(accessToken);
         }
 
         public async Task<User> LoginAsync(User user)
         {
             // Check the user exists.
-            if (await DataAccessManager.UserDataAccessManager().CheckUserExists(user.Email))
+            if (await _dataAccessManager.UserDataAccessManager().CheckUserExists(user.Email))
             {
                 // Get salt to hash password.
-                user.Salt = await DataAccessManager.UserDataAccessManager().GetUserSaltByEmail(user.Email);
+                user.Salt = await _dataAccessManager.UserDataAccessManager().GetUserSaltByEmail(user.Email);
 
                 if (user.Salt != string.Empty)
                 {
                     // Hash password with salt.
-                    user.Password = SecurityService.HashPasswordAsync(user.Password, user.Salt);
+                    user.Password = _securityProvider.HashPassword(user.Password, user.Salt);
 
                     // Validate password with server.
-                    if (await DataAccessManager.UserDataAccessManager().ValidatePassword(user.Password))
+                    if (await _dataAccessManager.UserDataAccessManager().ValidatePassword(user.Password))
                     {
-                        var returnedUser = await DataAccessManager.UserDataAccessManager().LogIn(user.Email, user.Password);
+                        var returnedUser = await _dataAccessManager.UserDataAccessManager().LogIn(user.Email, user.Password);
                         returnedUser.IsAuthenticatedByServer = true;
                         returnedUser.AccessToken = returnedUser.AccessToken;
 
@@ -57,7 +58,7 @@ namespace JobAgent.Services
 
         public async Task<bool> CheckUserExistsAsync(string email)
         {
-            var validation = await DataAccessManager.UserDataAccessManager().CheckUserExists(email);
+            var validation = await _dataAccessManager.UserDataAccessManager().CheckUserExists(email);
 
             if (validation)
             {
@@ -70,10 +71,10 @@ namespace JobAgent.Services
         public async Task<User> RegisterUserAsync(RegisterAccountModel registerAccountModel)
         {
             // Generate new salt.
-            string salt = SecurityService.GetNewSaltAsync();
+            string salt = _securityProvider.GetNewSalt();
 
             // Hash user's password.
-            string hashedSecret = SecurityService.HashPasswordAsync(registerAccountModel.Password, salt);
+            string hashedSecret = _securityProvider.HashPassword(registerAccountModel.Password, salt);
 
             var user = new User()
             {
@@ -92,7 +93,7 @@ namespace JobAgent.Services
 
             try
             {
-                await DataAccessManager.UserDataAccessManager().Create(user);
+                await _dataAccessManager.UserDataAccessManager().Create(user);
             }
             catch (Exception)
             {
@@ -104,7 +105,7 @@ namespace JobAgent.Services
 
         private string GenerateAccessToken(User user)
         {
-            return SecurityService.GenerateAccessToken(user);
+            return _securityProvider.GenerateAccessToken(user);
         }
     }
 }

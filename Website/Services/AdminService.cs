@@ -1,6 +1,8 @@
 ﻿using DataAccess;
+using JobAgent.Data.Providers;
 using JobAgent.Models;
 using Pocos;
+using SecurityAccess.Acess;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,16 +12,18 @@ namespace JobAgent.Services
 {
     public class AdminService
     {
-        private DataAccessManager DataAccessManager { get; }
+        private readonly DataAccessManager _dataAccessManager;
+        private readonly SecurityProvider _securityProvider;
 
         public AdminService()
         {
-            DataAccessManager = new DataAccessManager();
+            _dataAccessManager = new();
+            _securityProvider = new();
         }
 
         public async Task<User> GetUserByEmailAsync(string userMail)
         {
-            return await DataAccessManager.UserDataAccessManager().GetUserByEmail(userMail);
+            return await _dataAccessManager.UserDataAccessManager().GetUserByEmail(userMail);
         }
 
         public async Task<bool> UpdateUserInformationAsync(AccountModel accountModel)
@@ -36,7 +40,7 @@ namespace JobAgent.Services
 
             try
             {
-                await DataAccessManager.UserDataAccessManager().Update(user);
+                await _dataAccessManager.UserDataAccessManager().Update(user);
 
                 return true;
             }
@@ -48,10 +52,8 @@ namespace JobAgent.Services
 
         public async Task UpdateUserPasswordAsync(ChangePasswordModel auth)
         {
-            SecurityService securityService = new SecurityService();
-
-            string userSalt = await DataAccessManager.UserDataAccessManager().GetUserSaltByEmail(auth.Email);
-            var hashPassword = await Task.FromResult(securityService.HashPasswordAsync(auth.Password, userSalt));
+            string userSalt = await _dataAccessManager.UserDataAccessManager().GetUserSaltByEmail(auth.Email);
+            var hashPassword = _securityProvider.HashPassword(auth.Password, userSalt);
 
             auth.Password = hashPassword;
 
@@ -61,7 +63,7 @@ namespace JobAgent.Services
                 Password = auth.Password
             };
 
-            await DataAccessManager.UserDataAccessManager().UpdateUserPassword(user);
+            await _dataAccessManager.UserDataAccessManager().UpdateUserPassword(user);
         }
 
         public async Task<bool> UpdateJobVacancyAsync(JobVacancyModel data)
@@ -97,7 +99,7 @@ namespace JobAgent.Services
 
             try
             {
-                await DataAccessManager.JobAdvertDataAccessManager().Update(jobAdvert);
+                await _dataAccessManager.JobAdvertDataAccessManager().Update(jobAdvert);
 
                 return true;
             }
@@ -109,12 +111,12 @@ namespace JobAgent.Services
 
         public async Task<IEnumerable<JobAdvert>> GetJobVacanciesAsync()
         {
-            return await DataAccessManager.JobAdvertDataAccessManager().GetAllJobAdvertsForAdmins();
+            return await _dataAccessManager.JobAdvertDataAccessManager().GetAllJobAdvertsForAdmins();
         }
 
         public async Task<JobAdvert> GetJobVacancyDetailsByIdAsync(int id)
         {
-            return await DataAccessManager.JobAdvertDataAccessManager().GetJobAdvertDetailsForAdminsById(id);
+            return await _dataAccessManager.JobAdvertDataAccessManager().GetJobAdvertDetailsForAdminsById(id);
         }
 
         public async Task CreateJobVacancyAsync(JobVacancyModel model)
@@ -144,12 +146,12 @@ namespace JobAgent.Services
                     }
                 };
 
-            await DataAccessManager.JobAdvertDataAccessManager().Create(jobAdvert);
+            await _dataAccessManager.JobAdvertDataAccessManager().Create(jobAdvert);
         }
 
         public async Task RemoveJobVacancyByIdAsync(int id)
         {
-            await DataAccessManager.JobAdvertDataAccessManager().Remove(id);
+            await _dataAccessManager.JobAdvertDataAccessManager().Remove(id);
         }
 
         public async Task<bool> CreateContractAsync(ContractModel contractModel)
@@ -172,7 +174,7 @@ namespace JobAgent.Services
 
             try
             {
-                await DataAccessManager.ContractDataAccessManager().Create(contract);
+                await _dataAccessManager.ContractDataAccessManager().Create(contract);
 
                 return true;
             }
@@ -203,7 +205,7 @@ namespace JobAgent.Services
 
             try
             {
-                await DataAccessManager.ContractDataAccessManager().Update(contract);
+                await _dataAccessManager.ContractDataAccessManager().Update(contract);
 
                 return true;
             }
@@ -215,17 +217,17 @@ namespace JobAgent.Services
 
         public async Task RemoveContractAsync(int id)
         {
-            await DataAccessManager.ContractDataAccessManager().Remove(id);
+            await _dataAccessManager.ContractDataAccessManager().Remove(id);
         }
 
         public async Task<IEnumerable<Contract>> GetContractsAsync()
         {
-            return await DataAccessManager.ContractDataAccessManager().GetAll();
+            return await _dataAccessManager.ContractDataAccessManager().GetAll();
         }
 
         public async Task<Contract> GetContractByIdAsync(int contractId)
         {
-            return await DataAccessManager.ContractDataAccessManager().GetById(contractId);
+            return await _dataAccessManager.ContractDataAccessManager().GetById(contractId);
         }
 
         public async Task CreateCompanyAsync(CompanyModel companyModel)
@@ -237,7 +239,7 @@ namespace JobAgent.Services
                 URL = companyModel.URL
             };
 
-            await DataAccessManager.CompanyDataAccessManager().Create(company);
+            await _dataAccessManager.CompanyDataAccessManager().Create(company);
         }
 
         public async Task UpdateCompanyAsync(CompanyModel companyModel)
@@ -250,12 +252,12 @@ namespace JobAgent.Services
                 URL = companyModel.URL
             };
 
-            await DataAccessManager.CompanyDataAccessManager().Update(company);
+            await _dataAccessManager.CompanyDataAccessManager().Update(company);
         }
 
         public async Task RemoveCompanyByIdAsync(int id)
         {
-            await DataAccessManager.CompanyDataAccessManager().Remove(id);
+            await _dataAccessManager.CompanyDataAccessManager().Remove(id);
         }
 
         public async Task<bool> CreateSourceLinkAsync(SourceLinkModel sourceLinkModel)
@@ -271,7 +273,7 @@ namespace JobAgent.Services
 
             try
             {
-                await DataAccessManager.SourceLinkDataAccessManager().Create(sourceLink);
+                await _dataAccessManager.SourceLinkDataAccessManager().Create(sourceLink);
 
                 return true;
             }
@@ -285,7 +287,7 @@ namespace JobAgent.Services
         {
             try
             {
-                await DataAccessManager.SourceLinkDataAccessManager().Remove(id);
+                await _dataAccessManager.SourceLinkDataAccessManager().Remove(id);
 
                 return true;
             }
@@ -306,7 +308,7 @@ namespace JobAgent.Services
 
             try
             {
-                await DataAccessManager.SourceLinkDataAccessManager().Update(sourceLink);
+                await _dataAccessManager.SourceLinkDataAccessManager().Update(sourceLink);
 
                 return true;
             }
