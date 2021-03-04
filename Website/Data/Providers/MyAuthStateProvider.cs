@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Blazored.LocalStorage;
 using Pocos;
 using JobAgent.Services.Interfaces;
-using SecurityAccess.Acess;
+using SecurityAccess.Access;
 
 namespace JobAgent.Data.Providers
 {

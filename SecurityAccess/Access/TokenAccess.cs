@@ -6,7 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace SecurityAccess.Acess
+namespace SecurityAccess.Access
 {
     public class TokenAccess : IAccess
     {

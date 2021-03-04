@@ -1,5 +1,5 @@
 ﻿using Pocos;
-using SecurityAccess.Acess;
+using SecurityAccess.Access;
 using SecurityAccess.Cryptography;
 using System;
 using System.Collections.Generic;

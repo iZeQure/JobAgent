@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
 
-namespace SecurityAccess.Acess
+namespace SecurityAccess.Access
 {
     public interface IAccess
     {

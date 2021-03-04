@@ -11,7 +11,7 @@ using Blazored.LocalStorage;
 using JobAgent.Data.Providers;
 using JobAgent.Services;
 using JobAgent.Services.Interfaces;
-using SecurityAccess.Acess;
+using SecurityAccess.Access;
 
 namespace JobAgent
 {
