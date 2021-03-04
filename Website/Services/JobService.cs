@@ -60,7 +60,8 @@ namespace JobAgent.Services
 
         public async Task<IEnumerable<JobAdvert>> GetUncategorizedJobVacancies()
         {
-            return (await DataAccessManager.JobAdvertDataAccessManager().GetAll()).Where(x => x.Category.Identifier == 0).ToList();
+            return await DataAccessManager.JobAdvertDataAccessManager().GetAllUncategorized();
+            //return (await DataAccessManager.JobAdvertDataAccessManager().GetAll()).Where(x => x.Category.Identifier == 0).ToList();
         }
 
         public async Task<IEnumerable<JobAdvert>> GetJobVacanciesAsync(int id)

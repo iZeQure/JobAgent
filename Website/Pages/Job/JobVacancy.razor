@@ -4,18 +4,7 @@
 
 <PageTitle Title="Job" />
 
-@if (jobAdverts == null || !jobAdverts.Any())
-{
-    if (IsLoading)
-    {
-        <MessageAlert Alert="MessageAlert.AlertType.Info" Message="Vent Venligst!" MessageOptional="Henter stillingsopslag.." IsLoading="IsLoading" FullWidth="false" />
-    }
-    else
-    {
-        <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="Beklager! Job Agenten fandt ingen stillinger inden for denne kategori." FullWidth="false" />
-    }
-}
-else
+@if (jobAdverts != null)
 {
     <div class="card-columns">
         @foreach (var j in jobAdverts.OrderBy(date => date.JobRegisteredDate))
@@ -23,7 +12,10 @@ else
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">
-                        <a class="card-link" href="@(AppendWorldWideWebToStringIfNotExists(j.SourceURL).GetAwaiter().GetResult())" target="_blank">
+                        @{
+                            string appendedUrlString = DataService.AppendWorldWideWebToStringIfNotExists(j.SourceURL);
+                        }
+                        <a class="card-link" href="@(appendedUrlString)" target="_blank">
                             @(j.Title)
                         </a>
                     </h5>
@@ -39,91 +31,73 @@ else
             </div>
         }
     </div>
-}
 
-<DetailsVacancyModal Id="JobAdvertDetailsId" Details="AdvertDetails" />
+    <DetailsVacancyModal Details="AdvertDetails" />
+}
+else if (loadFailed)
+{
+    <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="Beklager, kunne ikke indlæse indholdet begrundet af en fejl." />
+}
+else
+{
+    <MessageAlert Alert="MessageAlert.AlertType.Info" Message="Indlæser indhold.." IsLoading="true" />
+}
 
 @code {
     [Parameter] public int JobAdvertId { get; set; }
-    [Parameter] public string JobAdvertName { get; set; }
     [Parameter] public int SpecializationId { get; set; }
-    [Parameter] public string SpecializationName { get; set; }
 
     [Inject] protected JobService JobService { get; set; }
+    [Inject] protected DataService DataService { get; set; }
     [Inject] protected NavigationManager NavigationManager { get; set; }
 
-    IEnumerable<JobAdvert> jobAdverts = new List<JobAdvert>();
-
+    private IEnumerable<JobAdvert> jobAdverts = new List<JobAdvert>();
     private JobAdvert AdvertDetails;
+    private bool loadFailed;
 
-    private bool IsLoading { get; set; } = false;
-
-    private int JobAdvertDetailsId;
-
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        NavigationManager.LocationChanged += HandleLocationChanged;
+        await LoadData();
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        await InvokeAsync(async () =>
-        {
-            await LoadJobVacancyData();
-        });
+        await LoadData();
     }
 
-    private async void HandleLocationChanged(object sender, LocationChangedEventArgs e)
+    private async Task GetJobAdvertDetails(int advertId)
     {
-        await LoadJobVacancyData();
-    }
-
-    private async void GetJobAdvertDetails(int advertId)
-    {
-        if (advertId != 0)
+        if (advertId == 0)
         {
-            JobAdvertDetailsId = advertId;
-            AdvertDetails = await JobService.GetJobVacancyById(advertId);
+            await Task.CompletedTask;
         }
+
+        AdvertDetails = await JobService.GetJobVacancyById(advertId);
     }
 
-    private async Task LoadJobVacancyData()
+    private async Task LoadData()
     {
-        IsLoading = true;
-
         try
         {
-            if (JobAdvertId == 0)
+            loadFailed = false;
+
+            if (JobAdvertId == 0 && SpecializationId == 0)
             {
-                jobAdverts = (await JobService.GetUncategorizedJobVacancies());
+                jobAdverts = await JobService.GetUncategorizedJobVacancies();
             }
             else if (SpecializationId == 0)
             {
-                jobAdverts = (await JobService.GetJobVacanciesAsync(JobAdvertId)).ToList();
+                jobAdverts = await JobService.GetJobVacanciesAsync(JobAdvertId);
             }
             else if (SpecializationId != 0)
             {
-                jobAdverts = (await JobService.GetJobSpecialVacanciesAsync(SpecializationId)).ToList();
+                jobAdverts = await JobService.GetJobSpecialVacanciesAsync(SpecializationId);
             }
         }
-        finally
+        catch (Exception ex)
         {
-            IsLoading = false;
-            await Task.CompletedTask;
-
-            StateHasChanged();
+            loadFailed = true;
+            Console.WriteLine($"Failed to load Job Adverts : {ex.Message}");
         }
-    }
-
-    private async Task<string> AppendWorldWideWebToStringIfNotExists(string url)
-    {
-        if (string.IsNullOrEmpty(url))
-            return await Task.FromResult(string.Empty);
-
-        if (url.Contains("www"))
-            return await Task.FromResult(url);
-
-        else
-            return await Task.FromResult(string.Concat("https://www.", url));
     }
 }

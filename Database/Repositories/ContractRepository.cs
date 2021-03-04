@@ -25,12 +25,7 @@ namespace DataAccess.Repositories
         public async Task Create(Contract create)
         {
             // Initialzie command obj.
-            using SqlCommand cmd = new SqlCommand()
-            {
-                CommandText = "CreateContract",
-                CommandType = CommandType.StoredProcedure,
-                Connection = _databaseAccess.GetConnection()
-            };
+            using SqlCommand cmd = _databaseAccess.GetCommand("CreateContract", CommandType.StoredProcedure);
 
             // Parameters.
             cmd.Parameters.AddWithValue("@contactPerson", create.ContactPerson);
@@ -45,7 +40,7 @@ namespace DataAccess.Repositories
 
             try
             {
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             finally
             {
@@ -58,18 +53,10 @@ namespace DataAccess.Repositories
             try
             {
                 // Initialize command obj.
-                using SqlCommand cmd = new SqlCommand()
-                {
-                    CommandText = "GetAllContracts",
-                    CommandType = CommandType.StoredProcedure,
-                    Connection = _databaseAccess.GetConnection()
-                };
-
-                // Open connection to database.
-                await _databaseAccess.OpenConnectionAsync();
+                using SqlCommand cmd = _databaseAccess.GetCommand("GetAllContracts", CommandType.StoredProcedure);
 
                 // Initialzie data reader.
-                using SqlDataReader reader = cmd.ExecuteReader();
+                using SqlDataReader reader = await _databaseAccess.GetSqlDataReader();
 
                 // Temporary list.
                 List<Contract> tempContracts = new List<Contract>();
@@ -78,7 +65,7 @@ namespace DataAccess.Repositories
                 if (reader.HasRows)
                 {
                     // Read data.
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         tempContracts.Add(
                             new Contract()
@@ -118,19 +105,12 @@ namespace DataAccess.Repositories
             try
             {
                 // Initialize command obj.
-                using SqlCommand c = new SqlCommand()
-                {
-                    CommandText = "GetContractById",
-                    CommandType = CommandType.StoredProcedure,
-                    Connection = _databaseAccess.GetConnection()
-                };
+                using SqlCommand c = _databaseAccess.GetCommand("GetContractById", CommandType.StoredProcedure);
 
                 c.Parameters.AddWithValue("@id", id);
 
-                await _databaseAccess.OpenConnectionAsync();
-
                 // Initialzie data reader.
-                using SqlDataReader r = c.ExecuteReader();
+                using SqlDataReader r = await _databaseAccess.GetSqlDataReader();
 
                 // Temporary contract.
                 Contract tempContract = new Contract();
@@ -139,7 +119,7 @@ namespace DataAccess.Repositories
                 if (r.HasRows)
                 {
                     // Read data.
-                    while (r.Read())
+                    while (await r.ReadAsync())
                     {
                         tempContract.Identifier = r.GetInt32("Id");
                         tempContract.ContactPerson = r.GetString("ContactPerson");
@@ -179,19 +159,13 @@ namespace DataAccess.Repositories
         {
             try
             {
-                using SqlCommand c = new SqlCommand()
-                {
-                    CommandText = "RemoveContract",
-                    CommandTimeout = 15,
-                    CommandType = CommandType.StoredProcedure,
-                    Connection = _databaseAccess.GetConnection()
-                };
+                using SqlCommand c = _databaseAccess.GetCommand("RemoveContract", CommandType.StoredProcedure);
 
                 c.Parameters.AddWithValue("@id", id);
 
                 await _databaseAccess.OpenConnectionAsync();
 
-                c.ExecuteNonQuery();
+                await c.ExecuteNonQueryAsync();
             }
             finally
             {
@@ -208,12 +182,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Initialize command obj.
-                using SqlCommand c = new SqlCommand()
-                {
-                    CommandText = "UpdateContract",
-                    CommandType = CommandType.StoredProcedure,
-                    Connection = _databaseAccess.GetConnection()
-                };
+                using SqlCommand c = _databaseAccess.GetCommand("UpdateContract", CommandType.StoredProcedure);
 
                 // Parameters.
                 c.Parameters.AddWithValue("@id", update.Identifier);
@@ -226,7 +195,7 @@ namespace DataAccess.Repositories
                 // Open connection to database.
                 await _databaseAccess.OpenConnectionAsync();
 
-                c.ExecuteNonQuery();
+                await c.ExecuteNonQueryAsync();
             }
             finally
             {

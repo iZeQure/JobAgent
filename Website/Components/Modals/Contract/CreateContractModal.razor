@@ -120,7 +120,6 @@
     [Inject] protected DataService DataService { get; set; }
 
     private CancellationTokenSource cancelation;
-    private EditContext editContext;
     private ContractModel contractModel;
     private IEnumerable<User> users;
     private IEnumerable<Company> companies;
@@ -136,19 +135,14 @@
     {
         cancelation = new();
         contractModel = new();
-        editContext = new EditContext(contractModel);
 
         users = new List<User>();
         companies = new List<Company>();
 
         isLoadingData = true;
 
-        await Task.Delay(500);
-
         companies = await DataService.GetCompaniesWithOutContractAsync();
         users = await DataService.GetUsersAsync();
-
-        await Task.Delay(500);
 
         isLoadingData = false;
     }
@@ -191,8 +185,6 @@
 
         await contractModel.Contract.OpenReadStream().ReadAsync(buffer, cancelation.Token);
         contractDataUrlForPreview = $"data:{contractModel.Contract.ContentType};base64,{FileService.EncodeFileToBase64(buffer)}";
-
-        editContext.NotifyFieldChanged(FieldIdentifier.Create(() => contractModel.Contract));
     }
 
     private void RemoveUploadedFile(MouseEventArgs e)

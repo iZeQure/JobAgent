@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +17,7 @@ namespace JobAgent.Services
         public FileService()
         {
             _sharedPath = Environment.GetEnvironmentVariable("SHARED_CONTRACT_PATH");
+            AddNetorkCredentials();
         }
 
         public string GetSharedPath { get { return _sharedPath; } }
@@ -50,8 +52,9 @@ namespace JobAgent.Services
 
                 return false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine($"Error : {ex.Message}");
                 return false;
             }
         }
@@ -126,6 +129,14 @@ namespace JobAgent.Services
             {
                 return string.Empty;
             }
+        }
+
+        private void AddNetorkCredentials()
+        {
+            NetworkCredential theNetworkCredential = new NetworkCredential($"jobagent", "Kode1234!");
+            CredentialCache theNetcache = new CredentialCache();
+
+            theNetcache.Add(host: _sharedPath, port: 139, "Basic", theNetworkCredential);
         }
     }
 }

@@ -30,10 +30,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Prepare command object with information.
-                using SqlCommand cmd = new SqlCommand("CreateCategory", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("CreateCategory", CommandType.StoredProcedure);
 
                 // Give the parameters some values.
                 cmd.Parameters.AddWithValue("@name", create.Name);
@@ -42,7 +39,7 @@ namespace DataAccess.Repositories
                 await _databaseAccess.OpenConnectionAsync();
 
                 // Execute the command.
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             finally
             {
@@ -55,10 +52,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Prepare command object with information.
-                using SqlCommand cmd = new SqlCommand("CreateSpecialization", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("CreateSpecialization", CommandType.StoredProcedure);
 
                 // Give the parameters some values.
                 cmd.Parameters.AddWithValue("@id", create.CategoryId);
@@ -68,7 +62,7 @@ namespace DataAccess.Repositories
                 await _databaseAccess.OpenConnectionAsync();
 
                 // Exectue the command.
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             finally
             {
@@ -86,10 +80,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Prepare command object with information.
-                using SqlCommand cmd = new SqlCommand("CreateSpecialization", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("CreateSpecialization", CommandType.StoredProcedure);
 
                 // Give the parameters some values.
                 cmd.Parameters.AddWithValue("@id", categoryId);
@@ -99,7 +90,7 @@ namespace DataAccess.Repositories
                 await _databaseAccess.OpenConnectionAsync();
 
                 // Exectue the command.
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             finally
             {
@@ -124,18 +115,10 @@ namespace DataAccess.Repositories
                 List<Category> tempCategories = new List<Category>();
 
                 // Prepare command object with information.
-                using SqlCommand cmd = new SqlCommand()
-                {
-                    CommandType = CommandType.StoredProcedure,
-                    CommandText = "GetAllCategories",
-                    Connection = _databaseAccess.GetConnection()
-                };
-
-                // Open connection to the database.
-                await _databaseAccess.OpenConnectionAsync();
+                using SqlCommand cmd = _databaseAccess.GetCommand("GetAllCategories", CommandType.StoredProcedure);
 
                 // Initialize Data reader.
-                using SqlDataReader reader = cmd.ExecuteReader();
+                using SqlDataReader reader = await _databaseAccess.GetSqlDataReader();
 
                 // Temp
                 Category temp = new Category();
@@ -144,7 +127,7 @@ namespace DataAccess.Repositories
                 if (reader.HasRows)
                 {
                     // Add data to the temp list while reading the data.
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         tempCategories.Add(new Category()
                         {
@@ -175,25 +158,15 @@ namespace DataAccess.Repositories
                 List<Category> tempCategories = new List<Category>();
 
                 // Prepare sql command object with information.
-                using SqlCommand cmd = new SqlCommand("GetAllCategoriesWithSpecialization", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure,
-                    CommandTimeout = 5
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("GetAllCategoriesWithSpecialization", CommandType.StoredProcedure);
 
-                // Open connection to the database.
-                await _databaseAccess.OpenConnectionAsync();
-
-                // Initialize a data reader.
-                //using SqlDataReader reader = await cmd.ExecuteReaderAsync();
-
-                using (SqlDataReader reader = cmd.ExecuteReader())
+                using (SqlDataReader reader = await _databaseAccess.GetSqlDataReader())
                 {
                     // Check if the reader has any rows.
                     if (reader.HasRows)
                     {
                         // Add data to the temporary list while reading.
-                        while (reader.Read())
+                        while (await reader.ReadAsync())
                         {
                             // Initialize temporary objects to store the data received from the database.
                             var Category = new Category();
@@ -291,16 +264,10 @@ namespace DataAccess.Repositories
                 List<Specialization> tempSpecializations = new List<Specialization>();
 
                 // Prepare command with information to execute.
-                using SqlCommand cmd = new SqlCommand("GetAllSpecializations", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
-
-                // Open connection to the database.
-                await _databaseAccess.OpenConnectionAsync();
+                using SqlCommand cmd = _databaseAccess.GetCommand("GetAllSpecializations", CommandType.StoredProcedure);
 
                 // Initialize data reader.
-                using SqlDataReader reader = cmd.ExecuteReader();
+                using SqlDataReader reader = await _databaseAccess.GetSqlDataReader();
 
                 // Temp
                 Specialization temp = new Specialization();
@@ -309,7 +276,7 @@ namespace DataAccess.Repositories
                 if (reader.HasRows)
                 {
                     // Add data to temporary list while reading.
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         tempSpecializations.Add(new Specialization()
                         {
@@ -342,23 +309,17 @@ namespace DataAccess.Repositories
                 Category tempCategory = new Category();
 
                 // Prepare command object with information.
-                using SqlCommand cmd = new SqlCommand("GetCategoryById", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("GetCategoryById", CommandType.StoredProcedure);
 
                 cmd.Parameters.AddWithValue("@id", id);
 
-                // Open connection to database.
-                await _databaseAccess.OpenConnectionAsync();
-
                 // Initialize data reader.
-                using SqlDataReader reader = cmd.ExecuteReader();
+                using SqlDataReader reader = await _databaseAccess.GetSqlDataReader();
 
                 // Check if any rows.
                 if (reader.HasRows)
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         // Get the row specified by the id.
                         tempCategory.Identifier = reader.GetInt32("Id");
@@ -388,25 +349,19 @@ namespace DataAccess.Repositories
                 Specialization tempSpecializationObj = new Specialization();
 
                 // Prepare command with information.
-                using SqlCommand cmd = new SqlCommand("GetSpecializationById", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("GetSpecializationById", CommandType.StoredProcedure);
 
                 // Add specialization to get.
                 cmd.Parameters.AddWithValue("@id", id);
 
-                // Open connection to database.
-                await _databaseAccess.OpenConnectionAsync();
-
                 // Initialize data reader.
-                using SqlDataReader reader = cmd.ExecuteReader();
+                using SqlDataReader reader = await _databaseAccess.GetSqlDataReader();
 
                 // Check for rows
                 if (reader.HasRows)
                 {
                     // Read the data
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         tempSpecializationObj.Identifier = reader.GetInt32("Id");
                         tempSpecializationObj.Name = reader.GetString("Name");
@@ -431,11 +386,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Prepare command object.
-                using SqlCommand cmd = new SqlCommand("RemoveCategory")
-                {
-                    CommandType = CommandType.StoredProcedure,
-                    Connection = _databaseAccess.GetConnection()
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("RemoveCategory", CommandType.StoredProcedure);
 
                 // Add category id parameter.
                 cmd.Parameters.AddWithValue("@id", id);
@@ -444,7 +395,7 @@ namespace DataAccess.Repositories
                 await _databaseAccess.OpenConnectionAsync();
 
                 // Execute command.
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             finally
             {
@@ -461,10 +412,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Prepare command object.
-                using SqlCommand cmd = new SqlCommand("RemoveSpecialization", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("RemoveSpecialization", CommandType.StoredProcedure);
 
                 // Define input parameters
                 cmd.Parameters.AddWithValue("@id", id);
@@ -473,7 +421,7 @@ namespace DataAccess.Repositories
                 await _databaseAccess.OpenConnectionAsync();
 
                 // Execute command.
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             finally
             {
@@ -490,10 +438,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Prepare command obj.
-                using SqlCommand cmd = new SqlCommand("UpdateCategory", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("UpdateCategory", CommandType.StoredProcedure);
 
                 // Define input parameters.
                 cmd.Parameters.AddWithValue("@id", update.Identifier);
@@ -503,7 +448,7 @@ namespace DataAccess.Repositories
                 await _databaseAccess.OpenConnectionAsync();
 
                 // Execute command.
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             finally
             {
@@ -516,10 +461,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Prepare command obj.
-                using SqlCommand cmd = new SqlCommand("UpdateSpecialization", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("UpdateSpecialization", CommandType.StoredProcedure);
 
                 // Define input parameters.
                 cmd.Parameters.AddWithValue("@categoryId", update.CategoryId);
@@ -530,7 +472,7 @@ namespace DataAccess.Repositories
                 await _databaseAccess.OpenConnectionAsync();
 
                 // Execute command.
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             finally
             {
@@ -547,10 +489,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Prepare command obj.
-                using SqlCommand cmd = new SqlCommand("UpdateSpecialization", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("UpdateSpecialization", CommandType.StoredProcedure);
 
                 // Define input parameters.
                 cmd.Parameters.AddWithValue("@categoryId", update.CategoryId);
@@ -561,7 +500,7 @@ namespace DataAccess.Repositories
                 await _databaseAccess.OpenConnectionAsync();
 
                 // Execute command.
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             finally
             {
@@ -577,16 +516,10 @@ namespace DataAccess.Repositories
                 List<Specialization> tempSpecializations = new List<Specialization>();
 
                 // Prepare command with information to execute.
-                using SqlCommand cmd = new SqlCommand("GetAllSpecializations", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
-
-                // Open connection to the database.
-                await _databaseAccess.OpenConnectionAsync();
+                using SqlCommand cmd = _databaseAccess.GetCommand("GetAllSpecializations", CommandType.StoredProcedure);
 
                 // Initialize data reader.
-                using SqlDataReader reader = cmd.ExecuteReader();
+                using SqlDataReader reader = await _databaseAccess.GetSqlDataReader();
 
                 // Temp
                 Specialization temp = new Specialization();
@@ -595,7 +528,7 @@ namespace DataAccess.Repositories
                 if (reader.HasRows)
                 {
                     // Add data to temporary list while reading.
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         tempSpecializations.Add(new Specialization()
                         {
@@ -623,25 +556,19 @@ namespace DataAccess.Repositories
                 Specialization tempSpecializationObj = new Specialization();
 
                 // Prepare command with information.
-                using SqlCommand cmd = new SqlCommand("GetSpecializationById", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("GetSpecializationById", CommandType.StoredProcedure);
 
                 // Add specialization to get.
                 cmd.Parameters.AddWithValue("@id", id);
 
-                // Open connection to database.
-                await _databaseAccess.OpenConnectionAsync();
-
                 // Initialize data reader.
-                using SqlDataReader reader = cmd.ExecuteReader();
+                using SqlDataReader reader = await _databaseAccess.GetSqlDataReader();
 
                 // Check for rows
                 if (reader.HasRows)
                 {
                     // Read the data
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         tempSpecializationObj.Identifier = reader.GetInt32("Id");
                         tempSpecializationObj.Name = reader.GetString("Name");
@@ -665,25 +592,22 @@ namespace DataAccess.Repositories
                 Category tempCategory = new Category();
 
                 // Prepare command object with information.
-                using SqlCommand cmd = new SqlCommand("GetCategoryById", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("GetCategoryById", CommandType.StoredProcedure);
 
                 cmd.Parameters.AddWithValue("@id", id);
 
-                // Open connection to database.
-                await _databaseAccess.OpenConnectionAsync();
-
                 // Initialize data reader.
-                using SqlDataReader reader = cmd.ExecuteReader();
+                using SqlDataReader reader = await _databaseAccess.GetSqlDataReader();
 
                 // Check if any rows.
                 if (reader.HasRows)
                 {
-                    // Get the row specified by the id.
-                    tempCategory.Identifier = reader.GetInt32("Id");
-                    tempCategory.Name = reader.GetString("Name");
+                    while (await reader.ReadAsync())
+                    {
+                        // Get the row specified by the id.
+                        tempCategory.Identifier = reader.GetInt32("Id");
+                        tempCategory.Name = reader.GetString("Name");
+                    }
                 }
 
                 // return data

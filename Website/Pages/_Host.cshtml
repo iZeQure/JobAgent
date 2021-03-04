@@ -31,8 +31,8 @@
 <body>
 
     <app>
-        <component type="typeof(App)" render-mode="Server" />
-        @*@(await Html.RenderComponentAsync<App>(RenderMode.Server))*@
+        @*<component type="typeof(App)" render-mode="Server" />*@
+        @(await Html.RenderComponentAsync<App>(RenderMode.Server))
     </app>
 
     <script src="_framework/blazor.server.js"></script>

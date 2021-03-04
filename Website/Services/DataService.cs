@@ -1,5 +1,6 @@
 ﻿using DataAccess;
 using Pocos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,12 +9,7 @@ namespace JobAgent.Services
 {
     public class DataService
     {
-        private DataAccessManager DataAccessManager { get; }
-
-        public DataService()
-        {
-            DataAccessManager = new DataAccessManager();
-        }
+        private DataAccessManager DataAccessManager { get; } = new DataAccessManager();
 
         public async Task<int> GetCountOfJobAdvertsByCategoryAsync(int id)
         {
@@ -88,6 +84,25 @@ namespace JobAgent.Services
         public static string TruncateString(string value, int maxChars)
         {
             return value.Length <= maxChars ? value : value.Substring(0, maxChars) + " ...";
+        }
+
+        public static string AppendWorldWideWebToStringIfNotExists(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+                return string.Empty;
+
+            if (url.Contains("www"))
+                return url;
+
+            else
+                return string.Concat("https://www.", url);
+        }
+
+        public static string RemoveWhitespace(string input)
+        {
+            return new string(input.ToCharArray()
+            .Where(c => !Char.IsWhiteSpace(c))
+            .ToArray());
         }
     }
 }

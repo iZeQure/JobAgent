@@ -29,10 +29,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Initialzie command obj.
-                using SqlCommand cmd = new SqlCommand("CheckUserExists", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("CheckUserExists", CommandType.StoredProcedure);
 
                 // Define input parameters.
                 cmd.Parameters.AddWithValue("@email", email);
@@ -45,7 +42,7 @@ namespace DataAccess.Repositories
                 await _databaseAccess.OpenConnectionAsync();
 
                 // Execute command, catch return value.
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
 
                 var result = returnParameter.Value;
 
@@ -65,10 +62,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Initialzie command obj.
-                using SqlCommand cmd = new SqlCommand("CreateUser", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("CreateUser", CommandType.StoredProcedure);
 
                 // Define input parameters.
                 cmd.Parameters.AddWithValue("@firstName", create.FirstName);
@@ -84,7 +78,7 @@ namespace DataAccess.Repositories
                 await _databaseAccess.OpenConnectionAsync();
 
                 // Execute command.
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             finally
             {
@@ -97,17 +91,10 @@ namespace DataAccess.Repositories
             try
             {
                 // Initialize command obj.
-                using SqlCommand c = new SqlCommand()
-                {
-                    CommandText = "GetAllUsers",
-                    CommandType = CommandType.StoredProcedure,
-                    Connection = _databaseAccess.GetConnection()
-                };
-
-                await _databaseAccess.OpenConnectionAsync();
+                using SqlCommand c = _databaseAccess.GetCommand("GetAllUsers", CommandType.StoredProcedure);
 
                 // Initialzie data reader.
-                using SqlDataReader r = await c.ExecuteReaderAsync();
+                using SqlDataReader r = await _databaseAccess.GetSqlDataReader();
 
                 // Temporary list.
                 List<User> tempUsers = new List<User>();
@@ -155,25 +142,19 @@ namespace DataAccess.Repositories
                 User tempUser = new User();
 
                 // Initialzie command obj.
-                using SqlCommand cmd = new SqlCommand("GetUserByEmail", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("GetUserByEmail", CommandType.StoredProcedure);
 
                 // Define input parameters.
                 cmd.Parameters.AddWithValue("@email", email);
 
-                // Open connection to database.
-                await _databaseAccess.OpenConnectionAsync();
-
                 // Initialzie data reader.
-                using SqlDataReader reader = cmd.ExecuteReader();
+                using SqlDataReader reader = await _databaseAccess.GetSqlDataReader();
 
                 // Check for data.
                 if (reader.HasRows)
                 {
                     // Read data.
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         tempUser = new User()
                         {
@@ -211,25 +192,19 @@ namespace DataAccess.Repositories
                 User tempUser = new User();
 
                 // Initialzie command obj.
-                using SqlCommand cmd = new SqlCommand("GetUserByAccessToken", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("GetUserByAccessToken", CommandType.StoredProcedure);
 
                 // Define input parameters.
                 cmd.Parameters.AddWithValue("@token", accessToken);
 
-                // Open connection to database.
-                await _databaseAccess.OpenConnectionAsync();
-
                 // Initialzie data reader.
-                using SqlDataReader reader = cmd.ExecuteReader();
+                using SqlDataReader reader = await _databaseAccess.GetSqlDataReader();
 
                 // Check for data.
                 if (reader.HasRows)
                 {
                     // Read data.
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         tempUser = new User()
                         {
@@ -275,25 +250,19 @@ namespace DataAccess.Repositories
             try
             {
                 // Initialize command obj.
-                using SqlCommand cmd = new SqlCommand("GetUserSaltByEmail", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("GetUserSaltByEmail", CommandType.StoredProcedure);
 
                 // Define input parameters.
                 cmd.Parameters.AddWithValue("@email", email);
 
-                // Open connection to database.
-                await _databaseAccess.OpenConnectionAsync();
-
                 // Initalize data reader.
-                using SqlDataReader reader = cmd.ExecuteReader();
+                using SqlDataReader reader = await _databaseAccess.GetSqlDataReader();
 
                 // Check if any data.
                 if (reader.HasRows)
                 {
                     // Read the data.
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         return reader.GetString("Salt");
                     }
@@ -316,26 +285,20 @@ namespace DataAccess.Repositories
                 User tempUser = new User();
 
                 // Initialize command obj.
-                using SqlCommand cmd = new SqlCommand("UserLogin", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("UserLogin", CommandType.StoredProcedure);
 
                 // Define input parameters.
                 cmd.Parameters.AddWithValue("@email", email);
                 cmd.Parameters.AddWithValue("@secret", password);
 
-                // Open connection to database.
-                await _databaseAccess.OpenConnectionAsync();
-
                 // Initialize data reader.
-                using SqlDataReader reader = cmd.ExecuteReader();
+                using SqlDataReader reader = await _databaseAccess.GetSqlDataReader();
 
                 // Check for data.
                 if (reader.HasRows)
                 {
                     // Read data.
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         tempUser.Identifier = reader.GetInt32("UserId");
                         tempUser.FirstName = reader.GetString("FirstName");
@@ -373,10 +336,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Initialzie command obj.
-                using SqlCommand cmd = new SqlCommand("UpdateUser", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("UpdateUser", CommandType.StoredProcedure);
 
                 // Define input parameters.
                 cmd.Parameters.AddWithValue("@id", update.Identifier).SqlDbType = SqlDbType.Int;
@@ -389,8 +349,8 @@ namespace DataAccess.Repositories
                 // Open connection to database.
                 await _databaseAccess.OpenConnectionAsync();
 
-                // Exectute command, catch return value.
-                int returnValue = cmd.ExecuteNonQuery();
+                // Exectute command
+                await cmd.ExecuteNonQueryAsync();
             }
             finally
             {
@@ -408,10 +368,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Initialize command obj.
-                using SqlCommand cmd = new SqlCommand("ValidatePassword", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("ValidatePassword", CommandType.StoredProcedure);
 
                 // Define input parameters.
                 cmd.Parameters.AddWithValue("@secret", password);
@@ -424,7 +381,7 @@ namespace DataAccess.Repositories
                 await _databaseAccess.OpenConnectionAsync();
 
                 // Execute command, catch return value.
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
 
                 var result = returnParameter.Value;
 
@@ -444,10 +401,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Initialize command obj.
-                using SqlCommand cmd = new SqlCommand("UpdateUserPassword", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("UpdateUserPassword", CommandType.StoredProcedure);
 
                 // Define input parameters.
                 cmd.Parameters.AddWithValue("@email", authorization.Email);
@@ -457,7 +411,7 @@ namespace DataAccess.Repositories
                 await _databaseAccess.OpenConnectionAsync();
 
                 // Execute cmd.
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             finally
             {

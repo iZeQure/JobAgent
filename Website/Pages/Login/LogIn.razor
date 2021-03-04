@@ -7,7 +7,9 @@
 <AuthorizeView>
     <Authorized>
         @if (true)
-        {<RedirectToAdminComponent />}
+        {
+            <RedirectToAdminComponent />
+        }
     </Authorized>
 </AuthorizeView>
 
@@ -63,8 +65,6 @@
     {
         IsProcessing = true;
 
-        await Task.Delay(1500);
-
         // Get values from the form.
         User.Email = UserLogInModel.Email.ToString();
         User.Password = UserLogInModel.Password;
@@ -78,12 +78,8 @@
             // Check if the credentials is validated.
             if (User.IsAuthenticatedByServer)
             {
-                await InvokeAsync(async () =>
-                {
                 // Mark User as authenticated to the service.
                 await MyAuthStateProvider.MarkUserAsAuthenticated(User);
-                    StateHasChanged();
-                });
 
                 NavManager.NavigateTo("/admin", true);
             }
@@ -96,8 +92,6 @@
         {
             LoginMessage = "Email er ikke gyldig.";
         }
-
-        await Task.Delay(1000);
 
         IsProcessing = false;
     }

@@ -1,9 +1,7 @@
-﻿@attribute [Authorize]
-
-<div class="modal fade" id="DetailsVacancyModal" tabindex="-1" role="dialog" aria-labelledby="DetailsVacancyModalTitle" aria-hidden="true">
+﻿<div class="modal fade" id="DetailsVacancyModal" tabindex="-1" role="dialog" aria-labelledby="DetailsVacancyModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
         <div class="modal-content">
-            @if (Id == 0 || Details == null)
+            @if (Details == null)
             {
                 <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="Henter detailjer på stillingsopslaget.." />
             }
@@ -53,7 +51,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Tilbage</button>
-                    <a class="btn btn-info text-light cursor-pointer" href="@(AppendWorldWideWebToStringIfNotExists(Details.SourceURL).GetAwaiter().GetResult())" target="_blank">Søg Job Opslag</a>
+                    <a class="btn btn-info text-light cursor-pointer" href="@(DataService.AppendWorldWideWebToStringIfNotExists(Details.SourceURL))" target="_blank">Søg Job Opslag</a>
                 </div>
             }
         </div>
@@ -62,21 +60,9 @@
 
 @code {
     [Parameter] public JobAdvert Details { get; set; }
-    [Parameter] public int Id { get; set; }
 
     [Inject] private JobService JobService { get; set; }
+    [Inject] private DataService DataService { get; set; }
 
     private string GoogleMapsLinkUrl { get; } = "https://www.google.com/maps/search/?api=1&query=";
-
-    private async Task<string> AppendWorldWideWebToStringIfNotExists(string url)
-    {
-        if (string.IsNullOrEmpty(url))
-            return await Task.FromResult(string.Empty);
-
-        if (url.Contains("www"))
-            return await Task.FromResult(url);
-
-        else
-            return await Task.FromResult(string.Concat("https://www.", url));
-    }
 }

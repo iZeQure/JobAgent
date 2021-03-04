@@ -1,13 +1,10 @@
 ﻿using DataAccess.SqlAccess.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
-using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DataAccess.SqlAccess
@@ -17,14 +14,14 @@ namespace DataAccess.SqlAccess
     /// </summary>
     public class SqlDatabaseAccess : IDatabaseAccess, IDisposable
     {
-        #region Fields
+        private static readonly CommandBehavior _commandBehavior = CommandBehavior.Default;
         private static readonly object _connectionLock = new object();
         private static string _connectionString = string.Empty;
         private static SqlDatabaseAccess _instance = null;
-        private readonly SqlConnection _sqlConnection = null;
-        #endregion
+        private static SqlConnection _sqlConnection = null;
+        private static SqlCommand _sqlCommand = null;
+        private static SqlDataReader _sqlDataReader = null;
 
-        #region Properties
         /// <summary>
         /// Get a new or current instance of the <see cref="SqlDatabaseAccess"/>.
         /// </summary>
@@ -40,43 +37,44 @@ namespace DataAccess.SqlAccess
                 }
             }
         }
-        #endregion
 
-        #region Constructors
         private SqlDatabaseAccess()
         {
-            if (_sqlConnection == null)
+            _sqlConnection = new SqlConnection(_connectionString);                       
+            _sqlConnection.StateChange += SqlConnection_StateChange;
+            _sqlConnection.InfoMessage += SqlConnection_InfoMessage;
+
+            try
             {
-                try
-                {
-                    var configuration = new ConfigurationBuilder()
-                        .AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json"), optional: false)
-                        //.AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "appsettings.Development.json"), optional: false)
-                        .Build();
+                var configuration = new ConfigurationBuilder()
+                    .AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json"), optional: false)
+                    .Build();
 
-                    if (configuration != null)
+                if (configuration != null)
+                {
+                    _connectionString = configuration.GetSection("ConnectionStrings").GetSection("Job.Agent.Database").Value;
+
+                    if (string.IsNullOrEmpty(_connectionString) == false)
                     {
-                        _connectionString = configuration.GetSection("ConnectionStrings").GetSection("Job.Agent.Database").Value;
-
-                        if (string.IsNullOrEmpty(_connectionString) == false)
-                        {
-                            _sqlConnection = new SqlConnection(_connectionString);
-
-                            _sqlConnection.Disposed += _sqlConnection_Disposed;
-                        }
-                        else
-                            throw new Exception($"Connection string couldn't be loaded.");
+                        _sqlConnection.ConnectionString = _connectionString;
                     }
-                    else
-                        throw new Exception($"Configuration couldn't be loaded.");
-                }
-                catch (Exception)
-                {
-                    throw;
                 }
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
-        #endregion
+
+        private void SqlConnection_InfoMessage(object sender, SqlInfoMessageEventArgs e)
+        {
+            Console.WriteLine($"SQL Info Message => {e.Message} : {e.Errors}");
+        }
+
+        private void SqlConnection_StateChange(object sender, StateChangeEventArgs e)
+        {
+            Console.WriteLine($"Connection State Changed => {e.OriginalState} to {e.CurrentState}");
+        }
 
         /// <summary>
         /// Get sql connection.
@@ -87,6 +85,22 @@ namespace DataAccess.SqlAccess
             return _sqlConnection;
         }
 
+        public SqlCommand GetCommand(string commandText, CommandType commandType)
+        {
+            _sqlCommand = new SqlCommand { Connection = _sqlConnection };
+            _sqlCommand.CommandText = commandText;
+            _sqlCommand.CommandType = commandType;
+
+            return _sqlCommand;
+        }
+
+        public async Task<SqlDataReader> GetSqlDataReader()
+        {
+            await OpenConnectionAsync();
+            _sqlDataReader = _sqlCommand.ExecuteReader(_commandBehavior);
+            return _sqlDataReader;
+        }
+
         /// <summary>
         /// Close connection.
         /// </summary>
@@ -95,7 +109,14 @@ namespace DataAccess.SqlAccess
             try
             {
                 if (_sqlConnection != null)
+                {
+                    if (_sqlConnection.State.Equals(ConnectionState.Closed))
+                    {
+                        return;
+                    }
+
                     _sqlConnection.Close();
+                }
             }
             catch (Exception)
             {
@@ -111,19 +132,16 @@ namespace DataAccess.SqlAccess
         {
             try
             {
-                if (_sqlConnection != null)
+                if (_sqlConnection.State != ConnectionState.Open && _sqlConnection.State != ConnectionState.Connecting)
                 {
-                    if (_sqlConnection.State != ConnectionState.Open)
-                    {
-                        await _sqlConnection.OpenAsync();
-                    }
-
-                    //while (_sqlConnection.State.Equals(ConnectionState.Connecting))
-                    //{
-                    //    await Task.Delay(25);
-                    //}
+                    await _sqlConnection.OpenAsync();
                 }
-
+                var attempts = 0;
+                while (_sqlConnection.State == ConnectionState.Connecting && attempts < 10)
+                {
+                    attempts++;
+                    Thread.Sleep(500);
+                }
             }
             catch (Exception)
             {
@@ -133,12 +151,7 @@ namespace DataAccess.SqlAccess
 
         public void Dispose()
         {
-            _sqlConnection.Dispose();
-        }
-
-        private void _sqlConnection_Disposed(object sender, EventArgs e)
-        {
-            Console.WriteLine($"Sql Conn disposed : {e}");
+            CloseConnection();
         }
     }
 }

@@ -192,29 +192,34 @@ else
         Refresh.RefreshRequest += RefreshAsync;
 
         await LoadData();
-
-        _dataIsLoading = !_dataIsLoading;
     }
 
     private async Task LoadData()
     {
         _dataIsLoading = true;
 
-        var paginationModel = await JobService.JobAdvertPagination();
-        var categories = await DataService.GetAllCategoriesAsync();
-        var companies = await DataService.GetAllCompaniesAsync();
-
-        if (companies.Any() == false)
+        try
         {
-            disabled = true;
+            var paginationModel = await JobService.JobAdvertPagination();
+            var categories = await DataService.GetAllCategoriesAsync();
+            var companies = await DataService.GetAllCompaniesAsync();
+
+            if (companies.Any() == false)
+            {
+                disabled = true;
+            }
+
+            if (paginationModel != null && categories != null)
+            {
+                PaginationModel = paginationModel;
+                Categories = categories;
+
+                return;
+            }
         }
-
-        if (paginationModel != null && categories != null)
+        finally
         {
-            PaginationModel = paginationModel;
-            Categories = categories;
-
-            return;
+            _dataIsLoading = false;
         }
     }
 

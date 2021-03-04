@@ -1,36 +1,24 @@
-﻿@if (dataIsLoading)
-{
-    <MessageAlert Alert="@MessageAlert.AlertType.Info" Message="Indlæser oplysninger.." IsLoading="@dataIsLoading" />
-}
-
-@if (menu != null && menu.Count() > 0)
+﻿@if (menu != null)
 {
     <div class="py-1 px-2">
         <a class="btn btn-link btn-sm text-wrap text-left @menuCssColor" href="/job/uncategorized">
-            <span class="mr-2">Ikke kategoriserert</span> <span class="badge badge-info">@(uncategorizedCount)</span>
+            <span class="mr-2">Ikke kategoriserert</span> <span class="badge badge-info">@(DataService.GetCountOfJobAdvertsUncategorizedAsync().Result)</span>
         </a>
     </div>
 
-    @for (int i = 0; i < menu.Count(); i++)
+    for (int jobAdvertIndex = 0; jobAdvertIndex < menu.Count(); jobAdvertIndex++)
     {
-        @if (menu.ElementAtOrDefault(i).Specializations != null)
+        if (menu.ElementAtOrDefault(jobAdvertIndex).Specializations != null)
         {
             <div class="dropright py-1 px-2">
-                @{
-                    Category menuItem = menu.ElementAtOrDefault(i);
-                    string nameWithoutWhitespaces = RemoveWhitespace(menuItem.Name);
-                }
 
-                <a id="@(nameWithoutWhitespaces)DropdownMenu" role="button" class="@menuCssColor dropdown-toggle btn btn-link btn-sm text-left cursor-pointer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="mr-2">@(menuItem.Name)</span>
-                    @if (GetCategoryCount(menuItem.Identifier).IsCompleted)
-                    {
-                        <span class="badge badge-info">@(categoryCount)</span>
-                    }
+                <a id="@(DataService.RemoveWhitespace(menu.ElementAtOrDefault(jobAdvertIndex).Name))-dropdown-menu" role="button" class="@menuCssColor dropdown-toggle btn btn-link btn-sm text-left cursor-pointer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="mr-2">@(menu.ElementAtOrDefault(jobAdvertIndex).Name)</span>
+                    <span class="badge badge-info">@(GetCategoryCount(menu.ElementAtOrDefault(jobAdvertIndex).Identifier).Result)</span>
                 </a>
 
                 <div class="dropdown-menu dropdown-menu-right" style="width:250px;">
-                    @if (menuItem.Specializations.Count > 1)
+                    @if (menu.ElementAtOrDefault(jobAdvertIndex).Specializations.Count > 1)
                     {
                         <h6 class="dropdown-header">Uddannelses Specialer</h6>
                     }
@@ -41,17 +29,11 @@
 
                     <div class="dropdown-divider"></div>
 
-                    @for (int j = 0; j < menuItem.Specializations.Count; j++)
+                    @for (int specializationIndex = 0; specializationIndex < menu.ElementAtOrDefault(jobAdvertIndex).Specializations.Count; specializationIndex++)
                     {
-                        <a class="dropdown-item text-left text-truncate w-auto" href="/job/@(menuItem.Identifier)/@(menuItem.Specializations[j].Identifier)">
-                            @{
-                                int selectedSpecializationId = menuItem.Specializations[j].Identifier;
-                            }
-                            @if (GetSpecializationCount(selectedSpecializationId).IsCompleted)
-                            {
-                                <span class="badge badge-info">@(specializationCount)</span>
-                            }
-                            <span class="ml-2">@(menuItem.Specializations[j].Name)</span>
+                        <a class="dropdown-item text-left text-truncate w-auto" href="/job/@(menu.ElementAtOrDefault(jobAdvertIndex).Identifier)/@(menu.ElementAtOrDefault(jobAdvertIndex).Specializations[specializationIndex].Identifier)">
+                            <span class="badge badge-info">@(GetSpecializationCount(menu.ElementAtOrDefault(jobAdvertIndex).Specializations[specializationIndex].Identifier).Result)</span>
+                            <span class="ml-2">@(menu.ElementAtOrDefault(jobAdvertIndex).Specializations[specializationIndex].Name)</span>
                         </a>
                     }
                 </div>
@@ -60,103 +42,98 @@
         else
         {
             <div class="py-1 px-2">
-                @{ var menuItem = menu.ElementAtOrDefault(i); }
-                <a class="@linkCssColor btn btn-link btn-sm text-wrap text-left" href="/job/@menuItem.Identifier">
-                    <span class="mr-2">@(menuItem.Name)</span>
-                    @if (GetCategoryCount(menuItem.Identifier).IsCompleted)
-                    {
-                        <span class="badge badge-info">@(categoryCount)</span>
-                    }
+                <a class="@linkCssColor btn btn-link btn-sm text-wrap text-left" href="/job/@menu.ElementAtOrDefault(jobAdvertIndex).Identifier">
+                    <span class="mr-2">@(menu.ElementAtOrDefault(jobAdvertIndex).Name)</span>
+                    <span class="badge badge-info">@(GetCategoryCount(menu.ElementAtOrDefault(jobAdvertIndex).Identifier).Result)</span>
                 </a>
             </div>
         }
     }
 }
+else if (loadFailed)
+{
+    <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="Beklager, kunne ikke indlæse indholdet begrundet af en fejl." />
+}
 else
 {
-    <MessageAlert Alert="@MessageAlert.AlertType.Warning" Message="Menuen blev ikke opdateret korrekt." MessageOptional="Vent lidt endnu, eller opdater siden igen." />
+    <MessageAlert Alert="MessageAlert.AlertType.Info" Message="Indlæser indhold.." IsLoading="true" />
 }
 
 @code {
     [Inject] JobService JobService { get; set; }
     [Inject] DataService DataService { get; set; }
 
-    private IEnumerable<Category> menu;
+    private IEnumerable<Category> menu = new List<Category>();
 
     private string menuCssColor = "text-light";
     private string linkCssColor = "text-light";
 
-    private int uncategorizedCount = 0;
-    private int categoryCount = 0;
-    private int specializationCount = 0;
-
-    private bool dataIsLoading = false;
+    private bool loadFailed;
 
     protected override async Task OnInitializedAsync()
     {
-        ShouldRender();
-        dataIsLoading = true;
-
-        await LoadMenu();
-
+        try
+        {
+            loadFailed = false;
+            menu = await JobService.GetJobMenuAsync();
+        }
+        catch (Exception ex)
+        {
+            loadFailed = true;
+            Console.WriteLine($"Failed to load Menu : {ex.Message}");
+        }
     }
 
-    protected override bool ShouldRender()
-    {
-        return base.ShouldRender();
-    }
-
-    protected async Task LoadMenu()
+    protected override async Task OnParametersSetAsync()
     {
         try
         {
-            uncategorizedCount = await DataService.GetCountOfJobAdvertsUncategorizedAsync();
-
+            loadFailed = false;
             menu = await JobService.GetJobMenuAsync();
+        }
+        catch (Exception ex)
+        {
+            loadFailed = true;
+            Console.WriteLine($"Failed to load Menu : {ex.Message}");
+        }
+    }
+
+    protected async Task<int> GetCategoryCount(int id)
+    {
+        try
+        {
+            return await DataService.GetCountOfJobAdvertsByCategoryAsync(id);
         }
         catch (Exception)
         {
-            menu = null;
-        }
-        finally
-        {
-            dataIsLoading = false;
+            Console.WriteLine("Kunne ikke hente antal af kategorier.");
+            return 0;
         }
     }
 
-    protected async Task GetCategoryCount(int id)
+    protected async Task<int> GetSpecializationCount(int id)
     {
         try
         {
-            categoryCount = await DataService.GetCountOfJobAdvertsByCategoryAsync(id);
+            return await DataService.GetCountOfJobAdvertsBySpecializationIdAsync(id);
         }
-        finally
+        catch (Exception)
         {
-            await Task.CompletedTask;
-        }
-    }
-
-    protected async Task GetSpecializationCount(int id)
-    {
-        try
-        {
-            specializationCount = await DataService.GetCountOfJobAdvertsBySpecializationIdAsync(id);
-        }
-        finally
-        {
-            await Task.CompletedTask;
+            Console.WriteLine("Kunne ikke hente antal af specialer.");
+            return 0;
         }
     }
 
     protected async Task<int> GetUncategorizedCount()
     {
-        return await DataService.GetCountOfJobAdvertsUncategorizedAsync();
-    }
-
-    protected string RemoveWhitespace(string input)
-    {
-        return new string(input.ToCharArray()
-        .Where(c => !Char.IsWhiteSpace(c))
-        .ToArray());
+        try
+        {
+            return await DataService.GetCountOfJobAdvertsUncategorizedAsync();
+        }
+        catch (Exception)
+        {
+            Console.WriteLine("Kunne ikke hente antal af ikke-kategoriseret kategorier.");
+            return 0;
+        }
     }
 }

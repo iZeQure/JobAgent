@@ -47,7 +47,5 @@
         user = (await AuthenticationState).User;
 
         if (user.Identity.IsAuthenticated) AuthorityLink = "admin";
-
-        base.StateHasChanged();
     }
 }
