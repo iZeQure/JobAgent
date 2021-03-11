@@ -63,7 +63,7 @@ else
     [Inject] JobService JobService { get; set; }
     [Inject] DataService DataService { get; set; }
 
-    private IEnumerable<Category> menu = new List<Category>();
+    private IEnumerable<Category> menu;
 
     private string menuCssColor = "text-light";
     private string linkCssColor = "text-light";
@@ -77,10 +77,9 @@ else
             loadFailed = false;
             menu = await JobService.GetJobMenuAsync();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             loadFailed = true;
-            Console.WriteLine($"Failed to load Menu : {ex.Message}");
         }
     }
 
@@ -91,10 +90,13 @@ else
             loadFailed = false;
             menu = await JobService.GetJobMenuAsync();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             loadFailed = true;
-            Console.WriteLine($"Failed to load Menu : {ex.Message}");
+        }
+        finally
+        {
+
         }
     }
 
@@ -106,7 +108,6 @@ else
         }
         catch (Exception)
         {
-            Console.WriteLine("Kunne ikke hente antal af kategorier.");
             return 0;
         }
     }
@@ -119,7 +120,6 @@ else
         }
         catch (Exception)
         {
-            Console.WriteLine("Kunne ikke hente antal af specialer.");
             return 0;
         }
     }
@@ -132,7 +132,6 @@ else
         }
         catch (Exception)
         {
-            Console.WriteLine("Kunne ikke hente antal af ikke-kategoriseret kategorier.");
             return 0;
         }
     }
