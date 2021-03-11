@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace JobAgent.Data.Providers
 {
@@ -21,11 +22,7 @@ namespace JobAgent.Data.Providers
         {
             get
             {
-                return 
-                    string.Join(
-                        Environment.GetEnvironmentVariable(IP_ADDRESS),
-                        Environment.GetEnvironmentVariable(UNC_CONTRACT_SHARE)
-                    );
+                return Environment.GetEnvironmentVariable(IP_ADDRESS) + Environment.GetEnvironmentVariable(UNC_CONTRACT_SHARE);
             }
         }
     }
