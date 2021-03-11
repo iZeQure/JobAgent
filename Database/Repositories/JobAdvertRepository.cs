@@ -120,7 +120,7 @@ namespace DataAccess.Repositories
 
                 JobAdvert tempData = new JobAdvert();
 
-                using SqlDataReader r = await command.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
+                using SqlDataReader r = await _databaseAccess.GetSqlDataReader();
 
                 if (r.HasRows)
                 {

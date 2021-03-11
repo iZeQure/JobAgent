@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,7 +41,7 @@ namespace DataAccess.SqlAccess
 
         private SqlDatabaseAccess()
         {
-            _sqlConnection = new SqlConnection(_connectionString);                       
+            _sqlConnection = new SqlConnection(_connectionString);
             _sqlConnection.StateChange += SqlConnection_StateChange;
             _sqlConnection.InfoMessage += SqlConnection_InfoMessage;
 
@@ -68,12 +69,12 @@ namespace DataAccess.SqlAccess
 
         private void SqlConnection_InfoMessage(object sender, SqlInfoMessageEventArgs e)
         {
-            Console.WriteLine($"SQL Info Message => {e.Message} : {e.Errors}");
+            Debug.WriteLine($"SQL Info Message => {e.Message} : {e.Errors}");
         }
 
         private void SqlConnection_StateChange(object sender, StateChangeEventArgs e)
         {
-            Console.WriteLine($"Connection State Changed => {e.OriginalState} to {e.CurrentState}");
+            Debug.WriteLine($"Sql Connection State Changed => {e.OriginalState} to {e.CurrentState} on {_sqlConnection.ClientConnectionId}");
         }
 
         /// <summary>
