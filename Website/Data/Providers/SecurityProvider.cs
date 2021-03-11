@@ -2,9 +2,6 @@
 using SecurityAccess.Access;
 using SecurityAccess.Cryptography;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace JobAgent.Data.Providers
 {
