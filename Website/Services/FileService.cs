@@ -1,11 +1,9 @@
-﻿using BlazorInputFile;
+﻿using JobAgent.Data.Providers;
 using JobAgent.Services.Interfaces;
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace JobAgent.Services
@@ -16,47 +14,50 @@ namespace JobAgent.Services
 
         public FileService()
         {
-            _sharedPath = Environment.GetEnvironmentVariable("SHARED_CONTRACT_PATH");
-            AddNetorkCredentials();
+            _sharedPath = EnvironmentProvider.GetUncPath;
         }
-
-        public string GetSharedPath { get { return _sharedPath; } }
 
         public bool CheckFileExists(string fileName)
         {
-            Console.WriteLine($"Checking that {fileName} exists...");
+            Debug.WriteLine($"Checking that {fileName} exists...");
 
             try
             {
                 if (string.IsNullOrEmpty(fileName))
                 {
-                    Console.WriteLine($"File name was empty");
+                    Debug.WriteLine($"File name was empty");
                     return false;
                 }
 
-                foreach (string file in Directory.EnumerateFiles(_sharedPath))
+                try
                 {
-                    string fn = Path.GetFileName(file);
+                    var fileNames = new FileAccessProvider().GetFileCollectionFromContractsShare();
 
-                    Console.WriteLine($"Comparing this file => {fn} with {fileName}");
-
-                    if (fn.Equals(fileName, StringComparison.Ordinal))
+                    if (!fileNames.Any())
                     {
-                        Console.WriteLine($"Found a match on => {fn}");
-
-                        return true;
+                        return false;
                     }
+
+                    for (int i = 0; i < fileNames.Count(); i++)
+                    {
+                        var extendedFileName = Path.GetFileName(fileNames.ElementAt(i));
+
+                        if (extendedFileName.Equals(fileName, StringComparison.Ordinal))
+                        {
+                            return true;
+                        }
+                    }
+
+                    Debug.WriteLine($"No matches found with => {fileName}");
+
+                    return false;
                 }
-
-                Console.WriteLine($"No matches found with => {fileName}");
-
-                return false;
+                catch (Exception)
+                {
+                    throw;
+                }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error : {ex.Message}");
-                return false;
-            }
+            catch (Exception) { throw; }
         }
 
         public string EncodeFileToBase64(byte[] fileBytes)
@@ -78,11 +79,11 @@ namespace JobAgent.Services
 
         public async Task<byte[]> GetFileFromDirectoryAsync(string fileName)
         {
-            Console.WriteLine($"Attemtps to get {fileName} from directory..");
+            Debug.WriteLine($"Attemtps to get {fileName} from directory..");
 
             if (string.IsNullOrEmpty(fileName))
             {
-                Console.WriteLine($"File name wasn't specified.");
+                Debug.WriteLine($"File name wasn't specified.");
 
                 return null;
             }
@@ -95,7 +96,7 @@ namespace JobAgent.Services
 
                     if (fn.Equals(fileName))
                     {
-                        Console.WriteLine($"Found a match on => {fn}");
+                        Debug.WriteLine($"Found a match on => {fn}");
 
                         byte[] bytes = await File.ReadAllBytesAsync(file);
 
@@ -103,7 +104,7 @@ namespace JobAgent.Services
                     }
                 }
 
-                Console.WriteLine($"No matches found with => {fileName}");
+                Debug.WriteLine($"No matches found with => {fileName}");
 
                 return null;
             }
@@ -129,14 +130,6 @@ namespace JobAgent.Services
             {
                 return string.Empty;
             }
-        }
-
-        private void AddNetorkCredentials()
-        {
-            NetworkCredential theNetworkCredential = new NetworkCredential($"jobagent", "Kode1234!");
-            CredentialCache theNetcache = new CredentialCache();
-
-            theNetcache.Add(host: _sharedPath, port: 139, "Basic", theNetworkCredential);
         }
     }
 }
