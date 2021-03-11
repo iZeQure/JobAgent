@@ -4,7 +4,7 @@
 {
     <div class="modal fade" id="ShowContractModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">               
+            <div class="modal-content">
 
                 <div class="modal-header">
                     @if (!string.IsNullOrEmpty(Model.ContractForCompanyName))
@@ -29,8 +29,7 @@
                         {
                             <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="@(Model.ViewContractMessage)" />
                         }
-
-                        @if (!string.IsNullOrEmpty(Model.EncodedContractData))
+                        else
                         {
                             <div class="container-fluid justify-content-center">
                                 <div class="embed-responsive embed-responsive-16by9">
