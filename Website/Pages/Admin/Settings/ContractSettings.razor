@@ -149,14 +149,14 @@ else
 
             var contracts = await AdminService.GetContractsAsync();
 
-            if (contracts.Count().Equals(0))
-            {
-                _disabled = true;
-            }
-
             if (contracts != null)
             {
                 _contracts = contracts;
+            }
+
+            if (!contracts.Any())
+            {
+                _disabled = true;
             }
         }
         catch (Exception)

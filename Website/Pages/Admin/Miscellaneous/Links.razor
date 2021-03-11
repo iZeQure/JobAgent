@@ -8,7 +8,7 @@
     <PageDisplayName DisplayName="Links til Robotten" />
     <div class="d-inline-block">
 
-        @if (disabled)
+        @if (contracts == null)
         {
             <a class="btn btn-sm btn-info cursor-pointer text-white no-gutters disabled">
                 <span class="d-inline-block">Ikke Aktiveret</span>
@@ -38,7 +38,7 @@ else
     }
     else
     {
-        @if (sourceLinks.Count().Equals(0))
+        @if (!sourceLinks.Any())
         {
             <MessageAlert Alert="MessageAlert.AlertType.Warning"
                           Message="Der blev ikke fundet nogen links."
@@ -88,7 +88,7 @@ else
     }
 }
 
-@if (!disabled)
+@if (contracts != null)
 {
     <CreateSourceLinkModal />
     <EditSourceLinkModal SourceLink="sourceLink" />
@@ -101,6 +101,7 @@ else
     [Inject] private IRefresh RefreshService { get; set; }
 
     private IEnumerable<SourceLink> sourceLinks;
+    private IEnumerable<Contract> contracts;
     private SourceLink sourceLink;
 
     private int sourceLinkId = 0;
@@ -111,9 +112,6 @@ else
     {
         RefreshService.RefreshRequest += RefreshContent;
 
-        sourceLinks = new List<SourceLink>();
-        sourceLink = new();
-
         await LoadData();
     }
 
@@ -123,25 +121,8 @@ else
 
         try
         {
-            var links = await DataService.GetAllSourceLinksAsync();
-            var contracts = await AdminService.GetContractsAsync();
-
-            if (links != null)
-            {
-                sourceLinks = links;
-            }
-
-            if (contracts.Count().Equals(0))
-            {
-                disabled = true;
-                return;
-            }
-
-            disabled = false;
-        }
-        catch (Exception)
-        {
-
+            sourceLinks = await DataService.GetAllSourceLinksAsync();
+            contracts = await AdminService.GetContractsAsync();
         }
         finally
         {
