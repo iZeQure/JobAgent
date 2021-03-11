@@ -13,17 +13,17 @@
     </div>
 </div>
 
-@if (Companies != null)
+@if (companies != null)
 {
-    @if (_dataIsLoading)
+    @if (dataIsLoading)
     {
-        <MessageAlert IsLoading="_dataIsLoading" Message="Indlæser data...">
+        <MessageAlert IsLoading="dataIsLoading" Message="Indlæser data...">
 
         </MessageAlert>
     }
     else
     {
-        @if (Companies.Count() == 0)
+        @if (companies.Count() == 0)
         {
             <MessageAlert Alert="MessageAlert.AlertType.Warning"
                           Message="Der blev ikke fundet nogen virksomheder."
@@ -46,7 +46,7 @@
                     </thead>
                     <tbody>
 
-                        @foreach (var company in Companies)
+                        @foreach (var company in companies)
                         {
                             <tr id="@(company.Identifier)">
                                 <th scope="row">@(company.Identifier)</th>
@@ -73,50 +73,43 @@
 
         <CreateCompanyModal />
 
-        <EditCompanyModal CompanyModel="Model" />
+        <EditCompanyModal CompanyModel="model" />
 
-        <RemoveCompanyModal CompanyId="CompanyId" />
+        <RemoveCompanyModal CompanyId="companyId" />
     }
 }
 else
 {
     <MessageAlert Alert="MessageAlert.AlertType.Error"
                   Message="Prøv at genindlæs siden."
-                  MessageOptional="@(_errorMessage)" />
+                  MessageOptional="@(errorMessage)" />
 }
 
 @code {
-    [Inject]
-    protected DataService DataService { get; set; }
+    [Inject] protected DataService DataService { get; set; }
+    [Inject] protected AdminService AdminService { get; set; }
+    [Inject] protected IJSRuntime JSRuntime { get; set; }
+    [Inject] protected IRefresh RefreshService { get; set; }
 
-    [Inject]
-    protected AdminService AdminService { get; set; }
+    private IEnumerable<Company> companies = new List<Company>();
 
-    [Inject]
-    protected IJSRuntime JSRuntime { get; set; }
-
-    [Inject]
-    protected IRefresh RefreshService { get; set; }
-
-    public IEnumerable<Company> Companies { get; set; } = new List<Company>();
-
-    private CompanyModel Model { get; set; } = new CompanyModel();
-    private int CompanyId { get; set; }
-    private string _errorMessage = string.Empty;
-    private bool _dataIsLoading = false;
+    private CompanyModel model { get; set; } = new CompanyModel();
+    private int companyId { get; set; }
+    private string errorMessage = string.Empty;
+    private bool dataIsLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
         RefreshService.RefreshRequest += UpdateContentAsync;
 
-        Companies = await LoadData();
+        companies = await LoadData();
 
-        _dataIsLoading = false;
+        dataIsLoading = false;
     }
 
     private async Task<IEnumerable<Company>> LoadData()
     {
-        _dataIsLoading = true;
+        dataIsLoading = true;
 
         return await DataService.GetAllCompaniesAsync();
     }
@@ -129,13 +122,13 @@ else
 
             if (companies != null)
             {
-                Companies = companies;
+                this.companies = companies;
                 return;
             }
 
-            Companies = null;
+            this.companies = null;
         }
-        catch (Exception) { _errorMessage = "Ukendt Fejl ved opdatering af virksomheder."; }
+        catch (Exception) { errorMessage = "Ukendt Fejl ved opdatering af virksomheder."; }
         finally { StateHasChanged(); }
     }
 
@@ -143,7 +136,7 @@ else
     {
         var company = await DataService.GetCompanyByIdAsync(id);
 
-        Model = new CompanyModel()
+        model = new CompanyModel()
         {
             Id = company.Identifier,
             CVR = company.CVR,
@@ -154,6 +147,6 @@ else
 
     private void OnClick_RemoveCompanyModal(int id)
     {
-        CompanyId = id;
+        companyId = id;
     }
 }

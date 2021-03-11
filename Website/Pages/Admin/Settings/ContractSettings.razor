@@ -33,7 +33,7 @@ else
 {
     @if (_contracts != null)
     {
-        @if (_contracts.Count().Equals(0))
+        @if (!_contracts.Any())
         {
             <MessageAlert Alert="Components.Notification.MessageAlert.AlertType.Warning"
                           Message="Der blev ikke fundet nogen kontrakter."
@@ -195,45 +195,52 @@ else
     private async Task OnClick_ShowContractModal(string name, string companyName)
     {
         showContractModel.ContractIsLoading = true;
-        showContractModel.ViewContractMessage = "Verificere kontrakt.";
+
+        if (true == string.IsNullOrEmpty(name))
+        {
+            showContractModel.ViewContractMessage = "Kontraktens navn, blev ikke indlæst korrekt, prøv igen.";
+            return;
+        }
 
         try
         {
-            if (string.IsNullOrEmpty(name))
+            var contractIsExisting = FileService.CheckFileExists(name);
+
+            if (false == contractIsExisting)
             {
-                showContractModel.ViewContractMessage = "Kunne ikke hente navnet på kontrakten.";
-                showContractModel.ContractIsLoading = false;
+                showContractModel.ViewContractMessage = "Kontrakten findes ikke i systemet.";
                 return;
             }
 
-            showContractModel.ContractExists = FileService.CheckFileExists(name);
+            var fileInformation = await FileService.GetFileFromDirectoryAsync(name);
+            var encodedFileInformation = FileService.EncodeFileToBase64(fileInformation);
 
-            if (!showContractModel.ContractExists)
+            if (true == string.IsNullOrEmpty(encodedFileInformation))
             {
-                showContractModel.ViewContractMessage = "Kontrakten eksitere ikke i systemet.";
-                showContractModel.ContractIsLoading = false;
+                showContractModel.ViewContractMessage = "Kontraktens informationer blev ikke indlæst korrekt.";
                 return;
             }
 
-            var fileBytes = await FileService.GetFileFromDirectoryAsync(name);
-            var encodedFileInfo = FileService.EncodeFileToBase64(fileBytes);
-
-            if (string.IsNullOrEmpty(encodedFileInfo))
+            showContractModel = new()
             {
-                showContractModel.ViewContractMessage = "Kunne ikke hente kontraktens data.";
-                showContractModel.ContractIsLoading = false;
-                return;
-            }
-
-            showContractModel.ContractForCompanyName = companyName;
-            showContractModel.EncodedContractData = encodedFileInfo;
-
-            showContractModel.ViewContractMessage = string.Empty;
-            showContractModel.ContractIsLoading = false;
+                ContractExists = true,
+                ContractIsLoading = false,
+                ContractForCompanyName = companyName,
+                EncodedContractData = encodedFileInformation,
+                ContractName = name,
+                ViewContractMessage = string.Empty
+            };
         }
-        catch (Exception)
+        catch (UnauthorizedAccessException)
         {
-            showContractModel.ViewContractMessage = $"Der skete en ukendt fejl.";
+            showContractModel.ViewContractMessage = "Den givne konto, har ikke rettigheder til at se dette.";
+        }
+        catch (Exception ex)
+        {
+            showContractModel.ViewContractMessage = $"Uventet fejl : {ex.Source}";
+        }
+        finally
+        {
             showContractModel.ContractIsLoading = false;
         }
     }
