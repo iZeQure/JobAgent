@@ -22,9 +22,12 @@
     },
     "IISX-Development": {
       "commandName": "Project",
-      "launchBrowser": true,
       "environmentVariables": {
-        "SHARED_CONTRACT_PATH": "\\\\172.17.0.62\\Shared-Jobagent\\_jobAgent\\_testEnv\\_contracts",
+        "NETWORK_DOMAIN": "\\\\172.17.0.62",
+        "AUTHENTICATION_PASSWORD": "Kode1234!",
+        "AUTHENTICATION_USER": "Jobagent",
+        "SHARED_CONTRACT_PATH": "\\Shared-Jobagent\\_jobAgent\\_testEnv\\_contracts",
+        "DOMAIN": "http://172.17.0.62",
         "ASPNETCORE_DETAILEDERRORS": "true",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
