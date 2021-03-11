@@ -19,7 +19,7 @@ namespace DataAccess.Repositories
         }
 
         /// <summary>
-        /// Not Implemented
+        /// Create new contract.
         /// </summary>
         /// <param name="create"></param>
         public async Task Create(Contract create)
@@ -152,7 +152,7 @@ namespace DataAccess.Repositories
         }
 
         /// <summary>
-        /// Not Implemented
+        /// Remove contract by id.
         /// </summary>
         /// <param name="id"></param>
         public async Task Remove(int id)
@@ -174,7 +174,7 @@ namespace DataAccess.Repositories
         }
 
         /// <summary>
-        /// Not Implemented
+        /// Update existing contract.
         /// </summary>
         /// <param name="update"></param>
         public async Task Update(Contract update)

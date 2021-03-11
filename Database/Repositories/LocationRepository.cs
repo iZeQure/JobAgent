@@ -27,10 +27,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Prepare command obj.
-                using SqlCommand cmd = new SqlCommand("CreateLocation", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("CreateLocation", CommandType.StoredProcedure);
 
                 // Define input parameters
                 cmd.Parameters.AddWithValue("@name", create.Name);
@@ -40,7 +37,7 @@ namespace DataAccess.Repositories
                 await _databaseAccess.OpenConnectionAsync();
 
                 // Execute command
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             finally
             {
@@ -60,24 +57,16 @@ namespace DataAccess.Repositories
                 List<Location> tempLocations = new List<Location>();
 
                 // Prepare command obj.
-                using SqlCommand cmd = new SqlCommand("GetAllLocations", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
-
-                // Open connection to database.
-                await _databaseAccess.OpenConnectionAsync();
+                using SqlCommand cmd = _databaseAccess.GetCommand("GetAllLocations", CommandType.StoredProcedure);
 
                 // Initialize data reader.
-                using SqlDataReader reader = cmd.ExecuteReader();
-
-                Location location = new Location();
+                using SqlDataReader reader = await _databaseAccess.GetSqlDataReader();
 
                 // Check if any data.
                 if (reader.HasRows)
                 {
                     // Read the data.
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         tempLocations.Add(
                             new Location()
@@ -105,39 +94,27 @@ namespace DataAccess.Repositories
         /// <returns>A <see cref="Location"/> if exists.</returns>
         public async Task<Location> GetById(int id)
         {
-            var _databaseAccess = SqlDatabaseAccess.SqlInstance;
-
             // Initalize temporary obj.
             Location tempLocationObj = new Location();
 
             // Initialize command obj.
-            using SqlCommand cmd = new SqlCommand("GetLocationById", _databaseAccess.GetConnection())
-            {
-                CommandType = CommandType.StoredProcedure
-            };
+            using SqlCommand cmd = _databaseAccess.GetCommand("GetLocationById", CommandType.StoredProcedure);
 
             // Define input parameters.
             cmd.Parameters.AddWithValue("@id", id);
 
-            // Open connetion to database.
-            await _databaseAccess.OpenConnectionAsync();
-
             // Initialize data reader.
-            using SqlDataReader reader = cmd.ExecuteReader();
+            using SqlDataReader reader = await _databaseAccess.GetSqlDataReader();
 
             // Check if reader has any data.
             if (reader.HasRows)
             {
                 // Read the data.
-                while (reader.Read())
+                while (await reader.ReadAsync())
                 {
                     tempLocationObj.Identifier = reader.GetInt32("Id");
                     tempLocationObj.Name = reader.GetString("Name");
-
-                    if (!DataReaderExtensions.IsDBNull(reader, "@description"))
-                        tempLocationObj.Description = reader.GetString("Description");
-                    else
-                        tempLocationObj.Description = string.Empty;
+                    tempLocationObj.Description = !DataReaderExtensions.IsDBNull(reader, "@description") ? reader.GetString("Description") : string.Empty;
                 }
             }
 
@@ -154,10 +131,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Initialize command obj.
-                using SqlCommand cmd = new SqlCommand("RemoveLocation", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("RemoveLocation", CommandType.StoredProcedure);
 
                 // Define input parameters.
                 cmd.Parameters.AddWithValue("@id", id);
@@ -166,7 +140,7 @@ namespace DataAccess.Repositories
                 await _databaseAccess.OpenConnectionAsync();
 
                 // Execute command.
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             finally
             {
@@ -183,10 +157,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Initialize command obj.
-                using SqlCommand cmd = new SqlCommand("UpdateLocation", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("UpdateLocation", CommandType.StoredProcedure);
 
                 // Define input parameters.
                 cmd.Parameters.AddWithValue("@id", update.Identifier);
@@ -197,7 +168,7 @@ namespace DataAccess.Repositories
                 await _databaseAccess.OpenConnectionAsync();
 
                 // Execute update.
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             finally
             {

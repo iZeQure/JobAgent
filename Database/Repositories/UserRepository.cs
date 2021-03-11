@@ -206,23 +206,20 @@ namespace DataAccess.Repositories
                     // Read data.
                     while (await reader.ReadAsync())
                     {
-                        tempUser = new User()
+                        tempUser.Identifier = reader.GetInt32("UserId");
+                        tempUser.FirstName = reader.GetString("FirstName");
+                        tempUser.LastName = reader.GetString("LastName");
+                        tempUser.Email = reader.GetString("Email");
+                        tempUser.AccessToken = reader.GetString("AccessToken");
+                        tempUser.ConsultantArea = new ConsultantArea()
                         {
-                            Identifier = reader.GetInt32("UserId"),
-                            FirstName = reader.GetString("FirstName"),
-                            LastName = reader.GetString("LastName"),
-                            Email = reader.GetString("Email"),
-                            AccessToken = reader.GetString("AccessToken"),
-                            ConsultantArea = new ConsultantArea()
-                            {
-                                Identifier = reader.GetInt32("ConsultantAreaId"),
-                                Name = reader.GetString("ConsultantAreaName")
-                            },
-                            Location = new Location()
-                            {
-                                Identifier = reader.GetInt32("LocationId"),
-                                Name = reader.GetString("LocationName")
-                            }
+                            Identifier = reader.GetInt32("ConsultantAreaId"),
+                            Name = reader.GetString("ConsultantAreaName")
+                        };
+                        tempUser.Location = new Location()
+                        {
+                            Identifier = reader.GetInt32("LocationId"),
+                            Name = reader.GetString("LocationName")
                         };
                     }
                 }

@@ -175,7 +175,7 @@ namespace DataAccess.Repositories
                 command.Parameters.AddWithValue("@id", id);
 
                 // Initialize data reader.
-                using SqlDataReader r = await command.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
+                using SqlDataReader r = await _databaseAccess.GetSqlDataReader();
 
                 // Initialize temporary obj.
                 JobAdvert tempJobAdvert = null;
@@ -239,7 +239,7 @@ namespace DataAccess.Repositories
                 List<JobAdvert> dataList = new List<JobAdvert>();
 
                 // Initialize data reader.
-                using SqlDataReader r = await command.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
+                using SqlDataReader r = await _databaseAccess.GetSqlDataReader();
 
                 // Check for rows.
                 if (r.HasRows)

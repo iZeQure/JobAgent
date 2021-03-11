@@ -28,12 +28,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Initialize command obj.
-                using SqlCommand c = new SqlCommand()
-                {
-                    CommandText = "CreateSourceLink",
-                    CommandType = CommandType.StoredProcedure,
-                    Connection = _databaseAccess.GetConnection()
-                };
+                using SqlCommand c = _databaseAccess.GetCommand("CreateSourceLink", CommandType.StoredProcedure);
 
                 // Define paramters.
                 c.Parameters.AddWithValue("@companyId", sourceLink.Company.Identifier);
@@ -42,11 +37,8 @@ namespace DataAccess.Repositories
                 c.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.Output;
 
                 // Execute procedure.
-
                 await _databaseAccess.OpenConnectionAsync();
-                c.ExecuteNonQuery();
-
-                int.TryParse(c.Parameters["@output"].Value.ToString(), out int output);
+                await c.ExecuteNonQueryAsync();
             }
             finally
             {
@@ -62,28 +54,19 @@ namespace DataAccess.Repositories
         {
             try
             {
-                List<SourceLink> sourceLinks = null;
-
                 // Initialize command obj.
-                using SqlCommand c = new SqlCommand()
-                {
-                    CommandText = "GetAllSourceLinks",
-                    CommandType = CommandType.StoredProcedure,
-                    Connection = _databaseAccess.GetConnection()
-                };
+                using SqlCommand c = _databaseAccess.GetCommand("GetAllSourceLinks", CommandType.StoredProcedure);
 
                 c.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.Output;
 
-                await _databaseAccess.OpenConnectionAsync();
-
                 // Initialzie data reader.
-                using SqlDataReader r = c.ExecuteReader();
+                using SqlDataReader r = await _databaseAccess.GetSqlDataReader();
+
+                List<SourceLink> sourceLinks = new List<SourceLink>();
 
                 if (r.HasRows)
                 {
-                    sourceLinks = new List<SourceLink>();
-
-                    while (r.Read())
+                    while (await r.ReadAsync())
                     {
                         sourceLinks.Add(
                             new SourceLink()
@@ -99,11 +82,7 @@ namespace DataAccess.Repositories
                     }
                 }
 
-                int.TryParse(c.Parameters["@output"].Value.ToString(), out int output);
-                if (await CheckOutput(output))
-                    return sourceLinks;
-                else
-                    return null;
+                return sourceLinks;
             }
             finally
             {
@@ -123,26 +102,19 @@ namespace DataAccess.Repositories
                 SourceLink sourceLinkObj = null;
 
                 // Initialize command obj.
-                using SqlCommand c = new SqlCommand()
-                {
-                    CommandText = "GetSourceLinkById",
-                    CommandType = CommandType.StoredProcedure,
-                    Connection = _databaseAccess.GetConnection()
-                };
+                using SqlCommand c = _databaseAccess.GetCommand("GetSourceLinkById", CommandType.StoredProcedure);
 
                 // Parameters.
                 c.Parameters.AddWithValue("@id", id);
 
                 c.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.Output;
 
-                await _databaseAccess.OpenConnectionAsync();
-
                 // Initialize data reader.
-                using SqlDataReader r = c.ExecuteReader();
+                using SqlDataReader r = await _databaseAccess.GetSqlDataReader();
 
                 if (r.HasRows)
                 {
-                    while (r.Read())
+                    while (await r.ReadAsync())
                     {
                         sourceLinkObj = new SourceLink()
                         {
@@ -156,11 +128,17 @@ namespace DataAccess.Repositories
                         };
                     }
                 }
-                int.TryParse(c.Parameters["@output"].Value.ToString(), out int output);
-                if (await CheckOutput(output))
+
+                string ouputValue = c.Parameters["@output"].Value as string;
+
+                int.TryParse(ouputValue, out int returnValue);
+
+                if (await CheckOutput(returnValue))
+                {
                     return sourceLinkObj;
-                else
-                    return null;
+                }
+
+                return null;
             }
             finally
             {
@@ -178,12 +156,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Initialize command obj.
-                using SqlCommand c = new SqlCommand()
-                {
-                    CommandText = "RemoveSourceLink",
-                    CommandType = CommandType.StoredProcedure,
-                    Connection = _databaseAccess.GetConnection()
-                };
+                using SqlCommand c = _databaseAccess.GetCommand("RemoveSourceLink", CommandType.StoredProcedure);
 
                 // Parameters.
                 c.Parameters.AddWithValue("@id", id);
@@ -191,9 +164,7 @@ namespace DataAccess.Repositories
                 c.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.Output;
 
                 await _databaseAccess.OpenConnectionAsync();
-                c.ExecuteNonQuery();
-
-                int.TryParse(c.Parameters["@output"].Value.ToString(), out int output);
+                await c.ExecuteNonQueryAsync();
             }
             finally
             {
@@ -211,12 +182,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Initialize command obj.
-                using SqlCommand c = new SqlCommand()
-                {
-                    CommandText = "UpdateSourceLink",
-                    CommandType = CommandType.StoredProcedure,
-                    Connection = _databaseAccess.GetConnection()
-                };
+                using SqlCommand c = _databaseAccess.GetCommand("UpdateSourceLink", CommandType.StoredProcedure);
 
                 // Parameters.
                 c.Parameters.AddWithValue("@id", sourceLink.Identifier);
@@ -226,9 +192,7 @@ namespace DataAccess.Repositories
                 c.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.Output;
 
                 await _databaseAccess.OpenConnectionAsync();
-                c.ExecuteNonQuery();
-
-                int.TryParse(c.Parameters["@ouput"].Value.ToString(), out int output);
+                await c.ExecuteNonQueryAsync();
             }
             finally
             {

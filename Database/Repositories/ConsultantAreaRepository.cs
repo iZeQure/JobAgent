@@ -27,10 +27,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Initialize command obj.
-                using SqlCommand cmd = new SqlCommand("CreateConsultantArea", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("CreateConsultantArea", CommandType.StoredProcedure);
 
                 // Define input parameters.
                 cmd.Parameters.AddWithValue("@name", create.Name);
@@ -41,7 +38,7 @@ namespace DataAccess.Repositories
                 await _databaseAccess.OpenConnectionAsync();
 
                 // Execute command.
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             finally
             {
@@ -61,22 +58,16 @@ namespace DataAccess.Repositories
                 List<ConsultantArea> tempConsultantAreas = new List<ConsultantArea>();
 
                 // Initialize command obj.
-                using SqlCommand cmd = new SqlCommand("GetAllConsultantAreas", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
-
-                // Open connection to database.
-                await _databaseAccess.OpenConnectionAsync();
+                using SqlCommand cmd = _databaseAccess.GetCommand("GetAllConsultantAreas", CommandType.StoredProcedure);
 
                 // Initialize data reader.
-                using SqlDataReader reader = cmd.ExecuteReader();
+                using SqlDataReader reader = await _databaseAccess.GetSqlDataReader();
 
                 // Check if any data.
                 if (reader.HasRows)
                 {
                     // Read data.
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         tempConsultantAreas.Add(
                             new ConsultantArea()
@@ -108,14 +99,8 @@ namespace DataAccess.Repositories
                 // Initialize temporary obj.
                 ConsultantArea tempConsultantArea = new ConsultantArea();
 
-                // Open connection to database.
-                await _databaseAccess.OpenConnectionAsync();
-
                 // Initialize command obj.
-                using SqlCommand cmd = new SqlCommand("GetConsultantAreaById", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("GetConsultantAreaById", CommandType.StoredProcedure);
 
                 // Define input parameters.
                 cmd.Parameters.AddWithValue("@id", id);
@@ -123,13 +108,13 @@ namespace DataAccess.Repositories
                 cmd.Parameters.Add("@output", SqlDbType.Int).Direction = ParameterDirection.Output;
 
                 // Initialize data reader.
-                using SqlDataReader reader = cmd.ExecuteReader();
+                using SqlDataReader reader = await _databaseAccess.GetSqlDataReader();
 
                 // Check if any data.
                 if (reader.HasRows)
                 {
                     // Read dataset.
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         tempConsultantArea.Identifier = reader.GetInt32("Id");
                         tempConsultantArea.Name = reader.GetString("Name");
@@ -154,10 +139,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Initialize command obj.
-                using SqlCommand cmd = new SqlCommand()
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("RemoveConsultantArea", CommandType.StoredProcedure);
 
                 // Define input parameters.
                 cmd.Parameters.AddWithValue("@id", id);
@@ -166,7 +148,7 @@ namespace DataAccess.Repositories
                 await _databaseAccess.OpenConnectionAsync();
 
                 // Execute command, catch return code.
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             finally
             {
@@ -183,10 +165,7 @@ namespace DataAccess.Repositories
             try
             {
                 // Initialize command obj.
-                using SqlCommand cmd = new SqlCommand("RemoveConsultantArea", _databaseAccess.GetConnection())
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                using SqlCommand cmd = _databaseAccess.GetCommand("RemoveConsultantArea", CommandType.StoredProcedure);
 
                 // Define input parameters.
                 cmd.Parameters.AddWithValue("@id", update.Identifier);
@@ -196,7 +175,7 @@ namespace DataAccess.Repositories
                 await _databaseAccess.OpenConnectionAsync();
 
                 // Execute command, catch return code.
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             finally
             {
