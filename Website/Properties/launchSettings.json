@@ -23,10 +23,8 @@
     "IISX-Development": {
       "commandName": "Project",
       "environmentVariables": {
-        "NETWORK_DOMAIN": "\\\\172.17.0.62",
-        "AUTHENTICATION_PASSWORD": "Kode1234!",
-        "AUTHENTICATION_USER": "Jobagent",
-        "SHARED_CONTRACT_PATH": "\\Shared-Jobagent\\_jobAgent\\_testEnv\\_contracts",
+        "UNCSHARE_CONTRACTS": "\\Shared-Jobagent\\_jobAgent\\_testEnv\\_contracts",
+        "IP_ADDRESS": "172.17.0.62",
         "DOMAIN": "http://172.17.0.62",
         "ASPNETCORE_DETAILEDERRORS": "true",
         "ASPNETCORE_ENVIRONMENT": "Development"

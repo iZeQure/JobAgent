@@ -11,7 +11,6 @@ using Blazored.LocalStorage;
 using JobAgent.Data.Providers;
 using JobAgent.Services;
 using JobAgent.Services.Interfaces;
-using SecurityAccess.Access;
 
 namespace JobAgent
 {
@@ -28,10 +27,6 @@ namespace JobAgent
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<JobService>(); // Job Service.
-            services.AddTransient<DataService>(); // Data Service.
-            services.AddTransient<AdminService>(); // Admin Service.    
-
             services.AddRazorPages();
             services.AddBlazoredLocalStorage();
             services.AddServerSideBlazor().AddHubOptions(o => { o.MaximumReceiveMessageSize = 102400000; });
@@ -51,6 +46,10 @@ namespace JobAgent
                  new QueryStringRequestCultureProvider() // Here, You can also use other localization provider
                 };
             });
+
+            services.AddTransient<JobService>(); // Job Service.
+            services.AddTransient<DataService>(); // Data Service.
+            services.AddTransient<AdminService>(); // Admin Service.  
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IFileService, FileService>();
