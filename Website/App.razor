@@ -10,11 +10,6 @@
             </AuthorizeRouteView>
         </Found>
         <NotFound>
-            <AuthorizeView>
-                <Authorized>
-                    @if (true) { <RedirectToAdminComponent /> }
-                </Authorized>
-            </AuthorizeView>
             <LayoutView Layout="@typeof(MainLayout)">
                 <p>
                     <b>404.</b>

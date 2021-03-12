@@ -11,6 +11,11 @@ using Blazored.LocalStorage;
 using JobAgent.Data.Providers;
 using JobAgent.Services;
 using JobAgent.Services.Interfaces;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.IO;
+using System.Net;
 
 namespace JobAgent
 {
@@ -63,6 +68,8 @@ namespace JobAgent
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            string fileProvider = string.Empty;
+
             app.UseRequestLocalization();
 
             if (env.IsDevelopment())
@@ -75,15 +82,23 @@ namespace JobAgent
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
-            }
+            }            
 
             app.UseHttpsRedirection();
+
             app.UseStaticFiles();
 
             app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseFileServer(new FileServerOptions
+            {
+                FileProvider = new PhysicalFileProvider(EnvironmentProvider.GetVirtualDirectory),
+                EnableDirectoryBrowsing = false,
+                RedirectToAppendTrailingSlash = true
+            });
 
             app.UseEndpoints(endpoints =>
             {

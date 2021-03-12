@@ -16,18 +16,16 @@
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
-        "SHARED_PATH": "\\\\172.17.0.62\\Shared-Jobagent\\_jobAgent\\_testEnv\\_contracts",
-        "ASPNETCORE_ENVIRONMENT": "Production"
+        "ASPNETCORE_ENVIRONMENT": "Production",
+        "VIRTUAL_DIRECTORY": "Z:\\_jobAgent\\_productionEnv\\_contracts"
       }
     },
     "IISX-Development": {
       "commandName": "Project",
       "environmentVariables": {
-        "UNCSHARE_CONTRACTS": "\\Shared-Jobagent\\_jobAgent\\_testEnv\\_contracts",
-        "IP_ADDRESS": "172.17.0.62",
-        "DOMAIN": "http://172.17.0.62",
         "ASPNETCORE_DETAILEDERRORS": "true",
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "VIRTUAL_DIRECTORY": "Z:\\_contracts"
       },
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
     }
