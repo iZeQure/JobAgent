@@ -235,9 +235,9 @@ else
         {
             showContractModel.ViewContractMessage = "Den givne konto, har ikke rettigheder til at se dette.";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            showContractModel.ViewContractMessage = $"Uventet fejl : {ex.Source}";
+            showContractModel.ViewContractMessage = $"Ukendt fejl.";
         }
         finally
         {

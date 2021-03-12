@@ -14,7 +14,7 @@ namespace JobAgent.Services
 
         public FileService()
         {
-            _sharedPath = EnvironmentProvider.GetUncPath;
+            _sharedPath = EnvironmentProvider.GetVirtualDirectory;
         }
 
         public bool CheckFileExists(string fileName)
@@ -52,12 +52,17 @@ namespace JobAgent.Services
 
                     return false;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Debug.WriteLine($"Failed to get File Collection from Contracts Share : {ex.Message}");
                     throw;
                 }
             }
-            catch (Exception) { throw; }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Unexpected Exception : {ex.Message}");
+                throw;
+            }
         }
 
         public string EncodeFileToBase64(byte[] fileBytes)
