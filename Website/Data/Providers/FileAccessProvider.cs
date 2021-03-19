@@ -17,16 +17,42 @@ namespace JobAgent.Data.Providers
             _directory = EnvironmentProvider.GetVirtualDirectory;
         }
 
-        public IEnumerable<string> GetFileCollectionFromContractsShare()
+        public IEnumerable<FileInfo> GetFileCollectionFromContractsShare()
         {
-            var directoryFiles = Directory.EnumerateFiles(_directory);
-
-            if (!directoryFiles.Any())
+            try
             {
-                return Enumerable.Empty<string>();
-            }
+                DriveInfo[] drives = DriveInfo.GetDrives();
 
-            return directoryFiles;
+                foreach (DriveInfo driveInfo in drives)
+                {
+                    if (driveInfo.Name.Equals(_directory))
+                    {
+                        DirectoryInfo dirInfo = driveInfo.RootDirectory;
+
+                        DirectoryInfo[] dirInfos = dirInfo.GetDirectories();
+                        FileInfo[] files = null;
+
+                        foreach (DirectoryInfo directory in dirInfos)
+                        {
+                            if (directory.Name.Equals("_contracts"))
+                            {
+                                files = directory.GetFiles();
+                            }
+                        }
+
+                        if (files != null)
+                        {
+                            return files;
+                        }
+                    }
+                }
+
+                return Enumerable.Empty<FileInfo>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

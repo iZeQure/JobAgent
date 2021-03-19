@@ -31,16 +31,16 @@ namespace JobAgent.Services
 
                 try
                 {
-                    var fileNames = new FileAccessProvider().GetFileCollectionFromContractsShare();
+                    var files = new FileAccessProvider().GetFileCollectionFromContractsShare();
 
-                    if (!fileNames.Any())
+                    if (!files.Any())
                     {
-                        return false;
+                        throw new FileNotFoundException();
                     }
 
-                    for (int i = 0; i < fileNames.Count(); i++)
+                    for (int i = 0; i < files.Count(); i++)
                     {
-                        var extendedFileName = Path.GetFileName(fileNames.ElementAt(i));
+                        var extendedFileName = Path.GetFileName(files.ElementAt(i).FullName);
 
                         if (extendedFileName.Equals(fileName, StringComparison.Ordinal))
                         {
@@ -95,15 +95,13 @@ namespace JobAgent.Services
 
             try
             {
-                foreach (string file in Directory.EnumerateFiles(_sharedPath))
+                foreach (FileInfo file in new FileAccessProvider().GetFileCollectionFromContractsShare())
                 {
-                    string fn = Path.GetFileName(file);
-
-                    if (fn.Equals(fileName))
+                    if (file.Name.Equals(fileName))
                     {
-                        Debug.WriteLine($"Found a match on => {fn}");
+                        Debug.WriteLine($"Found a match on => {file.Name}");
 
-                        byte[] bytes = await File.ReadAllBytesAsync(file);
+                        byte[] bytes = await File.ReadAllBytesAsync(file.FullName);
 
                         return bytes;
                     }

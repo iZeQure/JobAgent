@@ -11,11 +11,6 @@ using Blazored.LocalStorage;
 using JobAgent.Data.Providers;
 using JobAgent.Services;
 using JobAgent.Services.Interfaces;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.IO;
-using System.Net;
 
 namespace JobAgent
 {
@@ -92,13 +87,6 @@ namespace JobAgent
 
             app.UseAuthentication();
             app.UseAuthorization();
-
-            app.UseFileServer(new FileServerOptions
-            {
-                FileProvider = new PhysicalFileProvider(EnvironmentProvider.GetVirtualDirectory),
-                EnableDirectoryBrowsing = false,
-                RedirectToAppendTrailingSlash = true
-            });
 
             app.UseEndpoints(endpoints =>
             {
