@@ -594,3 +594,13 @@ TimedPromise/<@chrome://marionette/content/sync.js:231:19
 TimedPromise@chrome://marionette/content/sync.js:216:10
 GeckoDriver.prototype.minimizeWindow@chrome://marionette/content/driver.js:3250:11
 1616159237381	Marionette	INFO	Stopped listening on port 52189
+1616159776336	geckodriver	INFO	Listening on 127.0.0.1:52366
+1616159779374	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "--marionette" "-foreground" "-no-remote" "-profile" "C:\\Users\\iZeQure\\AppData\\Local\\Temp\\rust_mozprofilei4h5ay"
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1616159781959	Marionette	INFO	Listening on port 52376
+1616159782064	Marionette	WARN	TLS certificate errors will be ignored for this session
+1616159787088	Marionette	WARN	TimedPromise timed out after 5000 ms: stacktrace:
+TimedPromise/<@chrome://marionette/content/sync.js:231:19
+TimedPromise@chrome://marionette/content/sync.js:216:10
+GeckoDriver.prototype.minimizeWindow@chrome://marionette/content/driver.js:3250:11
+1616159791041	Marionette	INFO	Stopped listening on port 52376
