@@ -3,13 +3,14 @@ from datetime import datetime
 
 from bs4 import BeautifulSoup
 
-from WebCrawler.constants.constant import Constant
 from WebCrawler.services.data_service import DataService
 
 
 class SearchAlgorithmProvider:
+    __not_found_text = "Ikke Fundet"
+    __not_found_id = 0
+
     _data_service: DataService
-    _constant: Constant
 
     _title_filter_keys = []
     _email_filter_keys = []
@@ -23,9 +24,8 @@ class SearchAlgorithmProvider:
 
     _soup = str
 
-    def __init__(self, data_service: DataService, constant: Constant):
+    def __init__(self, data_service: DataService):
         self._data_service = data_service
-        self._constant = constant
         self.load_filters()
 
     def load_filters(self):
@@ -65,7 +65,7 @@ class SearchAlgorithmProvider:
             if title is not None:
                 return title
 
-        return self.__get_notfound_text__()
+        return self.__not_found_text
 
     def find_email(self) -> str:
         for arg in self._email_filter_keys:
@@ -74,7 +74,7 @@ class SearchAlgorithmProvider:
             if mail is not None:
                 return mail.get_text()
 
-        return self.__get_notfound_text__()
+        return self.__not_found_text
 
     def find_phone_number(self) -> str:
         regex = "([0-9]{8,8})"
@@ -87,7 +87,7 @@ class SearchAlgorithmProvider:
                     if re.match(pattern=regex, string=str(text_from_result)):
                         return text_from_result
 
-        return self.__get_notfound_text__()
+        return self.__not_found_text
 
     def find_description(self) -> str:
         for arg in self._description_filter_keys:
@@ -96,7 +96,7 @@ class SearchAlgorithmProvider:
             if description is not None:
                 return description.get_text(' ', True)
 
-        return self.__get_notfound_text__()
+        return self.__not_found_text
 
     def find_location(self) -> str:
         found_location_element = None
@@ -114,7 +114,7 @@ class SearchAlgorithmProvider:
             if actual_location is not None:
                 return actual_location.get_text(separator=' ')
 
-        return self.__get_notfound_text__()
+        return self.__not_found_text
 
     def find_registration_date(self) -> datetime:
         date_time_str = self.get_actual_result_from_element(
@@ -155,7 +155,7 @@ class SearchAlgorithmProvider:
         if category_id != 0:
             return category_id
 
-        return self.__get_notfound_identifier()
+        return self.__not_found_id
 
     def find_specialization(self) -> int:
         specialization_filter_keys = self._specialization_filter_keys
@@ -177,7 +177,7 @@ class SearchAlgorithmProvider:
         if specialization_id != 0:
             return specialization_id
 
-        return self.__get_notfound_identifier()
+        return self.__not_found_id
 
     def get_date_elements(self, filter_list: []) -> []:
         elements = []
@@ -202,7 +202,7 @@ class SearchAlgorithmProvider:
             if date is not None:
                 return date
 
-        return self.__get_notfound_text__()
+        return self.__not_found_text
 
     def get_result_from_elements(self, elements: []) -> []:
         """
@@ -217,7 +217,7 @@ class SearchAlgorithmProvider:
             if result is not None:
                 return result
 
-        return self.__get_notfound_text__()
+        return self.__not_found_text
 
     def get_date_element_from_parent(self, date_element) -> str:
         """
@@ -233,10 +233,4 @@ class SearchAlgorithmProvider:
         if sibling_element is not None:
             return sibling_element.text
 
-        return self.__get_notfound_text__()
-
-    def __get_notfound_text__(self) -> str:
-        return self._constant.get_notfound_text()
-
-    def __get_notfound_identifier(self) -> int:
-        return self._constant.get_notfound_identifier()
+        return self.__not_found_text

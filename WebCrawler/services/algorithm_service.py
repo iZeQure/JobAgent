@@ -1,12 +1,7 @@
 import logging
-from re import match
-from time import sleep
-
-from selenium import webdriver
-from selenium.common.exceptions import WebDriverException
 
 from WebCrawler.models.job_advert_model import JobAdvertModel
-from WebCrawler.providers.search_algorithm_provider import SearchAlgorithmProvider
+from WebCrawler.providers import GeckoDriverProvider, SearchAlgorithmProvider
 
 
 class AlgorithmService:
@@ -14,54 +9,12 @@ class AlgorithmService:
     Handles the communication with the available URLs for the raw data.
     """
     provider: SearchAlgorithmProvider
+    gecko: GeckoDriverProvider
     raw_data = []
 
-    def __init__(self, algorithm_provider: SearchAlgorithmProvider):
+    def __init__(self, algorithm_provider: SearchAlgorithmProvider, gecko_provider: GeckoDriverProvider):
         self.provider = algorithm_provider
-
-    def get_raw_data(self, source_links: []) -> []:
-        """
-        Achieves the raw data, from an URL.
-        @param source_links: A list of URLs.
-        @return: A dataset of raw html data.
-        """
-        driver = webdriver.Firefox(executable_path='C:\\VirtualEnvironment\\geckodriver.exe')
-        # driver = webdriver.Firefox(executable_path='C:\\Zombie_Crawler\\tools\\geckodriver.exe')
-        driver.minimize_window()
-
-        for link in source_links:
-            try:
-                formatted_url = self.format_url(link[1])
-
-                logging.info(f'Getting source data from: {formatted_url}')
-
-                driver.get(formatted_url)
-                sleep(1)
-
-                self.raw_data.append((str(driver.page_source), str(formatted_url), int(link[0])))
-            except ValueError:
-                driver.close()
-                continue
-            except WebDriverException:
-                logging.warning(f'Failed getting data from: {formatted_url}')
-                continue
-
-        driver.quit()
-
-        logging.info('Source Data loaded successfully.')
-
-        return self.raw_data
-
-    @staticmethod
-    def format_url(url: str):
-        """
-        Formats an URL, if it doesn't contain http | ftp | https.
-        @param url: The URL to format.
-        @return: A formatted URL.
-        """
-        if not match('(?:http|ftp|https)://', url):
-            return 'https://{}'.format(url)
-        return url
+        self.gecko = gecko_provider
 
     def find_jobadvert_match(self, raw_data: [str, str, int]) -> JobAdvertModel:
         """
@@ -91,3 +44,11 @@ class AlgorithmService:
 
             return jobadvert
         return None
+
+    def get_raw_data(self, source_links: []) -> []:
+        """
+        Achieves the raw data, from an URL.
+        @param source_links: A list of URLs.
+        @return: A dataset of raw html data.
+        """
+        return self.gecko.get_data(source_links)
