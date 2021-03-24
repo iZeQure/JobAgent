@@ -1,0 +1,69 @@
+USE [JobAgentDB_v2]
+GO
+
+DROP PROCEDURE IF EXISTS [JA.spCreateArea]
+DROP PROCEDURE IF EXISTS [JA.spUpdateArea]
+DROP PROCEDURE IF EXISTS [JA.spRemoveArea]
+DROP PROCEDURE IF EXISTS [JA.spGetAreaById]
+DROP PROCEDURE IF EXISTS [JA.spGetAreas]
+
+DROP PROCEDURE IF EXISTS [JA.spCreateLocation]
+DROP PROCEDURE IF EXISTS [JA.spUpdateLocation]
+DROP PROCEDURE IF EXISTS [JA.spRemoveLocation]
+DROP PROCEDURE IF EXISTS [JA.spGetLocationById]
+DROP PROCEDURE IF EXISTS [JA.spGetLocations]
+
+DROP PROCEDURE IF EXISTS [JA.spCreateContract]
+DROP PROCEDURE IF EXISTS [JA.spUpdateContract]
+DROP PROCEDURE IF EXISTS [JA.spRemoveContract]
+DROP PROCEDURE IF EXISTS [JA.spGetContractById]
+DROP PROCEDURE IF EXISTS [JA.spGetContracts]
+
+DROP PROCEDURE IF EXISTS [JA.spCreateCompany]
+DROP PROCEDURE IF EXISTS [JA.spUpdateCompany]
+DROP PROCEDURE IF EXISTS [JA.spRemoveCompany]
+DROP PROCEDURE IF EXISTS [JA.spGetCompanyById]
+DROP PROCEDURE IF EXISTS [JA.spGetCompanies]
+
+DROP PROCEDURE IF EXISTS [JA.spCreateVacantJob]
+DROP PROCEDURE IF EXISTS [JA.spUpdateVacantJob]
+DROP PROCEDURE IF EXISTS [JA.spRemoveVacantJob]
+DROP PROCEDURE IF EXISTS [JA.spGetVacantJobId]
+DROP PROCEDURE IF EXISTS [JA.spGetVacantJobs]
+
+DROP PROCEDURE IF EXISTS [JA.spCreateCategory]
+DROP PROCEDURE IF EXISTS [JA.spUpdateCategory]
+DROP PROCEDURE IF EXISTS [JA.spRemoveCategory]
+DROP PROCEDURE IF EXISTS [JA.spGetCategoryById]
+DROP PROCEDURE IF EXISTS [JA.spGetCategories]
+DROP PROCEDURE IF EXISTS [JA.spGetCategoryMenu] -- Returns Catory with associated Specializations
+
+DROP PROCEDURE IF EXISTS [JA.spCreateSpecialization]
+DROP PROCEDURE IF EXISTS [JA.spUpdateSpecialization]
+DROP PROCEDURE IF EXISTS [JA.spRemoveSpecialization]
+DROP PROCEDURE IF EXISTS [JA.spGetSpecializationById]
+DROP PROCEDURE IF EXISTS [JA.spGetSpecializations]
+
+DROP PROCEDURE IF EXISTS [JA.spCreateJobAdvert]
+DROP PROCEDURE IF EXISTS [JA.spUpdateJobAdvert]
+DROP PROCEDURE IF EXISTS [JA.spRemoveJobAdvert]
+DROP PROCEDURE IF EXISTS [JA.spGetJobAdvertById]
+DROP PROCEDURE IF EXISTS [JA.spGetJobAdverts]
+DROP PROCEDURE IF EXISTS [JA.spGetTotalJobAdvertCountByCategoryId] -- Returns Integer
+DROP PROCEDURE IF EXISTS [JA.spGetTotalJobAdvertCountBySpecializationId] -- Returns Integer
+DROP PROCEDURE IF EXISTS [JA.spGetTotalJobAdvertCountByNonCategorized] -- Returns Integer
+
+DROP PROCEDURE IF EXISTS [JA.spCreateUser]
+DROP PROCEDURE IF EXISTS [JA.spUpdateUser]
+DROP PROCEDURE IF EXISTS [JA.spRemoveUser]
+DROP PROCEDURE IF EXISTS [JA.spGetUserById]
+DROP PROCEDURE IF EXISTS [JA.spGetUsers]
+DROP PROCEDURE IF EXISTS [JA.spGrantUserArea]
+DROP PROCEDURE IF EXISTS [JA.spRemoveUserArea]
+DROP PROCEDURE IF EXISTS [JA.spGetUserSaltByEmail]
+DROP PROCEDURE IF EXISTS [JA.spGetUserByAccessToken]
+DROP PROCEDURE IF EXISTS [JA.spUpdateUserSecurity]
+DROP PROCEDURE IF EXISTS [JA.spValidateUserExists] -- Returns Bit
+DROP PROCEDURE IF EXISTS [JA.spValidateUserLogin] -- Returns Bit
+DROP PROCEDURE IF EXISTS [JA.spValidateUserPassword] -- Returns Bit
+GO
