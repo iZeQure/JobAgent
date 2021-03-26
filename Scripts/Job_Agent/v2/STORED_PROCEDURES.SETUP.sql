@@ -455,8 +455,8 @@ AS
 		IF EXISTS (SELECT [CompanyCVR] FROM [Contract] WHERE [CompanyCVR] = @companyCVR)
 			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating contract failed, already exists', 4, 2
 		ELSE			
-			IF NOT EXISTS (SELECT [Id] FROM [User] WHERE [Id] = 1)
-			AND NOT EXISTS (SELECT [CVR] FROM [Company] WHERE [CVR] = 1)
+			IF NOT EXISTS (SELECT [Id] FROM [User] WHERE [Id] = @userId)
+			AND NOT EXISTS (SELECT [CVR] FROM [Company] WHERE [CVR] = @companyCVR)
 				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating contract failed, user and company does not exist', 4, 2
 			ELSE
 				INSERT INTO [Contract] ([CompanyCVR], [UserId], [Name], [RegistrationDateTime], [ExpiryDateTime])
@@ -472,80 +472,89 @@ AS
 	END CATCH
 GO
 
-CREATE PROCEDURE [JA.spUpdateArea] (
-	@areaId int,
-	@areaName varchar(50))
+CREATE PROCEDURE [JA.spUpdateContract] (
+	@contractId int,
+	@companyCVR int,
+	@userId varchar(50),
+	@name uniqueidentifier,
+	@registrationDateTime datetime,
+	@expiryDateTime datetime)
 AS
 	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'AreaUpdate';
+	SELECT @TranName = 'ContractUpdate';
 
 	BEGIN TRANSACTION @TranName
-		WITH MARK N'Updating an Area';
+		WITH MARK N'Updating a Contract';
 
 	BEGIN TRY
-		IF EXISTS (SELECT [Name] FROM [Area] WHERE [Name] = @areaName AND [Id] != @areaId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating area failed, already exists', 4, 2
+		IF NOT EXISTS (SELECT [CompanyCVR] FROM [Contract] WHERE [CompanyCVR] = @companyCVR)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating contract failed, does not exist', 4, 2
 		ELSE
-			UPDATE [Area]
-				SET [Name] = @areaName
-			WHERE [Area].[Id] = @areaId
+			UPDATE [Contract]
+				SET 
+					[CompanyCVR] = @companyCVR,
+					[UserId] = @userId,
+					[Name] = @name,
+					[RegistrationDateTime] = @registrationDateTime,
+					[ExpiryDateTime] = @expiryDateTime
+			WHERE [Contract].[Id] = @contractId
 
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating area', 6, 2
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating contract', 6, 2
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
 GO
 
-CREATE PROCEDURE [JA.spRemoveArea] (
-	@areaId int)
+CREATE PROCEDURE [JA.spRemoveContract] (
+	@contractid int)
 AS
 	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'AreaRemove';
+	SELECT @TranName = 'ContractRemove';
 
 	BEGIN TRANSACTION @TranName
-		WITH MARK N'Removing an Area';
+		WITH MARK N'Removing a Contract';
 
 	BEGIN TRY
-		IF NOT EXISTS (SELECT * FROM [Area] WHERE [Id] = @areaId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing area failed, does not exist', 4, 2
+		IF NOT EXISTS (SELECT * FROM [Contract] WHERE [Id] = @contractid)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing contract failed, does not exist', 4, 2
 		ElSE
-			-- Remove all references to the primary key.
-			DELETE FROM [ConsultantArea]
-			WHERE [AreaId] = @areaId
-
-			DELETE FROM [Area]
-			WHERE [Id] = @areaId
+			DELETE FROM [Contract]
+			WHERE [Id] = @contractid
 
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing area', 6, 2
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing contract', 6, 2
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
 GO
 
-CREATE PROCEDURE [JA.spGetAreaById] (
-	@areaId int)
+CREATE PROCEDURE [JA.spGetContractById] (
+	@contractid int)
 AS
 	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'AreaGetById';
+	SELECT @TranName = 'ContractGetById';
 
 	BEGIN TRANSACTION @TranName
-		WITH MARK N'Getting an area by id';
+		WITH MARK N'Getting a contract by id';
 
 	BEGIN TRY
-		IF NOT EXISTS (SELECT [Id] FROM [Area] WHERE [Id] = @areaId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting area failed, does not exist', 4, 2
+		IF NOT EXISTS (SELECT [CompanyCVR] FROM [Contract] WHERE [Id] = @contractid)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting contract failed, does not exist', 4, 2
 		ELSE
 			SELECT
-				[dbo].[Area].[Id] AS 'Area ID',
-				[dbo].[Area].[Name] as 'Area Name'
-			FROM [Area]
-			WHERE [Id] = @areaId
+				[dbo].[Contract].[Id] AS 'Contract ID',
+				[dbo].[Contract].[CompanyCVR] AS 'Contract CVR',
+				[dbo].[Contract].[UserId] AS 'User ID',
+				[dbo].[Contract].[Name] AS 'Contract Name',
+				[dbo].[Contract].[RegistrationDateTime] AS 'Registered Date',
+				[dbo].[Contract].[ExpiryDateTime] AS 'Expiration Date'
+			FROM [Contract]
+			WHERE [Id] = @contractid
 
 			COMMIT TRANSACTION @TranName
 	END TRY
@@ -556,27 +565,31 @@ AS
 	END CATCH
 GO
 
-CREATE PROCEDURE [JA.spGetAreas]
+CREATE PROCEDURE [JA.spGetContracts]
 AS
 	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'AreaGetAll';
+	SELECT @TranName = 'ContractGetAll';
 
 	BEGIN TRANSACTION @TranName
-		WITH MARK N'Get collection of area';
+		WITH MARK N'Get collection of contract';
 
 	BEGIN TRY
-		IF NOT EXISTS (SELECT TOP(1) [Id] FROM [Area])
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting area collection, was empty', 4, 2
+		IF NOT EXISTS (SELECT TOP(1) [CompanyCVR] FROM [Contract])
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting contract collection, was empty', 4, 2
 		ELSE
 			SELECT
-				[dbo].[Area].[Id] AS 'Area ID',
-				[dbo].[Area].[Name] as 'Area Name'
-			FROM [Area]
+				[dbo].[Contract].[Id] AS 'Contract ID',
+				[dbo].[Contract].[CompanyCVR] AS 'Contract CVR',
+				[dbo].[Contract].[UserId] AS 'User ID',
+				[dbo].[Contract].[Name] AS 'Contract Name',
+				[dbo].[Contract].[RegistrationDateTime] AS 'Registered Date',
+				[dbo].[Contract].[ExpiryDateTime] AS 'Expiration Date'
+			FROM [Contract]
 
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting area collection', 6, 2
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting contract collection', 6, 2
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
