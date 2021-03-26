@@ -587,12 +587,319 @@ DROP PROCEDURE IF EXISTS [JA.spUpdateCompany]
 DROP PROCEDURE IF EXISTS [JA.spRemoveCompany]
 DROP PROCEDURE IF EXISTS [JA.spGetCompanyById]
 DROP PROCEDURE IF EXISTS [JA.spGetCompanies]
+GO
+
+CREATE PROCEDURE [JA.spCreateCompany] (
+	@companyId int,
+	@companyCVR int,
+	@companyName varchar(50),
+	@contactPerson varchar(50),
+	@jobPageUrl varchar(2048))
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'CompanyInsert';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Inserting a Company';
+
+	BEGIN TRY
+		IF EXISTS (SELECT [Id] FROM [Company] WHERE [Id] = @companyId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating company failed, already exists', 4, 2
+		ELSE
+			INSERT INTO [Company] ([CVR], [Name], [ContactPerson], [JobPageURL])
+			VALUES
+			(@CompanyCVR, @companyname, @contactPerson, @jobPageUrl);
+
+			COMMIT TRANSACTION @TranName;			
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating company', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spUpdateCompany] (
+    @companyId int,
+	@companyCVR int,
+	@companyName varchar(50),
+	@contactPerson varchar(50),
+	@jobPageUrl varchar(2048))
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'CompanyUpdate';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Updating a Company';
+
+	BEGIN TRY
+		IF EXISTS (SELECT [Id] FROM [Company] WHERE [Id] = @companyId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating Company failed, already exists', 4, 2
+		ELSE
+			UPDATE [Company]
+				SET [CVR] = @companyCVR,
+				    [Name] = @companyName,
+					[ContactPerson] = @contactPerson,
+					[JobPageURL] = @jobPageUrl
+			WHERE [Company].[CVR] = @companyCVR
+
+			COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating Company', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spRemoveCompany] (
+	@companyCVR int,
+	@companyName varchar(50),
+	@contactPerson varchar(50),
+	@jobPageUrl varchar(2048))
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'CompanyRemove';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Removing an Company';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [Company] WHERE [CVR] = @companyCVR)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing Company failed, does not exist', 4, 2
+		ElSE
+			-- Remove all references to the primary key.
+			DELETE FROM [Company]
+			WHERE [CVR] = @companyCVR
+
+			DELETE FROM [VacantJob]
+			WHERE [CompanyId] = @companyCVR
+
+			COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing company', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetCompanyById] (
+	@companyId int,
+	@companyCVR int,
+	@companyName varchar(50),
+	@contactPerson varchar(50),
+	@jobPageUrl varchar(2048))
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'CompanyGetById';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Getting a Company by ID';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT [Id] FROM [Company] WHERE [Id] = @companyId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting Company failed, does not exist', 4, 2
+		ELSE
+			SELECT
+			    [dbo].[Company].[CVR] AS 'Company CVR',
+				[dbo].[Company].[Name] AS 'Company Name',
+				[dbo].[Company].[ContactPerson] AS 'Contact Person',
+				[dbo].[Company].[JobPageURL] AS 'Jobpage Url'
+			FROM [Company]
+			WHERE [Id] = @companyId
+
+			COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Company by ID', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+
+CREATE PROCEDURE [JA.spGetCompanies]
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'CompanyGetAll';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Get collection of Company';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT TOP(1) [Id] FROM [Company])
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting company collection, was empty', 4, 2
+		ELSE
+			SELECT
+				[dbo].[Company].[CVR] AS 'Company CVR',
+				[dbo].[Company].[Name] as 'Company Name',
+				[dbo].[Company].[ContactPerson] as 'Contact person',
+				[dbo].[Company].JobPageURL as 'JobPage Url'
+			FROM [Company]
+
+			COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Company collection', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
 
 DROP PROCEDURE IF EXISTS [JA.spCreateVacantJob]
 DROP PROCEDURE IF EXISTS [JA.spUpdateVacantJob]
 DROP PROCEDURE IF EXISTS [JA.spRemoveVacantJob]
 DROP PROCEDURE IF EXISTS [JA.spGetVacantJobId]
 DROP PROCEDURE IF EXISTS [JA.spGetVacantJobs]
+GO
+
+CREATE PROCEDURE [JA.spCreateVacantJob] (
+	@vacantJobId int,
+	@vacantJobLink varchar(max),
+	@companyId int)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'VacantJobInsert';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Inserting a VacantJob';
+
+	BEGIN TRY
+		IF EXISTS (SELECT [Id] FROM [VacantJob] WHERE [Id] = @vacantJobId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating VacantJob failed, already exists', 4, 2
+		ELSE
+			INSERT INTO [VacantJob] ([Id], [Link], [CompanyId])
+			VALUES
+			(@vacantJobId, @vacantJobLink, @companyId);
+
+			COMMIT TRANSACTION @TranName;			
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating VacantJob', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spUpdateVacantJob] (
+	@vacantJobId int,
+	@vacantJobLink varchar(max),
+	@companyId int)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'VacantJobUpdate';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Updating a VacantJob';
+
+	BEGIN TRY
+		IF EXISTS (SELECT [Id] FROM [VacantJob] WHERE [Id] = @vacantJobId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating VacantJob failed, already exists', 4, 2
+		ELSE
+			UPDATE [VacantJob]
+				SET [Link] = @vacantJobLink,
+					[CompanyId] = @companyId
+			WHERE [VacantJob].[Id] = @vacantJobId
+
+			COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating VacantJob', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spRemoveVacantJob] (
+	@vacantJobId int,
+	@vacantJobLink varchar(max),
+	@companyId int)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'VacantJobRemove';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Removing a VacantJob';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [VacantJob] WHERE [Id] = @vacantJobId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing VacantJob failed, does not exist', 4, 2
+		ElSE
+			-- Remove all references to the primary key.
+			DELETE FROM [VacantJob]
+			WHERE [Id] = @vacantJobId
+
+			DELETE FROM [JobAdvert]
+			WHERE [VacantJobId] = @vacantJobId
+
+			COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing VacantJob', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetVacantJobById] (
+	@vacantJobId int,
+	@vacantJobLink varchar(max),
+	@companyId int)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'VacantJobById';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Getting a vacantjob by Id';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT [Id] FROM [VacantJob] WHERE [Id] = @vacantJobId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting Vacantjob failed, does not exist', 4, 2
+		ELSE
+			SELECT
+			    [dbo].[VacantJob].[Id] AS 'Vacant job ID',
+				[dbo].[VacantJob].[Link] AS 'VacantJob Link',
+				[dbo].[VacantJob].[CompanyId] AS 'Company ID'
+				
+			FROM [VacantJob]
+			WHERE [Id] = @vacantJobId
+
+			COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting VacantJob by ID', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetVacantJobs]
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'VacantJobGetAll';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Get collection of VacantJob';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT TOP(1) [Id] FROM [VacantJob])
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting Vacantjob collection, was empty', 4, 2
+		ELSE
+			SELECT
+				[dbo].[VacantJob].[Id] AS 'Vacant job ID',
+				[dbo].[VacantJob].[Link] AS 'VacantJob Link',
+				[dbo].[VacantJob].[CompanyId] AS 'Company ID'
+			FROM [VacantJob]
+
+			COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting VacantJob collection', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
 
 DROP PROCEDURE IF EXISTS [JA.spCreateCategory]
 DROP PROCEDURE IF EXISTS [JA.spUpdateCategory]
