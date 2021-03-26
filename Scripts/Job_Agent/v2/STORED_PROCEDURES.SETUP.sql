@@ -646,7 +646,7 @@ AS
 		WITH MARK N'Updating a Company';
 
 	BEGIN TRY
-		IF EXISTS (SELECT [Id] FROM [Company] WHERE [Id] = @companyId)
+		IF NOT EXISTS (SELECT [Id] FROM [Company] WHERE [Id] = @companyId)
 			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating Company failed, already exists', 4, 2
 		ELSE
 			UPDATE [Company]
@@ -920,6 +920,179 @@ DROP PROCEDURE IF EXISTS [JA.spRemoveCategory]
 DROP PROCEDURE IF EXISTS [JA.spGetCategoryById]
 DROP PROCEDURE IF EXISTS [JA.spGetCategories]
 DROP PROCEDURE IF EXISTS [JA.spGetCategoryMenu] -- Returns Catory with associated Specializations
+GO
+
+CREATE PROCEDURE [JA.spCreateCategory] (
+	@categoryId int,
+	@categoryName varchar(100))
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'CategoryInsert';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Inserting a category';
+
+	BEGIN TRY
+		IF EXISTS (SELECT [Id] FROM [Category] WHERE [Id] = @categoryId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating category failed, already exists', 4, 2
+		ELSE
+			INSERT INTO [Category] ([Id], [Name])
+			VALUES
+			(@categoryId, @categoryName);
+
+			COMMIT TRANSACTION @TranName;			
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating category', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spUpdateCategory] (
+	@categoryId int,
+	@categoryName varchar(100))
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'CategoryUpdate';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Updating a category';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT [Id] FROM [Category] WHERE [Id] = @categoryId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating category failed, already exists', 4, 2
+		ELSE
+			UPDATE [Category]
+				SET [Name] = @categoryName
+			WHERE [Category].[Id] = @categoryId
+
+			COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating category', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spRemoveCategory] (
+	@categoryId int,
+	@categoryName varchar(100))
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'categoryRemove';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Removing a Category';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [Category] WHERE [Id] = @categoryId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing category failed, does not exist', 4, 2
+		ElSE
+			-- Remove all references to the primary key.
+			DELETE FROM [Category]
+			WHERE [Id] = @categoryId
+
+			COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing category', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetCategoryById] (
+	@categoryId int,
+	@categoryName varchar(100))
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'CategoryById';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Getting a Category by Id';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT [Id] FROM [Category] WHERE [Id] = @categoryId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting category failed, does not exist', 4, 2
+		ELSE
+			SELECT
+			    [dbo].[Category].[Id] AS 'Category ID',
+				[dbo].[Category].[Name] AS 'Category Name'
+				
+				
+			FROM [Category]
+			WHERE [Id] = @categoryId
+
+			COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting category by ID', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+
+CREATE PROCEDURE [JA.spGetCategories]
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'CategoryGetAll';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Get collection of Category';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT TOP(1) [Id] FROM [VacantJob])
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting Category collection, was empty', 4, 2
+		ELSE
+			SELECT
+			    [dbo].[Category].[Id] AS 'Category ID',
+				[dbo].[Category].[Name] AS 'Category Name'
+				
+			FROM [Category]
+
+			COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Category collection', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetCategoryMenu] (
+    @categoryId int,
+	@categoryName varchar(100))
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'CategoryGetMenu';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Get Category Menu';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT TOP(1) [Id] FROM [VacantJob])
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting Category Menu, was empty', 4, 2
+		ELSE
+			SELECT
+			    [dbo].[Category].[Id] AS 'Category ID',
+				[dbo].[Category].[Name] AS 'Category Name'
+				
+			FROM [Category]
+
+			COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Category Menu', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+
+
+
+GO
 
 DROP PROCEDURE IF EXISTS [JA.spCreateSpecialization]
 DROP PROCEDURE IF EXISTS [JA.spUpdateSpecialization]
