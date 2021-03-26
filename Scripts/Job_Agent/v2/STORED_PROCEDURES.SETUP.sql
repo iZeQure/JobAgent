@@ -441,7 +441,7 @@ DROP PROCEDURE IF EXISTS [JA.spGetContracts]
 GO
 
 CREATE PROCEDURE [JA.spCreateContract] (
-	@companyCVR int,
+	@companyId int,
 	@userId int,
 	@name uniqueidentifier)
 AS
@@ -452,16 +452,16 @@ AS
 		WITH MARK N'Inserting a Contract';
 
 	BEGIN TRY
-		IF EXISTS (SELECT [CompanyCVR] FROM [Contract] WHERE [CompanyCVR] = @companyCVR)
+		IF EXISTS (SELECT * FROM [Contract] WHERE [CompanyId] = @companyId)
 			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating contract failed, already exists', 4, 2
 		ELSE			
 			IF NOT EXISTS (SELECT [Id] FROM [User] WHERE [Id] = @userId)
-			AND NOT EXISTS (SELECT [CVR] FROM [Company] WHERE [CVR] = @companyCVR)
+			AND NOT EXISTS (SELECT [Id] FROM [Company] WHERE [Id] = @companyId)
 				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating contract failed, user and company does not exist', 4, 2
 			ELSE
-				INSERT INTO [Contract] ([CompanyCVR], [UserId], [Name], [RegistrationDateTime], [ExpiryDateTime])
+				INSERT INTO [Contract] ([CompanyId], [UserId], [Name], [RegistrationDateTime], [ExpiryDateTime])
 				VALUES
-				(@companyCVR, @userId, @name, GETDATE(), DATEADD(YEAR, 5, GETDATE()));
+				(@companyId, @userId, @name, GETDATE(), DATEADD(YEAR, 5, GETDATE()));
 
 				COMMIT TRANSACTION @TranName;
 	END TRY
@@ -474,7 +474,7 @@ GO
 
 CREATE PROCEDURE [JA.spUpdateContract] (
 	@contractId int,
-	@companyCVR int,
+	@companyId int,
 	@userId varchar(50),
 	@name uniqueidentifier,
 	@registrationDateTime datetime,
@@ -487,12 +487,12 @@ AS
 		WITH MARK N'Updating a Contract';
 
 	BEGIN TRY
-		IF NOT EXISTS (SELECT [CompanyCVR] FROM [Contract] WHERE [CompanyCVR] = @companyCVR)
+		IF NOT EXISTS (SELECT * FROM [Contract] WHERE [Id] = @contractId)
 			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating contract failed, does not exist', 4, 2
 		ELSE
 			UPDATE [Contract]
 				SET 
-					[CompanyCVR] = @companyCVR,
+					[CompanyId] = @companyId,
 					[UserId] = @userId,
 					[Name] = @name,
 					[RegistrationDateTime] = @registrationDateTime,
@@ -509,7 +509,7 @@ AS
 GO
 
 CREATE PROCEDURE [JA.spRemoveContract] (
-	@contractid int)
+	@contractId int)
 AS
 	DECLARE @TranName varchar(20)
 	SELECT @TranName = 'ContractRemove';
@@ -518,11 +518,11 @@ AS
 		WITH MARK N'Removing a Contract';
 
 	BEGIN TRY
-		IF NOT EXISTS (SELECT * FROM [Contract] WHERE [Id] = @contractid)
+		IF NOT EXISTS (SELECT * FROM [Contract] WHERE [Id] = @contractId)
 			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing contract failed, does not exist', 4, 2
 		ElSE
 			DELETE FROM [Contract]
-			WHERE [Id] = @contractid
+			WHERE [Id] = @contractId
 
 			COMMIT TRANSACTION @TranName
 	END TRY
@@ -534,7 +534,7 @@ AS
 GO
 
 CREATE PROCEDURE [JA.spGetContractById] (
-	@contractid int)
+	@contractId int)
 AS
 	DECLARE @TranName varchar(20)
 	SELECT @TranName = 'ContractGetById';
@@ -543,12 +543,12 @@ AS
 		WITH MARK N'Getting a contract by id';
 
 	BEGIN TRY
-		IF NOT EXISTS (SELECT [CompanyCVR] FROM [Contract] WHERE [Id] = @contractid)
+		IF NOT EXISTS (SELECT [Id] FROM [Contract] WHERE [Id] = @contractId)
 			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting contract failed, does not exist', 4, 2
 		ELSE
 			SELECT
 				[dbo].[Contract].[Id] AS 'Contract ID',
-				[dbo].[Contract].[CompanyCVR] AS 'Contract CVR',
+				[dbo].[Contract].[CompanyId] AS 'Company ID',
 				[dbo].[Contract].[UserId] AS 'User ID',
 				[dbo].[Contract].[Name] AS 'Contract Name',
 				[dbo].[Contract].[RegistrationDateTime] AS 'Registered Date',
@@ -559,7 +559,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting area by id', 6, 2
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting contract by id', 6, 2
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -574,12 +574,12 @@ AS
 		WITH MARK N'Get collection of contract';
 
 	BEGIN TRY
-		IF NOT EXISTS (SELECT TOP(1) [CompanyCVR] FROM [Contract])
+		IF NOT EXISTS (SELECT TOP(1) [Id] FROM [Contract])
 			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting contract collection, was empty', 4, 2
 		ELSE
 			SELECT
 				[dbo].[Contract].[Id] AS 'Contract ID',
-				[dbo].[Contract].[CompanyCVR] AS 'Contract CVR',
+				[dbo].[Contract].[CompanyId] AS 'Contract ID',
 				[dbo].[Contract].[UserId] AS 'User ID',
 				[dbo].[Contract].[Name] AS 'Contract Name',
 				[dbo].[Contract].[RegistrationDateTime] AS 'Registered Date',
@@ -730,7 +730,6 @@ AS
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
 GO
-
 
 CREATE PROCEDURE [JA.spGetCompanies]
 AS
@@ -926,6 +925,151 @@ DROP PROCEDURE IF EXISTS [JA.spUpdateSpecialization]
 DROP PROCEDURE IF EXISTS [JA.spRemoveSpecialization]
 DROP PROCEDURE IF EXISTS [JA.spGetSpecializationById]
 DROP PROCEDURE IF EXISTS [JA.spGetSpecializations]
+GO
+
+CREATE PROCEDURE [JA.spCreateSpecialization] (
+	@specializationName varchar(100),
+	@categoryId int)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'SpecializationInsert';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Inserting a Specialization';
+
+	BEGIN TRY
+		IF EXISTS (SELECT * FROM [Specialization] WHERE [Name] = @specializationName)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating Specialization failed, already exists', 4, 2
+		ELSE
+			INSERT INTO [Specialization] ([Name], [CategoryId])
+			VALUES
+			(@specializationName, @categoryId);
+
+			COMMIT TRANSACTION @TranName;			
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating Specialization', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spUpdateSpecialization] (
+	@specializationId int,
+	@specializationName varchar(100),
+	@categoryId int)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'SpecializationUpdate';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Updating a Specialization';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [Specialization] WHERE [Id] = @specializationId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating Specialization failed, does not exist', 4, 2
+		ELSE
+			IF EXISTS (SELECT * FROM [Specialization] WHERE [Name] = @specializationId AND [Id] != @specializationId)
+				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating Specialization failed, duplicate of row', 4, 2	
+			ELSE
+				UPDATE [Specialization]
+					SET [Name] = @specializationName,
+						[CategoryId] = @categoryId
+					WHERE [Id] = @specializationId
+
+				COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating VacantJob', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spRemoveSpecialization] (
+	@specializationId int)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'SpecializationRemove';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Removing a Specialization';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [Specialization] WHERE [Id] = @specializationId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing Specialization failed, does not exist', 4, 2
+		ElSE
+			IF EXISTS (SELECT * FROM [JobAdvert] WHERE [SpecializationId] = @specializationId)
+				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing Specialization failed, is in use', 4, 2
+			ELSE
+				DELETE FROM [Specialization]
+				WHERE [Id] = @specializationId;
+
+				COMMIT TRANSACTION @TranName;
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing Specialization', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetSpecializationById] (
+	@specializationId int)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'SpecializationById';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Getting a Specialization by Id';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT [Id] FROM [Specialization] WHERE [Id] = @specializationId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting Specialization failed, does not exist', 4, 2
+		ELSE
+			SELECT
+				[dbo].[Specialization].[Id] AS 'Specialization ID',
+				[dbo].[Specialization].[Name] AS 'Specialization Name',
+				[dbo].[Specialization].[CategoryId] AS 'Category ID'
+			FROM
+				[Specialization] WHERE [Id] = @specializationId
+
+			COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Specialization by ID', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetSpecializations]
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'SpecializationGetAll';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Get collection of Specialization';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT TOP(1) [Id] FROM [Specialization])
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting Specialization collection, was empty', 4, 2
+		ELSE
+			SELECT
+				[dbo].[Specialization].[Id] AS 'Specialization ID',
+				[dbo].[Specialization].[Name] AS 'Specialization Name',
+				[dbo].[Specialization].[CategoryId] AS 'Category ID'
+			FROM
+				[Specialization]
+
+			COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Specialization collection', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
 
 DROP PROCEDURE IF EXISTS [JA.spCreateJobAdvert]
 DROP PROCEDURE IF EXISTS [JA.spUpdateJobAdvert]
