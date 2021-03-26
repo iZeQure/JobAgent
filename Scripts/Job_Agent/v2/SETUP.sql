@@ -47,10 +47,11 @@ GO
 CREATE TABLE [VacantJob] (
 [Id] int not null identity(1,1),
 [Link] varchar(max) not null,
-[CompanyCVR] int not null)
+[CompanyId] int not null)
 GO
 
 CREATE TABLE [Company] (
+[Id] int not null identity(1,1),
 [CVR] int not null,
 [Name] varchar(50) not null,
 [ContactPerson] varchar(50) not null,
@@ -58,7 +59,8 @@ CREATE TABLE [Company] (
 GO
 
 CREATE TABLE [Contract] (
-[CompanyCVR] int not null,
+[Id] int not null identity(1,1),
+[CompanyId] int not null,
 [UserId] int not null,
 [Name] uniqueidentifier not null,
 [RegistrationDateTime] datetime default GETDATE(),
@@ -141,19 +143,20 @@ GO
 
 ALTER TABLE [Company]
 ADD
-	PRIMARY KEY ([CVR])
+	PRIMARY KEY ([Id])
 GO
 
 ALTER TABLE [Contract]
 ADD
-	PRIMARY KEY ([CompanyCVR]),
+	PRIMARY KEY ([Id]),
+	FOREIGN KEY ([CompanyId]) REFERENCES [Company] ([Id]) ON UPDATE CASCADE,
 	FOREIGN KEY ([UserId]) REFERENCES [User] ([Id])	ON UPDATE CASCADE
 GO
 
 ALTER TABLE [VacantJob]
 ADD
 	PRIMARY KEY ([Id]),
-	FOREIGN KEY ([CompanyCVR]) REFERENCES [Company] ([CVR])	ON UPDATE CASCADE
+	FOREIGN KEY ([CompanyId]) REFERENCES [Company] ([Id]) ON UPDATE CASCADE
 GO
 
 ALTER TABLE [Category]
