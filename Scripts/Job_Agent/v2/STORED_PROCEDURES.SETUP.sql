@@ -1153,7 +1153,7 @@ AS
 				COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating VacantJob', 6, 2
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating Specialization', 6, 2
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1249,6 +1249,411 @@ DROP PROCEDURE IF EXISTS [JA.spGetJobAdverts]
 DROP PROCEDURE IF EXISTS [JA.spGetTotalJobAdvertCountByCategoryId] -- Returns Integer
 DROP PROCEDURE IF EXISTS [JA.spGetTotalJobAdvertCountBySpecializationId] -- Returns Integer
 DROP PROCEDURE IF EXISTS [JA.spGetTotalJobAdvertCountByNonCategorized] -- Returns Integer
+GO
+
+CREATE PROCEDURE [JA.spCreateJobAdvert] (
+	@vacantJobId int,
+    @specializationId int,
+	@categoryId int,
+	@jobAdvertTitle varchar(100),
+	@jobAdvertSummary varchar(250),
+	@jobAdvertDescription varchar(max),
+	@jobAdvertEmail varchar(50),
+	@jobAdvertPhoneNr varchar(25),
+	@jobAdvertRegistrationDateTime datetime,
+	@jobAdvertApplicationDeadlineDateTime datetime)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'JobAdvertInsert';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Inserting a JobAdvert';
+
+	BEGIN TRY
+		IF EXISTS (SELECT * FROM [JobAdvert] WHERE [VacantJobId] = @vacantJobId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating JobAdvert failed, already exists', 4, 2
+		 
+		ELSE
+			IF NOT EXISTS (SELECT * FROM [Category] WHERE [Id] = @categoryId) OR NOT EXISTS (SELECT * From [Specialization] WHERE [Id] = @specializationId)
+				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating JobAdvert failed, Category or specilization does not exist', 4, 2
+
+			ELSE
+			    INSERT INTO [JobAdvert] ([VacantJobId], [CategoryId], [SpecializationId], [Title], [Summary], [Description], [Email], [PhoneNumber], [RegistrationDateTime], [ApplicationDeadlineDateTime])
+				VALUES
+				(@vacantJobId, @specializationId, @categoryId, @jobAdvertTitle, @jobAdvertSummary, @jobAdvertDescription, @jobAdvertEmail, @jobAdvertPhoneNr, @jobAdvertRegistrationDateTime, @jobAdvertApplicationDeadlineDateTime);
+
+				COMMIT TRANSACTION @TranName;			
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating JobAdvert', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spUpdateJobAdvert] (
+	@vacantJobId int,
+    @specializationId int,
+	@categoryId int,
+	@jobAdvertTitle varchar(100),
+	@jobAdvertSummary varchar(250),
+	@jobAdvertDescription varchar(max),
+	@jobAdvertEmail varchar(50),
+	@jobAdvertPhoneNr varchar(25),
+	@jobAdvertRegistrationDateTime datetime,
+	@jobAdvertApplicationDeadlineDateTime datetime)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'JobAdvertUpdate';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Updating a JobAdvert';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [JobAdvert] WHERE [VacantJobId] = @vacantJobId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating JobAdvert failed, does not exist', 4, 2
+		ELSE
+			IF NOT EXISTS (SELECT * FROM [Category] WHERE [Id] = @categoryId) OR NOT EXISTS (SELECT * From [Specialization] WHERE [Id] = @specializationId)
+				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating JobAdvert failed, Category or specilization does not exist', 4, 2
+			ELSE
+				UPDATE [JobAdvert]
+					SET	
+					[CategoryId] = @categoryId,
+					[SpecializationId] = @specializationId,
+					[Title] = @jobAdvertTitle,
+					[Summary] = @jobAdvertSummary,
+					[Description] = @jobAdvertDescription,
+					[Email] = @jobAdvertEmail,
+					[PhoneNumber] = @jobAdvertPhoneNr,
+					[RegistrationDateTime] = @jobAdvertRegistrationDateTime,
+					[ApplicationDeadlineDateTime] = @jobAdvertApplicationDeadlineDateTime
+					WHERE [VacantJobId] = @vacantJobId
+
+				COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating JobAdvert', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spRemoveJobAdvert] (
+	@vacantJobId int)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'JobAdvertRemove';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Removing a JobAdvert';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [JobAdvert] WHERE [VacantJobId] = @vacantJobId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing JobAdvert failed, does not exist', 4, 2
+		ElSE
+			DELETE FROM [Address] WHERE [JobAdvertVacantJobId] = @vacantJobId;
+			DELETE FROM [JobAdvert] WHERE [VacantJobId] = @vacantJobId;
+
+			COMMIT TRANSACTION @TranName;
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing JobAdvert', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetJobAdvertById] (
+	@vacantJobId int)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'JobAdvertById';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Getting a JobAdvert by Id';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [JobAdvert] WHERE [VacantJobId] = @vacantJobId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting JobAdvert failed, does not exist', 4, 2
+		ELSE
+			SELECT
+				j.[VacantJobId] AS 'JobAdvert ID',
+				j.[CategoryId] AS 'Category ID',
+				j.[SpecializationId] AS 'Specialization ID',
+				j.[Title] AS 'JobAdvert Title',
+				j.[Summary] AS 'JobAdvert Summary',
+				j.[Description] AS 'JobAdvert Description',
+				j.[Email] AS 'JobAdvert Email',
+				j.[PhoneNumber] AS 'JobAdvert Phone Number',
+				j.[RegistrationDateTime] AS 'JobAdvert Registration Date',
+				j.[ApplicationDeadlineDateTime] AS 'JobAdvert Application Deadline Date'
+			FROM
+				[JobAdvert] j WHERE [VacantJobId] = @vacantJobId
+
+			COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting JobAdvert by ID', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetJobAdverts]
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'JobAdvertGetAll';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Get collection of JobAdvert';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT TOP(1) * FROM [JobAdvert])
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting JobAdvert collection, was empty', 4, 2
+		ELSE
+			SELECT
+				j.[VacantJobId] AS 'JobAdvert ID',
+				j.[CategoryId] AS 'Category ID',
+				j.[SpecializationId] AS 'Specialization ID',
+				j.[Title] AS 'JobAdvert Title',
+				j.[Summary] AS 'JobAdvert Summary',
+				j.[Description] AS 'JobAdvert Description',
+				j.[Email] AS 'JobAdvert Email',
+				j.[PhoneNumber] AS 'JobAdvert Phone Number',
+				j.[RegistrationDateTime] AS 'JobAdvert Registration Date',
+				j.[ApplicationDeadlineDateTime] AS 'JobAdvert Application Deadline Date'
+			FROM
+				[JobAdvert] j
+
+			COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting JobAdvert collection', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetTotalJobAdvertCountByCategoryId](
+	@categoryId int,
+	@countByCategory int OUTPUT)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'JobAdvertGetCountByCategoryId';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Get count by Category';
+
+	BEGIN TRY
+		SET @countByCategory = (SELECT COUNT (*) FROM [JobAdvert] WHERE [CategoryId] = @categoryId)
+
+		COMMIT TRANSACTION @TranName
+		
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting count by Category', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetTotalJobAdvertCountBySpecializationId](
+	@specializationId int,
+	@countBySpecialization int OUTPUT)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'JobAdvertGetCountBySpecializationId';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Get count by Specialization';
+
+	BEGIN TRY
+		SET @countBySpecialization = (SELECT COUNT (*) FROM [JobAdvert] WHERE [SpecializationId] = @specializationId)
+
+		COMMIT TRANSACTION @TranName
+		
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting count by Specialization', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetTotalJobAdvertCountByNonCategorized](
+	@countByNonCategorized int OUTPUT)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'JobAdvertGetCountByNonCategorized';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Get count by NonCategorized JobAdvert';
+
+	BEGIN TRY
+		SET @countByNonCategorized = (SELECT COUNT (*) FROM [JobAdvert] WHERE [CategoryId] = 0 AND [SpecializationId] = 0)
+
+			COMMIT TRANSACTION @TranName
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting count by NonCategorized JobAdvert', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+DROP PROCEDURE IF EXISTS [JA.spCreateAddress]
+DROP PROCEDURE IF EXISTS [JA.spUpdateAddress]
+DROP PROCEDURE IF EXISTS [JA.spRemoveAddress]
+DROP PROCEDURE IF EXISTS [JA.spGetAddressById]
+DROP PROCEDURE IF EXISTS [JA.spGetAddresses]
+GO
+
+CREATE PROCEDURE [JA.spCreateAddress](
+	@jobAdvertVacantJobId int,
+	@streetAddress varchar(250),
+	@city varchar(100),
+	@country varchar(100),
+	@postalCode varchar(10))
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'AddressInsert';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Inserting an Address';
+
+	BEGIN TRY
+		IF EXISTS (SELECT * FROM [Address] WHERE [JobAdvertVacantJobId] = @jobAdvertVacantJobId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating Address failed, already exists', 4, 2
+		 ELSE
+			INSERT INTO [Address] ([JobAdvertVacantJobId], [StreetAddress], [City], [Country], [PostalCode])
+			VALUES
+			(@jobAdvertVacantJobId, @streetAddress, @city, @country, @postalCode);
+		
+			COMMIT TRANSACTION @TranName;			
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating Address', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+
+GO
+
+CREATE PROCEDURE [JA.spUpdateAddress](
+	@jobAdvertVacantJobId int,
+	@streetAddress varchar(250),
+	@city varchar(100),
+	@country varchar(100),
+	@postalCode varchar(10))
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'AddressUpdate';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Updating an Address';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [Address] WHERE [JobAdvertVacantJobId] = @jobAdvertVacantJobId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Update Address failed, does not exists', 4, 2
+		 ELSE
+			UPDATE [Address]
+			SET
+			[StreetAddress] = @streetAddress,
+			[City] = @city,
+			[Country] = @country,
+			[PostalCode] = @postalCode
+			WHERE [JobAdvertVacantJobId] = @jobAdvertVacantJobId;
+
+			COMMIT TRANSACTION @TranName;			
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating Address', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spRemoveAddress](
+	@jobAdvertVacantJobId int)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'AddressRemove';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Removing an Address';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [Address] WHERE [JobAdvertVacantJobId] = @jobAdvertVacantJobId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing Address failed, does not exists', 4, 2
+		 ELSE
+			DELETE FROM [Address] WHERE [JobAdvertVacantJobId] = @jobAdvertVacantJobId;
+
+			COMMIT TRANSACTION @TranName;			
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing Address', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetAddressById](
+	@jobAdvertVacantJobId int)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'AddressGetById';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Getting an Address by ID';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [Address] WHERE [JobAdvertVacantJobId] = @jobAdvertVacantJobId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting Address failed, does not exists', 4, 2
+		 ELSE
+			SELECT 
+			StreetAddress AS 'Street Address', 
+			City AS 'City', 
+			Country AS 'Country', 
+			PostalCode AS 'Postal Code' 
+			FROM [Address] 
+			WHERE [JobAdvertVacantJobId] = @jobAdvertVacantJobId;
+
+			COMMIT TRANSACTION @TranName;			
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while getting Address by ID', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetAddresses]
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'GetAddresses';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Getting Address collection';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [Address])
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting Address collection failed, was empty', 4, 2
+		 ELSE
+			SELECT 
+			StreetAddress AS 'Street Address', 
+			City AS 'City', 
+			Country AS 'Country', 
+			PostalCode AS 'Postal Code' 
+			FROM [Address];
+
+			COMMIT TRANSACTION @TranName;			
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while getting Address collection', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
 
 DROP PROCEDURE IF EXISTS [JA.spCreateUser]
 DROP PROCEDURE IF EXISTS [JA.spUpdateUser]
@@ -1262,4 +1667,194 @@ DROP PROCEDURE IF EXISTS [JA.spGetUserByAccessToken]
 DROP PROCEDURE IF EXISTS [JA.spUpdateUserSecurity]
 DROP PROCEDURE IF EXISTS [JA.spValidateUserExists] -- Returns Bit
 DROP PROCEDURE IF EXISTS [JA.spValidateUserLogin] -- Returns Bit
+GO
+
+CREATE PROCEDURE [JA.spCreateUser](
+	@userId int,
+	@roleId int,
+	@locationId int,
+	@userFirstName varchar(50),
+	@userLastName varchar(50),
+	@userEmail varchar(50),
+	@userPass varchar(1000),
+	@userSalt varchar(1000),
+	@userAccessToken varchar(max))
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'UserInsert';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Inserting a User';
+
+	BEGIN TRY
+		IF EXISTS (SELECT * FROM [User] WHERE [Id] = @userId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating User failed, already exists', 4, 2
+		 ELSE
+			INSERT INTO [User] ([Id], [RoleId], [LocationId], [FirstName], [LastName], [Email], [Password], [Salt],[AccessToken])
+			VALUES
+			(@userId, @roleId, @locationId, @userFirstName, @userLastName, @userEmail, @userPass, @userSalt, @userAccessToken);
+		
+			COMMIT TRANSACTION @TranName;			
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating User', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+
+GO
+
+CREATE PROCEDURE [JA.spUpdateUser](
+	@userId int,
+	@roleId int,
+	@locationId int,
+	@userFirstName varchar(50),
+	@userLastName varchar(50),
+	@userEmail varchar(50),
+	@userPass varchar(1000),
+	@userSalt varchar(1000),
+	@userAccessToken varchar(max))
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'UserUpdate';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Updating a User';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [User] WHERE [Id] = @userId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating User failed, does not exists', 4, 2
+		 ELSE
+			UPDATE [User]
+			SET
+			[RoleId] = @roleId,
+			[LocationId] = @locationId,
+			[FirstName] = @userFirstName,
+			[LastName] = @userLastName,
+			[Email] = @userEmail,
+			[Password] = @userPass,
+			[salt] = @userSalt,
+			[AccessToken] = @userAccessToken
+			WHERE [Id] = @userId;
+		
+			COMMIT TRANSACTION @TranName;			
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating User', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+
+GO
+
+
+CREATE PROCEDURE [JA.spRemoveUser](
+	@userId int)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'UserRemove';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Removing a User';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [User] WHERE [Id] = @userId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing User failed, does not exists', 4, 2
+		 ELSE
+			DELETE FROM [Contract] WHERE [UserId] = @userId;
+			DELETE FROM [ConsultantArea] WHERE [UserId] = @userId;
+			DELETE FROM [User] WHERE [Id] = @userId;
+
+			COMMIT TRANSACTION @TranName;			
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing User', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetUserById](
+	@userId int)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'UserGetById';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Getting a User by ID';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [User] WHERE [Id] = @userId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting User failed, does not exists', 4, 2
+		 ELSE
+			SELECT 
+			u.[Id] AS 'User ID',
+			u.[FirstName] AS 'User Firstname',
+			u.[LastName] AS 'User Lastname',
+			u.[Email] AS 'User Email',
+
+			r.[Name] AS 'User Role',
+			l.[Name] AS 'User Location',
+
+			STUFF((	SELECT '; ' + a.[Name]
+					FROM [ConsultantArea] c
+						INNER JOIN [Area] a ON a.[Id] = c.[AreaId]
+					WHERE c.[UserId] = 1), 1, 1, '') AS 'Consultant Areas'
+
+			FROM [User] u
+				INNER JOIN [Role] r ON r.[Id] = u.[RoleId]
+				INNER JOIN [Location] l ON l.[Id] = u.[LocationId]
+				INNER JOIN [ConsultantArea] c ON c.[UserId] = u.[Id]
+				INNER JOIN [Area] a ON a.[Id] = c.[AreaId]
+			WHERE u.[Id] = @userId
+
+			COMMIT TRANSACTION @TranName;			
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while getting User by ID', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetUsers](
+	@userId int)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'UserGetAll';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Getting a collection of User';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [User])
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting collection of User failed, does not exists', 4, 2
+		 ELSE
+			SELECT 
+			u.[Id] AS 'User ID',
+			u.[FirstName] AS 'User Firstname',
+			u.[LastName] AS 'User Lastname',
+			u.[Email] AS 'User Email',
+
+			r.[Name] AS 'User Role',
+			l.[Name] AS 'User Location',
+
+			STUFF((	SELECT '; ' + a.[Name]
+					FROM [ConsultantArea] c
+						INNER JOIN [Area] a ON a.[Id] = c.[AreaId]
+					WHERE c.[UserId] = 1), 1, 1, '') AS 'Consultant Areas'
+
+			FROM [User] u
+				INNER JOIN [Role] r ON r.[Id] = u.[RoleId]
+				INNER JOIN [Location] l ON l.[Id] = u.[LocationId]
+				INNER JOIN [ConsultantArea] c ON c.[UserId] = u.[Id]
+				INNER JOIN [Area] a ON a.[Id] = c.[AreaId]
+
+			COMMIT TRANSACTION @TranName;			
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while getting collection of User', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
 GO
