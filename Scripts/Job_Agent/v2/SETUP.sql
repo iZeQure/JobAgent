@@ -44,6 +44,15 @@ CREATE TABLE [JobAdvert] (
 [ApplicationDeadlineDateTime] datetime default DATEADD(MONTH, 1, GETDATE()))
 GO
 
+CREATE TABLE [Address](
+[JobAdvertVacantJobId] int not null,
+[StreetAddress] varchar(250) not null,
+[City] varchar(100) not null,
+[Country] varchar(100) not null,
+[PostalCode] varchar(10) not null)
+GO
+
+
 CREATE TABLE [VacantJob] (
 [Id] int not null identity(1,1),
 [Link] varchar(max) not null,
@@ -178,6 +187,11 @@ ADD
 	FOREIGN KEY ([SpecializationId]) REFERENCES [Specialization] ([Id])
 GO
 
+ALTER TABLE[Address]
+ADD
+	PRIMARY KEY ([JobAdvertVacantJobId]),
+	FOREIGN KEY ([JobAdvertVacantJobId]) REFERENCES [JobAdvert] ([VacantJobId])
+GO
 
 INSERT INTO [Area] ([Name])
 VALUES
