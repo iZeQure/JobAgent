@@ -45,14 +45,17 @@ AS
 		WITH MARK N'Updating an Area';
 
 	BEGIN TRY
-		IF EXISTS (SELECT [Name] FROM [Area] WHERE [Name] = @areaName AND [Id] != @areaId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating area failed, already exists', 4, 2
+		IF NOT EXISTS (SELECT * FROM [Area] WHERE [Id] != @areaId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating area failed, does not exist', 4, 2
 		ELSE
-			UPDATE [Area]
-				SET [Name] = @areaName
-			WHERE [Area].[Id] = @areaId
+			IF EXISTS (SELECT * FROM [Area] WHERE [Name] = @areaName)
+				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating area failed, area already exists', 4, 2
+			ELSE
+				UPDATE [Area]
+					SET [Name] = @areaName
+				WHERE [Area].[Id] = @areaId
 
-			COMMIT TRANSACTION @TranName
+				COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
 		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating area', 6, 2
@@ -190,15 +193,18 @@ AS
 		WITH MARK N'Updating a Role';
 
 	BEGIN TRY
-		IF EXISTS (SELECT [Name] FROM [Role] WHERE [Name] = @roleName AND [Id] != @roleId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating role failed, already exists', 4, 2
+		IF NOT EXISTS (SELECT * FROM [Role] WHERE [Id] != @roleId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating role failed, does not exist', 4, 2
 		ELSE
-			UPDATE [Role]
-				SET [Name] = @roleName,
-					[Description] = @roleDescription
-			WHERE [Role].[Id] = @roleId
+			IF EXISTS (SELECT * FROM [Role] WHERE [Name] = @roleName)
+				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating role failed, role already exists', 4, 2
+			ELSE
+				UPDATE [Role]
+					SET [Name] = @roleName,
+						[Description] = @roleDescription
+				WHERE [Role].[Id] = @roleId
 
-			COMMIT TRANSACTION @TranName
+				COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
 		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating role', 6, 2
@@ -335,14 +341,17 @@ AS
 		WITH MARK N'Updating a Location';
 
 	BEGIN TRY
-		IF EXISTS (SELECT [Name] FROM [Location] WHERE [Name] = @locationName AND [Id] != @locationId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating location failed, already exists', 4, 2
+		IF NOT EXISTS (SELECT [Name] FROM [Location] WHERE [Id] != @locationId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating location failed, does not exist', 4, 2
 		ELSE
-			UPDATE [Location]
-				SET [Name] = @locationName
-			WHERE [dbo].[Location].[Id] = @locationId
+			IF EXISTS (SELECT * FROM [Location] WHERE [Name] = @locationName)
+				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating location failed, location already exists', 4, 2
+			ELSE
+				UPDATE [Location]
+					SET [Name] = @locationName
+				WHERE [dbo].[Location].[Id] = @locationId
 
-			COMMIT TRANSACTION @TranName
+				COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
 		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating location', 6, 2
@@ -603,7 +612,6 @@ DROP PROCEDURE IF EXISTS [JA.spGetCompanies]
 GO
 
 CREATE PROCEDURE [JA.spCreateCompany] (
-	@companyId int,
 	@companyCVR int,
 	@companyName varchar(50),
 	@contactPerson varchar(50),
@@ -616,7 +624,7 @@ AS
 		WITH MARK N'Inserting a Company';
 
 	BEGIN TRY
-		IF EXISTS (SELECT [Id] FROM [Company] WHERE [Id] = @companyId)
+		IF EXISTS (SELECT * FROM [Company] WHERE [CVR] = @companyCVR)
 			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating company failed, already exists', 4, 2
 		ELSE
 			INSERT INTO [Company] ([CVR], [Name], [ContactPerson], [JobPageURL])
@@ -666,10 +674,7 @@ AS
 GO
 
 CREATE PROCEDURE [JA.spRemoveCompany] (
-	@companyCVR int,
-	@companyName varchar(50),
-	@contactPerson varchar(50),
-	@jobPageUrl varchar(2048))
+	@companyId int)
 AS
 	DECLARE @TranName varchar(20)
 	SELECT @TranName = 'CompanyRemove';
@@ -678,15 +683,17 @@ AS
 		WITH MARK N'Removing an Company';
 
 	BEGIN TRY
-		IF NOT EXISTS (SELECT * FROM [Company] WHERE [CVR] = @companyCVR)
+		IF NOT EXISTS (SELECT * FROM [Company] WHERE [Id] = @companyId)
 			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing Company failed, does not exist', 4, 2
 		ElSE
-			-- Remove all references to the primary key.
-			DELETE FROM [Company]
-			WHERE [CVR] = @companyCVR
+			DECLARE @vacantJobId int
+			SET @vacantJobId = (SELECT [Id] FROM [VacantJob] WHERE [CompanyId] = @companyId)
 
-			DELETE FROM [VacantJob]
-			WHERE [CompanyId] = @companyCVR
+			-- Remove all references to the primary key.
+			DELETE FROM [JobAdvert] WHERE [VacantJobId] = @vacantJobId;
+			DELETE FROM [VacantJob] WHERE [CompanyId] = @companyId;
+			DELETE FROM [Contract] WHERE [CompanyId] = @companyId;
+			DELETE FROM [Company] WHERE [Id] = @companyId;
 
 			COMMIT TRANSACTION @TranName
 	END TRY
@@ -698,11 +705,7 @@ AS
 GO
 
 CREATE PROCEDURE [JA.spGetCompanyById] (
-	@companyId int,
-	@companyCVR int,
-	@companyName varchar(50),
-	@contactPerson varchar(50),
-	@jobPageUrl varchar(2048))
+	@companyId int)
 AS
 	DECLARE @TranName varchar(20)
 	SELECT @TranName = 'CompanyGetById';
@@ -767,7 +770,6 @@ DROP PROCEDURE IF EXISTS [JA.spGetVacantJobs]
 GO
 
 CREATE PROCEDURE [JA.spCreateVacantJob] (
-	@vacantJobId int,
 	@vacantJobLink varchar(max),
 	@companyId int)
 AS
@@ -778,14 +780,17 @@ AS
 		WITH MARK N'Inserting a VacantJob';
 
 	BEGIN TRY
-		IF EXISTS (SELECT [Id] FROM [VacantJob] WHERE [Id] = @vacantJobId)
+		IF EXISTS (SELECT * FROM [VacantJob] WHERE [Link] = @vacantJobLink)
 			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating VacantJob failed, already exists', 4, 2
 		ELSE
-			INSERT INTO [VacantJob] ([Id], [Link], [CompanyId])
-			VALUES
-			(@vacantJobId, @vacantJobLink, @companyId);
+			IF NOT EXISTS (SELECT * FROM [Company] WHERE [Id] = @companyId)
+				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating VacantJob failed, company does not exist', 4, 2	
+			ELSE
+				INSERT INTO [VacantJob] ([Link], [CompanyId])
+				VALUES
+				(@vacantJobLink, @companyId);
 
-			COMMIT TRANSACTION @TranName;			
+				COMMIT TRANSACTION @TranName;			
 	END TRY
 	BEGIN CATCH
 		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating VacantJob', 6, 2
@@ -806,15 +811,21 @@ AS
 		WITH MARK N'Updating a VacantJob';
 
 	BEGIN TRY
-		IF EXISTS (SELECT [Id] FROM [VacantJob] WHERE [Id] = @vacantJobId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating VacantJob failed, already exists', 4, 2
+		IF NOT EXISTS (SELECT [Id] FROM [VacantJob] WHERE [Id] = @vacantJobId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating VacantJob failed, does not exist', 4, 2
 		ELSE
-			UPDATE [VacantJob]
-				SET [Link] = @vacantJobLink,
-					[CompanyId] = @companyId
-			WHERE [VacantJob].[Id] = @vacantJobId
+			IF EXISTS (SELECT * FROM [VacantJob] WHERE [Link] = @vacantJobLink)
+				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating VacantJob failed, link already exists', 4, 2
+			ELSE
+				IF NOT EXISTS (SELECT * FROM [Company] WHERE [Id] = @companyId)
+					EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating VacantJob failed, company does not exist', 4, 2
+				ELSE
+					UPDATE [VacantJob]
+						SET [Link] = @vacantJobLink,
+							[CompanyId] = @companyId
+					WHERE [VacantJob].[Id] = @vacantJobId
 
-			COMMIT TRANSACTION @TranName
+					COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
 		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating VacantJob', 6, 2
@@ -824,9 +835,7 @@ AS
 GO
 
 CREATE PROCEDURE [JA.spRemoveVacantJob] (
-	@vacantJobId int,
-	@vacantJobLink varchar(max),
-	@companyId int)
+	@vacantJobId int)
 AS
 	DECLARE @TranName varchar(20)
 	SELECT @TranName = 'VacantJobRemove';
@@ -839,11 +848,8 @@ AS
 			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing VacantJob failed, does not exist', 4, 2
 		ElSE
 			-- Remove all references to the primary key.
-			DELETE FROM [VacantJob]
-			WHERE [Id] = @vacantJobId
-
-			DELETE FROM [JobAdvert]
-			WHERE [VacantJobId] = @vacantJobId
+			DELETE FROM [JobAdvert] WHERE [VacantJobId] = @vacantJobId;
+			DELETE FROM [VacantJob] WHERE [Id] = @vacantJobId;
 
 			COMMIT TRANSACTION @TranName
 	END TRY
@@ -855,9 +861,7 @@ AS
 GO
 
 CREATE PROCEDURE [JA.spGetVacantJobById] (
-	@vacantJobId int,
-	@vacantJobLink varchar(max),
-	@companyId int)
+	@vacantJobId int)
 AS
 	DECLARE @TranName varchar(20)
 	SELECT @TranName = 'VacantJobById';
@@ -922,7 +926,6 @@ DROP PROCEDURE IF EXISTS [JA.spGetCategoryMenu] -- Returns Catory with associate
 GO
 
 CREATE PROCEDURE [JA.spCreateCategory] (
-	@categoryId int,
 	@categoryName varchar(100))
 AS
 	DECLARE @TranName varchar(20)
@@ -932,12 +935,12 @@ AS
 		WITH MARK N'Inserting a category';
 
 	BEGIN TRY
-		IF EXISTS (SELECT [Id] FROM [Category] WHERE [Id] = @categoryId)
+		IF EXISTS (SELECT * FROM [Category] WHERE [Name] = @categoryName)
 			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating category failed, already exists', 4, 2
 		ELSE
-			INSERT INTO [Category] ([Id], [Name])
+			INSERT INTO [Category] ([Name])
 			VALUES
-			(@categoryId, @categoryName);
+			(@categoryName);
 
 			COMMIT TRANSACTION @TranName;			
 	END TRY
@@ -960,13 +963,16 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT [Id] FROM [Category] WHERE [Id] = @categoryId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating category failed, already exists', 4, 2
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating category failed, does not exist', 4, 2
 		ELSE
-			UPDATE [Category]
-				SET [Name] = @categoryName
-			WHERE [Category].[Id] = @categoryId
+			IF EXISTS (SELECT * FROM [Category] WHERE [Name] = @categoryName)
+				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating category failed, name already exists', 4, 2
+			ElSE
+				UPDATE [Category]
+					SET [Name] = @categoryName
+				WHERE [Category].[Id] = @categoryId
 
-			COMMIT TRANSACTION @TranName
+				COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
 		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating category', 6, 2
@@ -976,8 +982,7 @@ AS
 GO
 
 CREATE PROCEDURE [JA.spRemoveCategory] (
-	@categoryId int,
-	@categoryName varchar(100))
+	@categoryId int)
 AS
 	DECLARE @TranName varchar(20)
 	SELECT @TranName = 'categoryRemove';
@@ -990,8 +995,8 @@ AS
 			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing category failed, does not exist', 4, 2
 		ElSE
 			-- Remove all references to the primary key.
-			DELETE FROM [Category]
-			WHERE [Id] = @categoryId
+			DELETE FROM [JobAdvert] WHERE [CategoryId] = @categoryId;
+			DELETE FROM [Category]	WHERE [Id] = @categoryId;
 
 			COMMIT TRANSACTION @TranName
 	END TRY
@@ -1033,7 +1038,6 @@ AS
 	END CATCH
 GO
 
-
 CREATE PROCEDURE [JA.spGetCategories]
 AS
 	DECLARE @TranName varchar(20)
@@ -1061,9 +1065,7 @@ AS
 	END CATCH
 GO
 
-CREATE PROCEDURE [JA.spGetCategoryMenu] (
-    @categoryId int,
-	@categoryName varchar(100))
+CREATE PROCEDURE [JA.spGetCategoryMenu]
 AS
 	DECLARE @TranName varchar(20)
 	SELECT @TranName = 'CategoryGetMenu';
@@ -1072,25 +1074,23 @@ AS
 		WITH MARK N'Get Category Menu';
 
 	BEGIN TRY
-		IF NOT EXISTS (SELECT TOP(1) [Id] FROM [VacantJob])
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting Category Menu, was empty', 4, 2
-		ELSE
-			SELECT
-			    [dbo].[Category].[Id] AS 'Category ID',
-				[dbo].[Category].[Name] AS 'Category Name'
-				
-			FROM [Category]
+		SELECT
+			[Category].[Id] AS 'Category ID',
+			[Category].[Name] AS 'Category Name',
 
-			COMMIT TRANSACTION @TranName
+			[Specialization].[Id] AS 'Spec Id',
+			[Specialization].[Name] AS 'Specialization Name',
+			[Specialization].[CategoryId] AS 'Specialization Category ID'
+		FROM [Category]
+		LEFT OUTER JOIN [Specialization] ON [Category].[Id] = [Specialization].[CategoryId]
+
+		COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
 		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Category Menu', 6, 2
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
-
-
-
 GO
 
 DROP PROCEDURE IF EXISTS [JA.spCreateSpecialization]
@@ -1142,7 +1142,7 @@ AS
 		IF NOT EXISTS (SELECT * FROM [Specialization] WHERE [Id] = @specializationId)
 			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating Specialization failed, does not exist', 4, 2
 		ELSE
-			IF EXISTS (SELECT * FROM [Specialization] WHERE [Name] = @specializationId AND [Id] != @specializationId)
+			IF EXISTS (SELECT * FROM [Specialization] WHERE [Name] = @specializationName AND [Id] != @specializationId)
 				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating Specialization failed, duplicate of row', 4, 2	
 			ELSE
 				UPDATE [Specialization]
@@ -1171,14 +1171,11 @@ AS
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [Specialization] WHERE [Id] = @specializationId)
 			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing Specialization failed, does not exist', 4, 2
-		ElSE
-			IF EXISTS (SELECT * FROM [JobAdvert] WHERE [SpecializationId] = @specializationId)
-				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing Specialization failed, is in use', 4, 2
-			ELSE
-				DELETE FROM [Specialization]
-				WHERE [Id] = @specializationId;
+		ElSE			
+			DELETE FROM [JobAdvert] WHERE [SpecializationId] = @specializationId;
+			DELETE FROM [Specialization] WHERE [Id] = @specializationId;
 
-				COMMIT TRANSACTION @TranName;
+			COMMIT TRANSACTION @TranName;
 	END TRY
 	BEGIN CATCH
 		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing Specialization', 6, 2
