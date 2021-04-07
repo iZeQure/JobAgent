@@ -765,7 +765,7 @@ GO
 DROP PROCEDURE IF EXISTS [JA.spCreateVacantJob]
 DROP PROCEDURE IF EXISTS [JA.spUpdateVacantJob]
 DROP PROCEDURE IF EXISTS [JA.spRemoveVacantJob]
-DROP PROCEDURE IF EXISTS [JA.spGetVacantJobId]
+DROP PROCEDURE IF EXISTS [JA.spGetVacantJobById]
 DROP PROCEDURE IF EXISTS [JA.spGetVacantJobs]
 GO
 
@@ -1747,7 +1747,6 @@ AS
 
 GO
 
-
 CREATE PROCEDURE [JA.spRemoveUser](
 	@userId int)
 AS
@@ -1857,4 +1856,227 @@ AS
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGrantUserArea](
+	@userId int,
+	@areaId int)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'UserGrantArea';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Granting an area to User';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [User] WHERE [Id] = @userId) OR NOT EXISTS (SELECT * FROM [Area] WHERE [Id] = @areaId)
+				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Granting area to User failed, user or area does not exists', 4, 2
+		ELSE
+			IF EXISTS (SELECT * FROM [ConsultantArea] WHERE [UserId] = @userId AND [AreaId] = @areaId)
+				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Granting area to user failed, user already this area.', 4, 2
+			ELSE
+				INSERT INTO [ConsultantArea] ([UserId], [AreaId])
+				VALUES (@userId, @areaId);
+			
+			COMMIT TRANSACTION @TranName;
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while granting an area to User', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+
+GO
+
+CREATE PROCEDURE [JA.spRemoveUserArea](
+	@userId int,
+	@areaId int)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'UserRemoveArea';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Removing an area from User';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [User] WHERE [Id] = @userId) OR NOT EXISTS (SELECT * FROM [Area] WHERE [Id] = @areaId)
+				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing area from User failed, user or area does not exists', 4, 2
+		ELSE
+			IF NOT EXISTS (SELECT * FROM [ConsultantArea] WHERE [UserId] = @userId AND [AreaId] = @areaId)
+				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing area from user failed, user does not have this area.', 4, 2
+			ELSE
+				DELETE FROM [ConsultantArea] WHERE [UserId] = @userId AND [AreaId] = @areaId;
+			
+			COMMIT TRANSACTION @TranName;
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing an area from User', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+
+GO
+
+CREATE PROCEDURE [JA.spGetUserSaltByEmail](
+	@userEmail varchar(50))
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'UserGetSaltByEmail';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Getting a User salt by email';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [User] WHERE [Email] = @userEmail)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting User salt by Email failed, user does not exists', 4, 2
+		ELSE
+			SELECT 
+			[Salt] AS 'User Salt'
+			FROM [User]
+			WHERE [Email] = @userEmail
+
+			COMMIT TRANSACTION @TranName;
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while getting User salt by email', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+
+GO
+
+CREATE PROCEDURE [JA.spGetUserByAccessToken](
+	@userAccessToken varchar(max))
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'UserGetByAccessToken';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Getting a User by AccessToken';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [User] WHERE [AccessToken] = @userAccessToken)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting User by AccessToken, user does not exists', 4, 2
+		ELSE
+			SELECT 
+			u.[Id] AS 'User ID',
+			u.[FirstName] AS 'User Firstname',
+			u.[LastName] AS 'User Lastname',
+			u.[Email] AS 'User Email',
+
+			r.[Name] AS 'User Role',
+			l.[Name] AS 'User Location',
+
+			STUFF((	SELECT '; ' + a.[Name]
+					FROM [ConsultantArea] c
+						INNER JOIN [Area] a ON a.[Id] = c.[AreaId]
+					WHERE c.[UserId] = 1), 1, 1, '') AS 'Consultant Areas'
+
+			FROM [User] u
+				INNER JOIN [Role] r ON r.[Id] = u.[RoleId]
+				INNER JOIN [Location] l ON l.[Id] = u.[LocationId]
+				INNER JOIN [ConsultantArea] c ON c.[UserId] = u.[Id]
+				INNER JOIN [Area] a ON a.[Id] = c.[AreaId]
+			WHERE u.[AccessToken] = @userAccessToken
+
+			COMMIT TRANSACTION @TranName;
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while getting User by access token', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+
+GO
+
+CREATE PROCEDURE [JA.spUpdateUserSecurity](
+	@userId int,
+	@userNewPassword varchar(1000),
+	@userOldPassword varchar(1000),
+	@userNewSalt varchar(1000),
+	@resultReturn bit = 0 OUTPUT)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'UserUpdateSecurity';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Updates security info of User';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [User] WHERE [Id] = @userId)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed updating User security, user does not exists', 4, 2 
+		ELSE
+			IF NOT EXISTS (SELECT * FROM [User] WHERE [Password] = @userOldPassword)
+				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed updating User security, password does not match', 4, 2 
+			ELSE
+				UPDATE [User]
+				SET
+				[Password] = @userNewPassword,
+				[Salt] = @userNewSalt
+				WHERE [Id] = @userId;
+
+				SET @resultReturn = 1;
+				COMMIT TRANSACTION @TranName;
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating User security', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+
+GO
+
+CREATE PROCEDURE [JA.spValidateUserExists](
+	@userEmail varchar(50),
+	@returnResult bit = 0 OUTPUT)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'UserValidateExists';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Validates the existance of a User';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [User] WHERE [Email] = @userEmail)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed validating existence of User, user does not exists', 4, 2
+		ELSE
+			SET @returnResult = 1;
+
+
+			COMMIT TRANSACTION @TranName;
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while validating existence of User', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+
+GO
+
+CREATE PROCEDURE [JA.spValidateUserLogin](
+	@userEmail varchar(50),
+	@userPassword varchar(1000),
+	@returnResult bit = 0 OUTPUT)
+AS
+	DECLARE @TranName varchar(20)
+	SELECT @TranName = 'UserValidateLogin';
+
+	BEGIN TRANSACTION @TranName
+		WITH MARK N'Validating a User login';
+
+	BEGIN TRY
+		IF NOT EXISTS (SELECT * FROM [User] WHERE [Email] = @userEmail AND [Password] = @userPassword)
+			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed validating User login, credentials does not match', 4, 2
+		ELSE
+			SET @returnResult = 1;
+
+
+			COMMIT TRANSACTION @TranName;
+	END TRY
+	BEGIN CATCH
+		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while validating User login', 6, 2
+
+		ROLLBACK TRANSACTION @TranName
+	END CATCH
+
 GO
