@@ -1,6 +1,11 @@
 USE [ZombieCrawlerDB]
 GO
 
+DROP PROCEDURE IF EXISTS [GetKeysByKeyValue];
+DROP PROCEDURE IF EXISTS [GetInitializationInformation];
+GO
+
+
 CREATE PROCEDURE [GetKeysByKeyValue] (
 	@key_value VARCHAR(50))
 AS
@@ -12,7 +17,7 @@ GO
 CREATE PROCEDURE [GetInitializationInformation]
 AS
 	SELECT [Name], [Description], 
-	CONCAT([VersionControl].[Major],'.',[VersionControl].[Minor],'.',[VersionControl].[Patch]) AS VERSION
+	CONCAT('V',[VersionControl].[Major],'.',[VersionControl].[Minor],'.',[VersionControl].[Patch]) AS VERSION
 	FROM [Crawler]
 		INNER JOIN [VersionControl]
 			ON [Crawler].[Id] = [VersionControl].[CrawlerId]
