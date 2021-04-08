@@ -1,5 +1,6 @@
 {
   "DB": {
+    "Environment": "Local",
     "Local": {
       "Driver": "{ODBC Driver 17 for SQL Server}",
       "Server" : "IGEIRISS\\SQLDEV",

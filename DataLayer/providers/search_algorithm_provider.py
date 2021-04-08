@@ -3,7 +3,7 @@ from datetime import datetime
 
 from bs4 import BeautifulSoup
 
-from WebCrawler.services.data_service import DataService
+from DataLayer.services.data_service import DataService
 
 
 class SearchAlgorithmProvider:
