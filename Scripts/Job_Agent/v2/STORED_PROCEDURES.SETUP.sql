@@ -1253,8 +1253,8 @@ GO
 
 CREATE PROCEDURE [JA.spCreateJobAdvert] (
 	@vacantJobId int,
-    @specializationId int,
 	@categoryId int,
+    @specializationId int,
 	@jobAdvertTitle varchar(100),
 	@jobAdvertSummary varchar(250),
 	@jobAdvertDescription varchar(max),
