@@ -8,44 +8,44 @@ class DataManager:
     def __init__(self, database):
         self.__database = database
 
-    def get_initialization_information(self) -> []:
+    def get_initialization_information(self):
         context = self.__database.connect(database="ZombieCrawlerDB")
         sp_sql = 'EXEC [GetInitializationInformation]'
         return context.execute(sp_sql)
 
-    def get_algorithm_keywords_by_key_value(self, key_value: str) -> []:
+    def get_algorithm_keywords_by_key_value(self, key_value: str):
         context = self.__database.connect(database='ZombieCrawlerDB')
         sp_sql = """EXEC [GetKeysByKeyValue] 
         @key_value=?
         """
         return context.execute(sp_sql, key_value)
 
-    def get_jobadvert_ids(self) -> []:
-        context = self.__database.connect(database='JobAgentDB_v2')
+    def get_jobadvert_ids(self):
+        context = self.__database.connect()
         sql = 'SELECT [VacantJobId] FROM [JobAdvert]'
         return list(context.execute(sql))
 
-    def get_categories(self) -> []:
+    def get_categories(self):
         context = self.__database.connect()
-        sql = 'SELECT [Id], [Name] FROM [Category] WHERE [Name] IS NOT NULL'
-        return list(context.execute(sql))
+        sp_sql = 'EXEC [JA.spGetCategories]'
+        return list(context.execute(sp_sql))
 
-    def get_category_specializations(self) -> []:
+    def get_specializations(self):
         context = self.__database.connect()
-        sql = 'SELECT [Id], [Name] FROM [Specialization] WHERE [Name] IS NOT NULL'
-        return list(context.execute(sql))
+        sp_sql = 'EXEC [JA.spGetSpecializations]'
+        return list(context.execute(sp_sql))
 
-    def get_companies(self) -> []:
-        context = self.__database.connect(database='JobAgentDB_v2')
+    def get_companies(self):
+        context = self.__database.connect()
         sp_sql = 'EXEC [JA.spGetCompanies]'
         return list(context.execute(sp_sql))
 
-    def get_vacant_jobs(self) -> []:
-        context = self.__database.connect(database='JobAgentDB_v2')
+    def get_vacant_jobs(self):
+        context = self.__database.connect()
         sp_sql = 'EXEC [JA.spGetVacantJobs]'
-        return list(context.execute(sp_sql))
+        return list[context.execute(sp_sql)]
 
-    def get_vacant_job_id_from_jobadvert(self) -> []:
+    def get_vacant_job_id_from_jobadvert(self):
         context = self.__database.connect(database='JobAgentDB_v2')
         sql = 'SELECT [VacantJobId] FROM [JobAdvert]'
         return list(context.execute(sql))

@@ -5,16 +5,27 @@ from re import match
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 
+import DataLayer.models as models
 
-class GeckoDriverProvider:
-    def get_raw_jobadvert_source_data(self, source_data: []) -> []:
-        output = []
+
+class PageSourceProvider:
+    def get_html_page_source_data_list(self, vacant_jobs: list[models.VacantJob]):
+        """
+        Gets a list of html page source.
+        Args:
+            vacant_jobs: A list of objects containing the link for the html page.
+        Returns:
+            output: A list of vacant jobs with the html page source.
+        """
+        # Is the data list to return.
+        output = list[models.VacantJob]
+
         driver = webdriver.Firefox(executable_path=f'{self.__get_geckodriver_path("DEVELOPMENT")}')
         driver.minimize_window()
 
-        for data in source_data:
+        for vacant_job in vacant_jobs:
             try:
-                url = self.__format_url(data[1])
+                url = self.__format_url(vacant_job.link)
                 logging.info(f'Attempts to get data from -> {url}')
 
                 driver.get(url)
@@ -22,11 +33,13 @@ class GeckoDriverProvider:
 
                 if driver.page_source is not None:
                     output.append(
-                        [
-                            str(driver.page_source),
-                            str(url),
-                            int(data[0])
-                        ])
+                        models.VacantJob(
+                            vacant_job_id=vacant_job.id,
+                            link=vacant_job.link,
+                            company_id=vacant_job.company_id,
+                            html_page_source=driver.page_source
+                        )
+                    )
             except ValueError:
                 driver.close()
                 continue
@@ -57,5 +70,3 @@ class GeckoDriverProvider:
             return "C:\\Zombie_Crawler\\tools\\geckodriver.exe"
         if environment == "DEVELOPMENT":
             return "C:\\VirtualEnvironment\\geckodriver.exe"
-
-        return None

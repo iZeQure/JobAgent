@@ -30,23 +30,23 @@ class SearchAlgorithmProvider:
 
     def load_filters(self):
         self._title_filter_keys = \
-            self.get_keys_from_list(self._data_service.get_keys_by_value("Title_Key"))
+            self.get_keys_from_list(self._data_service.get_algorithm_keywords_by_key("Title_Key"))
         self._email_filter_keys = \
-            self.get_keys_from_list(self._data_service.get_keys_by_value("Email_Key"))
+            self.get_keys_from_list(self._data_service.get_algorithm_keywords_by_key("Email_Key"))
         self._phone_number_filter_keys = \
-            self.get_keys_from_list(self._data_service.get_keys_by_value("Phone_Number_Key"))
+            self.get_keys_from_list(self._data_service.get_algorithm_keywords_by_key("Phone_Number_Key"))
         self._description_filter_keys = \
-            self.get_keys_from_list(self._data_service.get_keys_by_value("Description_Key"))
+            self.get_keys_from_list(self._data_service.get_algorithm_keywords_by_key("Description_Key"))
         self._location_name_filter_keys = \
-            self.get_keys_from_list(self._data_service.get_keys_by_value("Location_Key"))
+            self.get_keys_from_list(self._data_service.get_algorithm_keywords_by_key("Location_Key"))
         self._registration_date_name_filter_keys = \
-            self.get_keys_from_list(self._data_service.get_keys_by_value("Registration_Date_Key"))
+            self.get_keys_from_list(self._data_service.get_algorithm_keywords_by_key("Registration_Date_Key"))
         self._deadline_date_name_filter_keys = \
-            self.get_keys_from_list(self._data_service.get_keys_by_value("Deadline_Date_Key"))
+            self.get_keys_from_list(self._data_service.get_algorithm_keywords_by_key("Deadline_Date_Key"))
         self._category_filter_keys = \
-            self.get_keys_from_list(self._data_service.get_keys_by_value("Category_Key"))
+            self.get_keys_from_list(self._data_service.get_algorithm_keywords_by_key("Category_Key"))
         self._specialization_filter_keys = \
-            self.get_keys_from_list(self._data_service.get_keys_by_value("Specialization_Key"))
+            self.get_keys_from_list(self._data_service.get_algorithm_keywords_by_key("Specialization_Key"))
 
     @staticmethod
     def get_keys_from_list(keys: []) -> []:

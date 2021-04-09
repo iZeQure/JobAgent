@@ -4,6 +4,7 @@ import DataLayer.database as database
 import DataLayer.access as manager
 import DataLayer.services as service
 import DataLayer.providers as provider
+import DataLayer.models as models
 
 
 class Startup:
@@ -11,7 +12,7 @@ class Startup:
     __manager: manager.DataManager
     __data_service: service.DataService
     __algorithm_service: service.AlgorithmService
-    __gecko_driver_provider: provider.GeckoDriverProvider
+    __gecko_driver_provider: provider.PageSourceProvider
     __algorithm_provider: provider.SearchAlgorithmProvider
 
     def __init__(self):
@@ -30,7 +31,7 @@ class Startup:
 
         try:
             logging.info('Initializing Crawler..')
-            initialized_information = self.__data_service.initialize_crawler()
+            initialized_information = self.__data_service.get_crawler_information()
 
             """ Shutdown Crawler, if init failed. """
             if initialized_information[0] is False:
@@ -47,18 +48,28 @@ class Startup:
             logging.exception("Error: 40 - Uncaught Exception.")
 
     def __compile_job_adverts_by_found_source_links(self) -> None:
-        source_links = self.__data_service.get_source_links()
-        try:
-            if len(source_links) != 0:
-                logging.info("Acquiring Source Data..")
-                raw_data = self.__algorithm_service.get_raw_jobadvert_source_data(source_links=source_links)
+        # Get list of available vacant jobs.
+        vacant_job_list = self.__data_service.get_vacant_jobs()
 
-                if len(raw_data) != 0:
-                    jobadvert_data_list = []
+        try:
+            # Check the length of the list result.
+            if len(vacant_job_list) != 0:
+                logging.info("Acquiring HTML Page Source Data..")
+
+                # Get list of html page source from vacant jobs.
+                acquired_data_list = \
+                    self.__algorithm_service\
+                    .get_html_page_source_data_list(data_list=vacant_job_list)
+
+                # Check the length of the html page source list result.
+                if len(acquired_data_list) != 0:
                     logging.info(f"Compiling Job Adverts..")
-                    for raw in raw_data:
-                        jobadvert_data_list.append(
-                            self.__algorithm_service.find_jobadvert_match_from_raw_source_data(raw))
+                    
+                    # Create a job advert data list.
+                    jobadvert_data_list = [models.JobAdvert]
+                    for data in acquired_data_list:
+                        compiled_jobadvert = self.__algorithm_service.compile_jobadvert_from_vacant_job_data_list(data)
+                        jobadvert_data_list.append(compiled_jobadvert)
 
                     if len(jobadvert_data_list) != 0:
                         logging.info(f"Saving <{len(jobadvert_data_list)}> compiled job advert(s).")
@@ -87,6 +98,6 @@ class Startup:
         self.__database = database.DatabaseMSSQL()
         self.__manager = manager.DataManager(self.__database)
         self.__data_service = service.DataService(self.__manager)
-        self.__gecko_driver_provider = provider.GeckoDriverProvider()
+        self.__gecko_driver_provider = provider.PageSourceProvider()
         self.__algorithm_provider = provider.SearchAlgorithmProvider(self.__data_service)
         self.__algorithm_service = service.AlgorithmService(self.__algorithm_provider, self.__gecko_driver_provider)

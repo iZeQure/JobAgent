@@ -11,7 +11,7 @@ class DataService:
     def __init__(self, data_manager):
         self.__data_manager = data_manager
 
-    def initialize_crawler(self) -> []:
+    def get_crawler_information(self):
         """
         Initializes the Crawler, with needed data from the database.
         @return: True on no errors.
@@ -35,7 +35,7 @@ class DataService:
         except ValueError:
             return False
 
-    def get_keys_by_value(self, key_value: str) -> []:
+    def get_algorithm_keywords_by_key(self, key_value: str):
         return self.__data_manager.get_algorithm_keywords_by_key_value(key_value)
 
     def create_jobadvert(self, jobadvert: models.JobAdvert):
@@ -44,20 +44,17 @@ class DataService:
         except ValueError:
             return
 
-    def get_source_links(self) -> []:
-        return self.__data_manager.get_source_links()
-
-    def get_categories(self) -> []:
+    def get_categories(self):
         return self.__data_manager.get_categories()
 
-    def get_specializations(self) -> []:
-        return self.__data_manager.get_category_specializations()
+    def get_specializations(self):
+        return self.__data_manager.get_specializations()
 
-    def get_companies(self) -> []:
+    def get_companies(self):
         return self.__data_manager.get_companies()
 
-    def get_vacant_jobs(self) -> []:
+    def get_vacant_jobs(self):
         return self.__data_manager.get_vacant_jobs()
 
-    def get_vacant_job_id_from_jobadvert(self) -> []:
+    def get_vacant_job_id_from_jobadvert(self):
         return self.__data_manager.get_vacant_job_id_from_jobadvert()
