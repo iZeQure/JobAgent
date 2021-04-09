@@ -2,16 +2,16 @@
   "DB": {
     "Environment": "Local",
     "Local": {
-      "Driver": "{ODBC Driver 17 for SQL Server}",
+      "Driver": "{SQL Server Native Client 11.0}",
       "Server" : "IGEIRISS\\SQLDEV",
-      "Trusted_Connection": "Yes"
+      "Trusted_Connection": "yes"
     },
     "Production": {
       "Driver": "{SQL Server Native Client 11.0}",
       "Server" : "172.17.0.62\\\\SKPMSSQLSERVER,1433",
       "UID": "job_agent",
       "PWD": "4Ndet0wn",
-      "Trusted_Connection": "Yes"
+      "Trusted_Connection": "yes"
     }
   }
 }

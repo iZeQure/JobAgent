@@ -4,7 +4,6 @@ import DataLayer.database as database
 import DataLayer.access as manager
 import DataLayer.services as service
 import DataLayer.providers as provider
-import DataLayer.models as models
 
 
 class Startup:
@@ -40,14 +39,14 @@ class Startup:
                 logging.info(f'{initialized_information[1]} Initialized on v{initialized_information[3]}')
                 logging.info(f'Responsibility: {initialized_information[2]}')
 
-                self.__crawl_page_urls_for_vacant_job_links()
+                #self.__crawl_page_urls_for_vacant_job_links()
 
-                self.__compile_job_adverts_by_found_source_links()
+                self.__compile_job_adverts_by_found_vacant_jobs()
 
         except ValueError:
             logging.exception("Error: 40 - Uncaught Exception.")
 
-    def __compile_job_adverts_by_found_source_links(self) -> None:
+    def __compile_job_adverts_by_found_vacant_jobs(self) -> None:
         # Get list of available vacant jobs.
         vacant_job_list = self.__data_service.get_vacant_jobs()
 
@@ -66,10 +65,16 @@ class Startup:
                     logging.info(f"Compiling Job Adverts..")
                     
                     # Create a job advert data list.
-                    jobadvert_data_list = [models.JobAdvert]
-                    for data in acquired_data_list:
-                        compiled_jobadvert = self.__algorithm_service.compile_jobadvert_from_vacant_job_data_list(data)
-                        jobadvert_data_list.append(compiled_jobadvert)
+                    jobadvert_data_list = []
+
+                    try:
+                        for data in acquired_data_list:
+                            compiled_jobadvert = self.__algorithm_service\
+                                .compile_jobadvert_from_vacant_job_data_list(data)
+
+                            jobadvert_data_list.append(compiled_jobadvert)
+                    except Exception as ex:
+                        logging.exception(ex)
 
                     if len(jobadvert_data_list) != 0:
                         logging.info(f"Saving <{len(jobadvert_data_list)}> compiled job advert(s).")
@@ -81,9 +86,12 @@ class Startup:
                     logging.info('No Data was found.')
             else:
                 logging.info('No Source Links were found.')
+        except Exception as ex:
+            logging.exception(ex)
         finally:
             logging.warning('Exiting in 10 seconds.')
             time.sleep(10)
+            exit()
 
     def __crawl_page_urls_for_vacant_job_links(self) -> None:
         logging.info('Getting necessary data for web crawling.')

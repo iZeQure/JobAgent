@@ -117,24 +117,34 @@ class SearchAlgorithmProvider:
         return self.__not_found_text
 
     def find_registration_date(self) -> datetime:
-        date_time_str = self.get_actual_result_from_element(
-            self.get_date_elements(
-                self._registration_date_name_filter_keys
-            )
-        )
+        reg_datetime = None
+        date_elements = []
+        for date_filter in self._registration_date_name_filter_keys:
+            date_elements.append(self._soup.find(text=re.compile(date_filter), flags=re.IGNORECASE))
 
-        date_time_obj = datetime.strptime(date_time_str, '%d.%m.%Y')
-        return date_time_obj
+        if date_elements is not None:
+            for date in date_elements:
+                if date is not None:
+                    if date.has_attr('datetime'):
+                        reg_datetime = date['datetime']
+
+        if reg_datetime is not None:
+            reg_datetime = datetime.strptime(reg_datetime, '%d.%m.%Y')
+        else:
+            reg_datetime = datetime.today()
+
+        return reg_datetime
 
     def find_deadline_date(self) -> datetime:
-        date_time_str = self.get_actual_result_from_element(
-            self.get_date_elements(
-                self._deadline_date_name_filter_keys
-            )
-        )
-
-        date_time_obj = datetime.strptime(date_time_str, '%d.%m.%Y')
-        return date_time_obj
+        return datetime.today()
+        # date_time_str = self.get_actual_result_from_element(
+        #     self.get_date_elements(
+        #         self._deadline_date_name_filter_keys
+        #     )
+        # )
+        #
+        # date_time_obj = datetime.strptime(date_time_str, '%d.%m.%Y')
+        # return date_time_obj
 
     def find_category(self) -> int:
         category_filter_keys = self._category_filter_keys
@@ -147,15 +157,16 @@ class SearchAlgorithmProvider:
             if result is not None:
                 result = result.lower()
 
-        for i, category in enumerate(categories):
-            if str(category[1]).lower() in result:
-                category_id = category[0]
-                break
+        if result is not None:
+            for i, category in enumerate(categories):
+                if str(category[1]).lower() in result:
+                    category_id = category[0]
+                    break
 
-        if category_id != 0:
-            return category_id
-
-        return self.__not_found_id
+            if category_id != 0:
+                return category_id
+        else:
+            return self.__not_found_id
 
     def find_specialization(self) -> int:
         specialization_filter_keys = self._specialization_filter_keys
@@ -178,59 +189,3 @@ class SearchAlgorithmProvider:
             return specialization_id
 
         return self.__not_found_id
-
-    def get_date_elements(self, filter_list: []) -> []:
-        elements = []
-        for date_filter in filter_list:
-            elements.append(self._soup.find(text=re.compile(date_filter, flags=re.IGNORECASE)))
-
-        return elements
-
-    def get_actual_result_from_element(self, elements: []) -> str:
-        """
-        Notes:
-            Gets the actual date result of the elements.
-        Args:
-            elements: An array of elements, containing a date.
-        Returns:
-                str: Contains the actual date as a string.
-        """
-        found_date_element = self.get_result_from_elements(elements)
-
-        if found_date_element is not None:
-            date = self.get_date_element_from_parent(found_date_element)
-            if date is not None:
-                return date
-
-        return self.__not_found_text
-
-    def get_result_from_elements(self, elements: []) -> []:
-        """
-        Summary:
-            Gets a result from the elements.
-        Args:
-            elements: An array of elements containing data.
-        Returns:
-            str: Returns a result of the elements if not None, else Not Found.
-        """
-        for result in elements:
-            if result is not None:
-                return result
-
-        return self.__not_found_text
-
-    def get_date_element_from_parent(self, date_element) -> str:
-        """
-        Summary:
-            Extracts the date element from the parent as next sibling.
-        Args:
-            date_element: The parent, of which has a sibling of a date element.
-        Returns:
-            str: The extracted element, if not None, else Not Found message.
-        """
-        sibling_element = date_element.parent.nextSibling
-
-        if sibling_element is not None:
-            return sibling_element.text
-
-        return self.__not_found_text

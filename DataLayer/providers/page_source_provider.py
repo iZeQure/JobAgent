@@ -1,5 +1,5 @@
 import logging
-from asyncio import sleep
+import time
 from re import match
 
 from selenium import webdriver
@@ -9,7 +9,7 @@ import DataLayer.models as models
 
 
 class PageSourceProvider:
-    def get_html_page_source_data_list(self, vacant_jobs: list[models.VacantJob]):
+    def get_html_page_source_data_list(self, vacant_jobs: []):
         """
         Gets a list of html page source.
         Args:
@@ -18,32 +18,30 @@ class PageSourceProvider:
             output: A list of vacant jobs with the html page source.
         """
         # Is the data list to return.
-        output = list[models.VacantJob]
+        output = []
 
         driver = webdriver.Firefox(executable_path=f'{self.__get_geckodriver_path("DEVELOPMENT")}')
         driver.minimize_window()
 
         for vacant_job in vacant_jobs:
             try:
-                url = self.__format_url(vacant_job.link)
+                url = self.__format_url(vacant_job[1])
                 logging.info(f'Attempts to get data from -> {url}')
 
                 driver.get(url)
-                sleep(1)
+                time.sleep(1)
 
                 if driver.page_source is not None:
-                    output.append(
-                        models.VacantJob(
-                            vacant_job_id=vacant_job.id,
-                            link=vacant_job.link,
-                            company_id=vacant_job.company_id,
-                            html_page_source=driver.page_source
-                        )
-                    )
-            except ValueError:
-                driver.close()
+                    output.append([
+                        vacant_job[0],
+                        vacant_job[1],
+                        vacant_job[2],
+                        driver.page_source
+                    ])
+            except Exception is WebDriverException:
                 continue
-            except WebDriverException:
+            except Exception is BaseException:
+                driver.close()
                 continue
 
         driver.quit()

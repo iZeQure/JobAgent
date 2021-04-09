@@ -17,7 +17,7 @@ class AlgorithmService:
         self.__search_algorithm_provider = algorithm_provider
         self.__page_source_provider = gecko_provider
 
-    def compile_jobadvert_from_vacant_job_data_list(self, vacant_job: models.VacantJob):
+    def compile_jobadvert_from_vacant_job_data_list(self, vacant_job):
         """
         Algorithm to find jobadvert information, specified by the object.
         Args:
@@ -25,13 +25,13 @@ class AlgorithmService:
         Returns:
             JobAdvertModel: the model with compiled data, from the page url.
         """
-        self.__search_algorithm_provider.set_page_source(vacant_job.html_page_source)
+        self.__search_algorithm_provider.set_page_source(vacant_job[3])
 
-        logging.info(f'Attempts to gather job advert data for: {vacant_job.link}')
+        logging.info(f'Attempts to gather job advert data for: {vacant_job[1]}')
 
         if self.__search_algorithm_provider is not None:
             jobadvert = models.JobAdvert(
-                vacant_job_id=vacant_job.id,
+                vacant_job_id=vacant_job[0],
                 category_id=self.__search_algorithm_provider.find_category(),
                 specialization_id=self.__search_algorithm_provider.find_specialization(),
                 title=self.__search_algorithm_provider.find_title(),
@@ -42,7 +42,7 @@ class AlgorithmService:
                 registration_datetime=self.__search_algorithm_provider.find_registration_date(),
                 application_deadline_datetime=self.__search_algorithm_provider.find_deadline_date(),
                 address=models.Address(
-                    job_advert_vacant_job_id=vacant_job.id,
+                    job_advert_vacant_job_id=vacant_job[0],
                     street_address=self.__search_algorithm_provider.find_location(),
                     city='None',
                     country='None',
@@ -52,7 +52,7 @@ class AlgorithmService:
 
             return jobadvert
 
-    def get_html_page_source_data_list(self, data_list: list[models.VacantJob]):
+    def get_html_page_source_data_list(self, data_list: []):
         """
         Achieves the html page source, from an URL.
         Args:
@@ -62,7 +62,7 @@ class AlgorithmService:
         """
         return self.__page_source_provider.get_html_page_source_data_list(data_list)
 
-    def get_links_by_company_page_url(self, companies):
+    def get_links_by_company_page_url(self, companies: []):
         """
         Acquires a list of vacant jobs with the given job advert url, by a list of companies.
         Args:

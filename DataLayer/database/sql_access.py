@@ -8,7 +8,6 @@ class DatabaseMSSQL:
     Handles the access to the database.
     """
     __db = pyodbc
-    __cursor = pyodbc.Cursor
     __connection_string = str
 
     def __init__(self):
@@ -26,9 +25,14 @@ class DatabaseMSSQL:
         Returns:
             object: A connection object, containing the db context.
         """
+        cursor: pyodbc.Cursor
+        connection: pyodbc.Connection
+
         try:
             connection = self.__db.connect(self.__connection_string, autocommit=auto_commit, database=database)
-            return connection.cursor()
+            cursor = connection.cursor()
+
+            return cursor
         except Exception as ex:
             raise ex
 
@@ -37,10 +41,11 @@ class DatabaseMSSQL:
             local_obj = context["Local"]
             self.__connection_string = f'DRIVER={local_obj["Driver"]};' \
                                        f'SERVER={local_obj["Server"]};' \
-                                       f'TRUSTED_CONNECTION={local_obj["Trusted_Connection"]}'
+                                       f'Trusted_Connection={local_obj["Trusted_Connection"]}'
         elif context["Environment"] == "Production":
             prod_obj = context["Production"]
             self.__connection_string = f'DRIVER={prod_obj["Driver"]};' \
                                        f'SERVER={prod_obj["Server"]};' \
                                        f'UID={prod_obj["UID"]};' \
-                                       f'PWD={prod_obj["PWD"]}'
+                                       f'PWD={prod_obj["PWD"]}' \
+                                       f'Trusted_Connection={prod_obj["Trusted_Connection"]}'

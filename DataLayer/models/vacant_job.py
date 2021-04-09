@@ -1,4 +1,4 @@
-class VacantJob(object):
+class VacantJob:
     __id: int
     __link: str
     __company_id: int
