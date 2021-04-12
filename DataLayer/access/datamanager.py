@@ -8,57 +8,89 @@ class DataManager:
     def __init__(self, database):
         self.__database = database
 
-    def get_initialization_information(self):
-        c = self.__database.connect(database="ZombieCrawlerDB")
+    def get_initialization_information(self) -> []:
+        context = self.__database.connect(database="ZombieCrawlerDB")
+        sp_sql = 'EXEC [GetInitializationInformation]'
 
-        c.execute('EXEC [GetInitializationInformation]')
-        result = c.fetchall()
-        c.close()
-        del c
+        context.execute(sp_sql)
+        result = context.fetchall()
+        context.close()
+        del context
+
         return result
 
-    def get_algorithm_keywords_by_key_value(self, key_value: str):
+    def get_algorithm_keywords_by_key_value(self, key_value: str) -> []:
         context = self.__database.connect(database='ZombieCrawlerDB')
         sp_sql = f'EXEC [GetKeysByKeyValue] @key_value=?'
-        return list(context.execute(sp_sql, key_value))
 
-    def get_jobadvert_ids(self):
-        context = self.__database.connect()
-        sql = 'SELECT [VacantJobId] FROM [JobAdvert];'
-        return list(context.execute(sql))
+        context.execute(sp_sql, key_value)
+        result = context.fetchall()
+        context.close()
+        del context
 
-    def get_categories(self):
-        context = self.__database.connect()
-        sp_sql = f'EXEC [JA.spGetCategories]'
-        return list(context.execute(sp_sql))
-
-    def get_specializations(self):
-        context = self.__database.connect()
-        sp_sql = f'EXEC [JA.spGetSpecializations]'
-        return list(context.execute(sp_sql))
-
-    def get_companies(self):
-        c = self.__database.connect()
-        c.execute('EXEC [JA.spGetCompanies]')
-        result = c.fetchall()
-        c.close()
-        del c
         return result
 
-    def get_vacant_jobs(self):
-        c = self.__database.connect(database='JobAgentDB_v2')
-        c.execute('EXEC [dbo].[JA.spGetVacantJobs]')
-        output = []
-        for result in c.fetchall():
-            output.append([result[0], result[1], result[2], 'None'])
-        c.close()
-        del c
-        return output
+    def get_jobadvert_ids(self) -> []:
+        context = self.__database.connect()
+        sql = 'SELECT [VacantJobId] FROM [JobAdvert];'
 
-    def get_vacant_job_id_from_jobadvert(self):
+        context.execute(sql)
+        result = context.fetchall()
+        context.close()
+        del context
+
+        return result
+
+    def get_categories(self) -> []:
+        context = self.__database.connect()
+        sp_sql = f'EXEC [JA.spGetCategories]'
+
+        context.execute(sp_sql)
+        result = context.fetchall()
+        context.close()
+        del context
+
+        return result
+
+    def get_specializations(self) -> []:
+        context = self.__database.connect()
+        sp_sql = f'EXEC [JA.spGetSpecializations]'
+
+        context.execute(sp_sql)
+        result = context.fetchall()
+        context.close()
+        del context
+
+        return result
+
+    def get_companies(self) -> []:
+        context = self.__database.connect()
+        context.execute('EXEC [JA.spGetCompanies]')
+        result = context.fetchall()
+        context.close()
+        del context
+        return result
+
+    def get_vacant_jobs(self) -> []:
+        context = self.__database.connect(database='JobAgentDB_v2')
+        context.execute('EXEC [dbo].[JA.spGetVacantJobs]')
+
+        result = context.fetchall()
+        context.close()
+        del context
+
+        return result
+
+    def get_existing_job_adverts(self) -> []:
         context = self.__database.connect(database='JobAgentDB_v2')
         sql = 'SELECT [VacantJobId] FROM [JobAdvert]'
-        return list(context.execute(sql))
+
+        context.execute(sql)
+        result = context.fetchall()
+        context.close()
+        del context
+
+        return result
 
     def create_jobadvert(self, obj: models.JobAdvert):
         context = self.__database.connect(True)
@@ -116,6 +148,35 @@ class DataManager:
         params = (
             obj.link,
             obj.company_id
+        )
+
+        context.execute(sp_sql, params)
+
+    def update_jobadvert(self, jobadvert):
+        context = self.__database.connect(True)
+        sp_sql = sp_sql = """EXEC [JA.spUpdateJobAdvert]
+        @vacantJobId=?, 
+        @categoryId=?, 
+        @specializationId=?,
+        @jobAdvertTitle=?, 
+        @jobAdvertSummary=?,
+        @jobAdvertDescription=?, 
+        @jobAdvertEmail=?, 
+        @jobAdvertPhoneNr=?,
+        @jobAdvertRegistrationDateTime=?, 
+        @jobAdvertApplicationDeadlineDateTime=?;
+        """
+        params = (
+            jobadvert.id,
+            jobadvert.category_id,
+            jobadvert.specialization_id,
+            jobadvert.title,
+            jobadvert.summary,
+            jobadvert.description,
+            jobadvert.email,
+            jobadvert.phone_number,
+            jobadvert.registration_datetime,
+            jobadvert.application_deadline_datetime
         )
 
         context.execute(sp_sql, params)

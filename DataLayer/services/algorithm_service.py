@@ -17,7 +17,7 @@ class AlgorithmService:
         self.__search_algorithm_provider = algorithm_provider
         self.__page_source_provider = gecko_provider
 
-    def compile_jobadvert_from_vacant_job_data_list(self, vacant_job):
+    def compile_jobadvert_from_vacant_job_data_list(self, vacant_job) -> models.JobAdvert:
         """
         Algorithm to find jobadvert information, specified by the object.
         Args:

@@ -38,12 +38,6 @@ class DataService:
     def get_algorithm_keywords_by_key(self, key_value: str):
         return self.__data_manager.get_algorithm_keywords_by_key_value(key_value)
 
-    def create_jobadvert(self, jobadvert: models.JobAdvert):
-        try:
-            self.__data_manager.create_jobadvert(jobadvert)
-        except ValueError:
-            return
-
     def get_categories(self):
         return self.__data_manager.get_categories()
 
@@ -56,5 +50,14 @@ class DataService:
     def get_vacant_jobs(self):
         return self.__data_manager.get_vacant_jobs()
 
-    def get_vacant_job_id_from_jobadvert(self):
-        return self.__data_manager.get_vacant_job_id_from_jobadvert()
+    def get_existing_job_adverts(self):
+        return self.__data_manager.get_existing_job_adverts()
+
+    def create_jobadvert(self, jobadvert: models.JobAdvert):
+        try:
+            self.__data_manager.create_jobadvert(jobadvert)
+        except ValueError:
+            return
+
+    def update_jobadvert(self, jobadvert):
+        self.__data_manager.update_jobadvert(jobadvert)
