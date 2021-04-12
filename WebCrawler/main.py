@@ -2,4 +2,4 @@ from startup import Startup
 
 init = Startup()
 
-init.start_crawling()
+init.init_crawler()

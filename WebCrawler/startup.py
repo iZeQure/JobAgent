@@ -1,5 +1,6 @@
 import logging
-import time
+import traceback
+
 import DataLayer.database as database
 import DataLayer.access as manager
 import DataLayer.services as service
@@ -7,6 +8,9 @@ import DataLayer.providers as provider
 
 
 class Startup:
+    __company_list: []
+    __existing_jobadvert_list: []
+
     __database: database.DatabaseMSSQL
     __manager: manager.DataManager
     __data_service: service.DataService
@@ -15,97 +19,177 @@ class Startup:
     __algorithm_provider: provider.SearchAlgorithmProvider
 
     def __init__(self):
+        # Initialize logging config.
         logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s [%(levelname)s] - %(message)s',
                             datefmt='%m/%d/%Y %I:%M:%S %p')
 
-    def start_crawling(self):
+    def init_crawler(self) -> None:
         """
-            Starts Job Agent Crawler
+        Initializes the Crawler.
         """
 
-        """ Initialize Services """
+        # Initialize Services
+        # Creates the necessary services and instantiates them.
+
         logging.info("Starting Services..")
         self.__initialize_services()
 
         try:
+            # Crawler Information
+            # Gathers the information from the database, to display information on execution.
+
             logging.info('Initializing Crawler..')
             initialized_information = self.__data_service.get_crawler_information()
 
-            """ Shutdown Crawler, if init failed. """
+            # Validate the initialization progress.
             if initialized_information[0] is False:
                 logging.error('Initializing Failed.')
             else:
-                logging.info(f'{initialized_information[1]} Initialized on v{initialized_information[3]}')
-                logging.info(f'Responsibility: {initialized_information[2]}')
+                # Data Crawling
+                # 1. Compiles a list of vacant job urls per company job page url.
+                # 2. Compiles the list of vacant jobs into jobadvert.
 
-                #self.__crawl_page_urls_for_vacant_job_links()
+                info_message = initialized_information[1]
+                version_message = initialized_information[3]
+                responsibility_message = initialized_information[2]
+                logging.info(f'{info_message} started running as {responsibility_message} on {version_message}')
 
-                self.__compile_job_adverts_by_found_vacant_jobs()
+                self.__compile_vacant_job_data_information()
+                self.__compile_jobadvert_data_information()
 
         except ValueError:
             logging.exception("Error: 40 - Uncaught Exception.")
 
-    def __compile_job_adverts_by_found_vacant_jobs(self) -> None:
-        # Get list of available vacant jobs.
-        vacant_job_list = self.__data_service.get_vacant_jobs()
-
-        try:
-            # Check the length of the list result.
-            if len(vacant_job_list) != 0:
-                logging.info("Acquiring HTML Page Source Data..")
-
-                # Get list of html page source from vacant jobs.
-                acquired_data_list = \
-                    self.__algorithm_service\
-                    .get_html_page_source_data_list(data_list=vacant_job_list)
-
-                # Check the length of the html page source list result.
-                if len(acquired_data_list) != 0:
-                    logging.info(f"Compiling Job Adverts..")
-                    
-                    # Create a job advert data list.
-                    jobadvert_data_list = []
-
-                    try:
-                        for data in acquired_data_list:
-                            compiled_jobadvert = self.__algorithm_service\
-                                .compile_jobadvert_from_vacant_job_data_list(data)
-
-                            jobadvert_data_list.append(compiled_jobadvert)
-                    except Exception as ex:
-                        logging.exception(ex)
-
-                    if len(jobadvert_data_list) != 0:
-                        logging.info(f"Saving <{len(jobadvert_data_list)}> compiled job advert(s).")
-                        for dataset in jobadvert_data_list:
-                            self.__data_service.create_jobadvert(dataset)
-                    else:
-                        logging.info('No job adverts were compiled.')
-                else:
-                    logging.info('No Data was found.')
-            else:
-                logging.info('No Source Links were found.')
-        except Exception as ex:
-            logging.exception(ex)
-        finally:
-            logging.warning('Exiting in 10 seconds.')
-            time.sleep(10)
-            exit()
-
-    def __crawl_page_urls_for_vacant_job_links(self) -> None:
-        logging.info('Getting necessary data for web crawling.')
-        company_list = self.__data_service.get_companies()
-        vacant_job_list = self.__data_service.get_vacant_jobs()
-        existing_jobadvert_ids = self.__data_service.get_vacant_job_id_from_jobadvert()
-        logging.info('Zombie is ready to crawl on the web.')
-
-        links = self.__algorithm_service.get_links_by_company_page_url(company_list)
-
-    def __initialize_services(self):
+    def __initialize_services(self) -> None:
         self.__database = database.DatabaseMSSQL()
         self.__manager = manager.DataManager(self.__database)
         self.__data_service = service.DataService(self.__manager)
         self.__gecko_driver_provider = provider.PageSourceProvider()
         self.__algorithm_provider = provider.SearchAlgorithmProvider(self.__data_service)
         self.__algorithm_service = service.AlgorithmService(self.__algorithm_provider, self.__gecko_driver_provider)
+
+    def __compile_jobadvert_data_information(self) -> None:
+        try:
+            # Get list of available vacant jobs.
+            vacant_job_data_list = self.__data_service.get_vacant_jobs()
+
+            # Check that vacant jobs is defined.
+            if vacant_job_data_list is not None:
+                # Validate the length of the list.
+                if len(vacant_job_data_list) == int(0):
+                    raise ValueError('Vacant Job List was empty.')
+                else:
+                    # Get the page sources from the vacant job list.
+                    vacant_jobs = self.__algorithm_service.get_html_page_source_data_list(vacant_job_data_list)
+
+                    # Create a list for job advert data.
+                    jobadvert_data_list = self.__get_jobadvert_data_from_list(vacant_jobs)
+
+                    self.__save_jobadvert_data_information(jobadvert_data_list)
+            else:
+                raise Exception('Vacant job list was None.')
+
+        except ValueError as er:
+            logging.warning(er)
+        except Exception as ex:
+            logging.exception(ex)
+
+    def __compile_vacant_job_data_information(self) -> None:
+        # Flow
+        # 1. Creates a list of companies then stored into a list.
+        # 2. Create a temporary list of vacant jobs, by found vacant jobs within the company job page url.
+        # 3. When all companies are checked, save the vacant job list, from found vacant jobs, into the database.
+
+        try:
+            company_list = self.__data_service.get_companies()
+
+            if company_list is None:
+                raise Exception('Invalid data list, no companies could be initialized.')
+            else:
+                if len(company_list) == int(0):
+                    raise ValueError('No data was found in the company data list.')
+                else:
+                    try:
+                        temp_data_list = []
+
+                        for company in company_list:
+                            # make an algorithm that compiles a list of links from the company job page url.
+                            # then to store the list in the temporary list for every company found.
+                            logging.info('Not Implemented')
+                            break
+
+                        if temp_data_list is None:
+                            raise Exception('Temp data list was not defined.')
+                        else:
+                            if len(temp_data_list) == int(0):
+                                raise ValueError('No data found within the temp data list.')
+                            else:
+                                # Store the found vacant job links in the database.
+                                logging.info('Not Implemented')
+                    except ValueError as er:
+                        logging.warning(er)
+                    except Exception is Exception as ex:
+                        logging.exception(ex)
+        except ValueError as er:
+            logging.warning(er)
+        except Exception is Exception as ex:
+            logging.exception(ex)
+
+    def __save_jobadvert_data_information(self, jobadvert_data_list: []) -> None:
+        try:
+            existing_jobadvert_data_list = self.__data_service.get_existing_job_adverts()
+
+            # Validate the data list for None.
+            if jobadvert_data_list is not None and existing_jobadvert_data_list is not None:
+                try:
+                    if len(jobadvert_data_list) == int(0) and len(existing_jobadvert_data_list) == int(0):
+                        raise ValueError('No data found in the given lists.')
+                    else:
+                        # logging.info(f"Saving <{len(jobadvert_data_list)}> compiled job advert(s).")
+                        logging.info('Looking for duplicate data.')
+
+                        # Validate duplicate information.
+                        for existing_data in existing_jobadvert_data_list:
+                            for jobadvert in jobadvert_data_list:
+                                if existing_data[0] == jobadvert.id:
+                                    logging.info(f'Found duplicate data on -> {existing_data[0]}')
+                                    # Update jobadvert with new information.
+                                    self.__data_service.update_jobadvert(jobadvert)
+                                else:
+                                    logging.info(f'No duplicate found on [{existing_data[0]}], creating jobadvert -> {jobadvert.id}')
+                                    # Create a jobadvert with new information.
+                                    self.__data_service.create_jobadvert(jobadvert)
+                except ValueError as er:
+                    logging.warning(er)
+            else:
+                raise Exception('Given data to save was invalid.')
+
+        except Exception as ex:
+            logging.exception(ex)
+        finally:
+            logging.info('Finished Saving JobAdvert Data.')
+
+    def __get_jobadvert_data_from_list(self, data_list: []) -> []:
+        # Create a job advert data list.
+        jobadvert_data_list = []
+
+        try:
+            # Check the data list is None.
+            if data_list is None:
+                raise Exception('Parameter was not defined.')
+            else:
+                try:
+                    # check the length of the data list is valid.
+                    if len(data_list) == 0:
+                        raise Exception('Parameter was empty.')
+                    else:
+                        for data in data_list:
+                            jobadvert = self.__algorithm_service.compile_jobadvert_from_vacant_job_data_list(data)
+                            jobadvert_data_list.append(jobadvert)
+
+                        return jobadvert_data_list
+                except Exception is Exception:
+                    logging.error(traceback.TracebackException)
+        except Exception is Exception:
+            logging.error(traceback.TracebackException)
