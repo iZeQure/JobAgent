@@ -4,18 +4,18 @@ GO
 DECLARE @kill varchar(8000) = ''
 SELECT @kill = @kill + 'kill ' + CONVERT(varchar(5), session_id) + ';'
 FROM sys.dm_exec_sessions
-WHERE database_id = DB_ID('JobAgentLogDB')
+WHERE database_id = DB_ID('LogDB')
 
 EXEC(@kill)
 GO
 
-DROP DATABASE IF EXISTS [JobAgentLogDB]
+DROP DATABASE IF EXISTS [LogDB]
 GO
 
-CREATE DATABASE [JobAgentLogDB]
+CREATE DATABASE [LogDB]
 GO
 
-USE [JobAgentLogDB]
+USE [LogDB]
 GO
 
 DROP TABLE IF EXISTS [Log]
@@ -72,6 +72,8 @@ GO
 INSERT INTO [LogType] ([Name])
 VALUES
 ('General'),
+('JobAgent'),
+('ZombieCrawler'),
 ('System')
 GO
 

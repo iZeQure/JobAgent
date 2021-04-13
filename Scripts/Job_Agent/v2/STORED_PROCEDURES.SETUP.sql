@@ -19,16 +19,16 @@ AS
 
 	BEGIN TRY
 		IF EXISTS (SELECT [Name] FROM [Area] WHERE [Name] = @areaName)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating area failed, already exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating area failed, already exists', 4, 2
 		ELSE
 			INSERT INTO [Area] ([Name])
 			VALUES
 			(@areaName);
 
-			COMMIT TRANSACTION @TranName;			
+			COMMIT TRANSACTION @TranName;
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating area', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating area', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -46,10 +46,10 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [Area] WHERE [Id] != @areaId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating area failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating area failed, does not exist', 4, 2
 		ELSE
 			IF EXISTS (SELECT * FROM [Area] WHERE [Name] = @areaName)
-				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating area failed, area already exists', 4, 2
+				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating area failed, area already exists', 4, 2
 			ELSE
 				UPDATE [Area]
 					SET [Name] = @areaName
@@ -58,7 +58,7 @@ AS
 				COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating area', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating area', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -75,7 +75,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [Area] WHERE [Id] = @areaId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing area failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing area failed, does not exist', 4, 2
 		ElSE
 			-- Remove all references to the primary key.
 			DELETE FROM [ConsultantArea]
@@ -87,7 +87,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing area', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing area', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -104,7 +104,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT [Id] FROM [Area] WHERE [Id] = @areaId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting area failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting area failed, does not exist', 4, 2
 		ELSE
 			SELECT
 				[dbo].[Area].[Id] AS 'Area ID',
@@ -115,7 +115,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting area by id', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting area by id', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -131,7 +131,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT TOP(1) [Id] FROM [Area])
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting area collection, was empty', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting area collection, was empty', 4, 2
 		ELSE
 			SELECT
 				[dbo].[Area].[Id] AS 'Area ID',
@@ -141,7 +141,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting area collection', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting area collection', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -166,7 +166,7 @@ AS
 
 	BEGIN TRY
 		IF EXISTS (SELECT [Name] FROM [Role] WHERE [Name] = @roleName)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating role failed, already exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating role failed, already exists', 4, 2
 		ELSE
 			INSERT INTO [Role] ([Name], [Description])
 			VALUES
@@ -175,7 +175,7 @@ AS
 			COMMIT TRANSACTION @TranName;			
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating role', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating role', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -194,10 +194,10 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [Role] WHERE [Id] != @roleId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating role failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating role failed, does not exist', 4, 2
 		ELSE
 			IF EXISTS (SELECT * FROM [Role] WHERE [Name] = @roleName)
-				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating role failed, role already exists', 4, 2
+				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating role failed, role already exists', 4, 2
 			ELSE
 				UPDATE [Role]
 					SET [Name] = @roleName,
@@ -207,7 +207,7 @@ AS
 				COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating role', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating role', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -224,10 +224,10 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [Role] WHERE [Id] = @roleId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing role failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing role failed, does not exist', 4, 2
 		ElSE
 			IF EXISTS (SELECT [RoleId] FROM [dbo].[User] WHERE [RoleId] = @roleId)
-				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing role failed, is in use', 4, 2
+				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing role failed, is in use', 4, 2
 			ELSE
 				DELETE FROM [Role]
 				WHERE [Role].[Id] = @roleId
@@ -235,7 +235,7 @@ AS
 				COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing role', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing role', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -252,7 +252,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT [Id] FROM [Role] WHERE [Id] = @roleId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting role failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting role failed, does not exist', 4, 2
 		ELSE
 			SELECT
 				[dbo].[Role].[Id] AS 'Role ID',
@@ -264,7 +264,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting role by id', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting role by id', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -280,7 +280,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT TOP(1) [Id] FROM [Role])
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting role collection, was empty', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting role collection, was empty', 4, 2
 		ELSE
 			SELECT
 				[dbo].[Role].[Id] AS 'Role ID',
@@ -291,7 +291,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting role collection', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting role collection', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -315,7 +315,7 @@ AS
 
 	BEGIN TRY
 		IF EXISTS (SELECT [Name] FROM [Location] WHERE [Name] = @locationName)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating location failed, already exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating location failed, already exists', 4, 2
 		ELSE
 			INSERT INTO [Location] ([Name])
 			VALUES
@@ -324,7 +324,7 @@ AS
 			COMMIT TRANSACTION @TranName;			
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating location', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating location', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -342,10 +342,10 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT [Name] FROM [Location] WHERE [Id] != @locationId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating location failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating location failed, does not exist', 4, 2
 		ELSE
 			IF EXISTS (SELECT * FROM [Location] WHERE [Name] = @locationName)
-				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating location failed, location already exists', 4, 2
+				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating location failed, location already exists', 4, 2
 			ELSE
 				UPDATE [Location]
 					SET [Name] = @locationName
@@ -354,7 +354,7 @@ AS
 				COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating location', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating location', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -371,10 +371,10 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [Location] WHERE [Id] = @locationId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing location failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing location failed, does not exist', 4, 2
 		ElSE
 			IF EXISTS (SELECT [LocationId] FROM [dbo].[User] WHERE [LocationId] = @locationId)
-				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing location failed, is in use', 4, 2
+				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing location failed, is in use', 4, 2
 			ELSE
 				DELETE FROM [Location]
 				WHERE [Location].[Id] = @locationId
@@ -382,7 +382,7 @@ AS
 				COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing location', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing location', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -399,7 +399,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT [Id] FROM [Location] WHERE [Id] = @locationId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting location failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting location failed, does not exist', 4, 2
 		ELSE
 			SELECT
 				[dbo].[Location].[Id] AS 'Location ID',
@@ -410,7 +410,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting location by id', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting location by id', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -426,7 +426,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT TOP(1) [Id] FROM [Location])
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting location collection, was empty', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting location collection, was empty', 4, 2
 		ELSE
 			SELECT
 				[dbo].[Location].[Id] AS 'Location ID',
@@ -436,7 +436,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting location collection', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting location collection', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -462,11 +462,11 @@ AS
 
 	BEGIN TRY
 		IF EXISTS (SELECT * FROM [Contract] WHERE [CompanyId] = @companyId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating contract failed, already exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating contract failed, already exists', 4, 2
 		ELSE			
 			IF NOT EXISTS (SELECT [Id] FROM [User] WHERE [Id] = @userId)
 			AND NOT EXISTS (SELECT [Id] FROM [Company] WHERE [Id] = @companyId)
-				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating contract failed, user and company does not exist', 4, 2
+				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating contract failed, user and company does not exist', 4, 2
 			ELSE
 				INSERT INTO [Contract] ([CompanyId], [UserId], [Name], [RegistrationDateTime], [ExpiryDateTime])
 				VALUES
@@ -475,7 +475,7 @@ AS
 				COMMIT TRANSACTION @TranName;
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating contract', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating contract', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -497,7 +497,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [Contract] WHERE [Id] = @contractId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating contract failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating contract failed, does not exist', 4, 2
 		ELSE
 			UPDATE [Contract]
 				SET 
@@ -511,7 +511,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating contract', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating contract', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -528,7 +528,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [Contract] WHERE [Id] = @contractId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing contract failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing contract failed, does not exist', 4, 2
 		ElSE
 			DELETE FROM [Contract]
 			WHERE [Id] = @contractId
@@ -536,7 +536,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing contract', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing contract', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -553,7 +553,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT [Id] FROM [Contract] WHERE [Id] = @contractId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting contract failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting contract failed, does not exist', 4, 2
 		ELSE
 			SELECT
 				[dbo].[Contract].[Id] AS 'Contract ID',
@@ -568,7 +568,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting contract by id', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting contract by id', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -584,7 +584,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT TOP(1) [Id] FROM [Contract])
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting contract collection, was empty', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting contract collection, was empty', 4, 2
 		ELSE
 			SELECT
 				[dbo].[Contract].[Id] AS 'Contract ID',
@@ -598,7 +598,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting contract collection', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting contract collection', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -625,7 +625,7 @@ AS
 
 	BEGIN TRY
 		IF EXISTS (SELECT * FROM [Company] WHERE [CVR] = @companyCVR)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating company failed, already exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating company failed, already exists', 4, 2
 		ELSE
 			INSERT INTO [Company] ([CVR], [Name], [ContactPerson], [JobPageURL])
 			VALUES
@@ -634,7 +634,7 @@ AS
 			COMMIT TRANSACTION @TranName;			
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating company', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating company', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -655,7 +655,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT [Id] FROM [Company] WHERE [Id] = @companyId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating Company failed, already exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating Company failed, already exists', 4, 2
 		ELSE
 			UPDATE [Company]
 				SET [CVR] = @companyCVR,
@@ -667,7 +667,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating Company', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating Company', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -684,7 +684,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [Company] WHERE [Id] = @companyId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing Company failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing Company failed, does not exist', 4, 2
 		ElSE
 			DECLARE @vacantJobId int
 			SET @vacantJobId = (SELECT [Id] FROM [VacantJob] WHERE [CompanyId] = @companyId)
@@ -698,7 +698,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing company', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing company', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -715,7 +715,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT [Id] FROM [Company] WHERE [Id] = @companyId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting Company failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting Company failed, does not exist', 4, 2
 		ELSE
 			SELECT
 			    [dbo].[Company].[CVR] AS 'Company CVR',
@@ -728,7 +728,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Company by ID', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Company by ID', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -744,7 +744,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT TOP(1) [Id] FROM [Company])
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting company collection, was empty', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting company collection, was empty', 4, 2
 		ELSE
 			SELECT
 				[dbo].[Company].[CVR] AS 'Company CVR',
@@ -756,7 +756,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Company collection', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Company collection', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -781,10 +781,10 @@ AS
 
 	BEGIN TRY
 		IF EXISTS (SELECT * FROM [VacantJob] WHERE [Link] = @vacantJobLink)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating VacantJob failed, already exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating VacantJob failed, already exists', 4, 2
 		ELSE
 			IF NOT EXISTS (SELECT * FROM [Company] WHERE [Id] = @companyId)
-				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating VacantJob failed, company does not exist', 4, 2	
+				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating VacantJob failed, company does not exist', 4, 2	
 			ELSE
 				INSERT INTO [VacantJob] ([Link], [CompanyId])
 				VALUES
@@ -793,7 +793,7 @@ AS
 				COMMIT TRANSACTION @TranName;			
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating VacantJob', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating VacantJob', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -812,13 +812,13 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT [Id] FROM [VacantJob] WHERE [Id] = @vacantJobId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating VacantJob failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating VacantJob failed, does not exist', 4, 2
 		ELSE
 			IF EXISTS (SELECT * FROM [VacantJob] WHERE [Link] = @vacantJobLink)
-				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating VacantJob failed, link already exists', 4, 2
+				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating VacantJob failed, link already exists', 4, 2
 			ELSE
 				IF NOT EXISTS (SELECT * FROM [Company] WHERE [Id] = @companyId)
-					EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating VacantJob failed, company does not exist', 4, 2
+					EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating VacantJob failed, company does not exist', 4, 2
 				ELSE
 					UPDATE [VacantJob]
 						SET [Link] = @vacantJobLink,
@@ -828,7 +828,7 @@ AS
 					COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating VacantJob', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating VacantJob', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -845,7 +845,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [VacantJob] WHERE [Id] = @vacantJobId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing VacantJob failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing VacantJob failed, does not exist', 4, 2
 		ElSE
 			-- Remove all references to the primary key.
 			DELETE FROM [JobAdvert] WHERE [VacantJobId] = @vacantJobId;
@@ -854,7 +854,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing VacantJob', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing VacantJob', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -871,7 +871,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT [Id] FROM [VacantJob] WHERE [Id] = @vacantJobId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting Vacantjob failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting Vacantjob failed, does not exist', 4, 2
 		ELSE
 			SELECT
 			    [dbo].[VacantJob].[Id] AS 'Vacant job ID',
@@ -884,7 +884,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting VacantJob by ID', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting VacantJob by ID', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -900,7 +900,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT TOP(1) [Id] FROM [VacantJob])
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting Vacantjob collection, was empty', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting Vacantjob collection, was empty', 4, 2
 		ELSE
 			SELECT
 				[dbo].[VacantJob].[Id] AS 'Vacant job ID',
@@ -911,7 +911,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting VacantJob collection', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting VacantJob collection', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -936,7 +936,7 @@ AS
 
 	BEGIN TRY
 		IF EXISTS (SELECT * FROM [Category] WHERE [Name] = @categoryName)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating category failed, already exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating category failed, already exists', 4, 2
 		ELSE
 			INSERT INTO [Category] ([Name])
 			VALUES
@@ -945,7 +945,7 @@ AS
 			COMMIT TRANSACTION @TranName;			
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating category', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating category', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -963,10 +963,10 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT [Id] FROM [Category] WHERE [Id] = @categoryId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating category failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating category failed, does not exist', 4, 2
 		ELSE
 			IF EXISTS (SELECT * FROM [Category] WHERE [Name] = @categoryName)
-				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating category failed, name already exists', 4, 2
+				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating category failed, name already exists', 4, 2
 			ElSE
 				UPDATE [Category]
 					SET [Name] = @categoryName
@@ -975,7 +975,7 @@ AS
 				COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating category', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating category', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -992,7 +992,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [Category] WHERE [Id] = @categoryId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing category failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing category failed, does not exist', 4, 2
 		ElSE
 			-- Remove all references to the primary key.
 			DELETE FROM [JobAdvert] WHERE [CategoryId] = @categoryId;
@@ -1001,7 +1001,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing category', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing category', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1019,7 +1019,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT [Id] FROM [Category] WHERE [Id] = @categoryId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting category failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting category failed, does not exist', 4, 2
 		ELSE
 			SELECT
 			    [dbo].[Category].[Id] AS 'Category ID',
@@ -1032,7 +1032,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting category by ID', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting category by ID', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1048,7 +1048,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT TOP(1) [Id] FROM [VacantJob])
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting Category collection, was empty', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting Category collection, was empty', 4, 2
 		ELSE
 			SELECT
 			    [dbo].[Category].[Id] AS 'Category ID',
@@ -1059,7 +1059,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Category collection', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Category collection', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1087,7 +1087,7 @@ AS
 		COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Category Menu', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Category Menu', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1112,7 +1112,7 @@ AS
 
 	BEGIN TRY
 		IF EXISTS (SELECT * FROM [Specialization] WHERE [Name] = @specializationName)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating Specialization failed, already exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating Specialization failed, already exists', 4, 2
 		ELSE
 			INSERT INTO [Specialization] ([Name], [CategoryId])
 			VALUES
@@ -1121,7 +1121,7 @@ AS
 			COMMIT TRANSACTION @TranName;			
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating Specialization', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating Specialization', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1140,10 +1140,10 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [Specialization] WHERE [Id] = @specializationId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating Specialization failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating Specialization failed, does not exist', 4, 2
 		ELSE
 			IF EXISTS (SELECT * FROM [Specialization] WHERE [Name] = @specializationName AND [Id] != @specializationId)
-				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating Specialization failed, duplicate of row', 4, 2	
+				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating Specialization failed, duplicate of row', 4, 2	
 			ELSE
 				UPDATE [Specialization]
 					SET [Name] = @specializationName,
@@ -1153,7 +1153,7 @@ AS
 				COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating Specialization', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating Specialization', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1170,7 +1170,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [Specialization] WHERE [Id] = @specializationId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing Specialization failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing Specialization failed, does not exist', 4, 2
 		ElSE			
 			DELETE FROM [JobAdvert] WHERE [SpecializationId] = @specializationId;
 			DELETE FROM [Specialization] WHERE [Id] = @specializationId;
@@ -1178,7 +1178,7 @@ AS
 			COMMIT TRANSACTION @TranName;
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing Specialization', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing Specialization', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1195,7 +1195,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT [Id] FROM [Specialization] WHERE [Id] = @specializationId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting Specialization failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting Specialization failed, does not exist', 4, 2
 		ELSE
 			SELECT
 				[dbo].[Specialization].[Id] AS 'Specialization ID',
@@ -1207,7 +1207,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Specialization by ID', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Specialization by ID', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1223,7 +1223,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT TOP(1) [Id] FROM [Specialization])
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting Specialization collection, was empty', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting Specialization collection, was empty', 4, 2
 		ELSE
 			SELECT
 				[dbo].[Specialization].[Id] AS 'Specialization ID',
@@ -1235,7 +1235,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Specialization collection', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting Specialization collection', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1271,11 +1271,11 @@ AS
 
 	BEGIN TRY
 		IF EXISTS (SELECT * FROM [JobAdvert] WHERE [VacantJobId] = @vacantJobId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating JobAdvert failed, already exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating JobAdvert failed, already exists', 4, 2
 		 
 		ELSE
 			IF NOT EXISTS (SELECT * FROM [Category] WHERE [Id] = @categoryId) OR NOT EXISTS (SELECT * From [Specialization] WHERE [Id] = @specializationId)
-				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating JobAdvert failed, Category or specilization does not exist', 4, 2
+				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating JobAdvert failed, Category or specilization does not exist', 4, 2
 
 			ELSE
 			    INSERT INTO [JobAdvert] ([VacantJobId], [CategoryId], [SpecializationId], [Title], [Summary], [Description], [Email], [PhoneNumber], [RegistrationDateTime], [ApplicationDeadlineDateTime])
@@ -1285,7 +1285,7 @@ AS
 				COMMIT TRANSACTION @TranName;			
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating JobAdvert', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating JobAdvert', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1311,10 +1311,10 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [JobAdvert] WHERE [VacantJobId] = @vacantJobId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating JobAdvert failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating JobAdvert failed, does not exist', 4, 2
 		ELSE
 			IF NOT EXISTS (SELECT * FROM [Category] WHERE [Id] = @categoryId) OR NOT EXISTS (SELECT * From [Specialization] WHERE [Id] = @specializationId)
-				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating JobAdvert failed, Category or specilization does not exist', 4, 2
+				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating JobAdvert failed, Category or specilization does not exist', 4, 2
 			ELSE
 				UPDATE [JobAdvert]
 					SET	
@@ -1332,7 +1332,7 @@ AS
 				COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating JobAdvert', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating JobAdvert', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1349,7 +1349,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [JobAdvert] WHERE [VacantJobId] = @vacantJobId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing JobAdvert failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing JobAdvert failed, does not exist', 4, 2
 		ElSE
 			DELETE FROM [Address] WHERE [JobAdvertVacantJobId] = @vacantJobId;
 			DELETE FROM [JobAdvert] WHERE [VacantJobId] = @vacantJobId;
@@ -1357,7 +1357,7 @@ AS
 			COMMIT TRANSACTION @TranName;
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing JobAdvert', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing JobAdvert', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1374,7 +1374,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [JobAdvert] WHERE [VacantJobId] = @vacantJobId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting JobAdvert failed, does not exist', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting JobAdvert failed, does not exist', 4, 2
 		ELSE
 			SELECT
 				j.[VacantJobId] AS 'JobAdvert ID',
@@ -1393,7 +1393,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting JobAdvert by ID', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting JobAdvert by ID', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1409,7 +1409,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT TOP(1) * FROM [JobAdvert])
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting JobAdvert collection, was empty', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting JobAdvert collection, was empty', 4, 2
 		ELSE
 			SELECT
 				j.[VacantJobId] AS 'JobAdvert ID',
@@ -1428,7 +1428,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting JobAdvert collection', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting JobAdvert collection', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1451,7 +1451,7 @@ AS
 		
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting count by Category', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting count by Category', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1474,7 +1474,7 @@ AS
 		
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting count by Specialization', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting count by Specialization', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1495,7 +1495,7 @@ AS
 			COMMIT TRANSACTION @TranName
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting count by NonCategorized JobAdvert', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error getting count by NonCategorized JobAdvert', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1523,7 +1523,7 @@ AS
 
 	BEGIN TRY
 		IF EXISTS (SELECT * FROM [Address] WHERE [JobAdvertVacantJobId] = @jobAdvertVacantJobId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating Address failed, already exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating Address failed, already exists', 4, 2
 		 ELSE
 			INSERT INTO [Address] ([JobAdvertVacantJobId], [StreetAddress], [City], [Country], [PostalCode])
 			VALUES
@@ -1532,11 +1532,10 @@ AS
 			COMMIT TRANSACTION @TranName;			
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating Address', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating Address', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
-
 GO
 
 CREATE PROCEDURE [JA.spUpdateAddress](
@@ -1554,7 +1553,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [Address] WHERE [JobAdvertVacantJobId] = @jobAdvertVacantJobId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Update Address failed, does not exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Update Address failed, does not exists', 4, 2
 		 ELSE
 			UPDATE [Address]
 			SET
@@ -1567,7 +1566,7 @@ AS
 			COMMIT TRANSACTION @TranName;			
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating Address', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating Address', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1584,14 +1583,14 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [Address] WHERE [JobAdvertVacantJobId] = @jobAdvertVacantJobId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing Address failed, does not exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing Address failed, does not exists', 4, 2
 		 ELSE
 			DELETE FROM [Address] WHERE [JobAdvertVacantJobId] = @jobAdvertVacantJobId;
 
 			COMMIT TRANSACTION @TranName;			
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing Address', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing Address', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1608,7 +1607,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [Address] WHERE [JobAdvertVacantJobId] = @jobAdvertVacantJobId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting Address failed, does not exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting Address failed, does not exists', 4, 2
 		 ELSE
 			SELECT 
 			StreetAddress AS 'Street Address', 
@@ -1621,7 +1620,7 @@ AS
 			COMMIT TRANSACTION @TranName;			
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while getting Address by ID', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while getting Address by ID', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1637,7 +1636,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [Address])
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting Address collection failed, was empty', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting Address collection failed, was empty', 4, 2
 		 ELSE
 			SELECT 
 			StreetAddress AS 'Street Address', 
@@ -1649,7 +1648,7 @@ AS
 			COMMIT TRANSACTION @TranName;			
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while getting Address collection', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while getting Address collection', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1688,7 +1687,7 @@ AS
 
 	BEGIN TRY
 		IF EXISTS (SELECT * FROM [User] WHERE [Id] = @userId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating User failed, already exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating User failed, already exists', 4, 2
 		 ELSE
 			INSERT INTO [User] ([Id], [RoleId], [LocationId], [FirstName], [LastName], [Email], [Password], [Salt],[AccessToken])
 			VALUES
@@ -1697,11 +1696,10 @@ AS
 			COMMIT TRANSACTION @TranName;			
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating User', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating User', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
-
 GO
 
 CREATE PROCEDURE [JA.spUpdateUser](
@@ -1723,7 +1721,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [User] WHERE [Id] = @userId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating User failed, does not exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating User failed, does not exists', 4, 2
 		 ELSE
 			UPDATE [User]
 			SET
@@ -1740,11 +1738,10 @@ AS
 			COMMIT TRANSACTION @TranName;			
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating User', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating User', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
-
 GO
 
 CREATE PROCEDURE [JA.spRemoveUser](
@@ -1758,7 +1755,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [User] WHERE [Id] = @userId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing User failed, does not exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing User failed, does not exists', 4, 2
 		 ELSE
 			DELETE FROM [Contract] WHERE [UserId] = @userId;
 			DELETE FROM [ConsultantArea] WHERE [UserId] = @userId;
@@ -1767,7 +1764,7 @@ AS
 			COMMIT TRANSACTION @TranName;			
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing User', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing User', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1784,7 +1781,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [User] WHERE [Id] = @userId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting User failed, does not exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting User failed, does not exists', 4, 2
 		 ELSE
 			SELECT 
 			u.[Id] AS 'User ID',
@@ -1810,7 +1807,7 @@ AS
 			COMMIT TRANSACTION @TranName;			
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while getting User by ID', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while getting User by ID', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1827,7 +1824,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [User])
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting collection of User failed, does not exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting collection of User failed, does not exists', 4, 2
 		 ELSE
 			SELECT 
 			u.[Id] AS 'User ID',
@@ -1852,7 +1849,7 @@ AS
 			COMMIT TRANSACTION @TranName;			
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while getting collection of User', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while getting collection of User', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
@@ -1870,10 +1867,10 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [User] WHERE [Id] = @userId) OR NOT EXISTS (SELECT * FROM [Area] WHERE [Id] = @areaId)
-				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Granting area to User failed, user or area does not exists', 4, 2
+				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Granting area to User failed, user or area does not exists', 4, 2
 		ELSE
 			IF EXISTS (SELECT * FROM [ConsultantArea] WHERE [UserId] = @userId AND [AreaId] = @areaId)
-				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Granting area to user failed, user already this area.', 4, 2
+				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Granting area to user failed, user already this area.', 4, 2
 			ELSE
 				INSERT INTO [ConsultantArea] ([UserId], [AreaId])
 				VALUES (@userId, @areaId);
@@ -1881,11 +1878,10 @@ AS
 			COMMIT TRANSACTION @TranName;
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while granting an area to User', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while granting an area to User', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
-
 GO
 
 CREATE PROCEDURE [JA.spRemoveUserArea](
@@ -1900,21 +1896,20 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [User] WHERE [Id] = @userId) OR NOT EXISTS (SELECT * FROM [Area] WHERE [Id] = @areaId)
-				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing area from User failed, user or area does not exists', 4, 2
+				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing area from User failed, user or area does not exists', 4, 2
 		ELSE
 			IF NOT EXISTS (SELECT * FROM [ConsultantArea] WHERE [UserId] = @userId AND [AreaId] = @areaId)
-				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing area from user failed, user does not have this area.', 4, 2
+				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing area from user failed, user does not have this area.', 4, 2
 			ELSE
 				DELETE FROM [ConsultantArea] WHERE [UserId] = @userId AND [AreaId] = @areaId;
 			
 			COMMIT TRANSACTION @TranName;
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing an area from User', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while removing an area from User', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
-
 GO
 
 CREATE PROCEDURE [JA.spGetUserSaltByEmail](
@@ -1928,7 +1923,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [User] WHERE [Email] = @userEmail)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting User salt by Email failed, user does not exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting User salt by Email failed, user does not exists', 4, 2
 		ELSE
 			SELECT 
 			[Salt] AS 'User Salt'
@@ -1938,11 +1933,10 @@ AS
 			COMMIT TRANSACTION @TranName;
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while getting User salt by email', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while getting User salt by email', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
-
 GO
 
 CREATE PROCEDURE [JA.spGetUserByAccessToken](
@@ -1956,7 +1950,7 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [User] WHERE [AccessToken] = @userAccessToken)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting User by AccessToken, user does not exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting User by AccessToken, user does not exists', 4, 2
 		ELSE
 			SELECT 
 			u.[Id] AS 'User ID',
@@ -1982,11 +1976,10 @@ AS
 			COMMIT TRANSACTION @TranName;
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while getting User by access token', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while getting User by access token', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
-
 GO
 
 CREATE PROCEDURE [JA.spUpdateUserSecurity](
@@ -2004,10 +1997,10 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [User] WHERE [Id] = @userId)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed updating User security, user does not exists', 4, 2 
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed updating User security, user does not exists', 4, 2 
 		ELSE
 			IF NOT EXISTS (SELECT * FROM [User] WHERE [Password] = @userOldPassword)
-				EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed updating User security, password does not match', 4, 2 
+				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed updating User security, password does not match', 4, 2 
 			ELSE
 				UPDATE [User]
 				SET
@@ -2019,11 +2012,10 @@ AS
 				COMMIT TRANSACTION @TranName;
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating User security', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while updating User security', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
-
 GO
 
 CREATE PROCEDURE [JA.spValidateUserExists](
@@ -2038,19 +2030,16 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [User] WHERE [Email] = @userEmail)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed validating existence of User, user does not exists', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed validating existence of User, user does not exists', 4, 2
 		ELSE
 			SET @returnResult = 1;
-
-
 			COMMIT TRANSACTION @TranName;
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while validating existence of User', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while validating existence of User', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
-
 GO
 
 CREATE PROCEDURE [JA.spValidateUserLogin](
@@ -2066,17 +2055,14 @@ AS
 
 	BEGIN TRY
 		IF NOT EXISTS (SELECT * FROM [User] WHERE [Email] = @userEmail AND [Password] = @userPassword)
-			EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed validating User login, credentials does not match', 4, 2
+			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed validating User login, credentials does not match', 4, 2
 		ELSE
 			SET @returnResult = 1;
-
-
 			COMMIT TRANSACTION @TranName;
 	END TRY
 	BEGIN CATCH
-		EXEC [JobAgentLogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while validating User login', 6, 2
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while validating User login', 6, 4
 
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
-
 GO
