@@ -1,0 +1,38 @@
+{
+  "ENVIRONMENT": {
+    "PRODUCTION": {
+      "WebDriver": {
+        "Path": "C:\\Zombie_Crawler\\tools\\geckodriver.exe"
+      },
+      "DatabaseConnection": {
+        "Driver": "{SQL Server Native Client 11.0}",
+        "Server" : "172.17.0.62\\SKPMSSQLSERVER,1433",
+        "UID": "job_agent",
+        "PWD": "4Ndet0wn",
+        "Trusted_Connection": "no"
+      }
+    },
+    "DEVELOPMENT": {
+      "WebDriver": {
+        "Path": "C:\\VirtualEnvironment\\geckodriver.exe"
+      },
+      "DatabaseConnection": {
+        "Driver": "{SQL Server Native Client 11.0}",
+        "Server" : "IGEIRISS\\SQLDEV",
+        "Trusted_Connection": "yes"
+      }
+    }
+  },
+  "Logging": {
+    "Format": "%(asctime)s [%(levelname)s] - %(message)s",
+    "DateFormat": "%m/%d/%Y %I:%M:%S %p",
+    "Level": {
+      "CRITICAL": 50,
+      "ERROR": 40,
+      "WARNING": 30,
+      "INFO": 20,
+      "DEBUG": 10,
+      "NOTSET": 0
+    }
+  }
+}

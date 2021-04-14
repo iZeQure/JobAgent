@@ -54,7 +54,7 @@ class DataService:
         return self.__data_manager.get_existing_job_adverts()
 
     def create_jobadvert(self, jobadvert: models.JobAdvert):
-        self.__data_manager.create_jobadvert(jobadvert)
+        self.__data_manager.create_job_advert(jobadvert)
 
     def update_jobadvert(self, jobadvert):
         self.__data_manager.update_jobadvert(jobadvert)
