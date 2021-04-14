@@ -1,16 +1,65 @@
+import logging
 import re
 from datetime import datetime
 
 from bs4 import BeautifulSoup
 
-from DataLayer.services.data_service import DataService
+from WebCrawler.DataLayer.services.data_service import DataService
 
 
 class SearchAlgorithmProvider:
+    """
+    Super class of Search Algorithms, provides the most basic information for crawling the web.
+    """
+    __service: DataService
+    __soup: BeautifulSoup
+
+    def __init__(self, data_service: DataService):
+        """
+        Instantiates the Algorithm provider.
+        Args:
+            data_service: Represents a data service, to give proper methods to execute from.
+        """
+        self.__service = data_service
+
+    def set_page_source(self, page_html: str):
+        """
+        Instantiates a BeautifulSoup object with the given HTML.
+        Args:
+            page_html: Page source of the URL provided.
+        Returns: None.
+        """
+        self.__soup = BeautifulSoup(page_html, 'html.parser')
+
+    @property
+    def data_service(self):
+        """
+        Get the data service.
+        Returns:
+            DataService: A DataService object.
+
+        """
+        try:
+            return self.__service
+        except Exception as ex:
+            logging.error(f'No instance found of [service] in {ex.__class__}')
+
+    @property
+    def soup(self):
+        """
+        Get the soup.
+        Returns:
+            BeautifulSoup: An object containing the Beautiful Soup object.
+        """
+        try:
+            return self.__soup
+        except Exception as ex:
+            logging.error(f'No instance found of [soup] in {ex.__class__}')
+
+
+class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
     __not_found_text = "Ikke Fundet"
     __not_found_id = 0
-
-    _data_service: DataService
 
     _title_filter_keys = []
     _email_filter_keys = []
@@ -22,45 +71,36 @@ class SearchAlgorithmProvider:
     _category_filter_keys = []
     _specialization_filter_keys = []
 
-    _soup = str
-
     def __init__(self, data_service: DataService):
-        self._data_service = data_service
+        super().__init__(data_service)
+
         self.load_filters()
 
     def load_filters(self):
+        service = self.data_service
+
         self._title_filter_keys = \
-            self.get_keys_from_list(self._data_service.get_algorithm_keywords_by_key("Title_Key"))
+            self.get_keys_from_list(service.get_algorithm_keywords_by_key("Title_Key"))
         self._email_filter_keys = \
-            self.get_keys_from_list(self._data_service.get_algorithm_keywords_by_key("Email_Key"))
+            self.get_keys_from_list(service.get_algorithm_keywords_by_key("Email_Key"))
         self._phone_number_filter_keys = \
-            self.get_keys_from_list(self._data_service.get_algorithm_keywords_by_key("Phone_Number_Key"))
+            self.get_keys_from_list(service.get_algorithm_keywords_by_key("Phone_Number_Key"))
         self._description_filter_keys = \
-            self.get_keys_from_list(self._data_service.get_algorithm_keywords_by_key("Description_Key"))
+            self.get_keys_from_list(service.get_algorithm_keywords_by_key("Description_Key"))
         self._location_name_filter_keys = \
-            self.get_keys_from_list(self._data_service.get_algorithm_keywords_by_key("Location_Key"))
+            self.get_keys_from_list(service.get_algorithm_keywords_by_key("Location_Key"))
         self._registration_date_name_filter_keys = \
-            self.get_keys_from_list(self._data_service.get_algorithm_keywords_by_key("Registration_Date_Key"))
+            self.get_keys_from_list(service.get_algorithm_keywords_by_key("Registration_Date_Key"))
         self._deadline_date_name_filter_keys = \
-            self.get_keys_from_list(self._data_service.get_algorithm_keywords_by_key("Deadline_Date_Key"))
+            self.get_keys_from_list(service.get_algorithm_keywords_by_key("Deadline_Date_Key"))
         self._category_filter_keys = \
-            self.get_keys_from_list(self._data_service.get_algorithm_keywords_by_key("Category_Key"))
+            self.get_keys_from_list(service.get_algorithm_keywords_by_key("Category_Key"))
         self._specialization_filter_keys = \
-            self.get_keys_from_list(self._data_service.get_algorithm_keywords_by_key("Specialization_Key"))
-
-    @staticmethod
-    def get_keys_from_list(keys: []) -> []:
-        temp_list = []
-        for key in keys:
-            temp_list.append(key[0])
-        return temp_list
-
-    def set_page_source(self, page_html: str):
-        self._soup = BeautifulSoup(page_html, 'html.parser')
+            self.get_keys_from_list(service.get_algorithm_keywords_by_key("Specialization_Key"))
 
     def find_title(self) -> str:
         for arg in self._title_filter_keys:
-            title = self._soup.find(text=re.compile(arg, flags=re.IGNORECASE))
+            title = self.soup.find(text=re.compile(arg, flags=re.IGNORECASE))
 
             if title is not None:
                 return title
@@ -69,7 +109,7 @@ class SearchAlgorithmProvider:
 
     def find_email(self) -> str:
         for arg in self._email_filter_keys:
-            mail = self._soup.select_one(arg)
+            mail = self.soup.select_one(arg)
 
             if mail is not None:
                 return mail.get_text()
@@ -80,7 +120,7 @@ class SearchAlgorithmProvider:
         regex = "([0-9]{8,8})"
 
         for arg in self._phone_number_filter_keys:
-            for result in self._soup.find_all(arg):
+            for result in self.soup.find_all(arg):
                 text_from_result = result.get_text()
 
                 if text_from_result is not None:
@@ -91,7 +131,7 @@ class SearchAlgorithmProvider:
 
     def find_description(self) -> str:
         for arg in self._description_filter_keys:
-            description = self._soup.select_one(arg)
+            description = self.soup.select_one(arg)
 
             if description is not None:
                 return description.get_text(' ', True)
@@ -103,7 +143,7 @@ class SearchAlgorithmProvider:
         elements = []
 
         for location_filter in self._location_name_filter_keys:
-            elements.append(self._soup.find(text=re.compile(location_filter, flags=re.IGNORECASE)))
+            elements.append(self.soup.find(text=re.compile(location_filter, flags=re.IGNORECASE)))
 
         for arg in elements:
             if arg is not None:
@@ -120,7 +160,7 @@ class SearchAlgorithmProvider:
         reg_datetime = None
         date_elements = []
         for date_filter in self._registration_date_name_filter_keys:
-            date_elements.append(self._soup.find(text=re.compile(date_filter), flags=re.IGNORECASE))
+            date_elements.append(self.soup.find(text=re.compile(date_filter), flags=re.IGNORECASE))
 
         if date_elements is not None:
             for date in date_elements:
@@ -148,12 +188,12 @@ class SearchAlgorithmProvider:
 
     def find_category(self) -> int:
         category_filter_keys = self._category_filter_keys
-        categories = self._data_service.get_categories()
+        categories = self.data_service.get_categories()
         category_id = 0
         result = ""
 
         for category_filter_key in category_filter_keys:
-            result = self._soup.find(text=re.compile(category_filter_key, flags=re.IGNORECASE))
+            result = self.soup.find(text=re.compile(category_filter_key, flags=re.IGNORECASE))
             if result is not None:
                 result = result.lower()
 
@@ -170,11 +210,11 @@ class SearchAlgorithmProvider:
 
     def find_specialization(self) -> int:
         specialization_filter_keys = self._specialization_filter_keys
-        specializations = self._data_service.get_specializations()
+        specializations = self.data_service.get_specializations()
         specialization_id = 0
 
         for specialization_filter in specialization_filter_keys:
-            result = self._soup.find(text=re.compile(specialization_filter, flags=re.IGNORECASE))
+            result = self.soup.find(text=re.compile(specialization_filter, flags=re.IGNORECASE))
             if result is not None:
                 result = result.lower()
                 for specialization in specializations:
@@ -189,3 +229,15 @@ class SearchAlgorithmProvider:
             return specialization_id
 
         return self.__not_found_id
+
+    @staticmethod
+    def get_keys_from_list(keys: []) -> []:
+        temp_list = []
+        for key in keys:
+            temp_list.append(key[0])
+        return temp_list
+
+
+class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
+    def __init__(self, data_service: DataService):
+        super().__init__(data_service)

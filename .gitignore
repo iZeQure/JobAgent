@@ -6,3 +6,5 @@ geckodriver.log
 /WebCrawler/main.spec
 /WebCrawler/zombie.spec
 /WebCrawler/__pycache__/
+/dist/
+/build/

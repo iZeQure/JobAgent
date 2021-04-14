@@ -7,6 +7,11 @@ from selenium.common.exceptions import WebDriverException
 
 
 class PageSourceProvider:
+    __app_config: object
+
+    def __init__(self, app_config: object):
+        self.__app_config = app_config
+
     def get_html_page_source_data_list(self, vacant_jobs: []) -> []:
         """
         Gets a list of html page source.
@@ -19,7 +24,7 @@ class PageSourceProvider:
         output = []
 
         try:
-            with webdriver.Firefox(executable_path=f'{self.__get_geckodriver_path("DEVELOPMENT")}') as driver:
+            with webdriver.Firefox(executable_path=f'{self.__get_geckodriver_path()}') as driver:
                 driver.minimize_window()
 
                 for vacant_job in vacant_jobs:
@@ -47,6 +52,9 @@ class PageSourceProvider:
     def get_links_from_company_page_url(self, company: []) -> []:
         pass
 
+    def __get_geckodriver_path(self) -> str:
+        return self.__app_config["WebDriver"]["Path"]
+
     @staticmethod
     def __format_url(url: str):
         """
@@ -57,10 +65,3 @@ class PageSourceProvider:
         if not match('(?:http|ftp|https)://', url):
             return 'https://{}'.format(url)
         return url
-
-    @staticmethod
-    def __get_geckodriver_path(environment: str) -> str:
-        if environment == "PRODUCTION":
-            return "C:\\Zombie_Crawler\\tools\\geckodriver.exe"
-        if environment == "DEVELOPMENT":
-            return "C:\\VirtualEnvironment\\geckodriver.exe"

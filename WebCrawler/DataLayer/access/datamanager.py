@@ -1,5 +1,5 @@
-import DataLayer.database as db
-import DataLayer.models as models
+import WebCrawler.DataLayer.database as db
+import WebCrawler.DataLayer.models as models
 
 
 class DataManager:

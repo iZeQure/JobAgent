@@ -1,5 +1,5 @@
-import DataLayer.access as manager
-import DataLayer.models as models
+import WebCrawler.DataLayer.access as manager
+import WebCrawler.DataLayer.models as models
 
 
 class DataService:
@@ -54,10 +54,7 @@ class DataService:
         return self.__data_manager.get_existing_job_adverts()
 
     def create_jobadvert(self, jobadvert: models.JobAdvert):
-        try:
-            self.__data_manager.create_jobadvert(jobadvert)
-        except ValueError:
-            return
+        self.__data_manager.create_jobadvert(jobadvert)
 
     def update_jobadvert(self, jobadvert):
         self.__data_manager.update_jobadvert(jobadvert)

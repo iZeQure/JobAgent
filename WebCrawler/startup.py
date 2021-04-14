@@ -1,13 +1,14 @@
 import logging
 import traceback
 
-import DataLayer.database as database
-import DataLayer.access as manager
-import DataLayer.services as service
-import DataLayer.providers as provider
+from DataLayer import providers as provider, services as service, access as manager, database
 
 
 class Startup:
+    __SET_CONFIGURATION_MODE = "DEVELOPMENT"
+
+    __app_config: object
+
     __company_list: []
     __existing_jobadvert_list: []
 
@@ -16,13 +17,14 @@ class Startup:
     __data_service: service.DataService
     __algorithm_service: service.AlgorithmService
     __gecko_driver_provider: provider.PageSourceProvider
-    __algorithm_provider: provider.SearchAlgorithmProvider
 
-    def __init__(self):
+    def __init__(self, app_config: object):
         # Initialize logging config.
-        logging.basicConfig(level=logging.INFO,
-                            format='%(asctime)s [%(levelname)s] - %(message)s',
-                            datefmt='%m/%d/%Y %I:%M:%S %p')
+        logging.basicConfig(level=app_config["Logging"]["Level"]["INFO"],
+                            format=app_config["Logging"]["Format"],
+                            datefmt=app_config["Logging"]["DateFormat"])
+
+        self.__app_config = app_config["ENVIRONMENT"][self.__SET_CONFIGURATION_MODE]
 
     def init_crawler(self) -> None:
         """
@@ -60,14 +62,26 @@ class Startup:
 
         except ValueError:
             logging.exception("Error: 40 - Uncaught Exception.")
+        except Exception as ex:
+            logging.exception(ex)
 
     def __initialize_services(self) -> None:
-        self.__database = database.DatabaseMSSQL()
-        self.__manager = manager.DataManager(self.__database)
-        self.__data_service = service.DataService(self.__manager)
-        self.__gecko_driver_provider = provider.PageSourceProvider()
-        self.__algorithm_provider = provider.SearchAlgorithmProvider(self.__data_service)
-        self.__algorithm_service = service.AlgorithmService(self.__algorithm_provider, self.__gecko_driver_provider)
+        try:
+            self.__database = database.DatabaseMSSQL(self.__app_config)
+            self.__manager = manager.DataManager(self.__database)
+            self.__data_service = service.DataService(self.__manager)
+
+            jobadvert_search_algorithm = provider.JobAdvertSearchAlgorithmProvider(self.__data_service)
+            vacantjob_search_algorithm = provider.VacantJobSearchAlgorithmProvider(self.__data_service)
+            gecko_driver_provider = provider.PageSourceProvider(self.__app_config)
+
+            self.__algorithm_service = service.AlgorithmService(
+                jobadvert_search_algorithm,
+                vacantjob_search_algorithm,
+                gecko_driver_provider)
+
+        except Exception as ex:
+            logging.exception(ex)
 
     def __compile_jobadvert_data_information(self) -> None:
         try:
@@ -89,7 +103,6 @@ class Startup:
                     self.__save_jobadvert_data_information(jobadvert_data_list)
             else:
                 raise Exception('Vacant job list was None.')
-
         except ValueError as er:
             logging.warning(er)
         except Exception as ex:
@@ -129,11 +142,11 @@ class Startup:
                                 logging.info('Not Implemented')
                     except ValueError as er:
                         logging.warning(er)
-                    except Exception is Exception as ex:
+                    except Exception as ex:
                         logging.exception(ex)
         except ValueError as er:
             logging.warning(er)
-        except Exception is Exception as ex:
+        except Exception as ex:
             logging.exception(ex)
 
     def __save_jobadvert_data_information(self, jobadvert_data_list: []) -> None:
@@ -164,11 +177,10 @@ class Startup:
                     logging.warning(er)
             else:
                 raise Exception('Given data to save was invalid.')
-
         except Exception as ex:
             logging.exception(ex)
         finally:
-            logging.info('Finished Saving JobAdvert Data.')
+            logging.info('Finished [Save JobAdvert Data Information].')
 
     def __get_jobadvert_data_from_list(self, data_list: []) -> []:
         # Create a job advert data list.
@@ -185,11 +197,11 @@ class Startup:
                         raise Exception('Parameter was empty.')
                     else:
                         for data in data_list:
-                            jobadvert = self.__algorithm_service.compile_jobadvert_from_vacant_job_data_list(data)
+                            jobadvert = self.__algorithm_service.compile_jobadvert_data_object(data)
                             jobadvert_data_list.append(jobadvert)
 
                         return jobadvert_data_list
-                except Exception is Exception:
+                except Exception as ex:
                     logging.error(traceback.TracebackException)
-        except Exception is Exception:
+        except Exception as ex:
             logging.error(traceback.TracebackException)
