@@ -1,4 +1,4 @@
-import re
+from re import compile, match, IGNORECASE
 from datetime import datetime
 
 from program.modules.services.data_service import DataService
@@ -48,7 +48,7 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
 
     def find_title(self) -> str:
         for arg in self._title_filter_keys:
-            title = self.soup.find(text=re.compile(arg, flags=re.IGNORECASE))
+            title = self.soup.find(text=compile(arg, flags=IGNORECASE))
 
             if title is not None:
                 return title
@@ -72,7 +72,7 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
                 text_from_result = result.get_text()
 
                 if text_from_result is not None:
-                    if re.match(pattern=regex, string=str(text_from_result)):
+                    if match(pattern=regex, string=str(text_from_result)):
                         return text_from_result
 
         return self.__not_found_text
@@ -91,7 +91,7 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
         elements = []
 
         for location_filter in self._location_name_filter_keys:
-            elements.append(self.soup.find(text=re.compile(location_filter, flags=re.IGNORECASE)))
+            elements.append(self.soup.find(text=compile(location_filter, flags=IGNORECASE)))
 
         for arg in elements:
             if arg is not None:
@@ -108,7 +108,7 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
         reg_datetime = None
         date_elements = []
         for date_filter in self._registration_date_name_filter_keys:
-            date_elements.append(self.soup.find(text=re.compile(date_filter), flags=re.IGNORECASE))
+            date_elements.append(self.soup.find(text=compile(date_filter), flags=IGNORECASE))
 
         if date_elements is not None:
             for date in date_elements:
@@ -141,7 +141,7 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
         result = ""
 
         for category_filter_key in category_filter_keys:
-            result = self.soup.find(text=re.compile(category_filter_key, flags=re.IGNORECASE))
+            result = self.soup.find(text=compile(category_filter_key, flags=IGNORECASE))
             if result is not None:
                 result = result.lower()
 
@@ -162,7 +162,7 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
         specialization_id = 0
 
         for specialization_filter in specialization_filter_keys:
-            result = self.soup.find(text=re.compile(specialization_filter, flags=re.IGNORECASE))
+            result = self.soup.find(text=compile(specialization_filter, flags=IGNORECASE))
             if result is not None:
                 result = result.lower()
                 for specialization in specializations:

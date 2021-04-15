@@ -2,7 +2,7 @@ from datetime import datetime
 from program.modules.objects.address import Address
 
 
-class JobAdvert(object):
+class JobAdvert:
     __vacant_job_id: int
     __category_id: int
     __specialization_id: int

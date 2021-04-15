@@ -1,4 +1,4 @@
-class Address(object):
+class Address:
     __job_advert_vacant_job_id: int
     __street_address: str
     __city: str

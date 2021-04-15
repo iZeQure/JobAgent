@@ -19,8 +19,8 @@ class AlgorithmService(object):
                  job_advert_search_algorithm_provider: JobAdvertSearchAlgorithmProvider,
                  vacant_job_search_algorithm_provider: VacantJobSearchAlgorithmProvider,
                  web_data_provider: WebDataProvider):
-        self.__job_advert_search_algorithm = job_advert_search_algorithm_provider,
-        self.__vacant_job_search_algorithm = vacant_job_search_algorithm_provider,
+        self.__job_advert_search_algorithm = job_advert_search_algorithm_provider
+        self.__vacant_job_search_algorithm = vacant_job_search_algorithm_provider
         self.__web_data_provider = web_data_provider
 
     def compile_jobadvert_data_object(self, vacant_job: VacantJob) -> JobAdvert:
@@ -31,13 +31,13 @@ class AlgorithmService(object):
         Returns:
             JobAdvertModel: the model with compiled data, from the page url.
         """
-        self.__job_advert_search_algorithm.set_page_source(vacant_job[3])
+        self.__job_advert_search_algorithm.set_page_source(vacant_job.html_page_source)
 
-        log.info(f'Attempts to gather job advert data for: {vacant_job[1]}')
+        log.info(f'Attempts to gather job advert data for: {vacant_job.link}')
 
         if self.__job_advert_search_algorithm is not None:
             jobadvert = JobAdvert(
-                vacant_job_id=vacant_job[0],
+                vacant_job_id=vacant_job.id,
                 category_id=self.__job_advert_search_algorithm.find_category(),
                 specialization_id=self.__job_advert_search_algorithm.find_specialization(),
                 title=self.__job_advert_search_algorithm.find_title(),
@@ -48,7 +48,7 @@ class AlgorithmService(object):
                 registered_date_time=self.__job_advert_search_algorithm.find_registration_date(),
                 application_deadline_date_time=self.__job_advert_search_algorithm.find_deadline_date(),
                 address=Address(
-                    job_advert_vacant_job_id=vacant_job[0],
+                    job_advert_vacant_job_id=vacant_job.id,
                     street_address=self.__job_advert_search_algorithm.find_location(),
                     city='None',
                     country='None',
@@ -66,7 +66,9 @@ class AlgorithmService(object):
         Returns:
             list: A list of data with the html page source.
         """
-        return self.__web_data_provider.load_web_data_html(data_list)
+        data = self.__web_data_provider.load_web_data_html(data_list)
+
+        return data
 
     def get_links_by_company_page_url(self, companies: []):
         """

@@ -3,14 +3,14 @@ from bs4 import BeautifulSoup
 from program.modules.services.data_service import DataService
 
 
-class SearchAlgorithmProvider(object):
+class SearchAlgorithmProvider:
     """
         Super class of Search Algorithms, provides the most basic information for crawling the web.
     """
     __service: DataService
     __soup: BeautifulSoup
 
-    def __init__(self, data_service: DataService):
+    def __init__(self, data_service: DataService) -> None:
         """
         Instantiates the Algorithm provider.
         Args:
@@ -18,7 +18,7 @@ class SearchAlgorithmProvider(object):
         """
         self.__service = data_service
 
-    def set_page_source(self, page_html: str):
+    def set_page_source(self, page_html: str) -> None:
         """
         Instantiates a BeautifulSoup object with the given HTML.
         Args:
@@ -28,7 +28,7 @@ class SearchAlgorithmProvider(object):
         self.__soup = BeautifulSoup(page_html, 'html.parser')
 
     @property
-    def data_service(self):
+    def data_service(self) -> DataService:
         """
         Get the data service.
         Returns:
@@ -41,7 +41,7 @@ class SearchAlgorithmProvider(object):
             log.error(f'No instance found of [service] in {ex.__class__}')
 
     @property
-    def soup(self):
+    def soup(self) -> BeautifulSoup:
         """
         Get the soup.
         Returns:

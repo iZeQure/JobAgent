@@ -2,7 +2,8 @@
   "ENVIRONMENT": {
     "PRODUCTION": {
       "WebDriver": {
-        "Path": "C:\\Zombie_Crawler\\tools\\geckodriver.exe"
+        "Firefox": "C:\\Zombie_Crawler\\tools\\geckodriver.exe",
+        "Edge": "C:\\Zombie_Crawler\\msedgedriver.exe"
       },
       "DatabaseConnection": {
         "Driver": "{SQL Server Native Client 11.0}",
@@ -14,7 +15,8 @@
     },
     "DEVELOPMENT": {
       "WebDriver": {
-        "Path": "C:\\VirtualEnvironment\\geckodriver.exe"
+        "Firefox": "C:\\VirtualEnvironment\\geckodriver.exe",
+        "Edge": "C:\\VirtualEnvironment\\msedgedriver.exe"
       },
       "DatabaseConnection": {
         "Driver": "{SQL Server Native Client 11.0}",

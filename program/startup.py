@@ -6,6 +6,7 @@ from program.modules.providers.vacant_job_algorithm_provider import VacantJobSea
 from program.modules.providers.job_advert_search_algorithm_provider import JobAdvertSearchAlgorithmProvider
 from program.modules.managers.database_manager import DatabaseManager
 from program.modules.database.db import DatabaseMSSQL
+from program.modules.objects.vacant_job import VacantJob
 
 
 class Startup(object):
@@ -21,7 +22,6 @@ class Startup(object):
     def __init__(self, app_config: object):
         # Set the app config as a global variable.
         self.__app_config = app_config
-        self.__build_config()
 
     def initialize_zombie(self):
         """
@@ -35,16 +35,22 @@ class Startup(object):
             initialized_information = self.__data_service.get_crawler_information()
 
             # Validate the initialization progress.
-            if initialized_information[0] is False:
+            if initialized_information is False:
                 raise ValueError('Initializing Failed.')
             else:
                 # Data Crawling
                 # 1. Compiles a list of vacant job urls per company job page url.
                 # 2. Compiles the list of vacant jobs into jobadvert.
 
-                info_message = initialized_information[1]
-                version_message = initialized_information[3]
-                responsibility_message = initialized_information[2]
+                info_message = str
+                version_message = str
+                responsibility_message = str
+
+                for val in initialized_information:
+                    info_message = val[0]
+                    version_message = val[2]
+                    responsibility_message = val[1]
+
                 log.info(f'{info_message} started running as {responsibility_message} on {version_message}')
 
                 self.__compile_vacant_job_data_information()
@@ -54,6 +60,26 @@ class Startup(object):
             log.exception(er)
         except Exception as ex:
             log.exception(ex)
+
+    def build_service_collection(self):
+        # Get Config from Environment
+        config = self.__app_config["ENVIRONMENT"][self.__CONFIGURATION_MODE]
+
+        # Build service collection.
+        log.info('Building service collection..')
+
+        database = DatabaseMSSQL(config)
+        manager = DatabaseManager(database)
+        self.__data_service = DataService(manager)
+        job_provider = JobAdvertSearchAlgorithmProvider(self.__data_service)
+        vacant_provider = VacantJobSearchAlgorithmProvider(self.__data_service)
+
+        self.__web_driver_provider = WebDataProvider(config)
+        self.__algorithm_service = AlgorithmService(
+            job_provider,
+            vacant_provider,
+            self.__web_driver_provider
+        )
 
     def __compile_job_advert_data_information(self):
         try:
@@ -121,21 +147,21 @@ class Startup(object):
         except Exception as ex:
             log.exception(ex)
 
-    def __get_jobadvert_data_from_list(self, data: []):
+    def __get_jobadvert_data_from_list(self, data_list: [VacantJob]):
         # Create a job advert data list.
         jobadvert_data_list = []
 
         try:
             # Check the data list is None.
-            if data is None:
+            if data_list is None:
                 raise Exception('Parameter was not defined.')
             else:
                 try:
                     # check the length of the data list is valid.
-                    if len(data) == 0:
+                    if len(data_list) == 0:
                         raise Exception('Parameter was empty.')
                     else:
-                        for data in data:
+                        for data in data_list:
                             jobadvert = self.__algorithm_service.compile_jobadvert_data_object(data)
                             jobadvert_data_list.append(jobadvert)
 
@@ -161,13 +187,13 @@ class Startup(object):
                         # Validate duplicate information.
                         for existing_data in existing_jobadvert_data_list:
                             for jobadvert in jobadvert_data_list:
-                                if existing_data[0] == jobadvert.id:
-                                    log.info(f'Found duplicate data on -> {existing_data[0]}')
+                                if existing_data == jobadvert.id:
+                                    log.info(f'Found duplicate data on -> {existing_data}')
                                     # Update jobadvert with new information.
                                     self.__data_service.update_job_advert(jobadvert)
                                 else:
                                     log.info(
-                                        f'No duplicate found on [{existing_data[0]}], creating jobadvert -> {jobadvert.id}')
+                                        f'No duplicate found on [{existing_data}], creating jobadvert -> {jobadvert.id}')
                                     # Create a jobadvert with new information.
                                     self.__data_service.create_job_advert(jobadvert)
                 except ValueError as er:
@@ -178,38 +204,3 @@ class Startup(object):
             log.exception(ex)
         finally:
             log.info('Finished [Save JobAdvert Data Information].')
-
-    def __build_config(self):
-        try:
-            # Build logging configuration.
-            log.info('Building logging configuration..')
-            log_config = self.__app_config['Logging']
-            log.basicConfig(
-                level=log_config['Level']['INFO'],
-                format=log_config['Format'],
-                datefmt=log_config['DateFormat']
-            )
-        except Exception as ex:
-            log.exception(ex)
-
-        try:
-            # Make Config from Environment
-            config = self.__app_config["ENVIRONMENT"][self.__CONFIGURATION_MODE]
-
-            # Build service collection.
-            log.info('Building service collection..')
-
-            database = DatabaseMSSQL(config)
-            manager = DatabaseManager(database)
-            self.__data_service = DataService(manager)
-            job_provider = JobAdvertSearchAlgorithmProvider(self.__data_service)
-            vacant_provider = VacantJobSearchAlgorithmProvider(self.__data_service)
-
-            self.__web_driver_provider = WebDataProvider(config)
-            self.__algorithm_service = AlgorithmService(
-                job_provider,
-                vacant_provider,
-                self.__web_driver_provider
-            )
-        except Exception as ex:
-            log.exception(ex)

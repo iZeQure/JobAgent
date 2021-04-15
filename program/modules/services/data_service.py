@@ -1,5 +1,6 @@
 from program.modules.managers.database_manager import DatabaseManager
 from program.modules.objects.job_advert import JobAdvert
+from program.modules.objects.vacant_job import VacantJob
 
 
 class DataService(object):
@@ -12,8 +13,8 @@ class DataService(object):
         try:
             information = self.__manager.get_crawler_information()
 
-            if information is not None:
-                return True, information[0], information[1], information[2]
+            if information is not None and information is not False:
+                return information
 
             return False
         except ValueError:
@@ -31,7 +32,7 @@ class DataService(object):
     def get_companies(self):
         return self.__manager.get_companies()
 
-    def get_vacant_jobs(self):
+    def get_vacant_jobs(self) -> [VacantJob]:
         return self.__manager.get_vacant_jobs()
 
     def get_existing_job_adverts(self):

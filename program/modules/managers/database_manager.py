@@ -30,16 +30,6 @@ class DatabaseManager:
 
         return output
 
-    def get_jobadvert_ids(self):
-        output: []
-
-        with self.__database.connect() as context:
-            sp_sql = 'SELECT [VacantJobId] FROM [JobAdvert];'
-            context.execute(sp_sql)
-            output = context.fetchall()
-
-        return output
-
     def get_categories(self):
         output: []
 
@@ -70,24 +60,40 @@ class DatabaseManager:
 
         return output
 
-    def get_vacant_jobs(self):
-        output: []
+    def get_vacant_jobs(self) -> [VacantJob]:
+        output = []
 
         with self.__database.connect() as context:
             sp_sql = 'EXEC [JA.spGetVacantJobs]'
             context.execute(sp_sql)
-            output = context.fetchall()
+            fetched_data = context.fetchall()
+
+            for data in fetched_data:
+                data_obj = VacantJob(
+                    vacant_job_id=data[0],
+                    link=data[1],
+                    company_id=data[2],
+                    html_page_source=""
+                )
+                output.append(data_obj)
 
         return output
 
     def get_existing_job_adverts(self):
-        output: []
+        output = []
 
         with self.__database.connect() as context:
             sp_sql = 'SELECT [VacantJobId] FROM [JobAdvert]'
             context.execute(sp_sql)
-            output = context.fetchall()
+            fetched_data = context.fetchall()
 
+            if len(fetched_data) == int(0):
+                output = None
+                return output
+
+            for data in fetched_data:
+                entity = data[0]
+                output.append(entity)
         return output
 
     def create_job_advert(self, job_advert: JobAdvert):
