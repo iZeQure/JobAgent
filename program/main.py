@@ -1,5 +1,6 @@
 import logging
 from json import load, JSONDecodeError
+from time import sleep
 
 from startup import Startup
 
@@ -45,3 +46,5 @@ class Main:
 
 main = Main()
 main.start_application()
+logging.warning('Program closing in 10 seconds.')
+sleep(10)

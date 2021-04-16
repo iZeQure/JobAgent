@@ -1,11 +1,6 @@
-/WebCrawler/venv/
-/WebCrawler/geckodriver.log
 geckodriver.log
-/WebCrawler/dist/
-/WebCrawler/build/
-/WebCrawler/main.spec
-/WebCrawler/zombie.spec
-/WebCrawler/__pycache__/
 /dist/
 /build/
 /.idea
+program/__pycache__/main.cpython-39.pyc
+*.spec

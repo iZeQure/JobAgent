@@ -198,4 +198,4 @@ class Startup(object):
         except Exception as ex:
             log.exception(ex)
         finally:
-            log.info('Finished [Save JobAdvert Data Information].')
+            log.info('Finished Handling Data.')
