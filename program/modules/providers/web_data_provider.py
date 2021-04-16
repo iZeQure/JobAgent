@@ -18,8 +18,7 @@ class WebDataProvider:
         output = []
 
         try:
-            with webdriver.Edge(executable_path=self.__get_driver_path()) as driver:
-                # with webdriver.Firefox(executable_path=f'{self.__get_gecko_driver_path()}') as driver:
+            with self.__get_driver_instance() as driver:
                 driver.minimize_window()
 
                 for data in data_list:
@@ -53,7 +52,31 @@ class WebDataProvider:
         pass
 
     def __get_driver_path(self):
-        return self.__app_config["WebDriver"]["Edge"]
+        web_driver_obj = self.__app_config["WebDriver"]
+        base_path = web_driver_obj["BasePath"]
+        driver_name = web_driver_obj["DriverName"]
+
+        return f"{base_path}{driver_name}"
+
+    def __get_driver_instance(self) -> webdriver:
+        driver_instance = self.__app_config["WebDriver"]["DriverInstance"]
+        driver_path = self.__get_driver_path()
+
+        try:
+            if driver_instance == "Edge":
+                return webdriver.Edge(executable_path=driver_path)
+            elif driver_instance == "Firefox":
+                return webdriver.Firefox(executable_path=driver_path)
+            elif driver_instance == "Chrome":
+                return webdriver.Chrome(executable_path=driver_path)
+            elif driver_instance == "Opera":
+                return webdriver.Opera(executable_path=driver_path)
+            else:
+                raise NotImplementedError('Given driver instance was not supported. '
+                                          'Only supports [Edge, Firefox, Chrome and Opera]')
+        except NotImplementedError as imErr:
+            log.error(imErr)
+            exit(0)
 
     @staticmethod
     def __format_url(url: str):

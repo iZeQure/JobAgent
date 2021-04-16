@@ -5,6 +5,7 @@ from startup import Startup
 
 
 class Main:
+    __CONFIG_PATH = 'C:\\\Zombie_Crawler\\configuration\\appconfig.json'
     configuration: object
 
     def __init__(self):
@@ -13,8 +14,15 @@ class Main:
 
     def get_configuration(self):
         # Build configuration file.
-        with open('program/appconfig.json') as config:
-            self.configuration = load(config)
+        try:
+            with open(self.__CONFIG_PATH) as config:
+                self.configuration = load(config)
+        except FileNotFoundError:
+            logging.error(msg='Could not get configuration: File not found.')
+            exit(0)
+        except FileExistsError:
+            logging.error(msg='Could not get configuration: File already exists.')
+            exit(0)
 
     def build_log_config(self):
         # Build logging configuration.
@@ -26,6 +34,7 @@ class Main:
         )
 
     def start_application(self):
+        # Get Config from Environment
         startup = Startup(self.configuration)
         startup.build_service_collection()
         startup.initialize_zombie()

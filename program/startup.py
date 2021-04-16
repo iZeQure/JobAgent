@@ -10,8 +10,6 @@ from program.modules.objects.vacant_job import VacantJob
 
 
 class Startup(object):
-    __CONFIGURATION_MODE = "DEVELOPMENT"
-
     __app_config: object
     __company_list: []
     __existing_job_advert_list: []
@@ -62,19 +60,16 @@ class Startup(object):
             log.exception(ex)
 
     def build_service_collection(self):
-        # Get Config from Environment
-        config = self.__app_config["ENVIRONMENT"][self.__CONFIGURATION_MODE]
-
         # Build service collection.
         log.info('Building service collection..')
 
-        database = DatabaseMSSQL(config)
+        database = DatabaseMSSQL(self.__app_config)
         manager = DatabaseManager(database)
         self.__data_service = DataService(manager)
         job_provider = JobAdvertSearchAlgorithmProvider(self.__data_service)
         vacant_provider = VacantJobSearchAlgorithmProvider(self.__data_service)
 
-        self.__web_driver_provider = WebDataProvider(config)
+        self.__web_driver_provider = WebDataProvider(self.__app_config)
         self.__algorithm_service = AlgorithmService(
             job_provider,
             vacant_provider,
