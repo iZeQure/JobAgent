@@ -2,6 +2,7 @@ from program.modules.database.db import DatabaseMSSQL
 from program.modules.objects.address import Address
 from program.modules.objects.job_advert import JobAdvert
 from program.modules.objects.vacant_job import VacantJob
+from pyodbc import ProgrammingError
 
 
 class DatabaseManager:
@@ -56,7 +57,11 @@ class DatabaseManager:
         with self.__database.connect() as context:
             sp_sql = 'EXEC [JA.spGetCompanies]'
             context.execute(sp_sql)
-            output = context.fetchall()
+
+            try:
+                output = context.fetchall()
+            except ProgrammingError:
+                output = []
 
         return output
 
@@ -66,17 +71,19 @@ class DatabaseManager:
         with self.__database.connect() as context:
             sp_sql = 'EXEC [JA.spGetVacantJobs]'
             context.execute(sp_sql)
-            fetched_data = context.fetchall()
+            try:
+                fetched_data = context.fetchall()
 
-            for data in fetched_data:
-                data_obj = VacantJob(
-                    vacant_job_id=data[0],
-                    link=data[1],
-                    company_id=data[2],
-                    html_page_source=""
-                )
-                output.append(data_obj)
-
+                for data in fetched_data:
+                    data_obj = VacantJob(
+                        vacant_job_id=data[0],
+                        link=data[1],
+                        company_id=data[2],
+                        html_page_source=""
+                    )
+                    output.append(data_obj)
+            except ProgrammingError:
+                output = []
         return output
 
     def get_existing_job_adverts(self):
