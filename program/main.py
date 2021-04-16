@@ -1,11 +1,11 @@
 import logging
-from json import load
+from json import load, JSONDecodeError
 
 from startup import Startup
 
 
 class Main:
-    __CONFIG_PATH = 'C:\\\Zombie_Crawler\\configuration\\appconfig.json'
+    __CONFIG_PATH = 'C:\\Zombie_Crawler\\configuration\\appconfig.json'
     configuration: object
 
     def __init__(self):
@@ -22,6 +22,9 @@ class Main:
             exit(0)
         except FileExistsError:
             logging.error(msg='Could not get configuration: File already exists.')
+            exit(0)
+        except ValueError is JSONDecodeError:
+            logging.error(msg='Failed to decode configuration.')
             exit(0)
 
     def build_log_config(self):
