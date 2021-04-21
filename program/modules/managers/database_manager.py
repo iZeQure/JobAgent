@@ -5,7 +5,7 @@ from program.modules.objects.vacant_job import VacantJob
 from pyodbc import ProgrammingError
 
 
-class DatabaseManager:
+class DataManager:
     __database: DatabaseMSSQL
 
     def __init__(self, database: DatabaseMSSQL):

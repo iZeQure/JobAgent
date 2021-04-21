@@ -6,11 +6,13 @@ class DatabaseMSSQL(object):
     """
     Represents a class handling the connection to an MSSQL Database.
     """
+    __app_config: object
     __database_obj = pyodbc
     __connection_string: str
 
     def __init__(self, app_config: object):
-        self.__build_config(app_config)
+        self.__app_config = app_config
+        self.__build_connection_string()
 
     def connect(self,
                 auto_commit: bool = False,
@@ -39,16 +41,14 @@ class DatabaseMSSQL(object):
         except Exception as ex:
             log.exception(ex)
 
-    def __build_config(self, app_config: object):
+    def __build_connection_string(self):
         """
         Builds the configuration for the database connection.
-        Args:
-            app_config: Contains the configuration for the database connection properties.
 
         Returns: None.
 
         """
-        database_config = app_config["DatabaseConnection"]
+        database_config = self.__app_config["DatabaseConnection"]
 
         if 'UID' in database_config and 'PWD' in database_config:
             self.__connection_string = f'DRIVER={database_config["Driver"]};' \

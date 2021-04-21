@@ -17,6 +17,3 @@ class BaseJobEntity(object):
     @property
     def html_page_source(self):
         return self.__html_page_source
-
-    def __repr__(self):
-        return str(self)

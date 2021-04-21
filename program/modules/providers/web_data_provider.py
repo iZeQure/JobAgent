@@ -62,7 +62,7 @@ class WebDataProvider:
                     log.info(f'Attempts to get data from -> {url}')
 
                     driver.get(url)
-                    sleep(10)
+                    sleep(3)
 
                     if driver.page_source is not None:
                         data_obj = Company(
@@ -101,6 +101,10 @@ class WebDataProvider:
                 return webdriver.Chrome(executable_path=driver_path)
             elif driver_instance == "Opera":
                 return webdriver.Opera(executable_path=driver_path)
+            elif driver_instance == "Headless":
+                options = webdriver.FirefoxOptions()
+                options.add_argument("--headless")
+                return webdriver.Firefox(executable_path=driver_path, options=options)
             else:
                 raise NotImplementedError('Given driver instance was not supported. '
                                           'Only supports [Edge, Firefox, Chrome and Opera]')

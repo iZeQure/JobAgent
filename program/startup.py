@@ -1,10 +1,9 @@
 import logging as log
 from program.modules.services.data_service import DataService
-from program.modules.services.algorithm_service import AlgorithmService
 from program.modules.providers.web_data_provider import WebDataProvider
 from program.modules.providers.vacant_job_search_algorithm_provider import VacantJobSearchAlgorithmProvider
 from program.modules.providers.job_advert_search_algorithm_provider import JobAdvertSearchAlgorithmProvider
-from program.modules.managers.database_manager import DatabaseManager
+from program.modules.managers.database_manager import DataManager
 from program.modules.database.db import DatabaseMSSQL
 from program.modules.objects.vacant_job import VacantJob
 from program.modules.objects.company import Company
@@ -15,8 +14,9 @@ class Startup(object):
     __company_list: []
     __existing_job_advert_list: []
     __data_service: DataService
-    __algorithm_service: AlgorithmService
-    __web_driver_provider: WebDataProvider
+    __job_advert_search_algorithm_provider: JobAdvertSearchAlgorithmProvider
+    __vacant_job_search_algorithm_provider: VacantJobSearchAlgorithmProvider
+    __web_data_provider: WebDataProvider
 
     def __init__(self, app_config: object):
         # Set the app config as a global variable.
@@ -65,17 +65,12 @@ class Startup(object):
         log.info('Building service collection..')
 
         database = DatabaseMSSQL(self.__app_config)
-        manager = DatabaseManager(database)
+        manager = DataManager(database)
         self.__data_service = DataService(manager)
-        job_provider = JobAdvertSearchAlgorithmProvider(self.__data_service)
-        vacant_provider = VacantJobSearchAlgorithmProvider(self.__data_service)
+        self.__job_advert_search_algorithm_provider = JobAdvertSearchAlgorithmProvider(self.__data_service)
+        self.__vacant_job_search_algorithm_provider = VacantJobSearchAlgorithmProvider(self.__data_service)
 
-        self.__web_driver_provider = WebDataProvider(self.__app_config)
-        self.__algorithm_service = AlgorithmService(
-            job_provider,
-            vacant_provider,
-            self.__web_driver_provider
-        )
+        self.__web_data_provider = WebDataProvider(self.__app_config)
 
     def __compile_job_advert_data_information(self):
         try:
@@ -89,7 +84,7 @@ class Startup(object):
                     raise ValueError('Vacant Job List was empty.')
                 else:
                     # Get the page sources from the vacant job list.
-                    vacant_jobs = self.__algorithm_service.get_html_page_source_data_list_from_vacant_job_list(vacant_job_data_list)
+                    vacant_jobs = self.__web_data_provider.load_vacant_job_web_data_html(vacant_job_data_list)
 
                     # Create a list for job advert data.
                     jobadvert_data_list = self.__get_jobadvert_data_from_list(vacant_jobs)
@@ -135,7 +130,7 @@ class Startup(object):
 
                             print("Getting HTML from company page.")
 
-                            data_obj = self.__algorithm_service.load_html_data_by_company(company)
+                            data_obj = self.__web_data_provider.load_html_page_data_by_company(company)
 
                             data_list = self.__get_vacant_job_list_from_company(data_obj)
 
@@ -152,7 +147,6 @@ class Startup(object):
                                 # Store the found vacant job links in the database.
 
                                 print('List of found vacant jobs..')
-                                print(temp_data_list)
                                 # log.info('Not Implemented')
                     except ValueError as er:
                         log.warning(er)
@@ -178,7 +172,7 @@ class Startup(object):
                         raise Exception('Parameter was empty.')
                     else:
                         for data in data_list:
-                            jobadvert = self.__algorithm_service.compile_jobadvert_data_object(data)
+                            jobadvert = self.__job_advert_search_algorithm_provider.get_data(data)
                             jobadvert_data_list.append(jobadvert)
 
                         return jobadvert_data_list
@@ -193,7 +187,7 @@ class Startup(object):
                 raise Exception('Expected parameter Comapny, but got None.')
             else:
                 try:
-                    data_list = self.__algorithm_service.compile_vacant_job_data_list(company)
+                    data_list = self.__vacant_job_search_algorithm_provider.get_data(company)
 
                     return data_list
                 except Exception as ex:
