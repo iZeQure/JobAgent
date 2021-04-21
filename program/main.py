@@ -10,10 +10,10 @@ class Main:
     configuration: object
 
     def __init__(self):
-        self.get_configuration()
-        self.build_log_config()
+        self.load_configuration()
+        self.build_log_configuration()
 
-    def get_configuration(self):
+    def load_configuration(self):
         # Build configuration file.
         try:
             with open(self.__CONFIG_PATH) as config:
@@ -28,7 +28,7 @@ class Main:
             logging.error(msg='Failed to decode configuration.')
             exit(0)
 
-    def build_log_config(self):
+    def build_log_configuration(self):
         # Build logging configuration.
         log_config = self.configuration['Logging']
         logging.basicConfig(
@@ -38,13 +38,22 @@ class Main:
         )
 
     def start_application(self):
-        # Get Config from Environment
+        # Get an instance of startup, inject the configuration.
         startup = Startup(self.configuration)
+
+        # Initialize needed services.
         startup.build_service_collection()
+
+        # Start the Bot.
         startup.initialize_zombie()
 
 
+# Get an instance of main.
 main = Main()
+
+# Start main.
 main.start_application()
+
+# Final
 logging.warning('Program closing in 10 seconds.')
 sleep(10)
