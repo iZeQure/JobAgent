@@ -2,11 +2,12 @@ import logging as log
 from program.modules.services.data_service import DataService
 from program.modules.services.algorithm_service import AlgorithmService
 from program.modules.providers.web_data_provider import WebDataProvider
-from program.modules.providers.vacant_job_algorithm_provider import VacantJobSearchAlgorithmProvider
+from program.modules.providers.vacant_job_search_algorithm_provider import VacantJobSearchAlgorithmProvider
 from program.modules.providers.job_advert_search_algorithm_provider import JobAdvertSearchAlgorithmProvider
 from program.modules.managers.database_manager import DatabaseManager
 from program.modules.database.db import DatabaseMSSQL
 from program.modules.objects.vacant_job import VacantJob
+from program.modules.objects.company import Company
 
 
 class Startup(object):
@@ -52,10 +53,10 @@ class Startup(object):
                 log.info(f'{info_message} started running as {responsibility_message} on {version_message}')
 
                 self.__compile_vacant_job_data_information()
-                self.__compile_job_advert_data_information()
+                # self.__compile_job_advert_data_information()
 
         except ValueError as er:
-            log.exception(er)
+            log.error(er)
         except Exception as ex:
             log.exception(ex)
 
@@ -88,7 +89,7 @@ class Startup(object):
                     raise ValueError('Vacant Job List was empty.')
                 else:
                     # Get the page sources from the vacant job list.
-                    vacant_jobs = self.__algorithm_service.get_html_page_source_data_list(vacant_job_data_list)
+                    vacant_jobs = self.__algorithm_service.get_html_page_source_data_list_from_vacant_job_list(vacant_job_data_list)
 
                     # Create a list for job advert data.
                     jobadvert_data_list = self.__get_jobadvert_data_from_list(vacant_jobs)
@@ -110,19 +111,36 @@ class Startup(object):
         try:
             company_list = self.__data_service.get_companies()
 
-            if company_list is None:
+            company_test_data_list = [
+                Company(
+                    1, "https://www.dr.dk/om-dr/job", ""
+                )
+            ]
+
+            print("Testing Company data list for information:")
+
+            if company_test_data_list is None:
                 raise Exception('Invalid data list, no companies could be initialized.')
             else:
-                if len(company_list) == int(0):
+                if len(company_test_data_list) == int(0):
                     raise ValueError('No data was found in the company data list.')
                 else:
                     try:
                         temp_data_list = []
 
-                        for company in company_list:
+                        for company in company_test_data_list:
                             # make an algorithm that compiles a list of links from the company job page url.
                             # then to store the list in the temporary list for every company found.
-                            log.info('Not Implemented')
+                            print(f"Current Company: {company.id}")
+
+                            print("Getting HTML from company page.")
+
+                            data_obj = self.__algorithm_service.load_html_data_by_company(company)
+
+                            data_list = self.__get_vacant_job_list_from_company(data_obj)
+
+                            temp_data_list.append(data_list)
+                            # log.info('Not Implemented')
                             break
 
                         if temp_data_list is None:
@@ -132,7 +150,10 @@ class Startup(object):
                                 raise ValueError('No data found within the temp data list.')
                             else:
                                 # Store the found vacant job links in the database.
-                                log.info('Not Implemented')
+
+                                print('List of found vacant jobs..')
+                                print(temp_data_list)
+                                # log.info('Not Implemented')
                     except ValueError as er:
                         log.warning(er)
                     except Exception as ex:
@@ -161,6 +182,20 @@ class Startup(object):
                             jobadvert_data_list.append(jobadvert)
 
                         return jobadvert_data_list
+                except Exception as ex:
+                    log.exception(ex)
+        except Exception as ex:
+            log.exception(ex)
+
+    def __get_vacant_job_list_from_company(self, company: Company) -> []:
+        try:
+            if company is None:
+                raise Exception('Expected parameter Comapny, but got None.')
+            else:
+                try:
+                    data_list = self.__algorithm_service.compile_vacant_job_data_list(company)
+
+                    return data_list
                 except Exception as ex:
                     log.exception(ex)
         except Exception as ex:
