@@ -1,9 +1,10 @@
 import logging as log
 from program.modules.providers.job_advert_search_algorithm_provider import JobAdvertSearchAlgorithmProvider
-from program.modules.providers.vacant_job_algorithm_provider import VacantJobSearchAlgorithmProvider
+from program.modules.providers.vacant_job_search_algorithm_provider import VacantJobSearchAlgorithmProvider
 from program.modules.providers.web_data_provider import WebDataProvider
 from program.modules.objects.job_advert import JobAdvert
 from program.modules.objects.vacant_job import VacantJob
+from program.modules.objects.company import Company
 from program.modules.objects.address import Address
 
 
@@ -58,7 +59,16 @@ class AlgorithmService(object):
 
             return jobadvert
 
-    def get_html_page_source_data_list(self, data_list: []):
+    def compile_vacant_job_data_list(self, company: Company) -> []:
+        self.__vacant_job_search_algorithm.set_page_source(company.html_page_source)
+
+        log.info(f'Attempting to gather vacant jobs from {company.job_page_url}')
+        
+        vacant_job_data_list = self.__vacant_job_search_algorithm.find_vacant_job_links()
+
+        return vacant_job_data_list
+
+    def get_html_page_source_data_list_from_vacant_job_list(self, data_list: []):
         """
         Achieves the html page source, from an URL.
         Args:
@@ -66,7 +76,12 @@ class AlgorithmService(object):
         Returns:
             list: A list of data with the html page source.
         """
-        data = self.__web_data_provider.load_web_data_html(data_list)
+        data = self.__web_data_provider.load_vacant_job_web_data_html(data_list)
+
+        return data
+
+    def load_html_data_by_company(self, company):
+        data = self.__web_data_provider.load_html_page_data_by_company(company)
 
         return data
 
@@ -78,4 +93,4 @@ class AlgorithmService(object):
         Returns:
             list: A datalist of vacant jobs
         """
-        return self.__web_data_provider.load_vacant_jobs_from_company_job_page_url(companies)
+        return self.__web_data_provider.load_html_page_data_by_company(companies)
