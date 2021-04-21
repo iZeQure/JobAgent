@@ -1,6 +1,7 @@
-geckodriver.log
 /dist/
 /build/
 /.idea
-program/__pycache__/main.cpython-39.pyc
+
 *.spec
+*.pyc
+*.log
