@@ -84,7 +84,7 @@ class Startup(object):
                     raise ValueError('Vacant Job List was empty.')
                 else:
                     # Get the page sources from the vacant job list.
-                    vacant_jobs = self.__web_data_provider.load_vacant_job_web_data_html(vacant_job_data_list)
+                    vacant_jobs = self.__web_data_provider.load_page_source_1(vacant_job_data_list)
 
                     # Create a list for job advert data.
                     jobadvert_data_list = self.__get_jobadvert_data_from_list(vacant_jobs)
@@ -108,11 +108,9 @@ class Startup(object):
 
             company_test_data_list = [
                 Company(
-                    1, "https://www.dr.dk/om-dr/job", ""
+                    1, "https://www.dr.dk/tjenester/job-widget/", ""
                 )
             ]
-
-            print("Testing Company data list for information:")
 
             if company_test_data_list is None:
                 raise Exception('Invalid data list, no companies could be initialized.')
@@ -130,7 +128,7 @@ class Startup(object):
 
                             print("Getting HTML from company page.")
 
-                            data_obj = self.__web_data_provider.load_html_page_data_by_company(company)
+                            data_obj = self.__web_data_provider.load_page_source_2(company)
 
                             data_list = self.__get_vacant_job_list_from_company(data_obj)
 
@@ -146,7 +144,7 @@ class Startup(object):
                             else:
                                 # Store the found vacant job links in the database.
 
-                                print('List of found vacant jobs..')
+                                log.info('List of found vacant jobs..')
                                 # log.info('Not Implemented')
                     except ValueError as er:
                         log.warning(er)

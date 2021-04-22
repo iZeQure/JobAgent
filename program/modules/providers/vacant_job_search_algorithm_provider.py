@@ -20,11 +20,7 @@ class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
 
         useful_links = []
         for link in self.soup.find_all('a'):
-
-            print(f'Testing this link for information: {link}')
-
             if link.text:
-                log.info(f'Gathered [{link["href"]}]')
                 useful_links.append(link['href'])
 
         return useful_links
@@ -34,13 +30,15 @@ class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
             raise ValueError('Parameter was type of None.')
         else:
             if isinstance(company, Company):
-                log.info(f'Processing gatherer with [{company.id}] for [{company.job_page_url}].')
+                log.info(f'Processing algorithm with [{company.id}] for [{company.job_page_url}].')
 
                 self.set_page_source(company.html_page_source)
 
                 vacant_job_list = []
 
                 for item in self.__find_vacant_job_links():
+                    log.info(f'Gathered [{item}] for {company.id}')
+
                     vacant_job = VacantJob(
                         vacant_job_id=0,
                         link=item[0],
@@ -50,6 +48,7 @@ class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
 
                     vacant_job_list.append(vacant_job)
 
+                log.info(f'Found [{len(vacant_job_list)}] for company [{company.id}]')
                 return vacant_job_list
             else:
                 raise TypeError('Given type was not of type Company.')

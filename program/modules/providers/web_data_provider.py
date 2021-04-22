@@ -14,7 +14,7 @@ class WebDataProvider:
                  app_config: object):
         self.__app_config = app_config
 
-    def load_vacant_job_web_data_html(self, data_list: []) -> [VacantJob]:
+    def load_page_source_1(self, data_list: []) -> [VacantJob]:
         # Is the data list to return.
         output = []
 
@@ -49,7 +49,7 @@ class WebDataProvider:
         except Exception as ex:
             log.error(ex)
 
-    def load_html_page_data_by_company(self, company: Company):
+    def load_page_source_2(self, company: Company):
         # Is the data list to return.
         output = Company
 
@@ -59,7 +59,7 @@ class WebDataProvider:
 
                 try:
                     url = self.__format_url(company.job_page_url)
-                    log.info(f'Attempts to get data from -> {url}')
+                    log.info(f'Attempts to load page source -> {url}')
 
                     driver.get(url)
                     sleep(3)

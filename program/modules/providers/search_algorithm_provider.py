@@ -18,6 +18,9 @@ class SearchAlgorithmProvider:
         """
         self.__service = data_service
 
+    def get_data(self, data_object: object):
+        log.info('You got fooled.')
+
     def set_page_source(self, page_html: str) -> None:
         """
         Instantiates a BeautifulSoup object with the given HTML.
