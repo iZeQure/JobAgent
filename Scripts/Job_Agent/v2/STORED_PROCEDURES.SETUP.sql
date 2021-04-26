@@ -470,9 +470,8 @@ CREATE PROCEDURE [JA.spCreateContract] (
 	@companyId int,
 	@userId int,
 	@name uniqueidentifier,
-	@regiDateTime DATETIME,
-	@expDateTime DATETIME
-	)
+	@regiDateTime datetime = NULL,
+	@expDateTime datetime = NULL)
 AS
 	DECLARE @TranName varchar(20)
 	SELECT @TranName = 'ContractInsert';
@@ -482,19 +481,22 @@ AS
 
 	BEGIN TRY
 		IF EXISTS (SELECT * FROM [Contract] WHERE [CompanyId] = @companyId)
-			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating contract failed, already exists', 4, 2
+			BEGIN
+				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating contract failed, already exists', 4, 2;
+			END
 		ELSE			
-			IF NOT EXISTS (SELECT [Id] FROM [User] WHERE [Id] = @userId)
-			AND NOT EXISTS (SELECT [Id] FROM [Company] WHERE [Id] = @companyId)
-				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating contract failed, user and company does not exist', 4, 2
+			IF NOT EXISTS (SELECT * FROM [User] WHERE [Id] = @userId)
+			AND NOT EXISTS (SELECT * FROM [Company] WHERE [Id] = @companyId)
+				BEGIN
+					EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating contract failed, user and company does not exist', 4, 2;
+				END
 			ELSE
 				DECLARE @registration DATETIME = GETDATE(), 
 						@expiry DATETIME = DATEADD(YEAR,5,GETDATE())
 
 				SET @registration = IIF (@regiDateTime IS NULL, GETDATE(), @regiDateTime);
 
-				SET @expiry = IIF(@expDateTime IS NULL, DATEADD(YEAR,5,@registration), @expDateTime);
-
+				SET @expiry = IIF (@expDateTime IS NULL, DATEADD(YEAR,5,@registration), @expDateTime);
 
 				INSERT INTO [Contract] ([CompanyId], [UserId], [Name], [RegistrationDateTime], [ExpiryDateTime])
 				VALUES
@@ -503,9 +505,11 @@ AS
 				COMMIT TRANSACTION @TranName;
 	END TRY
 	BEGIN CATCH
-		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating contract', 6, 4
+		EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Error while creating contract', 6, 4;
 
-		ROLLBACK TRANSACTION @TranName
+		ROLLBACK TRANSACTION @TranName;
+
+		PRINT(ERROR_MESSAGE())
 	END CATCH
 GO
 
@@ -1717,7 +1721,6 @@ DROP PROCEDURE IF EXISTS [JA.spValidateUserLogin] -- Returns Bit
 GO
 
 CREATE PROCEDURE [JA.spCreateUser](
-	@userId int,
 	@roleId int,
 	@locationId int,
 	@userFirstName varchar(50),
@@ -1734,12 +1737,12 @@ AS
 		WITH MARK N'Inserting a User';
 
 	BEGIN TRY
-		IF EXISTS (SELECT * FROM [User] WHERE [Id] = @userId)
+		IF EXISTS (SELECT * FROM [User] WHERE [Email] = @userEmail)
 			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating User failed, already exists', 4, 2
 		 ELSE
-			INSERT INTO [User] ([Id], [RoleId], [LocationId], [FirstName], [LastName], [Email], [Password], [Salt],[AccessToken])
+			INSERT INTO [User] ([RoleId], [LocationId], [FirstName], [LastName], [Email], [Password], [Salt],[AccessToken])
 			VALUES
-			(@userId, @roleId, @locationId, @userFirstName, @userLastName, @userEmail, @userPass, @userSalt, @userAccessToken);
+			(@roleId, @locationId, @userFirstName, @userLastName, @userEmail, @userPass, @userSalt, @userAccessToken);
 		
 			COMMIT TRANSACTION @TranName;			
 	END TRY
