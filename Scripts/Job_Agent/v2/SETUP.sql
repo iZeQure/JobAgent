@@ -25,9 +25,11 @@ DROP TABLE IF EXISTS [Role]
 DROP TABLE IF EXISTS [Location]
 DROP TABLE IF EXISTS [VacantJob]
 DROP TABLE IF EXISTS [JobAdvert]
+DROP TABLE IF EXISTS [Address]
 DROP TABLE IF EXISTS [ConsultantArea]
 DROP TABLE IF EXISTS [User]
 DROP TABLE IF EXISTS [Contract]
+DROP TABLE IF EXISTS [JobPage]
 DROP TABLE IF EXISTS [Company]
 GO
 
@@ -55,7 +57,7 @@ GO
 
 CREATE TABLE [VacantJob] (
 [Id] int not null identity(1,1),
-[Link] varchar(max) not null,
+[URL] varchar(2048) not null,
 [CompanyId] int not null)
 GO
 
@@ -63,12 +65,16 @@ CREATE TABLE [Company] (
 [Id] int not null identity(1,1),
 [CVR] int not null,
 [Name] varchar(50) not null,
-[ContactPerson] varchar(50) not null,
-[JobPageURL] varchar(2048) not null)
+[ContactPerson] varchar(50) not null)
+GO
+
+CREATE TABLE [JobPage](
+[Id] int not null identity(1,1),
+[CompanyId] int not null,
+[URL] varchar(2048))
 GO
 
 CREATE TABLE [Contract] (
-[Id] int not null identity(1,1),
 [CompanyId] int not null,
 [UserId] int not null,
 [Name] uniqueidentifier not null,
@@ -155,9 +161,15 @@ ADD
 	PRIMARY KEY ([Id])
 GO
 
-ALTER TABLE [Contract]
+ALTER TABLE [JobPage]
 ADD
 	PRIMARY KEY ([Id]),
+	FOREIGN KEY ([CompanyId]) REFERENCES [Company] ([Id]) ON DELETE CASCADE
+GO
+
+ALTER TABLE [Contract]
+ADD
+	PRIMARY KEY ([CompanyId]),
 	FOREIGN KEY ([CompanyId]) REFERENCES [Company] ([Id]) ON UPDATE CASCADE,
 	FOREIGN KEY ([UserId]) REFERENCES [User] ([Id])	ON UPDATE CASCADE
 GO

@@ -452,7 +452,10 @@ GO
 CREATE PROCEDURE [JA.spCreateContract] (
 	@companyId int,
 	@userId int,
-	@name uniqueidentifier)
+	@name uniqueidentifier,
+	@regiDateTime DATETIME,
+	@expDateTime DATETIME
+	)
 AS
 	DECLARE @TranName varchar(20)
 	SELECT @TranName = 'ContractInsert';
@@ -468,9 +471,17 @@ AS
 			AND NOT EXISTS (SELECT [Id] FROM [Company] WHERE [Id] = @companyId)
 				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating contract failed, user and company does not exist', 4, 2
 			ELSE
+				DECLARE @registration DATETIME = GETDATE(), 
+						@expiry DATETIME = DATEADD(YEAR,5,GETDATE())
+
+				SET @registration = IIF (@regiDateTime IS NULL, GETDATE(), @regiDateTime);
+
+				SET @expiry = IIF(@expDateTime IS NULL, DATEADD(YEAR,5,@registration), @expDateTime);
+
+
 				INSERT INTO [Contract] ([CompanyId], [UserId], [Name], [RegistrationDateTime], [ExpiryDateTime])
 				VALUES
-				(@companyId, @userId, @name, GETDATE(), DATEADD(YEAR, 5, GETDATE()));
+				(@companyId, @userId, @name, @registration, @expiry);
 
 				COMMIT TRANSACTION @TranName;
 	END TRY
