@@ -1,6 +1,10 @@
 USE [JobAgentDB_v2]
 GO
 
+/*##################################################
+				## Area Section ##
+####################################################*/
+
 DROP PROCEDURE IF EXISTS [JA.spCreateArea]
 DROP PROCEDURE IF EXISTS [JA.spUpdateArea]
 DROP PROCEDURE IF EXISTS [JA.spRemoveArea]
@@ -146,6 +150,11 @@ AS
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
 GO
+
+/*##################################################
+				## Role Section ##
+
+####################################################*/
 
 DROP PROCEDURE IF EXISTS [JA.spCreateRole]
 DROP PROCEDURE IF EXISTS [JA.spUpdateRole]
@@ -297,6 +306,10 @@ AS
 	END CATCH
 GO
 
+/*##################################################
+				## Location Section ##
+####################################################*/
+
 DROP PROCEDURE IF EXISTS [JA.spCreateLocation]
 DROP PROCEDURE IF EXISTS [JA.spUpdateLocation]
 DROP PROCEDURE IF EXISTS [JA.spRemoveLocation]
@@ -442,6 +455,10 @@ AS
 	END CATCH
 GO
 
+/*##################################################
+				## Contract Section ##
+####################################################*/
+
 DROP PROCEDURE IF EXISTS [JA.spCreateContract]
 DROP PROCEDURE IF EXISTS [JA.spUpdateContract]
 DROP PROCEDURE IF EXISTS [JA.spRemoveContract]
@@ -493,7 +510,6 @@ AS
 GO
 
 CREATE PROCEDURE [JA.spUpdateContract] (
-	@contractId int,
 	@companyId int,
 	@userId varchar(50),
 	@name uniqueidentifier,
@@ -507,17 +523,16 @@ AS
 		WITH MARK N'Updating a Contract';
 
 	BEGIN TRY
-		IF NOT EXISTS (SELECT * FROM [Contract] WHERE [Id] = @contractId)
+		IF NOT EXISTS (SELECT * FROM [Contract] WHERE [CompanyId] = @companyId)
 			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating contract failed, does not exist', 4, 2
 		ELSE
 			UPDATE [Contract]
 				SET 
-					[CompanyId] = @companyId,
 					[UserId] = @userId,
 					[Name] = @name,
 					[RegistrationDateTime] = @registrationDateTime,
 					[ExpiryDateTime] = @expiryDateTime
-			WHERE [Contract].[Id] = @contractId
+			WHERE [Contract].[CompanyId] = @companyId
 
 			COMMIT TRANSACTION @TranName
 	END TRY
@@ -529,7 +544,7 @@ AS
 GO
 
 CREATE PROCEDURE [JA.spRemoveContract] (
-	@contractId int)
+	@companyId int)
 AS
 	DECLARE @TranName varchar(20)
 	SELECT @TranName = 'ContractRemove';
@@ -538,11 +553,11 @@ AS
 		WITH MARK N'Removing a Contract';
 
 	BEGIN TRY
-		IF NOT EXISTS (SELECT * FROM [Contract] WHERE [Id] = @contractId)
+		IF NOT EXISTS (SELECT * FROM [Contract] WHERE [CompanyId] = @companyId)
 			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing contract failed, does not exist', 4, 2
 		ElSE
 			DELETE FROM [Contract]
-			WHERE [Id] = @contractId
+			WHERE [CompanyId] = @companyId
 
 			COMMIT TRANSACTION @TranName
 	END TRY
@@ -554,7 +569,7 @@ AS
 GO
 
 CREATE PROCEDURE [JA.spGetContractById] (
-	@contractId int)
+	@companyId int)
 AS
 	DECLARE @TranName varchar(20)
 	SELECT @TranName = 'ContractGetById';
@@ -563,18 +578,17 @@ AS
 		WITH MARK N'Getting a contract by id';
 
 	BEGIN TRY
-		IF NOT EXISTS (SELECT [Id] FROM [Contract] WHERE [Id] = @contractId)
+		IF NOT EXISTS (SELECT [CompanyId] FROM [Contract] WHERE [CompanyId] = @companyId)
 			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Getting contract failed, does not exist', 4, 2
 		ELSE
 			SELECT
-				[dbo].[Contract].[Id] AS 'Contract ID',
-				[dbo].[Contract].[CompanyId] AS 'Company ID',
+				[dbo].[Contract].[CompanyId] AS 'Contract ID',
 				[dbo].[Contract].[UserId] AS 'User ID',
 				[dbo].[Contract].[Name] AS 'Contract Name',
 				[dbo].[Contract].[RegistrationDateTime] AS 'Registered Date',
 				[dbo].[Contract].[ExpiryDateTime] AS 'Expiration Date'
 			FROM [Contract]
-			WHERE [Id] = @contractid
+			WHERE [CompanyId] = @companyId
 
 			COMMIT TRANSACTION @TranName
 	END TRY
@@ -594,11 +608,10 @@ AS
 		WITH MARK N'Get collection of contract';
 
 	BEGIN TRY
-		IF NOT EXISTS (SELECT TOP(1) [Id] FROM [Contract])
+		IF NOT EXISTS (SELECT TOP(1) [CompanyId] FROM [Contract])
 			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Failed getting contract collection, was empty', 4, 2
 		ELSE
 			SELECT
-				[dbo].[Contract].[Id] AS 'Contract ID',
 				[dbo].[Contract].[CompanyId] AS 'Contract ID',
 				[dbo].[Contract].[UserId] AS 'User ID',
 				[dbo].[Contract].[Name] AS 'Contract Name',
@@ -615,6 +628,10 @@ AS
 	END CATCH
 GO
 
+/*##################################################
+				## Company Section ##
+####################################################*/
+
 DROP PROCEDURE IF EXISTS [JA.spCreateCompany]
 DROP PROCEDURE IF EXISTS [JA.spUpdateCompany]
 DROP PROCEDURE IF EXISTS [JA.spRemoveCompany]
@@ -625,8 +642,7 @@ GO
 CREATE PROCEDURE [JA.spCreateCompany] (
 	@companyCVR int,
 	@companyName varchar(50),
-	@contactPerson varchar(50),
-	@jobPageUrl varchar(2048))
+	@contactPerson varchar(50))
 AS
 	DECLARE @TranName varchar(20)
 	SELECT @TranName = 'CompanyInsert';
@@ -638,9 +654,9 @@ AS
 		IF EXISTS (SELECT * FROM [Company] WHERE [CVR] = @companyCVR)
 			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating company failed, already exists', 4, 2
 		ELSE
-			INSERT INTO [Company] ([CVR], [Name], [ContactPerson], [JobPageURL])
+			INSERT INTO [Company] ([CVR], [Name], [ContactPerson])
 			VALUES
-			(@CompanyCVR, @companyname, @contactPerson, @jobPageUrl);
+			(@CompanyCVR, @companyname, @contactPerson);
 
 			COMMIT TRANSACTION @TranName;			
 	END TRY
@@ -655,8 +671,7 @@ CREATE PROCEDURE [JA.spUpdateCompany] (
     @companyId int,
 	@companyCVR int,
 	@companyName varchar(50),
-	@contactPerson varchar(50),
-	@jobPageUrl varchar(2048))
+	@contactPerson varchar(50))
 AS
 	DECLARE @TranName varchar(20)
 	SELECT @TranName = 'CompanyUpdate';
@@ -671,8 +686,7 @@ AS
 			UPDATE [Company]
 				SET [CVR] = @companyCVR,
 				    [Name] = @companyName,
-					[ContactPerson] = @contactPerson,
-					[JobPageURL] = @jobPageUrl
+					[ContactPerson] = @contactPerson
 			WHERE [Company].[CVR] = @companyCVR
 
 			COMMIT TRANSACTION @TranName
@@ -731,8 +745,7 @@ AS
 			SELECT
 			    [dbo].[Company].[CVR] AS 'Company CVR',
 				[dbo].[Company].[Name] AS 'Company Name',
-				[dbo].[Company].[ContactPerson] AS 'Contact Person',
-				[dbo].[Company].[JobPageURL] AS 'Jobpage Url'
+				[dbo].[Company].[ContactPerson] AS 'Contact Person'
 			FROM [Company]
 			WHERE [Id] = @companyId
 
@@ -760,8 +773,7 @@ AS
 			SELECT
 				[dbo].[Company].[CVR] AS 'Company CVR',
 				[dbo].[Company].[Name] as 'Company Name',
-				[dbo].[Company].[ContactPerson] as 'Contact person',
-				[dbo].[Company].JobPageURL as 'JobPage Url'
+				[dbo].[Company].[ContactPerson] as 'Contact person'
 			FROM [Company]
 
 			COMMIT TRANSACTION @TranName
@@ -773,6 +785,10 @@ AS
 	END CATCH
 GO
 
+/*##################################################
+			## Vacant Job Section ##
+####################################################*/
+
 DROP PROCEDURE IF EXISTS [JA.spCreateVacantJob]
 DROP PROCEDURE IF EXISTS [JA.spUpdateVacantJob]
 DROP PROCEDURE IF EXISTS [JA.spRemoveVacantJob]
@@ -781,8 +797,8 @@ DROP PROCEDURE IF EXISTS [JA.spGetVacantJobs]
 GO
 
 CREATE PROCEDURE [JA.spCreateVacantJob] (
-	@vacantJobLink varchar(max),
-	@companyId int)
+	@companyId int,
+	@url varchar(2048))
 AS
 	DECLARE @TranName varchar(20)
 	SELECT @TranName = 'VacantJobInsert';
@@ -791,15 +807,15 @@ AS
 		WITH MARK N'Inserting a VacantJob';
 
 	BEGIN TRY
-		IF EXISTS (SELECT * FROM [VacantJob] WHERE [Link] = @vacantJobLink)
+		IF EXISTS (SELECT * FROM [VacantJob] WHERE [URL] = @url)
 			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating VacantJob failed, already exists', 4, 2
 		ELSE
 			IF NOT EXISTS (SELECT * FROM [Company] WHERE [Id] = @companyId)
 				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Creating VacantJob failed, company does not exist', 4, 2	
 			ELSE
-				INSERT INTO [VacantJob] ([Link], [CompanyId])
+				INSERT INTO [VacantJob] ([URL], [CompanyId])
 				VALUES
-				(@vacantJobLink, @companyId);
+				(@url, @companyId);
 
 				COMMIT TRANSACTION @TranName;			
 	END TRY
@@ -812,8 +828,8 @@ GO
 
 CREATE PROCEDURE [JA.spUpdateVacantJob] (
 	@vacantJobId int,
-	@vacantJobLink varchar(max),
-	@companyId int)
+	@companyId int,
+	@url varchar(2048))
 AS
 	DECLARE @TranName varchar(20)
 	SELECT @TranName = 'VacantJobUpdate';
@@ -825,14 +841,14 @@ AS
 		IF NOT EXISTS (SELECT [Id] FROM [VacantJob] WHERE [Id] = @vacantJobId)
 			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating VacantJob failed, does not exist', 4, 2
 		ELSE
-			IF EXISTS (SELECT * FROM [VacantJob] WHERE [Link] = @vacantJobLink)
+			IF EXISTS (SELECT * FROM [VacantJob] WHERE [URL] = @url)
 				EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating VacantJob failed, link already exists', 4, 2
 			ELSE
 				IF NOT EXISTS (SELECT * FROM [Company] WHERE [Id] = @companyId)
 					EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Updating VacantJob failed, company does not exist', 4, 2
 				ELSE
 					UPDATE [VacantJob]
-						SET [Link] = @vacantJobLink,
+						SET [URL] = @url,
 							[CompanyId] = @companyId
 					WHERE [VacantJob].[Id] = @vacantJobId
 
@@ -859,6 +875,7 @@ AS
 			EXEC [LogDB].[dbo].[JA.log.spCreateLog] @TranName, 'Removing VacantJob failed, does not exist', 4, 2
 		ElSE
 			-- Remove all references to the primary key.
+			DELETE FROM [Address] WHERE [JobAdvertVacantJobId] = @vacantJobId;
 			DELETE FROM [JobAdvert] WHERE [VacantJobId] = @vacantJobId;
 			DELETE FROM [VacantJob] WHERE [Id] = @vacantJobId;
 
@@ -886,7 +903,7 @@ AS
 		ELSE
 			SELECT
 			    [dbo].[VacantJob].[Id] AS 'Vacant job ID',
-				[dbo].[VacantJob].[Link] AS 'VacantJob Link',
+				[dbo].[VacantJob].[URL] AS 'VacantJob Link',
 				[dbo].[VacantJob].[CompanyId] AS 'Company ID'
 				
 			FROM [VacantJob]
@@ -915,7 +932,7 @@ AS
 		ELSE
 			SELECT
 				[dbo].[VacantJob].[Id] AS 'Vacant job ID',
-				[dbo].[VacantJob].[Link] AS 'VacantJob Link',
+				[dbo].[VacantJob].[URL] AS 'VacantJob Link',
 				[dbo].[VacantJob].[CompanyId] AS 'Company ID'
 			FROM [VacantJob]
 
@@ -927,6 +944,10 @@ AS
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
 GO
+
+/*##################################################
+				## Category Section ##
+####################################################*/
 
 DROP PROCEDURE IF EXISTS [JA.spCreateCategory]
 DROP PROCEDURE IF EXISTS [JA.spUpdateCategory]
@@ -1104,6 +1125,10 @@ AS
 	END CATCH
 GO
 
+/*##################################################
+			## Specialization Section ##
+####################################################*/
+
 DROP PROCEDURE IF EXISTS [JA.spCreateSpecialization]
 DROP PROCEDURE IF EXISTS [JA.spUpdateSpecialization]
 DROP PROCEDURE IF EXISTS [JA.spRemoveSpecialization]
@@ -1251,6 +1276,10 @@ AS
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
 GO
+
+/*##################################################
+			  ## Job Advert Section ##
+####################################################*/
 
 DROP PROCEDURE IF EXISTS [JA.spCreateJobAdvert]
 DROP PROCEDURE IF EXISTS [JA.spUpdateJobAdvert]
@@ -1512,6 +1541,10 @@ AS
 	END CATCH
 GO
 
+/*##################################################
+				## Address Section ##
+####################################################*/
+
 DROP PROCEDURE IF EXISTS [JA.spCreateAddress]
 DROP PROCEDURE IF EXISTS [JA.spUpdateAddress]
 DROP PROCEDURE IF EXISTS [JA.spRemoveAddress]
@@ -1664,6 +1697,10 @@ AS
 		ROLLBACK TRANSACTION @TranName
 	END CATCH
 GO
+
+/*##################################################
+				## User Section ##
+####################################################*/
 
 DROP PROCEDURE IF EXISTS [JA.spCreateUser]
 DROP PROCEDURE IF EXISTS [JA.spUpdateUser]
