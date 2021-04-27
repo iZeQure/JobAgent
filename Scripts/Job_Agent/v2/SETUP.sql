@@ -95,7 +95,6 @@ CREATE TABLE [User] (
 GO
 
 CREATE TABLE [ConsultantArea] (
-[Id] int not null identity(1,1),
 [UserId] int not null,
 [AreaId] int not null)
 GO
@@ -151,7 +150,7 @@ GO
 
 ALTER TABLE [ConsultantArea]
 ADD
-	PRIMARY KEY ([Id]),
+	PRIMARY KEY ([UserId], [AreaId]),
 	FOREIGN KEY ([UserId]) REFERENCES [User] ([Id])	ON UPDATE CASCADE,
 	FOREIGN KEY ([AreaId]) REFERENCES [Area] ([Id])	ON UPDATE CASCADE
 GO
