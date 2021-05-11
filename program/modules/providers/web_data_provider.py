@@ -9,14 +9,18 @@ from program.modules.objects.company import Company
 
 class WebDataProvider:
     __app_config: object
+    __sleep_timer: int
 
     def __init__(self,
                  app_config: object):
         self.__app_config = app_config
+        self.__sleep_timer = self.get_sleep_timer()
 
     def load_page_source_1(self, data_list: []) -> [VacantJob]:
         # Is the data list to return.
         output = []
+
+        print(f"Sleep Timer: {self.__sleep_timer}")
 
         try:
             with self.__get_driver_instance() as driver:
@@ -28,7 +32,7 @@ class WebDataProvider:
                         log.info(f'Attempts to get data from -> {url}')
 
                         driver.get(url)
-                        sleep(1)
+                        sleep(self.__sleep_timer)
 
                         if driver.page_source is not None:
                             data_obj = VacantJob(
@@ -53,6 +57,8 @@ class WebDataProvider:
         # Is the data list to return.
         output = Company
 
+        print(f"Sleep Timer: {self.__sleep_timer}")
+
         try:
             with self.__get_driver_instance() as driver:
                 driver.minimize_window()
@@ -62,7 +68,7 @@ class WebDataProvider:
                     log.info(f'Attempts to load page source -> {url}')
 
                     driver.get(url)
-                    sleep(3)
+                    sleep(self.__sleep_timer)
 
                     if driver.page_source is not None:
                         data_obj = Company(
@@ -122,3 +128,11 @@ class WebDataProvider:
         if not match('(?:http|ftp|https)://', url):
             return 'https://{}'.format(url)
         return url
+
+    def get_sleep_timer(self) -> int:
+        webdriver_config = self.__app_config["WebDriver"]
+
+        if 'SleepTimer' in webdriver_config:
+            return webdriver_config["SleepTimer"]
+
+        return 1
