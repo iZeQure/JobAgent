@@ -54,10 +54,10 @@ class DatabaseMSSQL(object):
             self.__connection_string = f'DRIVER={database_config["Driver"]};' \
                                        f'SERVER={database_config["Server"]};' \
                                        f'UID={database_config["UID"]};' \
-                                       f'PWD={database_config["PWD"]}' \
-                                       f'TRUSTED_CONNECTION={database_config["Trusted_Connection"]}'
+                                       f'PWD={database_config["PWD"]};' \
+                                       f'TRUSTED_CONNECTION={database_config["Trusted_Connection"]};'
             return
 
         self.__connection_string = f'DRIVER={database_config["Driver"]};' \
                                    f'SERVER={database_config["Server"]};' \
-                                   f'TRUSTED_CONNECTION={database_config["Trusted_Connection"]}'
+                                   f'TRUSTED_CONNECTION={database_config["Trusted_Connection"]};'
