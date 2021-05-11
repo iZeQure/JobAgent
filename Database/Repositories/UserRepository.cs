@@ -323,9 +323,28 @@ namespace DataAccess.Repositories
             }
         }
 
-        public Task Remove(int id)
+        public async Task Remove(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                // Initialzie command obj.
+                using SqlCommand cmd = _databaseAccess.GetCommand("RemoveUser", CommandType.StoredProcedure);
+
+                // Define user id parameter.
+                cmd.Parameters.AddWithValue("@id", id).SqlDbType = SqlDbType.Int;
+
+                // Open connection to database.
+                await _databaseAccess.OpenConnectionAsync();
+
+                // Exectute command
+                await cmd.ExecuteNonQueryAsync();
+            }
+            finally
+            {
+                // Close connection to database.
+                _databaseAccess.CloseConnection();
+            }
+
         }
 
         public async Task Update(User update)

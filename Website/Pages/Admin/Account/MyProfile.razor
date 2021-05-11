@@ -91,6 +91,19 @@
                     <span>Gem bruger oplysninger</span>
                 }
             </button>
+            <button type="submit" class="btn btn-danger float-left ml-auto mt-5">
+                @if (IsProcessing)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span>Sletter oplysninger...</span>
+                }
+                else
+                {
+                    <span>Slet bruger</span>
+                }
+
+
+            </button>
         </div>
 
     </EditForm>
@@ -179,6 +192,30 @@
         }
         else
             ErrorMessage = "Kunne ikke opdatere dine oplysninger!";
+
+        IsProcessing = false;
+        StateHasChanged();
+    }
+
+    private async Task OnValidSubmit_DeleteUser()
+    {
+        IsProcessing = true;
+        bool result = false;
+
+        await Task.Delay(500);
+
+        await InvokeAsync(async () =>
+        {
+            result = await AdminService.RemoveUserAsync(AccountModel);
+        });
+
+        if (result)
+        {
+            await Task.Delay(1000);
+            await MyAuthStateProvider.MarkUserAsLoggedOut();
+        }
+        else
+            ErrorMessage = "Kunne ikke slette din bruger!";
 
         IsProcessing = false;
         StateHasChanged();

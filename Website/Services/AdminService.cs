@@ -50,6 +50,30 @@ namespace JobAgent.Services
             }
         }
 
+        public async Task<bool> RemoveUserAsync(AccountModel accountModel)
+        {
+            var user = new User()
+            {
+                Identifier = accountModel.AccountId,
+                Email = accountModel.Email,
+                FirstName = accountModel.FirstName,
+                LastName = accountModel.LastName,
+                ConsultantArea = new ConsultantArea() { Identifier = accountModel.ConsultantAreaId },
+                Location = new Location() { Identifier = accountModel.LocationId }
+            };
+
+            try
+            {
+                await _dataAccessManager.UserDataAccessManager().Remove(user.Identifier);
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         public async Task UpdateUserPasswordAsync(ChangePasswordModel auth)
         {
             string userSalt = await _dataAccessManager.UserDataAccessManager().GetUserSaltByEmail(auth.Email);
