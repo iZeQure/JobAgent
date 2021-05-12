@@ -2,8 +2,8 @@ import logging as log
 from re import compile, match, IGNORECASE
 from datetime import datetime
 
+from program.modules.managers.database_manager import DatabaseManager
 from program.modules.providers.search_algorithm_provider import SearchAlgorithmProvider
-from program.modules.services.data_service import DataService
 from program.modules.objects.job_advert import JobAdvert
 from program.modules.objects.vacant_job import VacantJob
 from program.modules.objects.address import Address
@@ -23,32 +23,32 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
     __category_filter_keys: []
     __specialization_filter_keys: []
 
-    def __init__(self, data_service: DataService):
-        super().__init__(data_service)
+    def __init__(self, manager: DatabaseManager):
+        super().__init__(manager)
 
         self.__load_filters()
 
     def __load_filters(self):
-        service = self.data_service
+        m = self.manager
 
         self.__title_filter_keys = \
-            self.__get_keys_from_list(service.get_algorithm_keywords_by_key("Title_Key"))
+            self.__get_keys_from_list(m.get_algorithm_keywords_by_key_value("Title_Key"))
         self.__email_filter_keys = \
-            self.__get_keys_from_list(service.get_algorithm_keywords_by_key("Email_Key"))
+            self.__get_keys_from_list(m.get_algorithm_keywords_by_key_value("Email_Key"))
         self.__phone_number_filter_keys = \
-            self.__get_keys_from_list(service.get_algorithm_keywords_by_key("Phone_Number_Key"))
+            self.__get_keys_from_list(m.get_algorithm_keywords_by_key_value("Phone_Number_Key"))
         self.__description_filter_keys = \
-            self.__get_keys_from_list(service.get_algorithm_keywords_by_key("Description_Key"))
+            self.__get_keys_from_list(m.get_algorithm_keywords_by_key_value("Description_Key"))
         self.__location_name_filter_keys = \
-            self.__get_keys_from_list(service.get_algorithm_keywords_by_key("Location_Key"))
+            self.__get_keys_from_list(m.get_algorithm_keywords_by_key_value("Location_Key"))
         self.__registration_date_name_filter_keys = \
-            self.__get_keys_from_list(service.get_algorithm_keywords_by_key("Registration_Date_Key"))
+            self.__get_keys_from_list(m.get_algorithm_keywords_by_key_value("Registration_Date_Key"))
         self.__deadline_date_name_filter_keys = \
-            self.__get_keys_from_list(service.get_algorithm_keywords_by_key("Deadline_Date_Key"))
+            self.__get_keys_from_list(m.get_algorithm_keywords_by_key_value("Deadline_Date_Key"))
         self.__category_filter_keys = \
-            self.__get_keys_from_list(service.get_algorithm_keywords_by_key("Category_Key"))
+            self.__get_keys_from_list(m.get_algorithm_keywords_by_key_value("Category_Key"))
         self.__specialization_filter_keys = \
-            self.__get_keys_from_list(service.get_algorithm_keywords_by_key("Specialization_Key"))
+            self.__get_keys_from_list(m.get_algorithm_keywords_by_key_value("Specialization_Key"))
 
     def __find_title(self) -> str:
         for arg in self.__title_filter_keys:
@@ -140,7 +140,7 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
 
     def __find_category(self) -> int:
         category_filter_keys = self.__category_filter_keys
-        categories = self.data_service.get_categories()
+        categories = self.manager.get_categories()
         category_id = 0
         result = ""
 
@@ -162,7 +162,7 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
 
     def __find_specialization(self) -> int:
         specialization_filter_keys = self.__specialization_filter_keys
-        specializations = self.data_service.get_specializations()
+        specializations = self.manager.get_specializations()
         specialization_id = 0
 
         for specialization_filter in specialization_filter_keys:

@@ -1,13 +1,13 @@
 import logging as log
-from program.modules.services.data_service import DataService
+from program.modules.managers.database_manager import DatabaseManager
 from program.modules.providers.search_algorithm_provider import SearchAlgorithmProvider
 from program.modules.objects.vacant_job import VacantJob
 from program.modules.objects.company import Company
 
 
 class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
-    def __init__(self, data_service: DataService):
-        super().__init__(data_service)
+    def __init__(self, manager: DatabaseManager):
+        super().__init__(manager)
 
     def __find_vacant_job_links(self) -> []:
         # job_iframe = self.soup.find_all(attrs={"aria-label": "Job widget"})
