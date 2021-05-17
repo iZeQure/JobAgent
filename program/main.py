@@ -1,4 +1,4 @@
-import logging
+import logging as log
 from json import load, JSONDecodeError
 from time import sleep
 
@@ -14,7 +14,7 @@ class Main:
             self.load_configuration()
             self.build_log_configuration()
         except ValueError as err:
-            logging.error(err)
+            log.error(err)
 
     def load_configuration(self):
         # Build configuration file.
@@ -22,13 +22,13 @@ class Main:
             with open(self.__CONFIG_PATH) as config:
                 self.configuration = load(config)
         except FileNotFoundError:
-            logging.error(msg='Could not get configuration: File not found.')
+            log.error(msg='Could not get configuration: File not found.')
             exit(0)
         except FileExistsError:
-            logging.error(msg='Could not get configuration: File already exists.')
+            log.error(msg='Could not get configuration: File already exists.')
             exit(0)
         except JSONDecodeError:
-            logging.error(msg='Failed to decode configuration.')
+            log.error(msg='Failed to decode configuration.')
             exit(0)
 
     def build_log_configuration(self):
@@ -37,7 +37,7 @@ class Main:
 
         if logging_key in self.configuration:
             log_config = self.configuration[logging_key]
-            logging.basicConfig(
+            log.basicConfig(
                 level=log_config['Level']['INFO'],
                 format=log_config['Format'],
                 datefmt=log_config['DateFormat']
@@ -56,8 +56,11 @@ class Main:
 
             # Start the Bot.
             startup.initialize_zombie()
+
         except ValueError as err:
-            logging.error(err)
+            log.error(err)
+        except Exception:
+            log.exception('Something bad happened.')
 
 
 # Get an instance of main.
@@ -67,10 +70,10 @@ main = Main()
 try:
     main.start_application()
 except ValueError as valErr:
-    logging.error(valErr)
+    log.error(valErr)
 except Exception as ex:
-    logging.error(f'Something went wrong while starting application: {ex}')
+    log.error(f'Something went wrong while starting application: {ex.args}')
 
 # Final
-logging.info('Destroying Crawler in 10 Seconds.')
+log.info('Destroying Crawler in 10 Seconds.')
 sleep(10)

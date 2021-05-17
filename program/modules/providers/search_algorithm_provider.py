@@ -1,6 +1,7 @@
 import logging as log
 from bs4 import BeautifulSoup
 from program.modules.managers.database_manager import DatabaseManager
+from program.modules.providers.web_data_provider import WebDataProvider
 
 
 class SearchAlgorithmProvider:
@@ -8,18 +9,17 @@ class SearchAlgorithmProvider:
         Super class of Search Algorithms, provides the most basic information for crawling the web.
     """
     __manager: DatabaseManager
+    __web_data: WebDataProvider
     __soup: BeautifulSoup
 
-    def __init__(self, manager: DatabaseManager) -> None:
+    def __init__(self, manager: DatabaseManager, web_data: WebDataProvider) -> None:
         """
         Instantiates the Algorithm provider.
         Args:
             manager: Represents a data manager, to give proper methods to execute from.
         """
         self.__manager = manager
-
-    def get_data(self, data_object: object):
-        log.info('You got fooled.')
+        self.__web_data = web_data
 
     def set_page_source(self, page_html: str) -> None:
         """
@@ -41,7 +41,14 @@ class SearchAlgorithmProvider:
         try:
             return self.__manager
         except Exception as ex:
-            log.error(f'No instance found of [service] in {ex.__class__}')
+            log.error(f'No instance found of [database manager] in {ex.__class__}')
+
+    @property
+    def web_data(self):
+        try:
+            return self.__web_data
+        except Exception as ex:
+            log.error(f'No instance found of [web data provider] in {ex.__class__}')
 
     @property
     def soup(self) -> BeautifulSoup:

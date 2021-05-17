@@ -1,6 +1,7 @@
 from program.modules.database.db import DatabaseMSSQL
 from program.modules.managers.manager import Manager
 from program.modules.objects.address import Address
+from program.modules.objects.company import Company
 from program.modules.objects.job_advert import JobAdvert
 from program.modules.objects.vacant_job import VacantJob
 
@@ -27,7 +28,8 @@ class DatabaseManager(Manager):
 
     def get_companies(self):
         sp_sql = 'EXEC [JA.spGetCompanies]'
-        return self.get_data(sp_sql)
+        output = [Company(row[0], row[1], row[2], row[3], "None") for row in self.get_data(sp_sql)]
+        return output
 
     def get_vacant_jobs(self) -> [VacantJob]:
         sp_sql = 'EXEC [JA.spGetVacantJobs]'
