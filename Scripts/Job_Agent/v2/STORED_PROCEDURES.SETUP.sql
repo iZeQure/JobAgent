@@ -622,6 +622,7 @@ AS
 
 	BEGIN TRY
 		SELECT
+			[dbo].[Company].[Id] AS 'ID',
 			[dbo].[Company].[CVR] AS 'Company CVR',
 			[dbo].[Company].[Name] as 'Company Name',
 			[dbo].[Company].[ContactPerson] as 'Contact person'
