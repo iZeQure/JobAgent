@@ -271,34 +271,26 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
                 return jobadvert_data_list
 
     def __save_jobadvert_data_information(self, jobadvert_data_list: []) -> None:
-        existing_jobadvert_data_list = self.manager.get_existing_job_adverts()
+        if jobadvert_data_list is None:
+            raise ValueError(f'Parameter {type(jobadvert_data_list)} was not defined.')
 
-        # Validate the data list for None.
-        if jobadvert_data_list is not None and existing_jobadvert_data_list is not None:
-            if len(jobadvert_data_list) == int(0) and len(existing_jobadvert_data_list) == int(0):
-                raise ValueError('No data found in the given lists.')
-            else:
-                # Validate duplicate information.
-                for job in jobadvert_data_list:
-                    if len(existing_jobadvert_data_list) == 0:
-                        log.info(f'Creating Job Advert <{job.title}>.')
-                        # Create a jobadvert with new information.
-                        self.manager.create_job_advert(job)
-                    else:
-                        # logging.info(f"Saving <{len(jobadvert_data_list)}> compiled job advert(s).")
-                        log.info('Looking for duplicate data.')
-                        for existing_job in existing_jobadvert_data_list:
-                            if existing_job == job.id:
-                                log.info(f'Found duplicate data on -> {existing_job}')
-                                # Update jobadvert with new information.
-                                self.manager.update_job_advert(existing_job)
-                            else:
-                                log.info(
-                                    f'No duplicate found on [{existing_job}], creating jobadvert -> {job.id}')
-                                # Create a jobadvert with new information.
-                                self.manager.create_job_advert(existing_job)
+        if len(jobadvert_data_list) == int(0):
+            raise ValueError(f'The length of {type(jobadvert_data_list)} was {len(jobadvert_data_list)}.')
+
+        existing_job_adverts = set(self.manager.get_existing_job_adverts())
+
+        if existing_job_adverts is None:
+            raise ValueError(f'Existing Job Advert were not defined.')
         else:
-            raise Exception('Given data to save was invalid.')
+            log.info('Looking for duplicate data.')
+            for job in jobadvert_data_list:
+                # create job advert if the list is empty or the job id is not in the existing list.
+                if len(existing_job_adverts) == int(0) or job.id not in existing_job_adverts:
+                    log.info(f'No duplicate found on [{job.id}]. Creating new job advert.')
+                    self.manager.create_job_advert(job)
+                else:
+                    log.info(f'Found duplicate data on [{job.id}]. Updating job advert.')
+                    self.manager.update_job_advert(job)
 
     @staticmethod
     def __get_keys_from_list(keys: []) -> []:

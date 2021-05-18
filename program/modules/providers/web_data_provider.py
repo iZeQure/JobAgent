@@ -15,15 +15,6 @@ class WebDataProvider:
         self.__app_config = app_config
         self.__sleep_timer = self.get_sleep_timer()
 
-    def __load_web_page(self, driver: webdriver, url: str):
-        try:
-            formatted_url = self.__format_url(url)
-            log.info(f'Loading web page from {formatted_url}')
-            driver.get(url)
-            sleep(self.__sleep_timer)
-        except WebDriverException:
-            raise WebDriverException(f'Error, could not load data for {url}')
-
     def load_page_sources_by_data_list(self, data_list: []) -> [VacantJob]:
         # Is the data list to return.
         output = []
@@ -62,6 +53,23 @@ class WebDataProvider:
 
             return ""
 
+    def url_ok(self, url: str):
+        from requests import head, RequestException
+        try:
+            r = head(self.format_url(url))
+            return r.status_code == 200
+        except RequestException:
+            return False
+
+    def __load_web_page(self, driver: webdriver, url: str):
+        try:
+            formatted_url = self.format_url(url)
+            log.info(f'Loading web page from {formatted_url}')
+            driver.get(url)
+            sleep(self.__sleep_timer)
+        except WebDriverException:
+            raise WebDriverException(f'Error, could not load data for {url}')
+
     def __get_driver_path(self):
         web_driver_obj = self.__app_config["WebDriver"]
         base_path = web_driver_obj["BasePath"]
@@ -87,10 +95,10 @@ class WebDataProvider:
             return webdriver.Firefox(executable_path=driver_path, options=options)
         else:
             raise NotImplementedError('Given driver instance was not supported. '
-                                      'Only supports [Edge, Firefox, Chrome and Opera]')
+                                      'Only supports [Edge, Firefox, Chrome, Opera] and Headless')
 
     @staticmethod
-    def __format_url(url: str):
+    def format_url(url: str):
         """
         Formats an URL, if it doesn't contain http | ftp | https.
         @param url: The URL to format.

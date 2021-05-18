@@ -20,7 +20,7 @@ class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
             # Run through every job page.
             for page in job_pages:
                 if page.url is None:
-                    break
+                    continue
 
                 # Get the page source for every job page.
                 page_source = self.web_data.load_page_source_by_page_url(page.url)
@@ -35,18 +35,14 @@ class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
             log.exception(ex)
 
     def __find_vacant_job_links(self) -> []:
-        # job_iframe = self.soup.find_all(attrs={"aria-label": "Job widget"})
-        #
-        # iframe = str
-        # if job_iframe is not None:
-        #     for job in job_iframe:
-        #         iframe = job['srcdoc']
-        # print(f'A found iframe: {iframe}')
-
+        import re
+        patterns = ['opslag-container-container', 'dre-teaser-content']
         useful_links = []
-        for link in self.soup.find_all('a'):
-            if link.text:
-                useful_links.append(link['href'])
+        for pattern in patterns:
+            regex = re.compile('.*' + pattern + '*.')
+            for div in self.soup.find_all('div', {'class': regex}):
+                for a in div.find_all('a'):
+                    useful_links.append(a['href'])
 
         return useful_links
 
@@ -65,16 +61,26 @@ class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
                 self.set_page_source(job_page.html_page_source)
 
                 for link in self.__find_vacant_job_links():
-                    log.info(f'Gathered [{link}] for {job_page.company_id}')
-
-                    vacant_job = VacantJob(
-                        vacant_job_id=0,
-                        link=link,
-                        company_id=job_page.company_id,
-                        html_page_source=''
-                    )
-
-                    vacant_jobs.append(vacant_job)
+                    if self.web_data.url_ok(link):
+                        log.info(f'Gathered [{link}] for {job_page.company_id}')
+                        vacant_job = VacantJob(
+                            vacant_job_id=0,
+                            link=link,
+                            company_id=job_page.company_id,
+                            html_page_source='')
+                        vacant_jobs.append(vacant_job)
+                    else:
+                        combined_link = self.web_data.format_url(f'{job_page.url.split("/")[2]}{link}')
+                        if self.web_data.url_ok(combined_link):
+                            log.info(f'Gathered [{combined_link}] for {job_page.company_id}')
+                            vacant_job = VacantJob(
+                                vacant_job_id=0,
+                                link=combined_link,
+                                company_id=job_page.company_id,
+                                html_page_source='')
+                            vacant_jobs.append(vacant_job)
+                        else:
+                            log.warning(f'{link} could not be gathered, is invalid.')
 
                 log.info(f'Found [{len(vacant_jobs)}] for company [{job_page.company_id}]')
                 return vacant_jobs
