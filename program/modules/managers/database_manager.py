@@ -3,6 +3,7 @@ from program.modules.managers.manager import Manager
 from program.modules.objects.address import Address
 from program.modules.objects.company import Company
 from program.modules.objects.job_advert import JobAdvert
+from program.modules.objects.job_page import JobPage
 from program.modules.objects.vacant_job import VacantJob
 
 
@@ -12,29 +13,34 @@ class DatabaseManager(Manager):
 
     def get_crawler_information(self):
         sp_sql = 'EXEC [GetInitializationInformation]'
-        return self.get_data(sp_sql, db_scheme='ZombieCrawlerDB')
+        return self.get_sql_data(sp_sql, db_scheme='ZombieCrawlerDB')
 
     def get_algorithm_keywords_by_key_value(self, key_value: str):
         sp_sql = 'EXEC [GetKeysByKeyValue] @key_value=?'
-        return self.get_data(sp_sql, key_value, db_scheme='ZombieCrawlerDB')
+        return self.get_sql_data(sp_sql, key_value, db_scheme='ZombieCrawlerDB')
 
     def get_categories(self):
         sp_sql = 'EXEC [JA.spGetCategories]'
-        return self.get_data(sp_sql)
+        return self.get_sql_data(sp_sql)
 
     def get_specializations(self):
         sp_sql = 'EXEC [JA.spGetSpecializations]'
-        return self.get_data(sp_sql)
+        return self.get_sql_data(sp_sql)
 
     def get_companies(self):
         sp_sql = 'EXEC [JA.spGetCompanies]'
-        output = [Company(row[0], row[1], row[2], row[3], "None") for row in self.get_data(sp_sql)]
+        output = [Company(row[0], row[1], row[2], row[3], "None") for row in self.get_sql_data(sp_sql)]
+        return output
+
+    def get_job_pages(self):
+        sp_sql = 'SELECT * FROM [JobPage]'
+        output = [JobPage(row[0], row[1], row[2], '') for row in self.get_sql_data(sp_sql)]
         return output
 
     def get_vacant_jobs(self) -> [VacantJob]:
         sp_sql = 'EXEC [JA.spGetVacantJobs]'
         output = []
-        for vacant_job in self.get_data(sp_sql):
+        for vacant_job in self.get_sql_data(sp_sql):
             obj = VacantJob(
                 vacant_job_id=vacant_job[0],
                 link=vacant_job[1],
@@ -47,7 +53,7 @@ class DatabaseManager(Manager):
     def get_existing_job_adverts(self):
         sql_text = 'SELECT [VacantJobId] FROM [JobAdvert]'
         output = []
-        for vacant_job in self.get_data(sql_text):
+        for vacant_job in self.get_sql_data(sql_text):
             output.append(vacant_job[0])
         return output
 
@@ -96,12 +102,12 @@ class DatabaseManager(Manager):
 
     def create_vacant_job(self, vacant_job: VacantJob):
         sp_sql = """EXEC [JA.spCreateVacantJob]
-                @vacantJobLink=?,
-                @companyId=?;
+                @companyId=?,
+                @url=?;
                 """
         params = (
-            vacant_job.link,
-            vacant_job.company_id
+            vacant_job.company_id,
+            vacant_job.link
         )
         self.save_data(sp_sql, params, auto_commit=True)
 

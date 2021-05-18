@@ -41,7 +41,7 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
                     raise ValueError('Vacant Job List was empty.')
                 else:
                     # Get the page sources from the vacant job list.
-                    vacant_jobs = self.web_data.load_page_source_1(vacant_job_data_list)
+                    vacant_jobs = self.web_data.load_page_sources_by_data_list(vacant_job_data_list)
 
                     # Create a list for job advert data.
                     jobadvert_data_list = self.__get_jobadvert_data_from_list(vacant_jobs)
@@ -278,21 +278,25 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
             if len(jobadvert_data_list) == int(0) and len(existing_jobadvert_data_list) == int(0):
                 raise ValueError('No data found in the given lists.')
             else:
-                # logging.info(f"Saving <{len(jobadvert_data_list)}> compiled job advert(s).")
-                log.info('Looking for duplicate data.')
-
                 # Validate duplicate information.
-                for existing_data in existing_jobadvert_data_list:
-                    for jobadvert in jobadvert_data_list:
-                        if existing_data == jobadvert.id:
-                            log.info(f'Found duplicate data on -> {existing_data}')
-                            # Update jobadvert with new information.
-                            self.manager.update_job_advert(jobadvert)
-                        else:
-                            log.info(
-                                f'No duplicate found on [{existing_data}], creating jobadvert -> {jobadvert.id}')
-                            # Create a jobadvert with new information.
-                            self.manager.create_job_advert(jobadvert)
+                for job in jobadvert_data_list:
+                    if len(existing_jobadvert_data_list) == 0:
+                        log.info(f'Creating Job Advert <{job.title}>.')
+                        # Create a jobadvert with new information.
+                        self.manager.create_job_advert(job)
+                    else:
+                        # logging.info(f"Saving <{len(jobadvert_data_list)}> compiled job advert(s).")
+                        log.info('Looking for duplicate data.')
+                        for existing_job in existing_jobadvert_data_list:
+                            if existing_job == job.id:
+                                log.info(f'Found duplicate data on -> {existing_job}')
+                                # Update jobadvert with new information.
+                                self.manager.update_job_advert(existing_job)
+                            else:
+                                log.info(
+                                    f'No duplicate found on [{existing_job}], creating jobadvert -> {job.id}')
+                                # Create a jobadvert with new information.
+                                self.manager.create_job_advert(existing_job)
         else:
             raise Exception('Given data to save was invalid.')
 

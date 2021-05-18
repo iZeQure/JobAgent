@@ -4,12 +4,11 @@ from re import match
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from program.modules.objects.vacant_job import VacantJob
-from program.modules.objects.company import Company
 
 
 class WebDataProvider:
     __app_config: object
-    __sleep_timer: int
+    __sleep_timer: float
 
     def __init__(self,
                  app_config: object):
@@ -25,7 +24,7 @@ class WebDataProvider:
         except WebDriverException:
             raise WebDriverException(f'Error, could not load data for {url}')
 
-    def load_page_source_1(self, data_list: []) -> [VacantJob]:
+    def load_page_sources_by_data_list(self, data_list: []) -> [VacantJob]:
         # Is the data list to return.
         output = []
 
@@ -51,24 +50,17 @@ class WebDataProvider:
 
             return output
 
-    def load_page_source_2(self, company: Company):
+    def load_page_source_by_page_url(self, page_url: str):
         # Is the data list to return.
-        output = Company
-
         with self.__get_driver_instance() as driver:
             driver.minimize_window()
 
-            self.__load_web_page(driver, company.job_page_url)
+            self.__load_web_page(driver, page_url)
 
             if driver.page_source is not None:
-                data_obj = Company(
-                    company_id=company.id,
-                    job_page_url=company.job_page_url,
-                    html_page_source=driver.page_source
-                )
-                output = data_obj
+                return driver.page_source
 
-            return output
+            return ""
 
     def __get_driver_path(self):
         web_driver_obj = self.__app_config["WebDriver"]
@@ -108,7 +100,7 @@ class WebDataProvider:
             return 'https://{}'.format(url)
         return url
 
-    def get_sleep_timer(self) -> int:
+    def get_sleep_timer(self) -> float:
         webdriver_config = self.__app_config["WebDriver"]
 
         if 'SleepTimer' in webdriver_config:

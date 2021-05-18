@@ -15,7 +15,7 @@ class Manager:
 
         return self.__db.connect(auto_commit, db_scheme)
 
-    def get_data(self, sp_sql: str, params: [] = None, db_scheme: str = None, auto_commit: bool = False) -> []:
+    def get_sql_data(self, sp_sql: str, params: [] = None, db_scheme: str = None, auto_commit: bool = False) -> []:
         with self.__connect(db_scheme, auto_commit) as conn:
             try:
                 if params is None:

@@ -54,9 +54,9 @@ class Startup(object):
             self.__vacant_job_search_algorithm_provider.run_algorithm()
             log.info('Finished Algorithm!')
 
-            # log.info('Starting Job Advert Search Algorithm..')
-            # self.__job_advert_search_algorithm_provider.run_algorithm()
-            # log.info('Finished Algorithm!')
+            log.info('Starting Job Advert Search Algorithm..')
+            self.__job_advert_search_algorithm_provider.run_algorithm()
+            log.info('Finished Algorithm!')
 
     def build_service_collection(self):
         # Build service collection.

@@ -17,3 +17,6 @@ class BaseJobEntity(object):
     @property
     def html_page_source(self):
         return self.__html_page_source
+
+    def set_page_source(self, page_source: str):
+        self.__html_page_source = page_source
