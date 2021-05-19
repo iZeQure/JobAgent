@@ -50,7 +50,7 @@ class DatabaseManager(Manager):
             output.append(obj)
         return output
 
-    def get_existing_job_adverts(self):
+    def get_job_adverts(self):
         sql_text = 'SELECT [VacantJobId] FROM [JobAdvert]'
         output = []
         for vacant_job in self.get_sql_data(sql_text):
@@ -58,18 +58,7 @@ class DatabaseManager(Manager):
         return output
 
     def create_job_advert(self, job_advert: JobAdvert):
-        sp_sql = """EXEC [JA.spCreateJobAdvert]
-                    @vacantJobId=?, 
-                    @categoryId=?, 
-                    @specializationId=?,
-                    @jobAdvertTitle=?, 
-                    @jobAdvertSummary=?,
-                    @jobAdvertDescription=?, 
-                    @jobAdvertEmail=?, 
-                    @jobAdvertPhoneNr=?,
-                    @jobAdvertRegistrationDateTime=?, 
-                    @jobAdvertApplicationDeadlineDateTime=?;
-                    """
+        sp_sql = "EXEC [JA.spCreateJobAdvert] @vacantJobId=?,@categoryId=?@specializationId=?,@jobAdvertTitle=?,@jobAdvertSummary=?,@jobAdvertDescription=?,@jobAdvertEmail=?,@jobAdvertPhoneNr=?,@jobAdvertRegistrationDateTime=?,@jobAdvertApplicationDeadlineDateTime=?;"
         params = (
             job_advert.id,
             job_advert.category_id,
@@ -85,12 +74,7 @@ class DatabaseManager(Manager):
         self.save_data(sp_sql, params, auto_commit=True)
 
     def create_address(self, address: Address):
-        sp_sql = """EXEC [JA.spCreateAddress]
-                @jobAdvertVacantJobId=?,
-                @streetAddress=?,
-                @city=?,
-                @postalCode=?;
-                """
+        sp_sql = "EXEC [JA.spCreateAddress]@jobAdvertVacantJobId=?,@streetAddress=?,@city=?,@postalCode=?;"
         params = (
             address.job_advert_vacant_job_id,
             address.street_address,
@@ -137,3 +121,12 @@ class DatabaseManager(Manager):
             job_advert.application_deadline_datetime
         )
         self.save_data(sp_sql, params, auto_commit=True)
+
+    def update_vacant_job(self, vacant_job: VacantJob):
+        sp_sql = """EXEC [JA.spUpdateVacantJob]
+        @vacantJobId=?,
+        @companyId=?,
+        @url=?
+        """
+        params = (vacant_job.id, vacant_job.company_id, vacant_job.link)
+        self.save_data(sp_sql, params)

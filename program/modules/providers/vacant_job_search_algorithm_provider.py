@@ -26,8 +26,8 @@ class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
                 page_source = self.web_data.load_page_source_by_page_url(page.url)
                 page.set_page_source(page_source)
 
-            vacant_jobs = self.__get_vacant_jobs(job_pages=job_pages)
-            self.__save_vacant_jobs(vacant_jobs)
+            vacant_jobs = self.__extract_vacant_jobs_from_job_pages(job_pages=job_pages)
+            self.__handle_vacant_job_data(vacant_jobs)
 
         except ValueError as er:
             log.warning(er)
@@ -46,7 +46,7 @@ class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
 
         return useful_links
 
-    def __get_data(self, job_page: object) -> []:
+    def __scrape_vacant_job_data(self, job_page: object) -> []:
         if job_page is None:
             raise ValueError('Parameter was type of None.')
         else:
@@ -61,45 +61,91 @@ class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
                 self.set_page_source(job_page.html_page_source)
 
                 for link in self.__find_vacant_job_links():
-                    if self.web_data.url_ok(link):
-                        log.info(f'Gathered [{link}] for {job_page.company_id}')
-                        vacant_job = VacantJob(
-                            vacant_job_id=0,
-                            link=link,
-                            company_id=job_page.company_id,
-                            html_page_source='')
-                        vacant_jobs.append(vacant_job)
-                    else:
-                        combined_link = self.web_data.format_url(f'{job_page.url.split("/")[2]}{link}')
-                        if self.web_data.url_ok(combined_link):
-                            log.info(f'Gathered [{combined_link}] for {job_page.company_id}')
-                            vacant_job = VacantJob(
-                                vacant_job_id=0,
-                                link=combined_link,
-                                company_id=job_page.company_id,
-                                html_page_source='')
-                            vacant_jobs.append(vacant_job)
-                        else:
-                            log.warning(f'{link} could not be gathered, is invalid.')
+                    validated_url_result = self.__validate_vacant_job_url(job_page.url, link)
+
+                    if validated_url_result == '':
+                        log.warning(f'{link} is unreachable or invalid.')
+                        return
+
+                    log.info(f'Gathered [{validated_url_result}] for Company [{job_page.company_id}].')
+                    vacant_job = VacantJob(
+                        vacant_job_id=0,
+                        link=validated_url_result,
+                        company_id=job_page.company_id,
+                        html_page_source=''
+                    )
+
+                    vacant_jobs.append(vacant_job)
 
                 log.info(f'Found [{len(vacant_jobs)}] for company [{job_page.company_id}]')
                 return vacant_jobs
             else:
                 raise TypeError('Given type was not of type JobPage.')
 
-    def __get_vacant_jobs(self, job_pages: []) -> []:
+    def __validate_vacant_job_url(self, page_url: str,  link: str) -> str:
+        # Check if the data url is reachable.
+        if self.web_data.url_ok(link):
+            return link
+
+        # Format the url, then split on / to combine the link to the domain url.
+        split_char = '/'
+        split_url = page_url.split(split_char)[2]
+        formatted_url = self.web_data.format_url(split_url + link)
+        if self.web_data.url_ok(formatted_url):
+            return formatted_url
+
+        return ''
+
+    def __extract_vacant_jobs_from_job_pages(self, job_pages: []) -> []:
         if job_pages is None:
             raise Exception('Expected parameter Job Page list, but got None.')
         else:
             vacant_jobs = []
             for job in job_pages:
-                links = self.__get_data(job)
+                links = self.__scrape_vacant_job_data(job)
                 for link in links:
                     vacant_jobs.append(link)
 
             return vacant_jobs
 
-    def __save_vacant_jobs(self, vacant_jobs: []):
-        log.info(f'Saving <{len(vacant_jobs)}> Vacant Jobs.')
-        for job in vacant_jobs:
-            self.manager.create_vacant_job(job)
+    def __handle_vacant_job_data(self, vacant_jobs: []) -> None:
+        if vacant_jobs is None:
+            raise ValueError(f'Parameter {type(vacant_jobs)} was not provided.')
+
+        if len(vacant_jobs) == int(0):
+            raise ValueError(f'Length of {type(vacant_jobs)} is 0.')
+
+        log.info(f'Handling <{len(vacant_jobs)}> Vacant Jobs.')
+        log.info('Searching for duplicate Vacant Jobs..')
+        for vacant_job in vacant_jobs:
+            try:
+                if self.__vacant_job_exists(vacant_job):
+                    continue
+                    # log.info(f'Updating data for [{vacant_job.link}]..')
+                    # self.manager.update_vacant_job(vacant_job)
+                else:
+                    log.info(f'Creating new data for [{vacant_job.link}]..')
+                    self.manager.create_vacant_job(vacant_job)
+            except ValueError as err:
+                log.warning(err)
+                continue
+
+    def __vacant_job_exists(self, vacant_job: VacantJob) -> bool:
+        if not isinstance(vacant_job, VacantJob):
+            raise ValueError(f'Parameter given, is not type of {type(VacantJob)}.')
+
+        existing_vacant_jobs = set(self.manager.get_vacant_jobs())
+        if existing_vacant_jobs is None:
+            raise ValueError('Existing Vacant Jobs is None.')
+        else:
+            if len(existing_vacant_jobs) == 0:
+                return False
+
+            if not any(x.link == vacant_job.link for x in existing_vacant_jobs):
+                # if vacant_job.link not in existing_vacant_jobs:
+                log.info(f'No duplicate found data for [{vacant_job.link}].')
+                return False
+
+            log.info(f'Found duplicate data at [{vacant_job.link}].')
+            return True
+

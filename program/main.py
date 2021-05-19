@@ -6,7 +6,7 @@ from startup import Startup
 
 
 class Main:
-    __CONFIG_PATH = 'F:\\Configuration\\webcrawler\\appsettings.json'
+    __CONFIG_PATH = 'C:\\Zombie_Crawler\\configuration\\appconfig.json'
     configuration: object
 
     def __init__(self):
