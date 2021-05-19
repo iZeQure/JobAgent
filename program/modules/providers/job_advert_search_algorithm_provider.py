@@ -183,6 +183,8 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
 
             if category_id != 0:
                 return category_id
+
+            return self.__not_found_id
         else:
             return self.__not_found_id
 

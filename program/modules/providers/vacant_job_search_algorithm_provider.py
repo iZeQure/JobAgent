@@ -1,4 +1,5 @@
 import logging as log
+import re
 from program.modules.managers.database_manager import DatabaseManager
 from program.modules.objects.job_page import JobPage
 from program.modules.providers.search_algorithm_provider import SearchAlgorithmProvider
@@ -35,7 +36,6 @@ class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
             log.exception(ex)
 
     def __find_vacant_job_links(self) -> []:
-        import re
         patterns = ['opslag-container-container', 'dre-teaser-content']
         useful_links = []
         for pattern in patterns:
@@ -62,7 +62,6 @@ class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
 
                 for link in self.__find_vacant_job_links():
                     validated_url_result = self.__validate_vacant_job_url(job_page.url, link)
-
                     if validated_url_result == '':
                         log.warning(f'{link} is unreachable or invalid.')
                         return
@@ -101,8 +100,8 @@ class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
             raise Exception('Expected parameter Job Page list, but got None.')
         else:
             vacant_jobs = []
-            for job in job_pages:
-                links = self.__scrape_vacant_job_data(job)
+            for page in job_pages:
+                links = self.__scrape_vacant_job_data(page)
                 for link in links:
                     vacant_jobs.append(link)
 

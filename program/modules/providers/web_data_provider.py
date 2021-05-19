@@ -2,18 +2,21 @@ import logging as log
 from time import sleep
 from re import match
 from selenium import webdriver
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import WebDriverException, TimeoutException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 from program.modules.objects.vacant_job import VacantJob
 
 
 class WebDataProvider:
     __app_config: object
-    __sleep_timer: float
+    __timeout: float
 
     def __init__(self,
                  app_config: object):
         self.__app_config = app_config
-        self.__sleep_timer = self.get_sleep_timer()
+        self.__timeout = self.get_timeout()
 
     def load_page_sources_by_data_list(self, data_list: []) -> [VacantJob]:
         # Is the data list to return.
@@ -36,7 +39,7 @@ class WebDataProvider:
                         output.append(data_obj)
 
                 except WebDriverException as driverEx:
-                    log.info(driverEx)
+                    log.warning(driverEx)
                     continue
 
             return output
@@ -66,7 +69,7 @@ class WebDataProvider:
             formatted_url = self.format_url(url)
             log.info(f'Loading web page from {formatted_url}')
             driver.get(url)
-            sleep(self.__sleep_timer)
+            sleep(self.__timeout)
         except WebDriverException:
             raise WebDriverException(f'Error, could not load data for {url}')
 
@@ -108,10 +111,10 @@ class WebDataProvider:
             return 'https://{}'.format(url)
         return url
 
-    def get_sleep_timer(self) -> float:
+    def get_timeout(self) -> float:
         webdriver_config = self.__app_config["WebDriver"]
 
-        if 'SleepTimer' in webdriver_config:
-            return webdriver_config["SleepTimer"]
+        if 'Timeout' in webdriver_config:
+            return webdriver_config["Timeout"]
 
-        return 1
+        return 5

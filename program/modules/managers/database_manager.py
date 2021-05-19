@@ -58,7 +58,7 @@ class DatabaseManager(Manager):
         return output
 
     def create_job_advert(self, job_advert: JobAdvert):
-        sp_sql = "EXEC [JA.spCreateJobAdvert] @vacantJobId=?,@categoryId=?@specializationId=?,@jobAdvertTitle=?,@jobAdvertSummary=?,@jobAdvertDescription=?,@jobAdvertEmail=?,@jobAdvertPhoneNr=?,@jobAdvertRegistrationDateTime=?,@jobAdvertApplicationDeadlineDateTime=?;"
+        sp_sql = "EXEC [JA.spCreateJobAdvert] @vacantJobId=?,@categoryId=?,@specializationId=?,@jobAdvertTitle=?,@jobAdvertSummary=?,@jobAdvertDescription=?,@jobAdvertEmail=?,@jobAdvertPhoneNr=?,@jobAdvertRegistrationDateTime=?,@jobAdvertApplicationDeadlineDateTime=?;"
         params = (
             job_advert.id,
             job_advert.category_id,
