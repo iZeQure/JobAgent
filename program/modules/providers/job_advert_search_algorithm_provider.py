@@ -41,11 +41,9 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
                     raise ValueError('Vacant Job List was empty.')
                 else:
                     # Get the page sources from the vacant job list.
-                    vacant_jobs = self.web_data.load_page_sources_by_data_list(vacant_job_data_list)
-
+                    vacant_jobs = self.web_data.load_page_sources(vacant_job_data_list)
                     # Create a list for job advert data.
                     jobadvert_data_list = self.__extract_job_advert_data_information(vacant_jobs)
-
                     self.__handle_jobadvert_data_information(jobadvert_data_list)
             else:
                 raise Exception('Vacant job list was None.')
@@ -127,10 +125,13 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
             if arg is not None:
                 found_location_element = arg
 
-        if found_location_element is not None:
-            actual_location = found_location_element.parent.nextSibling
-            if actual_location is not None:
-                return actual_location.get_text(separator=' ')
+        try:
+            if found_location_element is not None:
+                actual_location = found_location_element.parent.nextSibling
+                if actual_location is not None:
+                    return actual_location.get_text(separator=' ')
+        except AttributeError:
+            return self.__not_found_text
 
         return self.__not_found_text
 
@@ -224,10 +225,10 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
         else:
             if isinstance(vacant_job, VacantJob):
                 # Log gathering data information.
-                log.info(f'Processing gatherer with [{vacant_job.id}] for company [{vacant_job.company_id}].')
+                # log.info(f'Processing gatherer with [{vacant_job.id}] for company [{vacant_job.company_id}].')
 
                 # Set the page source of the current vacant job.
-                self.set_page_source(vacant_job.html_page_source)
+                self.initialize_soup(vacant_job.html_page_source)
 
                 # Process the search algorithm.
                 job_advert = JobAdvert(
@@ -280,14 +281,13 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
             raise ValueError(f'The length of {type(jobadvert_data_list)} was {len(jobadvert_data_list)}.')
 
         log.info(f'Handling <{len(jobadvert_data_list)}> Job Adverts.')
-        log.info('Searching for duplicate Job Adverts..')
         for job in jobadvert_data_list:
             try:
                 if self.__job_advert_exists(job):
-                    log.info(f'Updating data for [{job.id}].')
+                    # log.info(f'Updating data for [{job.id}].')
                     self.manager.update_job_advert(job)
                 else:
-                    log.info(f'Creating new data for [{job.id}]')
+                    # log.info(f'Creating new data for [{job.id}]')
                     self.manager.create_job_advert(job)
             except ValueError as err:
                 log.warning(err)
@@ -305,10 +305,10 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
                 return False
 
             if not any(job_advert_id == job_advert.id for job_advert_id in existing_job_adverts):
-                log.info(f'No duplicate found for [{job_advert.id}].')
+                # log.info(f'No duplicate found for [{job_advert.id}].')
                 return False
 
-            log.info(f'Found duplicate data at [{job_advert.id}].')
+            # log.info(f'Found duplicate data at [{job_advert.id}].')
             return True
 
     @staticmethod

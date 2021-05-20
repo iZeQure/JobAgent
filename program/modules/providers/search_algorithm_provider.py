@@ -21,7 +21,7 @@ class SearchAlgorithmProvider:
         self.__manager = manager
         self.__web_data = web_data
 
-    def set_page_source(self, page_html: str) -> None:
+    def initialize_soup(self, page_html: str) -> None:
         """
         Instantiates a BeautifulSoup object with the given HTML.
         Args:

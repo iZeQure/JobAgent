@@ -2,10 +2,9 @@ import logging as log
 from time import sleep
 from re import match
 from selenium import webdriver
-from selenium.common.exceptions import WebDriverException, TimeoutException
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
+from selenium.common.exceptions import WebDriverException
+
+from program.modules.objects.job_page import JobPage
 from program.modules.objects.vacant_job import VacantJob
 
 
@@ -18,43 +17,39 @@ class WebDataProvider:
         self.__app_config = app_config
         self.__timeout = self.get_timeout()
 
-    def load_page_sources_by_data_list(self, data_list: []) -> [VacantJob]:
-        # Is the data list to return.
-        output = []
+    def load_page_sources(self, pages: []) -> []:
+        log.info(f'Loading [{len(pages)}] pages                                             ..')
 
-        with self.__get_driver_instance() as driver:
-            driver.minimize_window()
+        try:
+            with self.__get_driver_instance() as driver:
+                driver.minimize_window()
+                for i, page in enumerate(pages):
+                    if isinstance(page, JobPage):
+                        try:
+                            self.__load_web_page(driver, page.url)
+                        except WebDriverException as ex:
+                            log.error(ex)
+                            continue
+                    elif isinstance(page, VacantJob):
+                        try:
+                            self.__load_web_page(driver, page.link)
+                        except WebDriverException as ex:
+                            log.error(ex)
+                            continue
+                    else:
+                        log.warning(f'Data type is undefined.')
+                        continue
 
-            for data in data_list:
-                try:
-                    self.__load_web_page(driver, data.link)
+                    if driver.page_source is None:
+                        page.set_page_source('')
+                    else:
+                        page.set_page_source(driver.page_source)
 
-                    if driver.page_source is not None:
-                        data_obj = VacantJob(
-                            vacant_job_id=data.id,
-                            link=data.link,
-                            company_id=data.company_id,
-                            html_page_source=driver.page_source
-                        )
-                        output.append(data_obj)
+                    log.info(f'Done Loading [{i + 1}].')
+        finally:
+            log.info(f'Finished loading Job Pages.')
 
-                except WebDriverException as driverEx:
-                    log.warning(driverEx)
-                    continue
-
-            return output
-
-    def load_page_source_by_page_url(self, page_url: str):
-        # Is the data list to return.
-        with self.__get_driver_instance() as driver:
-            driver.minimize_window()
-
-            self.__load_web_page(driver, page_url)
-
-            if driver.page_source is not None:
-                return driver.page_source
-
-            return ""
+        return pages
 
     def url_ok(self, url: str):
         from requests import head, RequestException
@@ -67,7 +62,7 @@ class WebDataProvider:
     def __load_web_page(self, driver: webdriver, url: str):
         try:
             formatted_url = self.format_url(url)
-            log.info(f'Loading web page from {formatted_url}')
+            log.debug(f'Loading web page from {formatted_url}')
             driver.get(url)
             sleep(self.__timeout)
         except WebDriverException:
