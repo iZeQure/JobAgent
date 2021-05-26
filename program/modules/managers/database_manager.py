@@ -11,9 +11,9 @@ class DatabaseManager(Manager):
     def __init__(self, database: DatabaseMSSQL):
         super().__init__(database)
 
-    def get_crawler_information(self):
-        sp_sql = 'EXEC [GetInitializationInformation]'
-        return self.get_sql_data(sp_sql, db_scheme='ZombieCrawlerDB')
+    def get_system_information(self, system_name: str):
+        sp_sql = 'EXEC [JA.spGetSystemInformationByName] @systemName=?;'
+        return self.get_sql_data(sp_sql, system_name)
 
     def get_algorithm_keywords_by_key_value(self, key_value: str):
         sp_sql = 'EXEC [GetKeysByKeyValue] @key_value=?'

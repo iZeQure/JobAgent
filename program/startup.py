@@ -28,10 +28,10 @@ class Startup(object):
         # Gathers the information from the database, to display information on execution.
 
         log.info('Initializing Crawler..')
-        initialized_information = self.__data_manager.get_crawler_information()
+        system_info = self.__data_manager.get_system_information(self.__app_config['SystemName'])
 
         # Validate the initialization progress.
-        if initialized_information is False:
+        if len(system_info) == int(0):
             raise ValueError('Initializing Failed.')
         else:
             # Data Crawling
@@ -42,7 +42,7 @@ class Startup(object):
             version_message = str
             responsibility_message = str
 
-            for val in initialized_information:
+            for val in system_info:
                 info_message = val[0]
                 version_message = val[2]
                 responsibility_message = val[1]
