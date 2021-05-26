@@ -1730,6 +1730,196 @@ AS
 		COMMIT TRANSACTION @TranName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName; 
+		ROLLBACK TRANSACTION @TranName;
+	END CATCH
+GO
+
+/*##################################################
+				## Log Section ##
+####################################################*/
+
+DROP PROCEDURE IF EXISTS [JA.spLog]
+GO
+
+CREATE PROCEDURE [JA.spLog] (
+	@severityId int,
+	@currentTime datetime = GETDATE,
+	@createdBy varchar(250),
+	@action varchar(250),
+	@message varchar(500))
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Log Transaction';
+
+	BEGIN TRANSACTION @transaction WITH MARK N'Logging Action';
+
+	BEGIN TRY
+
+		BEGIN
+			INSERT INTO [Log] ([LogSeverityId], [CreatedDateTime], [CreatedBy], [Action], [Message]) VALUES
+			(@severityId, @currentTime, @createdBy, @action, @message);
+
+			COMMIT TRANSACTION @transaction;
+		END
+
+	END TRY
+	BEGIN CATCH
+		
+		BEGIN 
+			INSERT INTO [Log] ([LogSeverityId], [CreatedDateTime], [CreatedBy], [Action], [Message]) VALUES
+			(1, GETDATE(), 'System', 'Failed logging.', 'Could not log action due to invalid');
+
+			ROLLBACK TRANSACTION @transaction;
+		END
+		
+	END CATCH
+GO
+
+/*##################################################
+			 ## Search Filter Section ##
+####################################################*/
+
+DROP PROCEDURE IF EXISTS [JA.spGetDynamicFilterKeys]
+DROP PROCEDURE IF EXISTS [JA.spGetStaticFilterKeys]
+DROP PROCEDURE IF EXISTS [JA.spGetStaticFilterKeysByTypeId]
+GO
+
+CREATE PROCEDURE [JA.spGetStaticFilterKeys]
+AS
+	DECLARE @t varchar(50)
+	SET @t = 'Static Filter Search Transaction';
+
+	BEGIN TRANSACTION @t WITH MARK 'Getting static filter keys.';
+
+	BEGIN TRY
+
+		BEGIN
+			SELECT
+				ssf.[Id] AS 'Key ID',
+				ft.[Name] AS 'Filter Name',
+				ssf.[Key] AS 'Key'
+			FROM [StaticSearchFilter] ssf
+			INNER JOIN [FilterType] ft ON ft.[Id] = ssf.[FilterTypeId]
+			COMMIT TRANSACTION @t;
+		END
+
+	END TRY
+	BEGIN CATCH
+
+		BEGIN
+			EXEC [JA.spLog] 4, GETDATE, 'System', 'Getting Static Filter Keys.', ERROR_MESSAGE;
+			ROLLBACK TRANSACTION @t;
+		END
+
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetStaticFilterKeysByTypeId](
+	@typeId int)
+AS
+	DECLARE @t varchar(50)
+	SET @t = 'Static Filter Search Transaction';
+
+	BEGIN TRANSACTION @t WITH MARK 'Getting static filter keys by type id.';
+
+	BEGIN TRY
+
+		BEGIN
+			SELECT
+				ssf.[Id] AS 'Key ID',
+				ft.[Name] AS 'Filter Name',
+				ssf.[Key] AS 'Key'
+			FROM [StaticSearchFilter] ssf
+			INNER JOIN [FilterType] ft ON ft.[Id] = @typeId
+			WHERE ssf.[FilterTypeId] = @typeId;
+			COMMIT TRANSACTION @t;
+		END
+
+	END TRY
+	BEGIN CATCH
+
+		BEGIN
+			EXEC [JA.spLog] 4, GETDATE, 'System', 'Getting Static Filter Keys by type Id.', ERROR_MESSAGE;
+			ROLLBACK TRANSACTION @t;
+		END
+
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetDynamicFilterKeys]
+AS
+	DECLARE @transaction varchar(50)
+	SET @transaction = 'Dynamic Filter Search Transaction';
+
+	BEGIN TRANSACTION @transaction WITH MARK 'Getting dynamic filter keys';
+
+	BEGIN TRY
+		
+		BEGIN
+			SELECT
+				dsf.[Id] AS 'Key ID',
+				dsf.[Key] AS 'Key',
+				dsf.[CategoryId] AS 'Key Category ID',
+				dsf.[SpecializationId] AS 'Key Specialization ID'
+			FROM [DynamicSearchFilter] dsf;
+			COMMIT TRANSACTION @transaction;
+		END
+
+	END TRY
+	BEGIN CATCH
+		
+		BEGIN
+			EXEC [JA.spLog] 4, GETDATE, 'System', 'Getting Dynamic Filter Search Keys.', ERROR_MESSAGE;
+			ROLLBACK TRANSACTION @transaction;
+		END
+
+	END CATCH
+GO
+
+/*##################################################
+				## Version Section ##
+####################################################*/
+
+DROP PROCEDURE IF EXISTS [JA.spGetSystemInformationByName]
+GO
+
+CREATE PROCEDURE [JA.spGetSystemInformationByName] (
+	@systemName varchar(50))
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Getting Information for System ' + @systemName;
+
+	BEGIN TRANSACTION @transaction WITH MARK N'Acquiring System Information';
+
+	BEGIN TRY
+
+		BEGIN
+			SELECT TOP (1)
+				v.[HashId] as 'Commit ID',
+				s.[Name] as 'System Name',
+				CONCAT('v',
+					CONCAT_WS (
+						'.'
+						,v.[Major], v.[Minor], v.[Patch]
+				), '-', r.[Name]) AS 'Version',
+				s.[PublishedDateTime] as 'Published Date',
+				v.[ReleaseDateTime] as 'Released Date'
+			FROM [Version] v
+
+			INNER JOIN [System] s ON s.[Name] = @systemName
+			INNER JOIN [ReleaseType] r ON r.[Id] = v.[ReleaseTypeId]
+			WHERE v.[SystemName] = @systemName
+			ORDER BY v.[ReleaseDateTime] DESC;
+			COMMIT TRANSACTION @transaction;
+		END
+
+	END TRY
+	BEGIN CATCH
+		
+		BEGIN
+			EXEC [JA.spLog] 4, GETDATE, 'System', 'Getting System Information.', ERROR_MESSAGE;
+			ROLLBACK TRANSACTION @transaction;
+		END
+
 	END CATCH
 GO

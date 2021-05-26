@@ -18,6 +18,10 @@ GO
 USE [JobAgentDB_v2]
 GO
 
+/*##################################################
+				## Drop Tables ##
+####################################################*/
+
 DROP TABLE IF EXISTS [Category]
 DROP TABLE IF EXISTS [Specialization]
 DROP TABLE IF EXISTS [Area]
@@ -31,7 +35,21 @@ DROP TABLE IF EXISTS [User]
 DROP TABLE IF EXISTS [Contract]
 DROP TABLE IF EXISTS [JobPage]
 DROP TABLE IF EXISTS [Company]
+
+DROP TABLE IF EXISTS [Version]
+DROP TABLE IF EXISTS [System]
+DROP TABLE IF EXISTS [ReleaseType]
+DROP TABLE IF EXISTS [StaticSearchFilter]
+DROP TABLE IF EXISTS [DynamicSearchFilter]
+DROP TABLE IF EXISTS [FilterType]
+
+DROP TABLE IF EXISTS [Log]
+DROP TABLE IF EXISTS [LogSeverity]
 GO
+
+/*##################################################
+				## Setup ##
+####################################################*/
 
 CREATE TABLE [JobAdvert] (
 [VacantJobId] int not null,
@@ -126,6 +144,63 @@ CREATE TABLE [Specialization] (
 [Name] varchar(100) not null)
 GO
 
+CREATE TABLE [System] (
+[Name] varchar(50) not null,
+[PublishedDateTime] datetime not null default GETDATE())
+GO
+
+CREATE TABLE [ReleaseType] (
+[Id] int not null identity(1,1),
+[Name] varchar(100) not null)
+GO
+
+CREATE TABLE [Version] (
+[HashId] varchar(40) not null,
+[SystemName] varchar(50) not null,
+[ReleaseTypeId] int not null,
+[Major] int not null default 0,
+[Minor] int not null default 0,
+[Patch] int not null default 0,
+[ReleaseDateTime] datetime default GETDATE())
+GO
+
+CREATE TABLE [FilterType] (
+[Id] int not null identity(1,1),
+[Name] varchar(50) not null,
+[Description] varchar(250) default 'None')
+GO
+
+CREATE TABLE [StaticSearchFilter] (
+[Id] int not null identity(1,1),
+[FilterTypeId] int not null,
+[Key] varchar(50) not null)
+GO
+
+CREATE TABLE [DynamicSearchFilter] (
+[Id] int not null identity(1,1),
+[CategoryId] int not null,
+[SpecializationId] int not null,
+[Key] varchar(50) not null)
+GO
+
+CREATE TABLE [LogSeverity] (
+[Id] int not null identity(1,1),
+[Severity] varchar(50))
+GO
+
+CREATE TABLE [Log] (
+[Id] int not null identity(1,1),
+[LogSeverityId] int not null,
+[CreatedDateTime] datetime not null default GETDATE(),
+[CreatedBy] varchar(250) not null,
+[Action] varchar(250) not null,
+[Message] varchar(500) not null)
+GO
+
+/*##################################################
+				## Alter Data Tables ##
+####################################################*/
+
 ALTER TABLE [Area]
 ADD 
 	PRIMARY KEY ([Id])
@@ -203,6 +278,56 @@ ADD
 	PRIMARY KEY ([JobAdvertVacantJobId]),
 	FOREIGN KEY ([JobAdvertVacantJobId]) REFERENCES [JobAdvert] ([VacantJobId])
 GO
+
+ALTER TABLE [System]
+ADD
+	PRIMARY KEY ([Name])
+GO
+
+ALTER TABLE [ReleaseType]
+ADD
+	PRIMARY KEY ([Id])
+GO
+
+ALTER TABLE [FilterType]
+ADD
+	PRIMARY KEY ([Id])
+GO
+
+ALTER TABLE [Version]
+ADD 
+	PRIMARY KEY ([HashId], [SystemName]),
+	FOREIGN KEY ([SystemName]) REFERENCES [System] ([Name]),
+	FOREIGN KEY ([ReleaseTypeId]) REFERENCES [ReleaseType] ([Id])
+GO
+
+ALTER TABLE [StaticSearchFilter]
+ADD
+	PRIMARY KEY ([Id]),
+	FOREIGN KEY ([FilterTypeId]) REFERENCES [FilterType] ([Id])
+GO
+
+ALTER TABLE [DynamicSearchFilter]
+ADD
+	PRIMARY KEY ([Id]),
+	FOREIGN KEY ([CategoryId]) REFERENCES [Category] ([Id]),
+	FOREIGN KEY ([SpecializationId]) REFERENCES [Specialization] ([Id])
+GO
+
+ALTER TABLE [LogSeverity]
+ADD
+	PRIMARY KEY ([Id])
+GO
+
+ALTER TABLE [Log]
+ADD
+	PRIMARY KEY ([Id]),
+	FOREIGN KEY ([LogSeverityId]) REFERENCES [LogSeverity] ([Id])
+GO
+
+/*##################################################
+		  ## Insert Dummy / Static Data ##
+####################################################*/
 
 INSERT INTO [Area] ([Name])
 VALUES
@@ -494,4 +619,103 @@ VALUES
 (0, 'Intet Speciale', 0)
 GO
 SET IDENTITY_INSERT [dbo].[Specialization] OFF;
+GO
+
+INSERT INTO [System] ([Name], [PublishedDateTime]) VALUES 
+('Din Job Agent', GETDATE()),
+('Zombie', GETDATE())
+GO
+
+INSERT INTO [ReleaseType] ([Name]) VALUES
+('stable'),
+('test'),
+('dev'),
+('alpha'),
+('beta')
+GO
+
+INSERT INTO [FilterType] ([Name], [Description]) VALUES
+('title', NULL),
+('summary', NULL),
+('description', NULL),
+('email', NULL),
+('phone_number', NULL),
+('registration_datetime', NULL),
+('application_deadline_datetime', NULL),
+('category', NULL),
+('specialization', NULL),
+('street_address', NULL),
+('city', NULL),
+('country', NULL),
+('postal_code', NULL)
+GO
+
+INSERT INTO [LogSeverity] ([Severity]) VALUES 
+('EMERGENCY'),
+('ALERT'),
+('CRITICAL'),
+('ERROR'),
+('WARNING'),
+('NOTIFICATION'),
+('INFO'),
+('DEBUG')
+GO
+
+INSERT INTO [DynamicSearchFilter] ([Key], [CategoryId], [SpecializationId]) VALUES
+('netværk', 16, 16),
+('supporter', 16, 16),
+('it-support', 16, 16),
+('support', 16, 16),
+('supporterelev', 16, 16),
+('supporterer', 16, 16),
+('it-help', 16, 16),
+('it-supporterelev', 16, 16),
+('it-supporter', 16, 16),
+('supporter-elever', 16, 16),
+('first-line', 16, 16),
+('first line', 16, 16),
+('it-lærling', 16, 16),
+('it lærling', 16, 16),
+('netværk', 16, 14),
+('infrastruktur', 16, 14),
+('cisco', 16, 14),
+('datateknikerelev', 16, 14),
+('speciale i infrastruktur', 16, 14),
+('it-datateknikerelev', 16, 14),
+('it-support elev', 16, 14),
+('cloud', 16, 14),
+('skyen', 16, 14),
+('it-konsulent', 16, 14),
+('it-specialist', 16, 14),
+('netværksspecialist', 16, 14),
+('programmering', 16, 15),
+('programmør', 16, 15),
+('programmering lærling', 16, 15),
+('programmør lærling', 16, 15),
+('udvikler', 16, 15),
+('it-udvikler', 16, 15),
+('udvikling', 16, 15),
+('database', 16, 15),
+('engineer', 16, 15),
+('system', 16, 15),
+('mainframe', 16, 15),
+('devops', 16, 15),
+('sql', 16, 15),
+('web', 16, 15),
+('.net', 16, 15),
+('dotnet', 16, 15),
+('c#', 16, 15),
+('java', 16, 15),
+('python', 16, 15),
+('c++', 16, 15),
+('frontend', 16, 15),
+('front-end', 16, 15),
+('full-stack', 16, 15),
+('full stack', 16, 15),
+('fullstack', 16, 15),
+('backend', 16, 15),
+('back-end', 16, 15),
+('back end', 16, 15),
+('software', 16, 15),
+('developer', 16, 15)
 GO
