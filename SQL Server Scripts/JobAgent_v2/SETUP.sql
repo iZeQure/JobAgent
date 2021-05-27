@@ -707,7 +707,6 @@ INSERT INTO [DynamicSearchFilter] ([Key], [CategoryId], [SpecializationId]) VALU
 ('c#', 16, 15),
 ('java', 16, 15),
 ('python', 16, 15),
-('c++', 16, 15),
 ('frontend', 16, 15),
 ('front-end', 16, 15),
 ('full-stack', 16, 15),
