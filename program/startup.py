@@ -32,22 +32,13 @@ class Startup(object):
 
         # Validate the initialization progress.
         if len(system_info) == int(0):
-            raise ValueError('Initializing Failed.')
+            raise ValueError('Initializing Failed. Information was not loaded correctly or information was empty.')
         else:
             # Data Crawling
             # 1. Compiles a list of vacant job urls per company job page url.
             # 2. Compiles the list of vacant jobs into jobadvert.
 
-            info_message = str
-            version_message = str
-            responsibility_message = str
-
-            for val in system_info:
-                info_message = val[0]
-                version_message = val[2]
-                responsibility_message = val[1]
-
-            log.info(f'{info_message} started running as {responsibility_message} on {version_message}')
+            log.info(f'Initialized {system_info[1]} on latest: {system_info[0]}:{system_info[2]}:{system_info[4]}')
 
             # Start Algorithms.
             log.info('Starting Vacant Job Search Algorithm..')

@@ -28,13 +28,20 @@ class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
             log.exception(ex)
 
     def __find_vacant_job_links(self) -> []:
-        search_words = ['udvikler', 'developer', 'programmering', 'datatekniker', 'lærling', 'elev', 'elever', 'supporter', 'netværk']
         useful_links = []
-        for word in search_words:
-            regex = re.compile('.*' + word + '*.', flags=re.IGNORECASE)
-            for a in self.soup.find_all('a', text=regex):
-                useful_links.append(a['href'])
-
+        for word in self.manager.get_search_words():
+            try:
+                regex = re.compile(word[0], flags=re.IGNORECASE)
+                links = self.soup.find_all('a', text=regex)
+                if len(links) != int(0):
+                    for a in links:
+                        if a['href'] in useful_links:
+                            continue
+                        else:
+                            useful_links.append(a['href'])
+            except re.error as err:
+                log.error(f'Failed checking for [{word[0]}]; Message: {err}')
+                continue
         return useful_links
 
     def __scrape_vacant_job_data(self, job_page: object) -> []:

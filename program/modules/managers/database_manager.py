@@ -11,13 +11,19 @@ class DatabaseManager(Manager):
     def __init__(self, database: DatabaseMSSQL):
         super().__init__(database)
 
-    def get_system_information(self, system_name: str):
+    def get_system_information(self, system_name: str) -> []:
         sp_sql = 'EXEC [JA.spGetSystemInformationByName] @systemName=?;'
-        return self.get_sql_data(sp_sql, system_name)
+        system_info = self.get_sql_data(sp_sql, system_name, fetch_mode='ONE')
+        return system_info
 
     def get_algorithm_keywords_by_key_value(self, key_value: str):
         sp_sql = 'EXEC [GetKeysByKeyValue] @key_value=?'
         return self.get_sql_data(sp_sql, key_value, db_scheme='ZombieCrawlerDB')
+
+    def get_search_words(self):
+        sp_sql = 'EXEC [JA.spGetDynamicFilterKeys]'
+        filters = [(x[1], x[2], x[3]) for x in self.get_sql_data(sp_sql)]
+        return filters
 
     def get_categories(self):
         sp_sql = 'EXEC [JA.spGetCategories]'
