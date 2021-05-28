@@ -20,6 +20,11 @@ class DatabaseManager(Manager):
         sp_sql = 'EXEC [GetKeysByKeyValue] @key_value=?'
         return self.get_sql_data(sp_sql, key_value, db_scheme='ZombieCrawlerDB')
 
+    def get_filter_keys(self):
+        sp_sql = 'EXEC [JA.spGetStaticFilterKeys]'
+        filters = [(f[1], f[2]) for f in self.get_sql_data(sp_sql)]
+        return filters
+
     def get_search_words(self):
         sp_sql = 'EXEC [JA.spGetDynamicFilterKeys]'
         filters = [(x[1], x[2], x[3]) for x in self.get_sql_data(sp_sql)]
@@ -78,9 +83,10 @@ class DatabaseManager(Manager):
             job_advert.application_deadline_datetime
         )
         self.save_data(sp_sql, params, auto_commit=True)
+        self.__create_address(job_advert.address)
 
-    def create_address(self, address: Address):
-        sp_sql = "EXEC [JA.spCreateAddress]@jobAdvertVacantJobId=?,@streetAddress=?,@city=?,@postalCode=?;"
+    def __create_address(self, address: Address):
+        sp_sql = "EXEC [JA.spCreateAddress]@jobAdvertVacantJobId=?,@streetAddress=?,@city=?, @country=?, @postalCode=?;"
         params = (
             address.job_advert_vacant_job_id,
             address.street_address,

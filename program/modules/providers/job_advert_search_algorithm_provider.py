@@ -14,6 +14,8 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
     __not_found_text = "Ikke Fundet"
     __not_found_id = 0
 
+    __filters: []
+
     __title_filter_keys: []
     __email_filter_keys: []
     __phone_number_filter_keys: []
@@ -53,30 +55,14 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
             log.exception(ex)
 
     def __load_filters(self):
-        m = self.manager
+        self.__filters = self.manager.get_filter_keys()
 
-        self.__title_filter_keys = \
-            self.__get_keys_from_list(m.get_algorithm_keywords_by_key_value("Title_Key"))
-        self.__email_filter_keys = \
-            self.__get_keys_from_list(m.get_algorithm_keywords_by_key_value("Email_Key"))
-        self.__phone_number_filter_keys = \
-            self.__get_keys_from_list(m.get_algorithm_keywords_by_key_value("Phone_Number_Key"))
-        self.__description_filter_keys = \
-            self.__get_keys_from_list(m.get_algorithm_keywords_by_key_value("Description_Key"))
-        self.__location_name_filter_keys = \
-            self.__get_keys_from_list(m.get_algorithm_keywords_by_key_value("Location_Key"))
-        self.__registration_date_name_filter_keys = \
-            self.__get_keys_from_list(m.get_algorithm_keywords_by_key_value("Registration_Date_Key"))
-        self.__deadline_date_name_filter_keys = \
-            self.__get_keys_from_list(m.get_algorithm_keywords_by_key_value("Deadline_Date_Key"))
-        self.__category_filter_keys = \
-            self.__get_keys_from_list(m.get_algorithm_keywords_by_key_value("Category_Key"))
-        self.__specialization_filter_keys = \
-            self.__get_keys_from_list(m.get_algorithm_keywords_by_key_value("Specialization_Key"))
+    def __get_filters_by_key(self, key: str):
+        return [(x[1]) for x in self.__filters if x[0] == key]
 
     def __find_title(self) -> str:
-        for arg in self.__title_filter_keys:
-            title = self.soup.find(text=compile(arg, flags=IGNORECASE))
+        for t_filter in self.__get_filters_by_key('title'):
+            title = self.soup.find(text=compile(t_filter, flags=IGNORECASE))
 
             if title is not None:
                 return title
@@ -84,21 +70,19 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
         return self.__not_found_text
 
     def __find_email(self) -> str:
-        for arg in self.__email_filter_keys:
-            mail = self.soup.select_one(arg)
+        for e_filter in self.__get_filters_by_key('email'):
+            email = self.soup.select_one(e_filter)
 
-            if mail is not None:
-                return mail.get_text()
+            if email is not None:
+                return email.get_text()
 
         return self.__not_found_text
 
     def __find_phone_number(self) -> str:
         regex = "([0-9]{8,8})"
-
-        for arg in self.__phone_number_filter_keys:
-            for result in self.soup.find_all(arg):
+        for pnr_filter in self.__get_filters_by_key('phone_number'):
+            for result in self.soup.find_all(pnr_filter):
                 text_from_result = result.get_text()
-
                 if text_from_result is not None:
                     if match(pattern=regex, string=str(text_from_result)):
                         return text_from_result
@@ -106,39 +90,39 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
         return self.__not_found_text
 
     def __find_description(self) -> str:
-        for arg in self.__description_filter_keys:
-            description = self.soup.select_one(arg)
+        for d_filter in self.__get_filters_by_key('description'):
+            description = self.soup.select_one(d_filter)
 
             if description is not None:
                 return description.get_text(' ', True)
 
         return self.__not_found_text
 
-    def __find_location(self) -> str:
-        found_location_element = None
-        elements = []
-
-        for location_filter in self.__location_name_filter_keys:
-            elements.append(self.soup.find(text=compile(location_filter, flags=IGNORECASE)))
-
-        for arg in elements:
-            if arg is not None:
-                found_location_element = arg
-
-        try:
-            if found_location_element is not None:
-                actual_location = found_location_element.parent.nextSibling
-                if actual_location is not None:
-                    return actual_location.get_text(separator=' ')
-        except AttributeError:
-            return self.__not_found_text
-
-        return self.__not_found_text
+    # def __find_location(self) -> str:
+    #     found_location_element = None
+    #     elements = []
+    #
+    #     for l_filter in self.__get_filters_by_key(''):
+    #         elements.append(self.soup.find(text=compile(l_filter, flags=IGNORECASE)))
+    #
+    #     for arg in elements:
+    #         if arg is not None:
+    #             found_location_element = arg
+    #
+    #     try:
+    #         if found_location_element is not None:
+    #             actual_location = found_location_element.parent.nextSibling
+    #             if actual_location is not None:
+    #                 return actual_location.get_text(separator=' ')
+    #     except AttributeError:
+    #         return self.__not_found_text
+    #
+    #     return self.__not_found_text
 
     def __find_registration_date(self) -> datetime:
         reg_datetime = None
         date_elements = []
-        for date_filter in self.__registration_date_name_filter_keys:
+        for date_filter in self.__get_filters_by_key('registration_datetime'):
             date_elements.append(self.soup.find(text=compile(date_filter), flags=IGNORECASE))
 
         if date_elements is not None:
@@ -156,22 +140,13 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
 
     def __find_deadline_date(self) -> datetime:
         return datetime.today()
-        # date_time_str = self.get_actual_result_from_element(
-        #     self.get_date_elements(
-        #         self._deadline_date_name_filter_keys
-        #     )
-        # )
-        #
-        # date_time_obj = datetime.strptime(date_time_str, '%d.%m.%Y')
-        # return date_time_obj
 
     def __find_category(self) -> int:
-        category_filter_keys = self.__category_filter_keys
         categories = self.manager.get_categories()
         category_id = 0
         result = ""
 
-        for category_filter_key in category_filter_keys:
+        for category_filter_key in self.__get_filters_by_key('category'):
             result = self.soup.find(text=compile(category_filter_key, flags=IGNORECASE))
             if result is not None:
                 result = result.lower()
@@ -190,11 +165,10 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
             return self.__not_found_id
 
     def __find_specialization(self) -> int:
-        specialization_filter_keys = self.__specialization_filter_keys
         specializations = self.manager.get_specializations()
         specialization_id = 0
 
-        for specialization_filter in specialization_filter_keys:
+        for specialization_filter in self.__get_filters_by_key('specialization'):
             result = self.soup.find(text=compile(specialization_filter, flags=IGNORECASE))
             if result is not None:
                 result = result.lower()
@@ -244,7 +218,7 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
                     application_deadline_date_time=self.__find_deadline_date(),
                     address=Address(
                         job_advert_vacant_job_id=vacant_job.id,
-                        street_address=self.__find_location(),
+                        street_address='None',
                         city='None',
                         country='None',
                         postal_code='None'
