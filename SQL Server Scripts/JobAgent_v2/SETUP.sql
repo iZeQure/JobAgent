@@ -661,6 +661,31 @@ INSERT INTO [LogSeverity] ([Severity]) VALUES
 ('DEBUG')
 GO
 
+INSERT INTO [StaticSearchFilter] ([FilterTypeId], [Key]) VALUES
+(1, 'datatekniker'),
+(1, 'it-support'),
+(1, 'it support'),
+(1, 'infrastruktur'),
+(1, 'programmering'),
+(1, 'programmør'),
+(1, 'support'),
+(3, 'description'),
+(3, 'area body'),
+(3, 'article__body'),
+(3, 'article_body'),
+(3, 'main span'),
+(4, 'a[href*="mailto"]'),
+(4, 'a[href^="mailto"]'),
+(5, 'td'),
+(6, 'opslagsdato'),
+(7, 'ansøgningsfrist'),
+(7, 'ansættelsesdato'),
+(8, 'data-'),
+(8, 'kommunikationsuddannelsen'),
+(9, 'programmering'),
+(10, 'adresse')
+GO
+
 INSERT INTO [DynamicSearchFilter] ([Key], [CategoryId], [SpecializationId]) VALUES
 ('netværk', 16, 16),
 ('supporter', 16, 16),
