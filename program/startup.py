@@ -31,6 +31,9 @@ class Startup(object):
         system_info = self.__data_manager.get_system_information(self.__app_config['SystemName'])
 
         # Validate the initialization progress.
+        if system_info is None:
+            log.info(f'system info is none')
+            return
         if len(system_info) == int(0):
             raise ValueError('Initializing Failed. Information was not loaded correctly or information was empty.')
         else:
