@@ -693,8 +693,6 @@ INSERT INTO [DynamicSearchFilter] ([Key], [CategoryId], [SpecializationId]) VALU
 ('it-udvikler', 16, 15),
 ('udvikling', 16, 15),
 ('database', 16, 15),
-('engineer', 16, 15),
-('engineering', 16, 15),
 ('mainframe', 16, 15),
 ('devops', 16, 15),
 ('.net', 16, 15),
@@ -710,5 +708,14 @@ INSERT INTO [DynamicSearchFilter] ([Key], [CategoryId], [SpecializationId]) VALU
 ('backend', 16, 15),
 ('back-end', 16, 15),
 ('back end', 16, 15),
-('software', 16, 15)
+('software', 16, 15),
+('medieforskning', 0, 0),
+('engineering', 16, 15),
+('machine learning', 16, 15),
+('android', 16, 15),
+('data platform', 16, 15),
+('data science', 16, 15),
+('data analyst', 16, 15),
+('data scientist', 16, 15),
+('data science and analystics', 16, 15)
 GO
