@@ -3,6 +3,7 @@ from time import sleep
 from re import match
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver import DesiredCapabilities
 
 from program.modules.objects.job_page import JobPage
 from program.modules.objects.vacant_job import VacantJob
@@ -76,21 +77,35 @@ class WebDataProvider:
         return f"{base_path}{driver_name}"
 
     def __get_driver_instance(self) -> webdriver:
-        driver_instance = self.__app_config["WebDriver"]["DriverInstance"]
+        driver_config = self.__app_config["WebDriver"]
+        driver_instance = driver_config["DriverInstance"]
         driver_path = self.__get_driver_path()
 
         if driver_instance == "Edge":
-            return webdriver.Edge(executable_path=driver_path)
-        elif driver_instance == "Firefox":
-            return webdriver.Firefox(executable_path=driver_path)
-        elif driver_instance == "Chrome":
-            return webdriver.Chrome(executable_path=driver_path)
+            edge = DesiredCapabilities.EDGE
+            return webdriver.Edge(executable_path=driver_path, capabilities=edge)
         elif driver_instance == "Opera":
-            return webdriver.Opera(executable_path=driver_path)
-        elif driver_instance == "Headless":
-            options = webdriver.FirefoxOptions()
-            options.add_argument("--headless")
-            return webdriver.Firefox(executable_path=driver_path, options=options)
+            opera = DesiredCapabilities.OPERA
+            return webdriver.Opera(executable_path=driver_path, desired_capabilities=opera)
+        elif driver_instance == "Firefox":
+            firefox = DesiredCapabilities.FIREFOX
+            if 'Options' in driver_config and 'Headless' in driver_config:
+                ff_options = webdriver.FirefoxOptions()
+                if driver_config["Headless"]:
+                    ff_options.add_argument("--headless")
+                [ff_options.add_argument(arg) for arg in driver_config["Options"]]
+                return webdriver.Firefox(executable_path=driver_path, options=ff_options, desired_capabilities=firefox)
+            return webdriver.Firefox(executable_path=driver_path, desired_capabilities=firefox)
+
+        elif driver_instance == "Chrome":
+            chrome = DesiredCapabilities.CHROME
+            if 'Options' in driver_config and 'Headless' in driver_config:
+                c_options = webdriver.ChromeOptions()
+                if driver_config["Headless"]:
+                    c_options.add_argument("--headless")
+                [c_options.add_argument(arg) for arg in driver_config["Options"]]
+                return webdriver.Chrome(executable_path=driver_path, options=c_options, desired_capabilities=chrome)
+            return webdriver.Chrome(executable_path=driver_path, desired_capabilities=chrome)
         else:
             raise NotImplementedError('Given driver instance was not supported. '
                                       'Only supports [Edge, Firefox, Chrome, Opera] and Headless')

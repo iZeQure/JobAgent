@@ -31,8 +31,8 @@ class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
         useful_links = []
         for word in self.manager.get_search_words():
             try:
-                regex = re.compile(word[0], flags=re.IGNORECASE)
-                links = self.soup.find_all('a', text=regex)
+                reg_obj = re.compile(f"({word[0]})", flags=re.IGNORECASE)
+                links = self.soup.find_all('a', text=reg_obj)
                 if len(links) != int(0):
                     for a in links:
                         if a['href'] in useful_links:
