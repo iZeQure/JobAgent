@@ -10,19 +10,43 @@ from program.modules.objects.vacant_job import VacantJob
 
 
 class WebDataProvider:
+    __WEB_DRIVER = 'WebDriver'
+    __TIMEOUT = 'TimeOut'
+    __IMPLICITLY_WAIT = 'ImplicitlyWait'
+    __BASE_PATH = 'BasePath'
+    __DRIVER_INSTANCE = 'Instance'
+    __DRIVER_NAME = 'Name'
+    __HEADLESS = 'Headless'
+    __OPTIONS = 'Options'
+
     __app_config: object
     __timeout: float
 
-    def __init__(self,
-                 app_config: object):
+    def __init__(self, app_config: object):
         self.__app_config = app_config
         self.__timeout = self.get_timeout()
 
     def load_page_sources(self, pages: []) -> []:
-        log.info(f'Loading [{len(pages)}] pages                                             ..')
+        """
+        Loads the page source as per page given.
+        Args:
+            pages: A list of pages containing the url to get the page source from.
+
+        Returns:
+            Pages with the given page source.
+        Raises:
+            ValueError: If the given list of pages has length of 0 or is None.
+            WebDriverException: On any error regarding the read of the page.
+
+        """
+        if len(pages) == int(0) or pages is None:
+            raise ValueError('List of pages given, was 0 or not defined.')
+
+        log.info(f'Loading [{len(pages)}] pages..')
 
         try:
             with self.__get_driver_instance() as driver:
+                driver.implicitly_wait(self.get_implicitly_wait_timer())
                 driver.minimize_window()
                 for i, page in enumerate(pages):
                     if isinstance(page, JobPage):
@@ -70,15 +94,15 @@ class WebDataProvider:
             raise WebDriverException(f'Error, could not load data for {url}')
 
     def __get_driver_path(self):
-        web_driver_obj = self.__app_config["WebDriver"]
-        base_path = web_driver_obj["BasePath"]
-        driver_name = web_driver_obj["DriverName"]
+        web_driver_obj = self.__app_config[self.__WEB_DRIVER]
+        base_path = web_driver_obj[self.__BASE_PATH]
+        driver_name = web_driver_obj[self.__DRIVER_NAME]
 
         return f"{base_path}{driver_name}"
 
     def __get_driver_instance(self) -> webdriver:
-        driver_config = self.__app_config["WebDriver"]
-        driver_instance = driver_config["DriverInstance"]
+        driver_config = self.__app_config[self.__WEB_DRIVER]
+        driver_instance = driver_config[self.__DRIVER_INSTANCE]
         driver_path = self.__get_driver_path()
 
         if driver_instance == "Edge":
@@ -89,26 +113,26 @@ class WebDataProvider:
             return webdriver.Opera(executable_path=driver_path, desired_capabilities=opera)
         elif driver_instance == "Firefox":
             firefox = DesiredCapabilities.FIREFOX
-            if 'Options' in driver_config and 'Headless' in driver_config:
+            if self.__OPTIONS in driver_config and self.__HEADLESS in driver_config:
                 ff_options = webdriver.FirefoxOptions()
-                if driver_config["Headless"]:
+                if driver_config[self.__HEADLESS]:
                     ff_options.add_argument("--headless")
-                [ff_options.add_argument(arg) for arg in driver_config["Options"]]
+                [ff_options.add_argument(arg) for arg in driver_config[self.__OPTIONS]]
                 return webdriver.Firefox(executable_path=driver_path, options=ff_options, desired_capabilities=firefox)
             return webdriver.Firefox(executable_path=driver_path, desired_capabilities=firefox)
 
         elif driver_instance == "Chrome":
             chrome = DesiredCapabilities.CHROME
-            if 'Options' in driver_config and 'Headless' in driver_config:
+            if self.__OPTIONS in driver_config and self.__HEADLESS in driver_config:
                 c_options = webdriver.ChromeOptions()
-                if driver_config["Headless"]:
+                if driver_config[self.__HEADLESS]:
                     c_options.add_argument("--headless")
-                [c_options.add_argument(arg) for arg in driver_config["Options"]]
+                [c_options.add_argument(arg) for arg in driver_config[self.__OPTIONS]]
                 return webdriver.Chrome(executable_path=driver_path, options=c_options, desired_capabilities=chrome)
             return webdriver.Chrome(executable_path=driver_path, desired_capabilities=chrome)
         else:
-            raise NotImplementedError('Given driver instance was not supported. '
-                                      'Only supports [Edge, Firefox, Chrome, Opera] and Headless')
+            raise ValueError('Given driver instance was not supported. '
+                             'Supported Drivers: [Edge, Firefox, Chrome, Opera]')
 
     @staticmethod
     def format_url(url: str):
@@ -122,9 +146,27 @@ class WebDataProvider:
         return url
 
     def get_timeout(self) -> float:
-        webdriver_config = self.__app_config["WebDriver"]
+        """
+        Gets the timeout for the driver. Default is 5.
+        Returns:
+            A float indicating the timeout.
+        """
+        config = self.__app_config[self.__WEB_DRIVER]
 
-        if 'Timeout' in webdriver_config:
-            return webdriver_config["Timeout"]
+        if self.__TIMEOUT in config:
+            return config[self.__TIMEOUT]
 
         return 5
+
+    def get_implicitly_wait_timer(self) -> float:
+        """
+        Gets the amount of time to wait implicitly. Default 30.
+        Returns:
+            A float indicating the implicit time.
+        """
+        config = self.__app_config[self.__WEB_DRIVER]
+
+        if self.__IMPLICITLY_WAIT in config:
+            return config[self.__IMPLICITLY_WAIT]
+
+        return 30
