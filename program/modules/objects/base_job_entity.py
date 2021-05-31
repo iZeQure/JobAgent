@@ -1,22 +1,29 @@
+from program.modules.handlers.error_handler import ErrorHandler
+from program.modules.handlers.property_handler import PropertyHandler
 
 
 class BaseJobEntity(object):
-    __id: int
-    __html_page_source: str
+    """
+    An object containing the base of a job object entity.
+    """
 
-    def __init__(self,
-                 entity_id: int,
-                 html_page_source: str):
-        self.__id = entity_id
-        self.__html_page_source = html_page_source
+    def __init__(self, entity_id: int):
+        """
+        Instantiates a base entity.
+        Args:
+            entity_id:
+        """
+        self._entity_id = entity_id
 
     @property
-    def id(self):
-        return self.__id
+    def get_entity_id(self):
+        """
+        Get the unique identifier of this object.
+        Returns:
+            int: An ID identifying the object.
 
-    @property
-    def html_page_source(self):
-        return self.__html_page_source
+        Raises:
+            ValueError: If the ID is not type of int.
 
-    def set_page_source(self, page_source: str):
-        self.__html_page_source = page_source
+        """
+        return self._entity_id

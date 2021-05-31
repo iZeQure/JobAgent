@@ -51,13 +51,13 @@ class WebDataProvider:
                 for i, page in enumerate(pages):
                     if isinstance(page, JobPage):
                         try:
-                            self.__load_web_page(driver, page.url)
+                            self.__load_web_page(driver, page.get_urls)
                         except WebDriverException as ex:
                             log.error(ex)
                             continue
                     elif isinstance(page, VacantJob):
                         try:
-                            self.__load_web_page(driver, page.link)
+                            self.__load_web_page(driver, page.get_url)
                         except WebDriverException as ex:
                             log.error(ex)
                             continue

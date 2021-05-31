@@ -51,14 +51,14 @@ class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
             if isinstance(job_page, JobPage):
                 vacant_jobs = []
 
-                if job_page.url is None:
-                    log.warning(f'Could not process {job_page.id}, no url associated.')
+                if job_page.get_urls is None:
+                    log.warning(f'Could not process {job_page.get_entity_id}, no url associated.')
                     return vacant_jobs
 
-                self.initialize_soup(job_page.html_page_source)
-                log.info(f'Processing {self.__class__.__name__} for Job Page [{job_page.id}] for Company [{job_page.company_id}].')
+                self.initialize_soup(job_page.get_page_source)
+                log.info(f'Processing {self.__class__.__name__} for Job Page [{job_page.get_entity_id}] for Company [{job_page.get_company_id}].')
                 for link in self.__find_vacant_job_links():
-                    validated_url_result = self.__validate_vacant_job_url(job_page.url, link)
+                    validated_url_result = self.__validate_vacant_job_url(job_page.get_urls, link)
                     if validated_url_result == '':
                         log.warning(f'{link} is unreachable or invalid.')
                         continue
@@ -66,14 +66,14 @@ class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
                     # log.info(f'Gathered [{validated_url_result}] for Company [{job_page.company_id}].')
                     vacant_job = VacantJob(
                         vacant_job_id=0,
-                        link=validated_url_result,
-                        company_id=job_page.company_id,
-                        html_page_source=''
+                        url=validated_url_result,
+                        company_id=job_page.get_company_id,
+                        page_source=''
                     )
 
                     vacant_jobs.append(vacant_job)
 
-                log.info(f'Loaded [{len(vacant_jobs)}] Vacant Jobs for Company [{job_page.company_id}].')
+                log.info(f'Loaded [{len(vacant_jobs)}] Vacant Jobs for Company [{job_page.get_company_id}].')
                 return vacant_jobs
             else:
                 raise TypeError('Given type was not of type JobPage.')
@@ -136,7 +136,7 @@ class VacantJobSearchAlgorithmProvider(SearchAlgorithmProvider):
             if len(existing_vacant_jobs) == 0:
                 return False
 
-            if not any(x.link == vacant_job.link for x in existing_vacant_jobs):
+            if not any(x.get_url == vacant_job.get_url for x in existing_vacant_jobs):
                 # if vacant_job.link not in existing_vacant_jobs:
                 # log.info(f'No duplicate found data for [{vacant_job.link}].')
                 return False

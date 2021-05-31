@@ -1,7 +1,6 @@
 from program.modules.database.db import DatabaseMSSQL
 from program.modules.managers.manager import Manager
 from program.modules.objects.address import Address
-from program.modules.objects.company import Company
 from program.modules.objects.job_advert import JobAdvert
 from program.modules.objects.job_page import JobPage
 from program.modules.objects.vacant_job import VacantJob
@@ -54,9 +53,9 @@ class DatabaseManager(Manager):
         for vacant_job in self.get_sql_data(sp_sql):
             obj = VacantJob(
                 vacant_job_id=vacant_job[0],
-                link=vacant_job[1],
+                url=vacant_job[1],
                 company_id=vacant_job[2],
-                html_page_source=''
+                page_source=''
             )
             output.append(obj)
         return output
@@ -72,27 +71,27 @@ class DatabaseManager(Manager):
         sp_sql = "EXEC [JA.spCreateJobAdvert] @vacantJobId=?,@categoryId=?,@specializationId=?,@jobAdvertTitle=?,@jobAdvertSummary=?,@jobAdvertDescription=?,@jobAdvertEmail=?,@jobAdvertPhoneNr=?,@jobAdvertRegistrationDateTime=?,@jobAdvertApplicationDeadlineDateTime=?;"
         params = (
             job_advert.id,
-            job_advert.category_id,
-            job_advert.specialization_id,
-            job_advert.title,
-            job_advert.summary,
-            job_advert.description,
-            job_advert.email,
-            job_advert.phone_number,
-            job_advert.registration_datetime,
-            job_advert.application_deadline_datetime
+            job_advert.get_category_id,
+            job_advert.get_specialization_id,
+            job_advert.get_title,
+            job_advert.get_summary,
+            job_advert.get_,
+            job_advert.get_email,
+            job_advert.get_phone_number,
+            job_advert.get_registration_datetime,
+            job_advert.get_application_deadline_datetime
         )
         self.save_data(sp_sql, params, auto_commit=True)
-        self.__create_address(job_advert.address)
+        self.__create_address(job_advert.get_address)
 
     def __create_address(self, address: Address):
         sp_sql = "EXEC [JA.spCreateAddress]@jobAdvertVacantJobId=?,@streetAddress=?,@city=?, @country=?, @postalCode=?;"
         params = (
-            address.job_advert_vacant_job_id,
-            address.street_address,
-            address.city,
-            address.country,
-            address.postal_code
+            address.get_job_advert_vacant_job_id,
+            address.get_street_address,
+            address.get_city,
+            address.get_country,
+            address.get_postal_code
         )
         self.save_data(sp_sql, params, auto_commit=True)
 
@@ -102,8 +101,8 @@ class DatabaseManager(Manager):
                 @url=?;
                 """
         params = (
-            vacant_job.company_id,
-            vacant_job.link
+            vacant_job.get_company_id,
+            vacant_job.get_url
         )
         self.save_data(sp_sql, params, auto_commit=True)
 
@@ -121,16 +120,16 @@ class DatabaseManager(Manager):
                 @jobAdvertApplicationDeadlineDateTime=?;
                 """
         params = (
-            job_advert.id,
-            job_advert.category_id,
-            job_advert.specialization_id,
-            job_advert.title,
-            job_advert.summary,
-            job_advert.description,
-            job_advert.email,
-            job_advert.phone_number,
-            job_advert.registration_datetime,
-            job_advert.application_deadline_datetime
+            job_advert.get_entity_id,
+            job_advert.get_category_id,
+            job_advert.get_specialization_id,
+            job_advert.get_title,
+            job_advert.get_summary,
+            job_advert.get_,
+            job_advert.get_email,
+            job_advert.get_phone_number,
+            job_advert.get_registration_datetime,
+            job_advert.get_application_deadline_datetime
         )
         self.save_data(sp_sql, params, auto_commit=True)
 
@@ -140,5 +139,5 @@ class DatabaseManager(Manager):
         @companyId=?,
         @url=?
         """
-        params = (vacant_job.id, vacant_job.company_id, vacant_job.link)
+        params = (vacant_job.get_entity_id, vacant_job.get_company_id, vacant_job.get_url)
         self.save_data(sp_sql, params)

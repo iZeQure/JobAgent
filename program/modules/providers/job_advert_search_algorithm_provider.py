@@ -202,11 +202,11 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
                 # log.info(f'Processing gatherer with [{vacant_job.id}] for company [{vacant_job.company_id}].')
 
                 # Set the page source of the current vacant job.
-                self.initialize_soup(vacant_job.html_page_source)
+                self.initialize_soup(vacant_job.get_page_source)
 
                 # Process the search algorithm.
                 job_advert = JobAdvert(
-                    vacant_job_id=vacant_job.id,
+                    vacant_job_id=vacant_job.get_entity_id,
                     category_id=self.__find_category(),
                     specialization_id=self.__find_specialization(),
                     title=self.__find_title(),
@@ -217,7 +217,7 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
                     registered_date_time=self.__find_registration_date(),
                     application_deadline_date_time=self.__find_deadline_date(),
                     address=Address(
-                        job_advert_vacant_job_id=vacant_job.id,
+                        job_advert_vacant_job_id=vacant_job.get_entity_id,
                         street_address='None',
                         city='None',
                         country='None',
@@ -278,7 +278,7 @@ class JobAdvertSearchAlgorithmProvider(SearchAlgorithmProvider):
             if len(existing_job_adverts) == int(0):
                 return False
 
-            if not any(job_advert_id == job_advert.id for job_advert_id in existing_job_adverts):
+            if not any(job_advert_id == job_advert.get_entity_id for job_advert_id in existing_job_adverts):
                 # log.info(f'No duplicate found for [{job_advert.id}].')
                 return False
 
