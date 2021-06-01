@@ -1,5 +1,3 @@
-from program.modules.handlers.error_handler import ErrorHandler
-from program.modules.handlers.property_handler import PropertyHandler
 from program.modules.objects.base_job_entity import BaseJobEntity
 
 
@@ -32,10 +30,7 @@ class Address(BaseJobEntity):
             str: A string representing the street address.
 
         """
-        if PropertyHandler.is_type_of(self._street_address, str):
-            return self._street_address
-
-        ErrorHandler.raise_value_error(str, self._street_address, 'Street Address')
+        return self._street_address
 
     @property
     def get_city(self) -> str:
@@ -45,10 +40,7 @@ class Address(BaseJobEntity):
             str: A string representing the city.
 
         """
-        if PropertyHandler.is_type_of(self._city, str):
-            return self._city
-
-        ErrorHandler.raise_value_error(str, self._city, 'City')
+        return self._city
 
     @property
     def get_country(self) -> str:
