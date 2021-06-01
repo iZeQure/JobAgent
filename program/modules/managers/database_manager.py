@@ -15,10 +15,6 @@ class DatabaseManager(Manager):
         system_info = self.get_sql_data(sp_sql, system_name, fetch_mode='ONE')
         return system_info
 
-    def get_algorithm_keywords_by_key_value(self, key_value: str):
-        sp_sql = 'EXEC [GetKeysByKeyValue] @key_value=?'
-        return self.get_sql_data(sp_sql, key_value, db_scheme='ZombieCrawlerDB')
-
     def get_filter_keys(self):
         sp_sql = 'EXEC [JA.spGetStaticFilterKeys]'
         filters = [(f[1], f[2]) for f in self.get_sql_data(sp_sql)]
@@ -36,11 +32,6 @@ class DatabaseManager(Manager):
     def get_specializations(self):
         sp_sql = 'EXEC [JA.spGetSpecializations]'
         return self.get_sql_data(sp_sql)
-
-    def get_companies(self):
-        sp_sql = 'EXEC [JA.spGetCompanies]'
-        output = [Company(row[0], row[1], row[2], row[3], "None") for row in self.get_sql_data(sp_sql)]
-        return output
 
     def get_job_pages(self):
         sp_sql = 'SELECT * FROM [JobPage]'
@@ -70,7 +61,7 @@ class DatabaseManager(Manager):
     def create_job_advert(self, job_advert: JobAdvert):
         sp_sql = "EXEC [JA.spCreateJobAdvert] @vacantJobId=?,@categoryId=?,@specializationId=?,@jobAdvertTitle=?,@jobAdvertSummary=?,@jobAdvertDescription=?,@jobAdvertEmail=?,@jobAdvertPhoneNr=?,@jobAdvertRegistrationDateTime=?,@jobAdvertApplicationDeadlineDateTime=?;"
         params = (
-            job_advert.id,
+            job_advert.get_entity_id,
             job_advert.get_category_id,
             job_advert.get_specialization_id,
             job_advert.get_title,
@@ -87,7 +78,7 @@ class DatabaseManager(Manager):
     def __create_address(self, address: Address):
         sp_sql = "EXEC [JA.spCreateAddress]@jobAdvertVacantJobId=?,@streetAddress=?,@city=?, @country=?, @postalCode=?;"
         params = (
-            address.get_job_advert_vacant_job_id,
+            address.get_entity_id,
             address.get_street_address,
             address.get_city,
             address.get_country,
