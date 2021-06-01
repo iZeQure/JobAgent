@@ -1,6 +1,7 @@
 import logging as log
-from time import sleep
 from re import match
+from time import sleep
+
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver import DesiredCapabilities

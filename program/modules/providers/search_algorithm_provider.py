@@ -1,5 +1,7 @@
 import logging as log
+
 from bs4 import BeautifulSoup
+
 from program.modules.managers.database_manager import DatabaseManager
 from program.modules.providers.web_data_provider import WebDataProvider
 

@@ -1,7 +1,5 @@
 from datetime import datetime
 
-from program.modules.handlers.property_handler import PropertyHandler
-from program.modules.handlers.error_handler import ErrorHandler
 from program.modules.objects.address import Address
 from program.modules.objects.base_job_entity import BaseJobEntity
 

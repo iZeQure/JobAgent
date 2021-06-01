@@ -1,6 +1,8 @@
 import logging as log
-from program.modules.database.db import DatabaseMSSQL
+
 from pyodbc import Cursor, ProgrammingError
+
+from program.modules.database.db import DatabaseMSSQL
 
 
 class Manager:

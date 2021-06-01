@@ -1,5 +1,3 @@
-from program.modules.handlers.error_handler import ErrorHandler
-from program.modules.handlers.property_handler import PropertyHandler
 from program.modules.objects.base_job_entity import BaseJobEntity
 from program.modules.objects.page import Page
 

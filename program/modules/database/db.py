@@ -1,5 +1,6 @@
-from pyodbc import Cursor, Connection, connect, DatabaseError, Error
 import logging as log
+
+from pyodbc import Cursor, Connection, connect, DatabaseError, Error
 
 
 class DatabaseMSSQL(object):

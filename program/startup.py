@@ -1,9 +1,11 @@
 import logging as log
-from program.modules.providers.web_data_provider import WebDataProvider
-from program.modules.providers.vacant_job_search_algorithm_provider import VacantJobSearchAlgorithmProvider
-from program.modules.providers.job_advert_search_algorithm_provider import JobAdvertSearchAlgorithmProvider
-from program.modules.managers.database_manager import DatabaseManager
+
 from program.modules.database.db import DatabaseMSSQL
+from program.modules.managers.database_manager import DatabaseManager
+from program.modules.providers.job_advert_search_algorithm_provider import JobAdvertSearchAlgorithmProvider
+from program.modules.providers.vacant_job_search_algorithm_provider import VacantJobSearchAlgorithmProvider
+from program.modules.providers.web_data_provider import WebDataProvider
+
 
 # TODO:
 # Get a list of Job Pages.

@@ -1,9 +1,10 @@
 import logging as log
 import re
+
 from program.modules.managers.database_manager import DatabaseManager
 from program.modules.objects.job_page import JobPage
-from program.modules.providers.search_algorithm_provider import SearchAlgorithmProvider
 from program.modules.objects.vacant_job import VacantJob
+from program.modules.providers.search_algorithm_provider import SearchAlgorithmProvider
 from program.modules.providers.web_data_provider import WebDataProvider
 
 

@@ -1,7 +1,3 @@
-from program.modules.handlers.error_handler import ErrorHandler
-from program.modules.handlers.property_handler import PropertyHandler
-
-
 class BaseJobEntity(object):
     """
     An object containing the base of a job object entity.

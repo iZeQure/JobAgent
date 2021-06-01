@@ -1,12 +1,12 @@
 import logging as log
-from re import compile, match, IGNORECASE
 from datetime import datetime
+from re import compile, match, IGNORECASE
 
 from program.modules.managers.database_manager import DatabaseManager
-from program.modules.providers.search_algorithm_provider import SearchAlgorithmProvider
+from program.modules.objects.address import Address
 from program.modules.objects.job_advert import JobAdvert
 from program.modules.objects.vacant_job import VacantJob
-from program.modules.objects.address import Address
+from program.modules.providers.search_algorithm_provider import SearchAlgorithmProvider
 from program.modules.providers.web_data_provider import WebDataProvider
 
 
