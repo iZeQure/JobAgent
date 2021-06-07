@@ -7,70 +7,55 @@
     --border-width: 0.15em;
 }
 
-::placeholder {
+html {
+    font-size: 1rem;
+}
+
+h1 {
+    font-family: nerisblack, Arial, sans-serif;
+    font-size: 2.5rem;
+    color: var(--primary-color);
+}
+
+a {
+    font-size: 1.5rem !important;
+    color: var(--primary-color) !important;
+}
+
+button {
+    font-size: 1em !important;
+    border-radius: var(--border-radius) !important;
+    border-width: var(--border-width) !important;
+    text-transform: uppercase !important;
+}
+
+svg {
+    fill: var(--primary-color);
+}
+
+.navbar {
+    background-color: var(--primary-background-color) !important;
+}
+
+.logo {
+    height: 4rem;
+    margin-right: .75rem;
+}
+
+.navbar-brand span {
+    font-family: nerisblack, Aria, sans-serif;
+    font-size: 2.5rem;
+}
+
+input::placeholder {
     font-family: 'nerislight_italic', Arial, sans-serif;
     font-size: .85em;
 }
 
-html, body {
-    margin: 0;
-    padding: 0;
-}
-
-/*.page {
-    width: 100vw;
-    height: 100vh;
-}*/
-
-    .topbar {
-        position: sticky !important;
-    }
-
-    .navbar {
-        background-color: var(--primary-background-color) !important;
-        z-index: 10;
-    }
-        .navbar-brand .logo {
-            height: 50px;
-            width: auto;
-            margin-right: 0.75em;
-            fill: var(--primary-color);
-        }
-
-        .navbar-brand span {
-            font-family: 'nerisblack', Arial, sans-serif;            
-            font-size: 1.35em;    
-        }
-
-    .sidebar {
-        position: fixed;
-        top: 75px;
-        bottom: 0;
-        left: 0;
-        width: 300px;
-        background-color: var(--primary-background-color);
-        z-index: 9;
-    }
-
-    main {
-        position: relative;
-        width: 100%;
-        padding-left: 300px;
-        box-sizing: border-box;
-        -webkit-box-sizing: border-box;
-        z-index: 8;
-    }
-
-#start-your-adventure {
-    /*object-fit: contain;
-  object-fit: scale-down;
-  object-position: -10% 0;
-  object-fit: none;
-  object-fit: fill;*/
-    /*min-width: 100%;
+.menu-icons {
+    width: 5em !important;
     height: auto;
-    object-fit: cover;
-    object-position: center;*/
+    font-size: 1.5em;
 }
 
 .dropdown-menu {
@@ -78,6 +63,10 @@ html, body {
     border-radius: var(--border-radius);
     min-height: 350px;
     max-height: 350px;
+}
+
+a:hover {
+    fill: red;
 }
 
 #user-profile-dropdown {
@@ -99,10 +88,6 @@ html, body {
         position: absolute;
         right: 1em;
         bottom: 1em;
-        font-size: 1em;
-        border-radius: var(--border-radius);
-        border-width: var(--border-width);
-        text-transform: uppercase;
     }
 
 .valid.modified:not([type=checkbox]) {
