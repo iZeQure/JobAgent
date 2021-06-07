@@ -1,7 +1,11 @@
-/dist/
-/build/
+# System Configuration
 /.idea
 
+# Distribution Files
+/dist
+/build
+
+# Logging & Testing
+*.log
 *.spec
 *.pyc
-*.log
