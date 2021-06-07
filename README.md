@@ -1,3 +1,0 @@
-# JobAgent
-
-Still in development..
