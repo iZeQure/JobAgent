@@ -1,0 +1,263 @@
+﻿@page "/admin/settings/contracts"
+
+@attribute [Authorize]
+
+<PageTitle Title="Indstillinger for Kontrakter" />
+
+<div class="d-flex">
+    <PageDisplayName DisplayName="Administrer Kontrakter" />
+    <div class="d-inline-block">
+
+        @if (_disabled)
+        {
+            <a class="btn btn-sm btn-info cursor-pointer text-white disabled">
+                <span>Ikke Aktiveret</span>
+            </a>
+            <span class="d-inline-block"><small class="text-danger font-weight-bolder">* Opret en Virksomhed for at benytte kontrakter.</small></span>
+        }
+        else
+        {
+            <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#CreateContractModal" @onclick="RefreshContent">
+                Opret ny Kontrakt
+            </a>
+        }
+
+    </div>
+</div>
+
+@if (_dataIsloading)
+{
+    <MessageAlert IsLoading="_dataIsloading" Message="Indlæser kontrakter..." />
+}
+else
+{
+    @if (_contracts != null)
+    {
+        @if (!_contracts.Any())
+        {
+            <MessageAlert Alert="Components.Notification.MessageAlert.AlertType.Warning"
+                          Message="Der blev ikke fundet nogen kontrakter."
+                          MessageOptional="Opret kontrakter, ved at trykke på knappen : Opret ny Kontrakt. - Hvis knappen ikke er aktiveret, er det fordi der ikke blev fundet nogen virksomheder." />
+        }
+        else
+        {
+            <div class="table-responsive table-responsive-sm table-responsive-md">
+                <table class="table table-sm table-striped table-hover">
+                    <caption>Liste over virksomheders kontrakter..</caption>
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Virksomhed</th>
+                            <th scope="col">Kontakt Person</th>
+                            <th scope="col">Praktikkonsulent</th>
+                            <th scope="col">Kontrakt</th>
+                            <th scope="col">Kontrakt Oprettet</th>
+                            <th scope="col">Udløbsdato</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var contract in _contracts)
+                        {
+                            <tr id="@(contract.Identifier)">
+                                <th scope="row">@(contract.Identifier)</th>
+                                <td>@(contract.Company.Name)</td>
+                                <td>@(contract.ContactPerson)</td>
+                                <td>@(contract.SignedByUserId.FullName)</td>
+                                @if (!string.IsNullOrEmpty(contract.ContractName))
+                                {
+                                    <td>
+                                        <span @onclick="@(mouseClickEvent => OnClick_ShowContractModal(contract.ContractName, contract.Company.Name))" class="table-icons" data-toggle="modal" data-target="#ShowContractModal">
+                                            <i class="fas fa-file-invoice"></i>
+                                        </span>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>Ingen kontrakt fundet.</td>
+                                }
+                                <td>@(contract.RegistrationDate.ToString("D"))</td>
+                                <td>@(contract.ExpiryDate.ToString("D"))</td>
+                                <td>
+                                    <span @onclick="(id => OnClick_OpenEditModal(contract.Identifier))" data-toggle="modal" data-target="#EditContractModal">
+                                        <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne kontrakt." Color="Popover.PopoverType.Info" />
+                                    </span>
+                                </td>
+                                <td>
+                                    <span @onclick="@(mouseEvent => OnClick_RemoveContractModal(contract.Identifier))" data-toggle="modal" data-target="#RemoveContractModal">
+                                        <Popover Title="Forsigtig!" Body="Denne knap sletter den valgte kontrakt, forevigt!" Color="Popover.PopoverType.Danger" />
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+    else
+    {
+        <MessageAlert Alert="MessageAlert.AlertType.Error"
+                      Message="Prøv at genindlæs siden."
+                      MessageOptional="@(_errorMessage)" />
+    }
+}
+
+@if (!_disabled)
+{
+    <CreateContractModal />
+
+    <EditContractModal ContractModel="@contractModel" />
+
+    <RemoveContractModal ContractId="@_contractId" />
+
+    <ShowContractModal Model="showContractModel" />
+}
+
+@code {
+    [Inject] protected IRefresh RefreshService { get; set; }
+    [Inject] protected AdminService AdminService { get; set; }
+    [Inject] protected DataService DataService { get; set; }
+    [Inject] protected IFileService FileService { get; set; }
+
+    private ContractModel contractModel = new();
+    private ShowContractModel showContractModel = new();
+    private IEnumerable<Contract> _contracts = new List<Contract>();
+
+    private int _contractId = 0;
+    private string _errorMessage = string.Empty;
+    private bool _disabled = false;
+    private bool _dataIsloading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        RefreshService.RefreshRequest += RefreshContent;
+
+        await LoadData();
+
+        _dataIsloading = false;
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            _dataIsloading = true;
+
+            var contracts = await AdminService.GetContractsAsync();
+
+            if (contracts != null)
+            {
+                _contracts = contracts;
+            }
+
+            if (!contracts.Any())
+            {
+                _disabled = true;
+            }
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    private async Task RefreshContent()
+    {
+        showContractModel = new();
+
+        try
+        {
+            var contracts = await AdminService.GetContractsAsync();
+
+            if (contracts != null)
+            {
+                _contracts = contracts;
+                return;
+            }
+
+            _contracts = null;
+
+            _errorMessage = "Kunne ikke indlæse kontrakter.";
+        }
+        catch (Exception) { _errorMessage = "Ukendt Fejl ved opdatering af kontrakter."; }
+        finally { StateHasChanged(); }
+    }
+
+    private void OnClick_RemoveContractModal(int id)
+    {
+        _contractId = id;
+    }
+
+    private async Task OnClick_ShowContractModal(string name, string companyName)
+    {
+        showContractModel.ContractIsLoading = true;
+
+        if (true == string.IsNullOrEmpty(name))
+        {
+            showContractModel.ViewContractMessage = "Kontraktens navn, blev ikke indlæst korrekt, prøv igen.";
+            return;
+        }
+
+        try
+        {
+            var contractIsExisting = FileService.CheckFileExists(name);
+
+            if (false == contractIsExisting)
+            {
+                showContractModel.ViewContractMessage = "Kontrakten findes ikke i systemet.";
+                return;
+            }
+
+            var fileInformation = await FileService.GetFileFromDirectoryAsync(name);
+            var encodedFileInformation = FileService.EncodeFileToBase64(fileInformation);
+
+            if (true == string.IsNullOrEmpty(encodedFileInformation))
+            {
+                showContractModel.ViewContractMessage = "Kontraktens informationer blev ikke indlæst korrekt.";
+                return;
+            }
+
+            showContractModel = new()
+            {
+                ContractExists = true,
+                ContractIsLoading = false,
+                ContractForCompanyName = companyName,
+                EncodedContractData = encodedFileInformation,
+                ContractName = name,
+                ViewContractMessage = string.Empty
+            };
+        }
+        catch (UnauthorizedAccessException)
+        {
+            showContractModel.ViewContractMessage = "Den givne konto, har ikke rettigheder til at se dette.";
+        }
+        catch (Exception)
+        {
+            showContractModel.ViewContractMessage = $"Ukendt fejl.";
+        }
+        finally
+        {
+            showContractModel.ContractIsLoading = false;
+        }
+    }
+
+    private async Task OnClick_OpenEditModal(int contractId)
+    {
+        var contract = await AdminService.GetContractByIdAsync(contractId);
+
+        contractModel = new ContractModel()
+        {
+            Id = contract.Identifier,
+            SignedWithCompany = contract.Company.Identifier,
+            SignedByUser = contract.SignedByUserId.Identifier,
+            ContactPerson = contract.ContactPerson,
+            ContractFileName = contract.ContractName,
+            RegistrationDate = contract.RegistrationDate,
+            ExpiryDate = contract.ExpiryDate
+        };
+    }
+}

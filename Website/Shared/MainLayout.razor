@@ -1,0 +1,66 @@
+﻿@inject MyAuthStateProvider MyAuthStateProvider
+@inject NavigationManager NavManager
+
+@inherits LayoutComponentBase
+
+<div class="sidebar" style="overflow-x: hidden !important">
+    <NavMenu />
+</div>
+
+<div class="main">
+    <div class="top-row">
+        <AuthorizeView>
+            <NotAuthorized>
+
+                <div class="ml-auto mr-1">
+                    <button type="button" class="btn btn-sm progress-bar progress-bar-striped bg-info @HoverAnimationCSS" @onmouseover="(() => HoverMode())" @onmouseout="(() => HoverMode())" @onclick='() => NavManager.NavigateTo("/login")'>Praktikkonsulent Log ind</button>
+                </div>
+
+            </NotAuthorized>
+            <Authorizing>
+                Authorizing..
+            </Authorizing>
+            <Authorized>
+                <div class="welcome-message">
+                    <p>Velkommen, @context.User.Identity.Name!</p>
+                    <div class="d-flex">
+                        @foreach (var claim in context.User.Claims)
+                        {
+                            @if (claim.Type == ClaimTypes.Role || claim.Type == "LocationName")
+                            {
+                                <p class="text-muted smaller pr-2">@claim.Value</p>
+                            }
+                        }
+                    </div>
+                </div>
+
+                <div class="float-right ml-auto mr-1">
+                    <button type="button" class="btn btn-sm progress-bar progress-bar-striped bg-danger @HoverAnimationCSS" @onclick="(() => LogOut())"  @onmouseover="(() => HoverMode())" @onmouseout="(() => HoverMode())">Log ud</button>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+    </div>
+
+    <div class="content">
+        <ToastNotificationComponent />
+
+        @Body
+    </div>
+</div>
+
+@code {
+    public string HoverAnimationCSS { get; set; } = string.Empty;
+
+    private void HoverMode()
+    {
+        if (string.IsNullOrEmpty(HoverAnimationCSS)) HoverAnimationCSS = "progress-bar-animated";
+
+        else
+            HoverAnimationCSS = string.Empty;
+    }
+
+    private async Task LogOut()
+    {
+        await (MyAuthStateProvider.MarkUserAsLoggedOut());
+    }
+}

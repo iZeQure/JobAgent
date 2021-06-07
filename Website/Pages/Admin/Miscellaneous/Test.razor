@@ -1,0 +1,42 @@
+﻿@page "/admin/miscellaneous/tests"
+
+@attribute [Authorize]
+
+<h3 class="text-uppercase"> Test Miljø</h3>
+
+@foreach (var advert in Model.PaginatedJobAdverts())
+{
+    <div class="alert alert-secondary rounded-0">
+        <a href="#" class="link" target="_blank">@advert.Identifier @advert.Title</a> <span class="float-right text-primary"><i class="fa fa-calendar"></i> @advert.JobRegisteredDate.ToString("D")</span>
+    </div>
+}
+
+<ul class="pagination">
+    @for (int i = 1; i <= Model.PageCount(); i++)
+    {
+        var localPageCount = i;
+
+        <li class="@(i == Model.CurrentPage ? "page-item active" : "page-item")">
+            <a class="page-link" href="/admin/miscellaneous/tests#@(i)" @onclick="@(() => ReturnPage(localPageCount))">@(i)</a>
+        </li>
+    }
+</ul>
+
+@code {
+    [Inject] public JobService GetJobService { get; set; }
+    [Inject] public NavigationManager Navigation { get; set; }
+
+    private protected JobAdvertPaginationModel Model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await GetJobService.JobAdvertPagination();
+    }
+
+    protected async void ReturnPage(int page)
+    {
+        Model = await GetJobService.JobAdvertPagination(page);
+
+        StateHasChanged();
+    }
+}
