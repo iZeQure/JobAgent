@@ -1,0 +1,19 @@
+﻿<div class="position-absolute">
+    <div class="d-flex flex-row-reverse fixed-bottom mx-2 my-2">
+        
+    </div>
+</div>
+
+@code {
+    // Toast Test
+    public bool isVisible { get; set; } = false;
+    private string headerService { get; set; } = "Job Agent Service";
+    public string notificationMessage { get; set; } = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+
+    void onclick(MouseEventArgs e)
+    {
+        isVisible = !isVisible;
+        StateHasChanged();
+    }
+    //
+}

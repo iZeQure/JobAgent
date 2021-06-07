@@ -1,0 +1,234 @@
+﻿@page "/admin/account/myprofile"
+
+@attribute [Authorize]
+@* Set page title *@
+<PageTitle Title="Min Profil" />
+
+<PageDisplayName DisplayName="Min Bruger Profil" />
+
+@if (AccountModel != null)
+{
+    <MessageAlert Message="@ErrorMessage" FullWidth="false" Alert="MessageAlert.AlertType.Error" />
+    <MessageAlert Message="@Message" FullWidth="false" Alert="MessageAlert.AlertType.Success" />
+
+    <EditForm Model="AccountModel" OnValidSubmit="@OnValidSubmit_ChangeUserInformation">
+
+        <DataAnnotationsValidator />
+
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <label for="inputEmail" class="admin-label">Email Adresse :</label>
+                    @if (UserAlreadyExists)
+                    {
+                        <span class="d-inline-flex"><small class="text-danger font-weight-bolder">* Email er allerede tilknyttet en Praktikkonsulent.</small></span>
+                    }
+                    <input id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" @bind-value="AccountModel.Email" @onfocusout="OnFocusOut_CheckUserAlreadyExists" />
+                    <ValidationMessage For="@(() => AccountModel.Email)" />
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col">
+                    <label for="inputFirstName" class="admin-label">Fornavn :</label>
+                    <input id="inputFirstName" type="text" class="form-control form-control-sm" placeholder="Fornavn" @bind-value="AccountModel.FirstName" />
+                    <ValidationMessage For="@(() => AccountModel.FirstName)" />
+                </div>
+
+                <div class="col">
+                    <label for="inputLastName" class="admin-label">Efternavn :</label>
+                    <input id="inputLastName" type="text" class="form-control form-control-sm" placeholder="Efternavn" @bind-value="AccountModel.LastName" />
+                    <ValidationMessage For="@(() => AccountModel.LastName)" />
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col">
+                    <label for="inputConsultantArea" class="admin-label">Konsulent Område :</label>
+                    <select class="form-control form-control-sm" @bind="AccountModel.ConsultantAreaId">
+                        @foreach (var area in ConsultantAreas)
+                        {
+                            @if (area.Identifier == AccountModel.ConsultantAreaId)
+                            {
+                                <option value="@area.Identifier" selected>@area.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@area.Identifier">@area.Name</option>
+                            }
+                        }
+                    </select>
+                    <ValidationMessage For="@(() => AccountModel.ConsultantAreaId)" />
+                </div>
+
+                <div class="col">
+                    <label for="inputLocation" class="admin-label">Lokation :</label>
+                    <select class="form-control form-control-sm" @bind="AccountModel.LocationId">
+                        @foreach (var lctn in Locations)
+                        {
+                            @if (lctn.Identifier == AccountModel.LocationId)
+                            {
+                                <option value="@lctn.Identifier" selected>@lctn.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@lctn.Identifier">@lctn.Name</option>
+                            }
+                        }
+                    </select>
+                    <ValidationMessage For="@(() => AccountModel.LocationId)" />
+                </div>
+            </div>
+            <hr />
+            <button type="submit" class="btn btn-info float-right ml-auto mt-5" disabled="@(IsProcessing || UserAlreadyExists)">
+                @if (IsProcessing)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span>Gemmer oplysninger...</span>
+                }
+                else
+                {
+                    <span>Gem bruger oplysninger</span>
+                }
+            </button>
+            <button type="submit" class="btn btn-danger float-left ml-auto mt-5">
+                @if (IsProcessing)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span>Sletter oplysninger...</span>
+                }
+                else
+                {
+                    <span>Slet bruger</span>
+                }
+
+
+            </button>
+        </div>
+
+    </EditForm>
+}
+
+@code {
+    [Inject] private MyAuthStateProvider MyAuthStateProvider { get; set; }
+    [Inject] private DataService DataService { get; set; }
+    [Inject] private AdminService AdminService { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private IUserService UserService { get; set; }
+
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthState { get; set; }
+
+    private AccountModel AccountModel = new AccountModel();
+
+    private IEnumerable<ConsultantArea> ConsultantAreas { get; set; } = new List<ConsultantArea>();
+    private IEnumerable<Location> Locations { get; set; } = new List<Location>();
+
+    private string ErrorMessage { get; set; }
+    private string Message { get; set; }
+    private string UserEmail { get; set; }
+
+    private bool UserAlreadyExists = false;
+    private bool IsProcessing;
+
+    private ClaimsPrincipal GetPrincipal;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAuthState();
+
+        await LoadInformation();
+    }
+
+    private async Task LoadAuthState()
+    {
+        GetPrincipal = (await AuthState).User;
+
+        foreach (Claim item in GetPrincipal.Claims)
+        {
+            // Get session values, to store inside the user object.
+            if (item.Type == ClaimTypes.Email) UserEmail = item.Value;
+        }
+    }
+
+    private async Task LoadInformation()
+    {
+        // Get user data, from the existing session data.
+        var user = await AdminService.GetUserByEmailAsync(UserEmail);
+        AccountModel = new AccountModel()
+        {
+            AccountId = user.Identifier,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            ConsultantAreaId = user.ConsultantArea.Identifier,
+            LocationId = user.Location.Identifier
+        };
+
+        // Get Consulent areas and locations.
+        ConsultantAreas = await DataService.GetAllConsultantAreasAsync();
+        Locations = await DataService.GetAllLocationsAsync();
+    }
+
+    private async Task OnValidSubmit_ChangeUserInformation()
+    {
+        IsProcessing = true;
+        bool result = false;
+
+        await Task.Delay(500);
+
+        await InvokeAsync(async () =>
+        {
+            result = await AdminService.UpdateUserInformationAsync(AccountModel);
+        });
+
+        if (result)
+        {
+            Message = "Din bruger blev opdateret!";
+            StateHasChanged();
+
+            await Task.Delay(1000);
+            NavigationManager.NavigateTo("/admin/account/myprofile", true);
+        }
+        else
+            ErrorMessage = "Kunne ikke opdatere dine oplysninger!";
+
+        IsProcessing = false;
+        StateHasChanged();
+    }
+
+    private async Task OnValidSubmit_DeleteUser()
+    {
+        IsProcessing = true;
+        bool result = false;
+
+        await Task.Delay(500);
+
+        await InvokeAsync(async () =>
+        {
+            result = await AdminService.RemoveUserAsync(AccountModel);
+        });
+
+        if (result)
+        {
+            await Task.Delay(1000);
+            await MyAuthStateProvider.MarkUserAsLoggedOut();
+        }
+        else
+            ErrorMessage = "Kunne ikke slette din bruger!";
+
+        IsProcessing = false;
+        StateHasChanged();
+    }
+
+    private async void OnFocusOut_CheckUserAlreadyExists(FocusEventArgs e)
+    {
+        if (UserService is UserService service)
+        {
+            if (UserEmail != AccountModel.Email)
+            {
+                UserAlreadyExists = await service.CheckUserExistsAsync(AccountModel.Email);
+            }
+        }
+    }
+}

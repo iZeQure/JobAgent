@@ -1,0 +1,103 @@
+﻿@page "/job/uncategorized"
+@page "/job/{JobAdvertId:int}"
+@page "/job/{JobAdvertId:int}/{SpecializationId:int}"
+
+<PageTitle Title="Job" />
+
+@if (jobAdverts != null)
+{
+    <div class="card-columns">
+        @foreach (var j in jobAdverts.OrderBy(date => date.JobRegisteredDate))
+        {
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        @{
+                            string appendedUrlString = DataService.AppendWorldWideWebToStringIfNotExists(j.SourceURL);
+                        }
+                        <a class="card-link" href="@(appendedUrlString)" target="_blank">
+                            @(j.Title)
+                        </a>
+                    </h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@(j.Company.Name), @(j.JobLocation)</h6>
+                    <p class="card-text">@(DataService.TruncateString(j.JobDescription, 150))</p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            Oprettet: @j.JobRegisteredDate.ToString("dddd, d MMM yyyy", CultureInfo.CreateSpecificCulture("da-DK"))
+                        </small>
+                    </p>
+                    <button @onclick="@(clickEvent => GetJobAdvertDetails(j.Identifier))" class="btn btn-info btn-sm d-block" type="button" data-toggle="modal" data-target="#DetailsVacancyModal">Se Detailjer</button>
+                </div>
+            </div>
+        }
+    </div>
+
+    <DetailsVacancyModal Details="AdvertDetails" />
+}
+else if (loadFailed)
+{
+    <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="Beklager, kunne ikke indlæse indholdet begrundet af en fejl." />
+}
+else
+{
+    <MessageAlert Alert="MessageAlert.AlertType.Info" Message="Indlæser indhold.." IsLoading="true" />
+}
+
+@code {
+    [Parameter] public int JobAdvertId { get; set; }
+    [Parameter] public int SpecializationId { get; set; }
+
+    [Inject] protected JobService JobService { get; set; }
+    [Inject] protected DataService DataService { get; set; }
+    [Inject] protected NavigationManager NavigationManager { get; set; }
+
+    private IEnumerable<JobAdvert> jobAdverts = new List<JobAdvert>();
+    private JobAdvert AdvertDetails;
+    private bool loadFailed;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task GetJobAdvertDetails(int advertId)
+    {
+        if (advertId == 0)
+        {
+            await Task.CompletedTask;
+        }
+
+        AdvertDetails = await JobService.GetJobVacancyById(advertId);
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            loadFailed = false;
+
+            if (JobAdvertId == 0 && SpecializationId == 0)
+            {
+                jobAdverts = await JobService.GetUncategorizedJobVacancies();
+            }
+            else if (SpecializationId == 0)
+            {
+                jobAdverts = await JobService.GetJobVacanciesAsync(JobAdvertId);
+            }
+            else if (SpecializationId != 0)
+            {
+                jobAdverts = await JobService.GetJobSpecialVacanciesAsync(SpecializationId);
+            }
+        }
+        catch (Exception ex)
+        {
+            loadFailed = true;
+            Console.WriteLine($"Failed to load Job Adverts : {ex.Message}");
+        }
+    }
+}
