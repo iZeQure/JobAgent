@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pocos", "..\Pocos\Pocos.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SecurityAccess", "..\SecurityAccess\SecurityAccess.csproj", "{4CA88E54-131C-49D7-9EE0-8602475F331E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebsiteV2", "..\WebsiteV2\WebsiteV2.csproj", "{6BDE31B8-DCAE-4B24-BF58-B8BB77FA8680}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{4CA88E54-131C-49D7-9EE0-8602475F331E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CA88E54-131C-49D7-9EE0-8602475F331E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4CA88E54-131C-49D7-9EE0-8602475F331E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BDE31B8-DCAE-4B24-BF58-B8BB77FA8680}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BDE31B8-DCAE-4B24-BF58-B8BB77FA8680}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BDE31B8-DCAE-4B24-BF58-B8BB77FA8680}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BDE31B8-DCAE-4B24-BF58-B8BB77FA8680}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
