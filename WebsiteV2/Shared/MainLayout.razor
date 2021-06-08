@@ -1,15 +1,18 @@
 ﻿@inherits LayoutComponentBase
 
-<section class="page">
+<main class="page">
     <div class="sticky-top">
         <TopNavbar />
     </div>
 
-    <div class="sidebar">
-        <NavMenu />
+    <div class="main-content">
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+        <div class="content">
+            <div class="container-fluid">
+                @Body
+            </div>
+        </div>
     </div>
-
-    <main class="main-content">
-        @Body
-    </main>
-</section>
+</main>

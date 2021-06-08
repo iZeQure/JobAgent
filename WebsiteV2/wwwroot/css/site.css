@@ -4,23 +4,64 @@
     --primary-background-color: #432874;
     --primary-color: #F3F7FD;
     --border-radius: 0.5em;
-    --border-width: 0.15em;
 }
 
 html {
-    font-size: 1rem;
+    font-size: 1em;
+}
+
+h1, h2, h3, h4 {
+    color: var(--primary-color);
 }
 
 h1 {
     font-family: nerisblack, Arial, sans-serif;
     font-size: 2.5rem;
-    color: var(--primary-color);
+}
+
+h4 {
+    position: relative;
+    font-family: nerislight, Arial, sans-serif;
+    font-size: 1.75rem;
+    text-decoration: none;
+    text-align: center;
+}
+
+    h4::after {
+        position: absolute;
+        content: "";
+        height: 0.10em;
+        bottom: -0.30em;
+        margin: 0 auto;
+        left: 0;
+        right: 0;
+        width: 75%;
+        border-radius: var(--border-radius);
+        background: #a98eda;
+    }
+
+input::placeholder {
+    font-family: nerissemibold_italic, Arial, sans-serif;
+    font-size: .85em;
+    color: #a98eda !important;
+    padding: .5em .5em;
 }
 
 a {
     font-size: 1.5rem !important;
     color: var(--primary-color) !important;
 }
+
+    a .menu-icons {
+        width: 5em !important;
+        height: auto;
+        font-size: 2.5rem;
+        transition: color ease 250ms;
+    }
+
+        a .menu-icons:hover {
+            color: var(--primary-color);
+        }
 
 button {
     font-size: 1em !important;
@@ -33,29 +74,68 @@ svg {
     fill: var(--primary-color);
 }
 
+.menu-icons {
+    color: #a98eda;
+}
+
+.logo {
+    height: 3.25rem;
+    margin-right: .75rem;
+}
+
 .navbar {
     background-color: var(--primary-background-color) !important;
 }
 
-.logo {
-    height: 4rem;
-    margin-right: .75rem;
-}
-
 .navbar-brand span {
     font-family: nerisblack, Aria, sans-serif;
-    font-size: 2.5rem;
+    font-size: 1.75rem;
 }
 
-input::placeholder {
-    font-family: 'nerislight_italic', Arial, sans-serif;
-    font-size: .85em;
+main.page {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
 }
 
-.menu-icons {
-    width: 5em !important;
-    height: auto;
-    font-size: 1.5em;
+div.main-content {
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 100%;
+}
+
+    div.main-content > *:nth-child(1) {
+        flex: 1 1 auto;
+        min-width: 35ch;
+    }
+
+    div.main-content > *:nth-child(2) {
+        flex: 1 1 75%;
+    }
+
+    div.main-content .sidebar {
+        background-color: var(--primary-background-color);
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+        div.main-content .sidebar .menu-title {
+            padding: .35em .5em 0 .5em;
+        }
+
+        div.main-content .sidebar .menu-search {
+            margin: 0;
+            padding: 0 .75em;
+        }
+
+    div.main-content .content {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+#landing-page-container {
+    background-image: url(../assets/images/test-content-bg.svg);
+    background-position: right bottom;
 }
 
 .dropdown-menu {
@@ -63,10 +143,6 @@ input::placeholder {
     border-radius: var(--border-radius);
     min-height: 350px;
     max-height: 350px;
-}
-
-a:hover {
-    fill: red;
 }
 
 #user-profile-dropdown {
@@ -81,7 +157,7 @@ a:hover {
     }
 
     #user-profile-dropdown input {
-        border-radius: 10px;
+        border-radius: var(--border-radius);
     }
 
     #user-profile-dropdown button {
