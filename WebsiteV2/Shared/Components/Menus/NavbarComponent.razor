@@ -32,8 +32,8 @@
             <div class="navbar-nav ms-auto">
                 <div class="user-profile-container d-flex">
                     <div class="dropdown">
-                        <a href="#user-profile" role="button" id="dropdownUserProfile" data-bs-toggle="dropdown" data-bs-auto-close="false" aria-expanded="false">
-                            <span class="user-profile-icon menu-icons">
+                        <a href="#user-profile" role="button" id="dropdownUserProfile" data-bs-toggle="dropdown" data-bs-auto-close="false" aria-expanded="false" data-bs-reference="parent">
+                            <span class="user-profile-icon menu-icons @_userProfileState" @onclick="OnClick_UserProfileIcon">
                                 <i class="far fa-user-circle"></i>
                             </span>
                         </a>
@@ -69,9 +69,21 @@
 
 @code {
     private readonly AuthenticationModel _authModel = new();
+    private string _userProfileState = string.Empty;
 
     protected override Task OnParametersSetAsync()
     {
         return base.OnParametersSetAsync();
+    }
+
+    private void OnClick_UserProfileIcon()
+    {
+        if (string.IsNullOrEmpty(_userProfileState))
+        {
+            _userProfileState = "active";
+            return;
+        }
+
+        _userProfileState = string.Empty;
     }
 }

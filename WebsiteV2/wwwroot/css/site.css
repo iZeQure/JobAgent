@@ -59,7 +59,8 @@ a {
         transition: color ease 250ms;
     }
 
-        a .menu-icons:hover {
+        a .menu-icons:hover,
+        a .menu-icons.active {
             color: var(--primary-color);
         }
 
@@ -72,6 +73,10 @@ button {
 
 svg {
     fill: var(--primary-color);
+}
+
+.bg-purple-300 {
+    background: #A98EDA !important;
 }
 
 .menu-icons {
@@ -105,12 +110,13 @@ div.main-content {
 }
 
     div.main-content > *:nth-child(1) {
-        flex: 1 1 auto;
-        min-width: 35ch;
+        flex: 1 1 25%;
+        min-width: 25ch;
     }
 
     div.main-content > *:nth-child(2) {
         flex: 1 1 75%;
+        min-width: 15ch;
     }
 
     div.main-content .sidebar {
@@ -119,14 +125,18 @@ div.main-content {
         overflow-x: hidden;
     }
 
-        div.main-content .sidebar .menu-title {
-            padding: .35em .5em 0 .5em;
+        div.main-content .sidebar .menu-categories span {
+            max-width: 175px;
         }
 
-        div.main-content .sidebar .menu-search {
-            margin: 0;
-            padding: 0 .75em;
+        div.main-content .sidebar .menu-categories a {
+            font-size: 1em !important;
         }
+
+            div.main-content .sidebar .menu-categories a:hover,
+            div.main-content .sidebar .menu-categories a.active {
+                color: #A98EDA !important;
+            }
 
     div.main-content .content {
         overflow-y: auto;
@@ -138,17 +148,20 @@ div.main-content {
     background-position: right bottom;
 }
 
-.dropdown-menu {
-    background-color: var(--primary-background-color) !important;
-    border-radius: var(--border-radius);
-    min-height: 350px;
-    max-height: 350px;
+#user-profile {
+
 }
 
 #user-profile-dropdown {
     width: 300px;
-    background-color: black;
 }
+
+    #user-profile-dropdown.dropdown-menu {
+        background-color: var(--primary-background-color) !important;
+        border-radius: var(--border-radius);
+        min-height: 350px;
+        max-height: 350px;
+    }
 
     #user-profile-dropdown label {
         font-size: .65em;
