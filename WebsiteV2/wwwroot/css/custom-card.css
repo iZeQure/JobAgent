@@ -21,6 +21,8 @@
     background-size: cover;
     border-radius: 1rem;
     overflow: hidden;
+    min-width: 20em;
+
     transition: transform 500ms ease;
 }
 
