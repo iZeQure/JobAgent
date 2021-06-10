@@ -1,3 +1,10 @@
 ﻿@page "/"
 
-<img id="your-adventure" src="assets/images/test-content-bg.svg" alt="Landing Page" />
+<AuthorizeView>
+    <Authorized>
+        <AdminPageRedirect />
+    </Authorized>
+    <NotAuthorized>
+        <img id="your-adventure" src="assets/images/test-content-bg.svg" alt="Landing Page" />
+    </NotAuthorized>
+</AuthorizeView>

@@ -2,24 +2,15 @@
 
 <main class="page">
     <div class="sticky-top">
-        <NavbarComponent />
+        <NavbarMenu />
     </div>
 
     <div class="main-content">
         <div class="sidebar">
-            <AuthorizeView>
-                <Authorized>
-                    <AdminSideMenuComponent />
-                </Authorized>
-                <NotAuthorized>
-                    <JobSideMenuComponent />
-                </NotAuthorized>
-            </AuthorizeView>
+            <SidebarMenu />
         </div>
         <div class="content">
-                @Body
-            @*<div class="container-fluid">
-            </div>*@
+            @Body
         </div>
     </div>
 </main>

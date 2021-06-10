@@ -113,7 +113,7 @@ div.main-content {
 
     div.main-content > *:nth-child(1) {
         flex: 1 1 25%;
-        min-width: 25ch;
+        min-width: 30ch;
     }
 
     div.main-content > *:nth-child(2) {
