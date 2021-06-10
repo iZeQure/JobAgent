@@ -24,7 +24,6 @@
     transition: transform 500ms ease;
 }
 
-
     .card:hover,
     .card:focus-within {
         transform: scale(1.05);
@@ -42,6 +41,7 @@
     word-wrap: break-word;
     color: var(--primary-color);
     font-family: nerisblack, Arial, sans-serif;
+    -webkit-text-stroke: 2px var(--clr-neutral-900);
 }
 
     .card-title::after {
