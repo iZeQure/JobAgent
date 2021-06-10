@@ -3,8 +3,13 @@
 @import "scrollbar.css";
 
 :root {
+    --ff-heading-text: nerisblack, Arial, sans-serif;
+    --ff-small-text: nerislight, Arial, sans-serif;
+    --ff-info-text: nerisblack, Aria, sans-serif;
+    --ff-placeholder-text: nerissemibold_italic, Arial, sans-serif;
     --primary-background-color: #432874;
     --primary-color: #F3F7FD;
+    --clr-validation-error: #F3CD52;
     --border-radius: 0.5em;
 }
 
@@ -17,13 +22,13 @@ h1, h2, h3, h4 {
 }
 
 h1 {
-    font-family: nerisblack, Arial, sans-serif;
+    font-family: var(--ff-heading-text);
     font-size: 2.5rem;
 }
 
 h4 {
     position: relative;
-    font-family: nerislight, Arial, sans-serif;
+    font-family: var(--ff-small-text);
     font-size: 1.75rem;
     text-decoration: none;
     text-align: center;
@@ -43,7 +48,7 @@ h4 {
     }
 
 input::placeholder {
-    font-family: nerissemibold_italic, Arial, sans-serif;
+    font-family: var(--ff-placeholder-text);
     font-size: .85em;
     color: #a98eda !important;
     padding: .5em .5em;
@@ -95,7 +100,7 @@ svg {
 }
 
 .navbar-brand span {
-    font-family: nerisblack, Aria, sans-serif;
+    font-family: var(--ff-info-text);
     font-size: 1.75rem;
 }
 
@@ -190,7 +195,10 @@ div.main-content {
 }
 
 .validation-message {
-    color: red;
+    font-family: var(--ff-info-text);
+    color: var(--clr-validation-error);
+    font-size: .75em;
+    padding: .3em 0 0 .3em;
 }
 
 #blazor-error-ui {

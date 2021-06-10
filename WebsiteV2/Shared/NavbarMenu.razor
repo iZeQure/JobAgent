@@ -39,23 +39,23 @@
                         </a>
 
                         <div id="user-profile-dropdown" class="dropdown-menu dropdown-menu dropdown-menu-lg-end" aria-labelledby="dropdownUserProfile">
-                            <AuthorizeView Context="UserProfileContext">
-                                <Authorized Context="AuthorizedContext">
+                            <AuthorizeView Context="userProfileContext">
+                                <Authorized Context="authorizedContext">
 
                                 </Authorized>
                                 <NotAuthorized>
-                                    <EditForm class="px-2 py-1" Context="LoginFormContext" Model="_authModel">
-                                        <DataAnnotationsValidator />
-
+                                    <EditForm class="px-2 py-1" Context="loginFormContext" EditContext="_authContext" OnValidSubmit="OnValidSubmit_LogInAsync" OnInvalidSubmit="OnInvalidSubmit_DisableLogIn">
                                         <div class="mb-3">
-                                            <label for="exampleDropdownFormEmail1" class="form-label">Email address</label>
-                                            <input type="email" class="form-control" id="exampleDropdownFormEmail1" placeholder="email@example.com">
+                                            <label for="dropdownProfileEmail" class="form-label">Email address</label>
+                                            <input type="email" class="form-control" id="dropdownProfileEmail" placeholder="email@example.com" @bind-value="@(_authenticationModel.Email)">
+                                            <ValidationMessage For="@(() => _authenticationModel.Email)" />
                                         </div>
                                         <div class="mb-3">
-                                            <label for="exampleDropdownFormPassword1" class="form-label">Password</label>
-                                            <input type="password" class="form-control" id="exampleDropdownFormPassword1" placeholder="Password">
+                                            <label for="dropdownProfilePassword" class="form-label">Password</label>
+                                            <input type="password" class="form-control" id="dropdownProfilePassword" placeholder="Password" @bind-value="@(_authenticationModel.Password)">
+                                            <ValidationMessage For="@(() => _authenticationModel.Password)" />
                                         </div>
-                                        <button type="submit" class="btn btn-outline-light float-end">Log ind</button>
+                                        <button type="submit" class="btn btn-outline-light float-end" disabled="@(_isLogInDisabled)">Log ind</button>
                                     </EditForm>
                                 </NotAuthorized>
                             </AuthorizeView>
@@ -66,24 +66,3 @@
         </div>
     </div>
 </nav>
-
-@code {
-    private readonly AuthenticationModel _authModel = new();
-    private string _userProfileState = string.Empty;
-
-    protected override Task OnParametersSetAsync()
-    {
-        return base.OnParametersSetAsync();
-    }
-
-    private void OnClick_UserProfileIcon()
-    {
-        if (string.IsNullOrEmpty(_userProfileState))
-        {
-            _userProfileState = "active";
-            return;
-        }
-
-        _userProfileState = string.Empty;
-    }
-}
