@@ -1,5 +1,6 @@
 @import url('web-fonts/neris/css/neris-webfont.css');
 @import "custom-card.css";
+@import "scrollbar.css";
 
 :root {
     --primary-background-color: #432874;

@@ -1,0 +1,22 @@
+﻿html {
+    --scrollbar-background-color: #212529 !important;
+    --scrollbar-wheel-color: #A98EDA !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-wheel-color) !important;
+    border-radius: 5px !important;
+}
+
+::-webkit-scrollbar {
+    width: 10px !important;
+}
+
+.card-body::-webkit-scrollbar {
+    width: 4px !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-wheel-color) !important;
+    border-radius: 5px !important;
+}
