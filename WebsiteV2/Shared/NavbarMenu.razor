@@ -39,24 +39,12 @@
                         </a>
 
                         <div id="user-profile-dropdown" class="dropdown-menu dropdown-menu dropdown-menu-lg-end" aria-labelledby="dropdownUserProfile">
-                            <AuthorizeView Context="userProfileContext">
-                                <Authorized Context="authorizedContext">
+                            <AuthorizeView Context="authorizeContext">
+                                <Authorized>
 
                                 </Authorized>
                                 <NotAuthorized>
-                                    <EditForm class="px-2 py-1" Context="loginFormContext" EditContext="_authContext" OnValidSubmit="OnValidSubmit_LogInAsync" OnInvalidSubmit="OnInvalidSubmit_DisableLogIn">
-                                        <div class="mb-3">
-                                            <label for="dropdownProfileEmail" class="form-label">Email address</label>
-                                            <input type="email" class="form-control" id="dropdownProfileEmail" placeholder="email@example.com" @bind-value="@(_authenticationModel.Email)">
-                                            <ValidationMessage For="@(() => _authenticationModel.Email)" />
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="dropdownProfilePassword" class="form-label">Password</label>
-                                            <input type="password" class="form-control" id="dropdownProfilePassword" placeholder="Password" @bind-value="@(_authenticationModel.Password)">
-                                            <ValidationMessage For="@(() => _authenticationModel.Password)" />
-                                        </div>
-                                        <button type="submit" class="btn btn-outline-light float-end" disabled="@(_isLogInDisabled)">Log ind</button>
-                                    </EditForm>
+                                    <LoginComponent />
                                 </NotAuthorized>
                             </AuthorizeView>
                         </div>
@@ -66,3 +54,18 @@
         </div>
     </div>
 </nav>
+
+@code {
+    private string _userProfileState = string.Empty;
+
+    private void OnClick_UserProfileIcon()
+    {
+        if (string.IsNullOrEmpty(_userProfileState))
+        {
+            _userProfileState = "active";
+            return;
+        }
+
+        _userProfileState = string.Empty;
+    }
+}

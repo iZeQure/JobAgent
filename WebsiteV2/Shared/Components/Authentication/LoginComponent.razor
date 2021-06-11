@@ -1,0 +1,25 @@
+﻿@if (!string.IsNullOrEmpty(ValidationMessage))
+{
+    <div class="container-fluid">
+        <div class="alert alert-warning d-flex align-items-center small" role="alert">
+            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="assets/images/sprites.svg#exclamation-triangle-fill" /></svg>
+            <div>
+                @ValidationMessage
+            </div>
+        </div>
+    </div>
+}
+
+<EditForm class="px-2 py-1" Context="loginFormContext" EditContext="_authContext" OnValidSubmit="OnValidSubmit_LogInAsync" OnInvalidSubmit="OnInvalidSubmit_DisplayError">
+    <div class="mb-3">
+        <label for="dropdownProfileEmail" class="form-label">Email address</label>
+        <input type="email" class="form-control" id="dropdownProfileEmail" placeholder="email@example.com" @bind-value="@(_authenticationModel.Email)">
+        <ValidationMessage For="@(() => _authenticationModel.Email)" />
+    </div>
+    <div class="mb-3">
+        <label for="dropdownProfilePassword" class="form-label">Password</label>
+        <input type="password" class="form-control" id="dropdownProfilePassword" placeholder="Password" @bind-value="@(_authenticationModel.Password)">
+        <ValidationMessage For="@(() => _authenticationModel.Password)" />
+    </div>
+    <button type="submit" class="btn btn-outline-light float-end">Log ind</button>
+</EditForm>
