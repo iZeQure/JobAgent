@@ -150,20 +150,15 @@ div.main-content {
         overflow-x: hidden;
     }
 
-#landing-page-container {
-    background-image: url(../assets/images/test-content-bg.svg);
-    background-position: right bottom;
-}
-
-#admin-page-background {
-    background-position: left top;
-    width: fit-content();
-    width: -webkit-fill-available;
-    height: fit-content;
+img.cover-center {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    width: -moz-fit-content;
+    width: fit-content;
 }
 
 #user-profile {
-
 }
 
 #user-profile-dropdown {
