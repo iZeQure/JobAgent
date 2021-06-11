@@ -17,8 +17,9 @@
 
 .card {
     color: var(--clr-neutral-100);
-    background-image: url(/assets/images/card-bg.png);
+    background-image: url(/assets/images/card-bg-v2.svg);
     background-size: cover;
+    background-repeat: no-repeat;
     border-radius: 1rem;
     overflow: hidden;
     min-width: 20em;
