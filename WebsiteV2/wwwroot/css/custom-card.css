@@ -19,6 +19,7 @@
 
 .card {
     color: var(--clr-neutral-100);
+    background-image: url(../assets/images/card-bg-v2.svg);
     background-color: var(--clr-neutral-900);
     border-radius: 1rem;
     overflow: hidden;
@@ -42,7 +43,7 @@
 .card-content {
     overflow-y: scroll;
     overflow-x: hidden;
-    max-height: 5em;
+    max-height: 6em;
 }
 
 .card-subtitle {
