@@ -11,27 +11,49 @@
 
 <AuthorizeView>
     <NotAuthorized>
+        <div class="admin-tools">
+            <div id="administration-tool">
+                <div class="tool-heading">
+                    <span>Administrer</span>
+                </div>
+                <div class="admin-tool-links">
+                    <NavLink class="my-1" href="#1">
+                        <span class="menu-icons"><i class="fas fa-clipboard-list"></i></span>
+                        <span class="text-truncate text-start">Stillingsopslag</span>
+                    </NavLink>
+                    <NavLink class="my-1" href="#2">
+                        <span class="menu-icons"><i class="fas fa-file-signature"></i></span>
+                        <span class="text-truncate text-start">Kontrakter</span>
+                    </NavLink>
+                    <NavLink></NavLink>
+                    <NavLink></NavLink>
+                </div>
+            </div>
+            <div id="user-tool">
+                <div class="tool-heading">
+                    <span>Bruger Indstillinger</span>
+                </div>
+                <div class="admin-tool-links">
+                    <NavLink>Min Bruger</NavLink>
+                    <NavLink>Ændre Adgangskode</NavLink>
+                </div>
+            </div>
+        </div>
+    </NotAuthorized>
+    <Authorized>
         <div class="menu-search pb-3">
             ´<div class="input-group mx-auto px-3">
                 <input class="form-control" type="text" placeholder="Søg Uddannelse..." aria-label="Søg Uddannelse" aria-describedby="search-addon">
                 <span class="input-group-text" id="search-addon"><i class="fas fa-search menu-icons"></i></span>
             </div>
         </div>
-    </NotAuthorized>
-</AuthorizeView>
-
-<div class="menu-categories py-2">
-    <div class="px-3 py-1">
-        <AuthorizeView>
-            <Authorized>
-
-            </Authorized>
-            <NotAuthorized>
+        <div class="menu-categories py-2">
+            <div class="px-3 py-1">
                 <NavLink class="btn btn-outline-light btn-sm w-100 position-relative" href="/job">
                     <span class="text-start float-start d-inline-block text-truncate align-middle">wudqwokidopasklcjxz</span>
                     <span class="badge bg-purple-300 position-absolute top-50 end-0 translate-middle-y me-1">1</span>
                 </NavLink>
-            </NotAuthorized>
-        </AuthorizeView>
-    </div>
-</div>
+            </div>
+        </div>
+    </Authorized>
+</AuthorizeView>
