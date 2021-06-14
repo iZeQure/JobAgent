@@ -159,7 +159,29 @@ img.cover-center {
     width: fit-content;
 }
 
-#user-profile {
+.page-background {
+    background-image: linear-gradient(hsl(247, 61%, 27%), hsl(247, 67%, 24%), hsl(248, 75%, 20%));
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.page-picture {
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: auto;
+    margin-right: auto;
+    height: auto;
+    width: 100%;
+    max-height: 50%;
+}
+
+.page-text {
+    font-size: 2.5vw;
+    margin-top: 2em;
+    position: center;
+    text-align: center;
+
 }
 
 #user-profile-dropdown {
@@ -226,3 +248,16 @@ img.cover-center {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+
+@media screen and (max-width: 800px) {
+    .page-picture {
+        display:none;
+    }
+
+    .page-text {
+        font-size: 4.5vw;
+    }
+
+}
+
