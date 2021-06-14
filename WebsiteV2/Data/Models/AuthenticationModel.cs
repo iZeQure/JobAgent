@@ -12,23 +12,12 @@ namespace WebsiteV2.Data.Models
         [Required(AllowEmptyStrings = false, ErrorMessage = "Email adresse er påkrævet.")]
         [StringLength(255, ErrorMessage = "Email er for long (255 karakter begrænse).")]
         [EmailAddress(ErrorMessage = "Indtast en gyldig email adresse.")]
+        [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "Adgangskode er påkrævet.")]
         [StringLength(255)]
+        [DataType(DataType.Password)]
         public string Password { get; set; }
-
-        public bool IsValidEmail(string email)
-        {
-            try
-            {
-                var addr = new MailAddress(email);
-                return addr.Address == email;
-            }
-            catch
-            {
-                return false;
-            }
-        }
     }
 }

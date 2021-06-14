@@ -10,16 +10,16 @@
     </div>
 }
 
-<EditForm class="px-2 py-1" Context="loginFormContext" EditContext="_authContext" OnValidSubmit="OnValidSubmit_LogInAsync" OnInvalidSubmit="OnInvalidSubmit_DisplayError">
+<EditForm class="px-2 py-1" EditContext="_editContext" OnValidSubmit="OnValidSubmit_LogInAsync">
     <div class="mb-3">
         <label for="dropdownProfileEmail" class="form-label">Email address</label>
-        <input type="email" class="form-control" id="dropdownProfileEmail" placeholder="email@example.com" @bind-value="@(_authenticationModel.Email)">
+        <InputText @bind-Value="@_authenticationModel.Email" class="form-control" type="email" placeholder="email@example.com" />
         <ValidationMessage For="@(() => _authenticationModel.Email)" />
     </div>
     <div class="mb-3">
         <label for="dropdownProfilePassword" class="form-label">Password</label>
-        <input type="password" class="form-control" id="dropdownProfilePassword" placeholder="Password" @bind-value="@(_authenticationModel.Password)">
+        <InputText @bind-Value="@_authenticationModel.Password" class="form-control" type="password" placeholder="Password" />
         <ValidationMessage For="@(() => _authenticationModel.Password)" />
     </div>
-    <button type="submit" class="btn btn-outline-light float-end">Log ind</button>
+    <button type="submit" class="btn btn-outline-light btn-sm float-end">Log ind</button>
 </EditForm>

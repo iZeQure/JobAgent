@@ -10,30 +10,39 @@ namespace WebsiteV2.Shared.Components.Authentication
 {
     public partial class LoginComponent : ComponentBase
     {
-        private EditContext _authContext;
+        private EditContext _editContext;
+        private bool _processingRequest;
         private readonly AuthenticationModel _authenticationModel = new();
-        private bool _isLogInDisabled = true;
 
         public string ValidationMessage { get; set; }
 
-        protected override Task OnInitializedAsync()
-        {
-            _authContext = new EditContext(_authenticationModel);
-            _authContext.AddDataAnnotationsValidation();
+        public bool ProcessingRequest { get { return _processingRequest; } }
 
-            return base.OnInitializedAsync();
-        }        
+        protected override void OnInitialized()
+        {
+            _editContext = new EditContext(_authenticationModel);
+            _editContext.AddDataAnnotationsValidation();
+        }
+
+        protected override Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                _editContext.OnFieldChanged += LoginForm_OnFieldChanged;
+                Console.WriteLine($"Rendered Login Component");
+            }
+
+            return base.OnAfterRenderAsync(firstRender);
+        }
+
+        private void LoginForm_OnFieldChanged(object sender, FieldChangedEventArgs e)
+        {
+            Console.WriteLine($"{e.FieldIdentifier.FieldName} has been changed.");
+        }
 
         private Task OnValidSubmit_LogInAsync()
         {
             ValidationMessage = "Logger ind, vent venligst..";
-
-            return ClearValidationMessageAfterInterval();
-        }
-
-        private Task OnInvalidSubmit_DisplayError()
-        {
-            ValidationMessage = "Der er fejl i formen, tjek venligst.";
 
             return ClearValidationMessageAfterInterval();
         }

@@ -7,9 +7,10 @@
     --ff-small-text: nerislight, Arial, sans-serif;
     --ff-info-text: nerisblack, Aria, sans-serif;
     --ff-placeholder-text: nerissemibold_italic, Arial, sans-serif;
+    --clr-valid: #A98EDA;
+    --clr-invalid: #F3CD52;
     --primary-background-color: #432874;
     --primary-color: #F3F7FD;
-    --clr-validation-error: #F3CD52;
     --border-radius: 0.5em;
 }
 
@@ -193,12 +194,16 @@ img.cover-center {
 }
 
 .invalid {
-    outline: 1px solid red;
+    outline: none !important;
+}
+
+.valid {
+    outline: none !important;
 }
 
 .validation-message {
     font-family: var(--ff-info-text);
-    color: var(--clr-validation-error);
+    color: var(--clr-invalid);
     font-size: .75em;
     padding: .3em 0 0 .3em;
 }
