@@ -1,4 +1,4 @@
-﻿<div class="menu-title mx-auto">
+﻿<div class="pb-3">
     <AuthorizeView>
         <Authorized>
             <h4>Kontrolpanel</h4>
@@ -10,58 +10,67 @@
 </div>
 
 <AuthorizeView>
-    <NotAuthorized>
-        <div class="mx-3 py-3 tools">
-            <div class="mx-auto my-3">
-                <h5>Administrer</h5>
-                <nav class="nav flex-column">
-                    <NavLink class="nav-link text-truncate" href="/admin/settings/job/vacancies">
-                        <span class="menu-icons pe-3"><i class="fas fa-clipboard-list"></i></span>
-                        Stillingsopslag
-                    </NavLink>
-                    <NavLink class="nav-link text-truncate" href="/admin/settings/contracts">
-                        <span class="menu-icons pe-3"><i class="fas fa-file-signature"></i></span>
-                        Kontrakter
-                    </NavLink>
-                    <NavLink class="nav-link text-truncate" href="/admin/settings/companies">
-                        <span class="menu-icons pe-3"><i class="fas fa-building"></i></span>
-                        Virksomheder
-                    </NavLink>
-                    <NavLink class="nav-link text-truncate" href="/admin/settings/createuser">
-                        <span class="menu-icons pe-3"><i class="fas fa-user-plus"></i></span>
-                        Opret Praktikkonsulent
-                    </NavLink>
-                </nav>
-            </div>
-            <div class="mx-auto">
-                <h5>Bruger Indstillinger</h5>
-                <nav class="nav flex-column">
-                    <NavLink class="nav-link text-truncate" href="/admin//account/my/profile">
-                        <span class="menu-icons pe-3"><i class="fas fa-user-cog"></i></span>
-                        Min Bruger
-                    </NavLink>
-                    <NavLink class="nav-link text-truncate" href="/admin//account/my/changepassowrd">
-                        <span class="menu-icons pe-3"><i class="fas fa-user-lock"></i></span>
-                        Ændre Adgangskode
-                    </NavLink>
-                </nav>
-            </div>
-        </div>
-    </NotAuthorized>
     <Authorized>
-        <div class="menu-search pb-3">
-            ´<div class="input-group mx-auto px-3">
-                <input class="form-control" type="text" placeholder="Søg Uddannelse..." aria-label="Søg Uddannelse" aria-describedby="search-addon">
-                <span class="input-group-text" id="search-addon"><i class="fas fa-search menu-icons"></i></span>
-            </div>
-        </div>
-        <div class="menu-categories py-2">
-            <div class="px-3 py-1">
-                <NavLink class="btn btn-outline-light btn-sm w-100 position-relative" href="/job">
-                    <span class="text-start float-start d-inline-block text-truncate align-middle">wudqwokidopasklcjxz</span>
-                    <span class="badge bg-purple-300 position-absolute top-50 end-0 translate-middle-y me-1">1</span>
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+            <span>Administrer</span>
+        </h6>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/admin/settings/job/vacancies">
+                    <span><i class="fas fa-clipboard-list"></i></span>
+                    Stillingsopslag
                 </NavLink>
-            </div>
-        </div>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/admin/settings/contracts">
+                    <span><i class="fas fa-file-signature"></i></span>
+                    Kontrakter
+                </NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/admin/settings/companies">
+                    <span><i class="fas fa-building"></i></span>
+                    Virksomheder
+                </NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/admin/settings/createuser">
+                    <span><i class="fas fa-user-plus"></i></span>
+                    Opret Praktikkonsulent
+                </NavLink>
+            </li>
+        </ul>
+
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+            <span>Bruger Indstillinger</span>
+        </h6>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/admin//account/my/profile">
+                    <span><i class="fas fa-user-cog"></i></span>
+                    Min Bruger
+                </NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/admin//account/my/changepassowrd">
+                    <span><i class="fas fa-user-lock"></i></span>
+                    Ændre Adgangskode
+                </NavLink>
+            </li>
+        </ul>
     </Authorized>
+    <NotAuthorized>
+        <div class="input-group px-1">
+            <input class="form-control" type="text" placeholder="Søg Uddannelse..." aria-label="Søg Uddannelse" aria-describedby="search-addon">
+            <span class="input-group-text" id="search-addon"><i class="fas fa-search menu-icons"></i></span>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/job">
+                    <span class="me-auto">wudqwokidopasklcjxz</span>
+                    <span class="badge bg-purple-300">1</span>
+                </NavLink>
+            </li>
+        </ul>
+    </NotAuthorized>
 </AuthorizeView>

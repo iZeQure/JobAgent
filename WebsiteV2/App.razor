@@ -1,14 +1,14 @@
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">
         <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(DashboardLayout)">
                 <NotAuthorized>
                     <HomePageRedirect />
                 </NotAuthorized>
             </AuthorizeRouteView>
         </Found>
         <NotFound>
-            <LayoutView Layout="@typeof(MainLayout)">
+            <LayoutView Layout="@typeof(DashboardLayout)">
                 <p>
                     <b>404.</b>
                     Det er en fejl.
