@@ -11,32 +11,40 @@
 
 <AuthorizeView>
     <NotAuthorized>
-        <div class="admin-tools">
-            <div id="administration-tool">
-                <div class="tool-heading">
-                    <span>Administrer</span>
-                </div>
-                <div class="admin-tool-links">
-                    <NavLink class="my-1" href="#1">
-                        <span class="menu-icons"><i class="fas fa-clipboard-list"></i></span>
-                        <span class="text-truncate text-start">Stillingsopslag</span>
+        <div class="mx-3 py-3 tools">
+            <div class="mx-auto my-3">
+                <h5>Administrer</h5>
+                <nav class="nav flex-column">
+                    <NavLink class="nav-link text-truncate" href="/admin/settings/job/vacancies">
+                        <span class="menu-icons pe-3"><i class="fas fa-clipboard-list"></i></span>
+                        Stillingsopslag
                     </NavLink>
-                    <NavLink class="my-1" href="#2">
-                        <span class="menu-icons"><i class="fas fa-file-signature"></i></span>
-                        <span class="text-truncate text-start">Kontrakter</span>
+                    <NavLink class="nav-link text-truncate" href="/admin/settings/contracts">
+                        <span class="menu-icons pe-3"><i class="fas fa-file-signature"></i></span>
+                        Kontrakter
                     </NavLink>
-                    <NavLink></NavLink>
-                    <NavLink></NavLink>
-                </div>
+                    <NavLink class="nav-link text-truncate" href="/admin/settings/companies">
+                        <span class="menu-icons pe-3"><i class="fas fa-building"></i></span>
+                        Virksomheder
+                    </NavLink>
+                    <NavLink class="nav-link text-truncate" href="/admin/settings/createuser">
+                        <span class="menu-icons pe-3"><i class="fas fa-user-plus"></i></span>
+                        Opret Praktikkonsulent
+                    </NavLink>
+                </nav>
             </div>
-            <div id="user-tool">
-                <div class="tool-heading">
-                    <span>Bruger Indstillinger</span>
-                </div>
-                <div class="admin-tool-links">
-                    <NavLink>Min Bruger</NavLink>
-                    <NavLink>Ændre Adgangskode</NavLink>
-                </div>
+            <div class="mx-auto">
+                <h5>Bruger Indstillinger</h5>
+                <nav class="nav flex-column">
+                    <NavLink class="nav-link text-truncate" href="/admin//account/my/profile">
+                        <span class="menu-icons pe-3"><i class="fas fa-user-cog"></i></span>
+                        Min Bruger
+                    </NavLink>
+                    <NavLink class="nav-link text-truncate" href="/admin//account/my/changepassowrd">
+                        <span class="menu-icons pe-3"><i class="fas fa-user-lock"></i></span>
+                        Ændre Adgangskode
+                    </NavLink>
+                </nav>
             </div>
         </div>
     </NotAuthorized>
