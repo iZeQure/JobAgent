@@ -27,12 +27,51 @@
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+    @*<input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">*@
     <ul class="navbar-nav px-3">
-        <li class="nav-item text-nowrap">
-            <a class="nav-link" href="#">Sign out</a>
+        @*<li class="nav-item text-nowrap">
+                <a class="nav-link" href="#">Sign out</a>
+            </li>*@
+        <li class="nav-item dropdown">
+            <a href="#user-profile-dropdown" id="userProfileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                @*@_userProfileState" @onclick="OnClick_UserProfileIcon"*@
+                <span class="user-profile-icon menu-icons">
+                    <i class="far fa-user-circle"></i>
+                </span>
+            </a>
+            <div class="dropdown-menu p-4">
+                <AuthorizeView Context="authorizeContext">
+                    <Authorized>
+                        <UserProfileComponent />
+                    </Authorized>
+                    <NotAuthorized>
+                        <LoginComponent />
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
         </li>
     </ul>
+
+    @*<div class="user-profile-container d-flex">
+            <div class="dropdown">
+                <a href="#user-profile" role="button" id="dropdownUserProfile" data-bs-toggle="dropdown" data-bs-auto-close="false" aria-expanded="false" data-bs-reference="parent">
+                    <span class="user-profile-icon menu-icons @_userProfileState" @onclick="OnClick_UserProfileIcon">
+                        <i class="far fa-user-circle"></i>
+                    </span>
+                </a>
+
+                <div id="user-profile-dropdown" class="dropdown-menu dropdown-menu dropdown-menu-lg-end" aria-labelledby="dropdownUserProfile">
+                    <AuthorizeView Context="authorizeContext">
+                        <Authorized>
+                            <UserProfileComponent />
+                        </Authorized>
+                        <NotAuthorized>
+                            <LoginComponent />
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </div>
+            </div>
+        </div>*@
 </header>
 
 <div class="container-fluid">
