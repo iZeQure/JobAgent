@@ -71,6 +71,12 @@ h5 {
     margin: 0;
 }
 
+label {
+    font-size: 1em;
+    text-transform: uppercase;
+    font-family: nerissemibold;
+}
+
 input::placeholder {
     font-family: var(--ff-placeholder-text);
     font-size: .85em;
@@ -330,7 +336,7 @@ img.cover-center {
     left: 36%;
     top: 13%;
     text-align: center;
-}*/
+}
 
 
 /*#userProfileDropdown {
@@ -418,11 +424,6 @@ img.cover-center {
         font-size: 4.5vw;
         left: 25%;
         top: 20%;
-    }
-
-    div.main-content .sidebar {
-        position: absolute;
-        width: 100%;
     }
 }
 
