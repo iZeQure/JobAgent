@@ -3,26 +3,35 @@
 @import "scrollbar.css";
 
 :root {
-    --ff-heading-text: nerisblack, Arial, sans-serif;
-    --ff-small-text: nerislight, Arial, sans-serif;
-    --ff-info-text: nerisblack, Aria, sans-serif;
-    --ff-placeholder-text: nerissemibold_italic, Arial, sans-serif;
     --ff-h4: nerislight, Aria, sans-serif;
     --ff-h5: nerissemibold, Arial, sans-serif;
+    --ff-heading-text: nerisblack, Arial, sans-serif;
+    --ff-info-text: nerisblack, Aria, sans-serif;
+    --ff-small-text: nerislight, Arial, sans-serif;
+    --ff-placeholder-text: nerissemibold_italic, Arial, sans-serif;
     --clr-valid: #A98EDA;
     --clr-invalid: #F3CD52;
     --clr-after: #a98eda;
+    --clr-purple-300: #A98EDA;
     --primary-background-color: #432874;
     --primary-color: #F3F7FD;
     --border-radius: 0.5em;
 }
 
-/*html {
-    font-size: 1em;
-}*/
+.text-light {
+    color: var(--primary-color) !important;
+}
+
+.bg-purple {
+    background: var(--primary-background-color) !important;
+}
+
+.bg-purple-300 {
+    background: var(--clr-purple-300) !important;
+}
 
 h1, h2, h3, h4, h5 {
-    color: var(--primary-color);
+    color: var(--primary-color) !important;
 }
 
 h1 {
@@ -73,30 +82,75 @@ svg {
     fill: var(--primary-color);
 }
 
-    svg.logo {
+    svg .logo {
         width: 50px;
         height: auto;
     }
 
-.bg-purple {
-    background: var(--primary-background-color) !important;
+a {
+    position: relative;
+    color: var(--primary-color) !important;
+    font-family: var(--ff-small-text);
 }
 
-.bg-purple-300 {
-    background: #A98EDA !important;
-}
+    a .menu-icons {
+        font-size: 1.75em;
+    }
+
+    a.nav-link {
+        font-size: 1.25em;
+    }
+
+    a.nav-link:hover {
+        color: var(--clr-after) !important;
+    }
+
+    a.nav-link::before {
+        content: "" !important;
+        position: absolute !important;
+        width: 50% !important;
+        height: 2px !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        background-color: var(--clr-after) !important;
+        visibility: hidden !important;
+        transform: scaleX(0) !important;
+        transition: all 0.3s ease-in-out 0s !important;
+    }
+
+    a.nav-link:hover::before {
+        visibility: visible !important;
+        transform: scaleX(1) !important;
+    }
+
+    a.active::before {
+        content: "" !important;
+        position: absolute !important;
+        width: 80% !important;
+        height: 2px !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        background-color: var(--clr-after) !important;
+        visibility: visible !important;
+        transform: scaleX(1) !important;
+        transition: all 0.3s ease-in-out 0s !important;
+    }
+
+    a.active {
+        color: var(--clr-after) !important;
+    }
+
+    a.navbar-brand {
+        font-family: var(--ff-heading-text);
+    }
 
 .menu-icons {
     color: #a98eda;
 }
 
-a {
-    color: var(--primary-color) !important;
+.dropdown-menu {
+    width: 300px;
 }
-
-    a.navbar-brand {
-        font-family: var(--ff-heading-text);
-    }
 
 /*button {
     font-size: 1em !important;
@@ -104,17 +158,6 @@ a {
     border-width: var(--border-width) !important;
     text-transform: uppercase !important;
 }*/
-
-/*.bg-purple-300 {
-    background: #A98EDA !important;
-}*/
-
-
-
-.logo {
-    height: 3.25rem;
-    margin-right: .75rem;
-}
 
 /*.navbar {
     background-color: var(--primary-background-color) !important;
@@ -287,35 +330,35 @@ img.cover-center {
     left: 36%;
     top: 13%;
     text-align: center;
-}
+}*/
 
-/*
-#user-profile-dropdown {
+
+/*#userProfileDropdown {
     width: 300px;
 }
 
-    #user-profile-dropdown.dropdown-menu {
+    #userProfileDropdown.dropdown-menu {
         background-color: var(--primary-background-color) !important;
         border-radius: var(--border-radius);
         min-height: 350px;
         max-height: 350px;
     }
 
-    #user-profile-dropdown label {
+    #userProfileDropdown label {
         font-size: .65em;
         text-transform: uppercase;
         color: var(--primary-color);
     }
 
-    #user-profile-dropdown input {
+    #userProfileDropdown input {
         border-radius: var(--border-radius);
     }
 
-    #user-profile-dropdown button {
+    #userProfileDropdown button {
         position: absolute;
         right: 1em;
         bottom: 1em;
-    }
+    }*/
 
 */
 
