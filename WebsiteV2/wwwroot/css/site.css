@@ -218,22 +218,62 @@ div.main-content {
         overflow-x: hidden;
     }
 
+
 img.cover-center {
     background-size: cover;
     background-repeat: no-repeat;
     background-position: 50% 50%;
     width: -moz-fit-content;
     width: fit-content;
+    width: 100%;
+    height: auto;
+    max-height: 100%;
 }
 
-.page-background {
+
+#indexpage {
+    content: "";
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: auto;
+    width: 100%;
+    /*use multiple background-images first is highest z-order
+    background-image: url('/assets/images/start-your-adventure-text.svg'), url('/assets/images/rocketcloud.svg'), url('/assets/images/Cloud Left.svg');
+    background-size: 70%, 50%, 30%;
+    background-repeat: no-repeat, no-repeat, no-repeat;
+    background-position: 30% 50%, top right, 35.6% 100%;
+}
+
+#justtext {
+    position: absolute;
+    text-align: left;
+    display: none;
+    max-width: 60vw;
+    left: 20%;
+    top: 60%;
+}
+
+#justtextline {
+    content: "";
+    position: absolute;
+    height: 2px;
+    background-color: black;
+    width: 40%;
+    border-radius: 2px;
+}
+
+.admin-page-background {
     background-image: linear-gradient(hsl(247, 61%, 27%), hsl(247, 67%, 24%), hsl(248, 75%, 20%));
     height: 100%;
     width: 100%;
     overflow: hidden;
 }
 
-.page-picture {
+.admin-page-picture {
     margin-top: auto;
     margin-bottom: auto;
     margin-left: auto;
@@ -243,12 +283,13 @@ img.cover-center {
     max-height: 50%;
 }
 
-.page-text {
+.admin-page-text {
     font-size: 2.5vw;
     margin-top: 2em;
     position: center;
     text-align: center;
 }
+
 
 #user-profile-dropdown {
     width: 300px;
@@ -275,7 +316,7 @@ img.cover-center {
         position: absolute;
         right: 1em;
         bottom: 1em;
-    }*/
+    }
 
 .valid.modified:not([type=checkbox]) {
     outline: 1px solid #26b050;
@@ -316,13 +357,24 @@ img.cover-center {
     }
 
 
-/*@media screen and (max-width: 800px) {
-    .page-picture {
+@media screen and (max-width: 1035px) {
+    .admin-page-picture,
+    #indexpage{
         display: none;
     }
 
-    .page-text {
+    #justtext {
+        display: inline-block;
+    }
+
+    .admin-page-text,
+    .index-page-text {
         font-size: 4.5vw;
+    }
+
+    div.main-content .sidebar {
+        position: absolute;
+        width: 100%;
     }
 }
 */
