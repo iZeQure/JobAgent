@@ -229,7 +229,7 @@ img.cover-center {
     height: auto;
     max-height: 100%;
 }
-
+*/
 
 #indexpage {
     content: "";
@@ -241,56 +241,55 @@ img.cover-center {
     bottom: 0;
     height: auto;
     width: 100%;
-    /*use multiple background-images first is highest z-order
-    background-image: url('/assets/images/start-your-adventure-text.svg'), url('/assets/images/rocketcloud.svg'), url('/assets/images/Cloud Left.svg');
-    background-size: 70%, 50%, 30%;
-    background-repeat: no-repeat, no-repeat, no-repeat;
-    background-position: 30% 50%, top right, 35.6% 100%;
+    background-image: url('/assets/images/rocket.svg'), url('/assets/images/cloud_left_right.svg'), linear-gradient(hsl(247, 61%, 27%), hsl(247, 67%, 24%), hsl(248, 75%, 20%));
+    background-size: 10%, 20%, 20%, 100%;
+    background-repeat: no-repeat, no-repeat, repeat-x;
+    background-position: bottom center, bottom right, center;
 }
 
-#justtext {
+#indextext {
     position: absolute;
     text-align: left;
-    display: none;
-    max-width: 60vw;
-    left: 20%;
-    top: 60%;
+    left: 30%;
+    top: 20%;
+    max-width: 50%;
+    color: white;
 }
 
-#justtextline {
-    content: "";
-    position: absolute;
-    height: 2px;
-    background-color: black;
-    width: 40%;
-    border-radius: 2px;
-}
+    #indextext h1 {
+        font-size: 3.5rem;
+    }
+
+    #indextext h6 {
+        font-size: 2.5rem;
+    }
+
 
 .admin-page-background {
-    background-image: linear-gradient(hsl(247, 61%, 27%), hsl(247, 67%, 24%), hsl(248, 75%, 20%));
-    height: 100%;
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: auto;
     width: 100%;
+    background-image: url('/assets/images/admin-fg.svg'), linear-gradient(hsl(247, 61%, 27%), hsl(247, 67%, 24%), hsl(248, 75%, 20%));
+    background-size: 40%, 100%;
+    background-repeat: no-repeat, no-repeat;
+    background-position: center bottom, center center;
     overflow: hidden;
 }
 
-.admin-page-picture {
-    margin-top: auto;
-    margin-bottom: auto;
-    margin-left: auto;
-    margin-right: auto;
-    height: auto;
-    width: 100%;
-    max-height: 50%;
-}
-
 .admin-page-text {
+    position: absolute;
     font-size: 2.5vw;
-    margin-top: 2em;
-    position: center;
+    left: 36%;
+    top: 13%;
     text-align: center;
 }
 
-
+/*
 #user-profile-dropdown {
     width: 300px;
 }
@@ -317,6 +316,8 @@ img.cover-center {
         right: 1em;
         bottom: 1em;
     }
+
+*/
 
 .valid.modified:not([type=checkbox]) {
     outline: 1px solid #26b050;
@@ -357,19 +358,23 @@ img.cover-center {
     }
 
 
-@media screen and (max-width: 1035px) {
-    .admin-page-picture,
-    #indexpage{
+@media screen and (max-width: 780px) {
+    .admin-page-picture {
         display: none;
     }
 
-    #justtext {
-        display: inline-block;
+    #indextext h1 {
+        font-size: 2.5rem;
     }
 
-    .admin-page-text,
-    .index-page-text {
+    #indextext h6 {
+        font-size: 1.5rem;
+    }
+
+    .admin-page-text {
         font-size: 4.5vw;
+        left: 25%;
+        top: 20%;
     }
 
     div.main-content .sidebar {
@@ -377,4 +382,3 @@ img.cover-center {
         width: 100%;
     }
 }
-*/

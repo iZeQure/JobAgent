@@ -10,7 +10,7 @@
 </div>
 
 <AuthorizeView>
-    <Authorized>
+    <NotAuthorized>
         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
             <span>Administrer</span>
         </h6>
@@ -58,8 +58,8 @@
                 </NavLink>
             </li>
         </ul>
-    </Authorized>
-    <NotAuthorized>
+    </NotAuthorized>
+    <Authorized>
         <div class="input-group px-1">
             <input class="form-control" type="text" placeholder="Søg Uddannelse..." aria-label="Søg Uddannelse" aria-describedby="search-addon">
             <span class="input-group-text" id="search-addon"><i class="fas fa-search menu-icons"></i></span>
@@ -72,5 +72,5 @@
                 </NavLink>
             </li>
         </ul>
-    </NotAuthorized>
+    </Authorized>
 </AuthorizeView>
