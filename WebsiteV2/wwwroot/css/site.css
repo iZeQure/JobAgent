@@ -149,7 +149,7 @@ a {
 }
 
 .dropdown-menu {
-    width: 300px;
+    /*max-width: 35rem !important;*/
 }
 
 /*button {
@@ -423,5 +423,11 @@ img.cover-center {
     div.main-content .sidebar {
         position: absolute;
         width: 100%;
+    }
+}
+
+@media (min-width: 768px) {
+    .dropdown-menu {
+        min-width: 15rem;
     }
 }
