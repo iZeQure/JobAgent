@@ -38,6 +38,7 @@
     word-wrap: break-word;
     color: var(--primary-color);
     font-family: var(--ff-heading-text);
+    font-size: 1em;
 }
 
 .card-content {
