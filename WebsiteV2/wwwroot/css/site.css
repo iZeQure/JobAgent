@@ -4,7 +4,7 @@
 @import "scrollbar.css";
 
 .text-light {
-    color: var(--clr-primary) !important;
+    color: var(--clr-white) !important;
 }
 
 .bg-purple {
@@ -15,16 +15,54 @@
     background: var(--clr-purple-300) !important;
 }
 
+.btn-outline-primary {
+    color: var(--bs-purple) !important;
+    border-color: var(--bs-purple) !important;
+}
+
+    .btn-outline-primary:hover,
+    .btn-outline-primary:active {
+        color: var(--clr-white) !important;
+        background-color: var(--bs-purple);
+    }
+
+    .btn-outline-primary:focus {
+        box-shadow: 0 0 0 0.25rem rgb(146 87 255 / 25%) !important;
+    }
+
+.btn-outline-warning {
+    color: var(--bs-purple) !important;
+    border-color: var(--clr-gold) !important;
+}
+
+    .btn-outline-warning:hover,
+    .btn-outline-warning:active {
+        color: var(--bs-purple) !important;
+        background-color: var(--clr-gold);
+    }
+
+    .btn-outline-warning:focus {
+        box-shadow: 0 0 0 0.25rem rgb(255 237 86 / 70%) !important;
+    }
+
 h1, h2, h3, h4, h5 {
-    color: var(--clr-primary) !important;
+    font-family: var(--ff-heading-text);
+    
 }
 
 h1 {
-    font-family: var(--ff-heading-text);
+    color: var(--clr-white) !important;
     font-size: 2.5rem;
 }
 
+h3 {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    user-select: none !important;
+}
+
 h4 {
+    color: var(--clr-white) !important;
     position: relative;
     font-family: var(--ff-h4);
     font-size: 1.75rem;
@@ -46,6 +84,7 @@ h4 {
     }
 
 h5 {
+    color: var(--clr-white) !important;
     position: relative;
     font-family: var(--ff-h5);
     font-size: .75rem;
@@ -56,9 +95,22 @@ h5 {
     margin: 0;
 }
 
+label {
+    font-family: var(--ff-h5);
+    font-size: .6rem;
+    text-transform: uppercase;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    user-select: none !important;
+}
+
+hr {
+    color: var(--clr-white);
+}
+
 a {
     position: relative;
-    color: var(--clr-primary) !important;
+    color: var(--clr-white) !important;
     font-family: var(--ff-small-text);
 }
 
@@ -129,19 +181,13 @@ input::placeholder {
     padding: .5em .5em;
 }
 
-input:focus {
-    color: var(--clr-purple-300) !important;
-    border-color: var(--clr-primary) !important;
-    box-shadow: 0 0 0 0.25rem rgb(243 247 253 / 25%) !important;
-}
-
 .navbar-brand span {
     font-family: var(--ff-info-text);
     font-size: 1.75rem;
 }
 
 .navbar-brand svg {
-    fill: var(--clr-primary);
+    fill: var(--clr-white);
     width: 5rem !important;
     height: 2rem !important;
 }
@@ -155,24 +201,48 @@ input:focus {
 }
 
     .dropdown span.active {
-        color: var(--clr-primary) !important;
+        color: var(--clr-white) !important;
     }
 
     .dropdown span:hover {
-        color: var(--clr-primary) !important;
+        color: var(--clr-white) !important;
     }
 
 .dropdown-menu {
     /*max-width: 35rem !important;*/
-    border: .1rem solid var(--clr-primary);
+    border: .1rem solid var(--clr-white);
 }
 
-    .dropdown-menu label {
-        font-size: .6rem;
-        color: var(--clr-primary) !important;
-        text-transform: uppercase;
-        font-family: var(--ff-h5);
+    .dropdown-menu label,
+    .sidebar-menu label {
+        color: var(--clr-white) !important;
     }
+
+    .dropdown-menu input:focus,
+    #sidebarMenu input:focus {
+        color: var(--clr-purple-300) !important;
+        border-color: var(--clr-white) !important;
+        box-shadow: 0 0 0 0.25rem rgb(243 247 253 / 25%) !important;
+    }
+
+.page-content label {
+    color: var(--clr-white);
+    background-color: var(--clr-neutral-900);
+    padding: 5px 10px 5px 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+}
+
+.page-content input:focus,
+.page-content select:focus {
+    color: var(--clr-purple-300);
+    border-color: var(--clr-purple-300);
+    box-shadow: 0 0 0 0.25rem rgb(118 99 152 / 25%) !important;
+}
+
+.page-content hr {
+    color: var(--clr-neutral-900);
+}
 
 /*.navbar {
     background-color: var(--primary-background-color) !important;
@@ -355,6 +425,7 @@ img.cover-center {
     background-size: 20%;
     background-repeat: no-repeat;
     background-position: bottom right;
+    z-index: -1;
 }
 
 /*#userProfileDropdown {
