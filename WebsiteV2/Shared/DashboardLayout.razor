@@ -2,10 +2,10 @@
 
 <header class="navbar navbar-dark sticky-top bg-purple flex-md-nowrap p-0 shadow">
     <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">
-        <svg class="d-none d-sm-none d-md-inline-block align-content-center pe-2" width="50px" height="30px" role="img" aria-label="Logo:">
+        <svg class="d-none d-sm-none d-md-inline-block pe-2" role="img" aria-label="Logo:">
             <use xlink:href="assets/images/sprites.svg#brand-logo" />
         </svg>
-        Din Job Agent
+        <span class="align-middle">Din Job Agent</span>
     </a>
 
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,7 +19,7 @@
                 <i class="far fa-user-circle"></i>
             </span>
         </a>
-        <div class="dropdown-menu dropdown-menu-start dropdown-menu-sm-start dropdown-menu-md-end dropdown-menu-lg-end ms-0 ms-sm-3 me-md-3 me-lg-3" aria-labelledby="userDropdown" style="min-width: 15rem;">
+        <div class="bg-purple dropdown-menu dropdown-menu-start dropdown-menu-sm-start dropdown-menu-md-end dropdown-menu-lg-end ms-0 ms-sm-3 me-md-3 me-lg-3" aria-labelledby="userDropdown" style="min-width: 15rem;">
             <AuthorizeView Context="authorizeContext">
                 <Authorized>
                     <UserProfileComponent />
