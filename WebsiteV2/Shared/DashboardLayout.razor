@@ -15,11 +15,11 @@
 
     <div class="dropdown px-3 me-auto me-md-0 me-lg-0">
         <a href="#user-dropdown" id="userDropdown" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-            <span class="menu-icons @_userProfileState" @onclick="OnClick_UserProfileIcon">
+            <span class="menu-icons @_userProfileState" @onclick="UserProfileIcon_ChangeActiveState">
                 <i class="far fa-user-circle"></i>
             </span>
         </a>
-        <div class="bg-purple dropdown-menu dropdown-menu-start dropdown-menu-sm-start dropdown-menu-md-end dropdown-menu-lg-end ms-0 ms-sm-3 me-md-3 me-lg-3" aria-labelledby="userDropdown" style="min-width: 15rem;">
+        <div class="bg-purple dropdown-menu dropdown-menu-start dropdown-menu-sm-start dropdown-menu-md-end dropdown-menu-lg-end ms-0 ms-sm-3 me-md-3 me-lg-3" aria-labelledby="userDropdown" style="min-width: 15rem;" @onfocusout="UserProfileIcon_ChangeActiveState">
             <AuthorizeView Context="authorizeContext">
                 <Authorized>
                     <UserProfileComponent />
@@ -47,16 +47,11 @@
 </div>
 
 @code {
-    private string _userProfileState = string.Empty;
+    private string _userProfileState => isStateActive ? "active" : "";
+    private bool isStateActive = false;
 
-    private void OnClick_UserProfileIcon()
+    private void UserProfileIcon_ChangeActiveState()
     {
-        if (string.IsNullOrEmpty(_userProfileState))
-        {
-            _userProfileState = "active";
-            return;
-        }
-
-        _userProfileState = string.Empty;
+        isStateActive = !isStateActive;
     }
 }
