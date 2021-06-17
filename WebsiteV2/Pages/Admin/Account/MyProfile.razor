@@ -1,45 +1,45 @@
 ﻿@page "/admin/account/my/profile"
 
-    <div class="container" style="height: 49.5vh; overflow:hidden;">
-        <div class="row">
-            <div class="col">
-                <label for="inputEmail">Email Adresse:</label>
-                <input id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" />
-            </div>
+<div class="container-fluid pt-5">
+    <div class="row">
+        <div class="col">
+            <label for="inputEmail">Email Adresse:</label>
+            <input id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" />
         </div>
-        <hr />
-        <div class="row">
-            <div class="col">
-                <label for="inputFirstName">Fornavn:</label>
-                <input id="inputFirstName" type="text" class="form-control form-control-sm" placeholder="Fornavn" />
-            </div>
-
-            <div class="col">
-                <label for="inputLastName">Efternavn:</label>
-                <input id="inputLastName" type="text" class="form-control form-control-sm" placeholder="Efternavn" />
-            </div>
-        </div>
-        <hr />
-        <div class="row">
-            <div class="col">
-                <label for="inputConsultantArea">Konsulent Område:</label>
-                <select class="form-control form-control-sm">
-                </select>
-            </div>
-
-            <div class="col">
-                <label for="inputLocation">Lokation:</label>
-                <select class="form-control form-control-sm">
-                </select>
-            </div>
-        </div>
-        <hr />
-        <button type="submit" class="btn btn-info float-right ml-auto mt-5">
-            <span>Gem bruger oplysninger</span>
-        </button>
-        <button type="submit" class="btn btn-danger float-left ml-auto mt-5">
-            <span>Slet bruger</span>
-        </button>
     </div>
+    <hr />
+    <div class="row">
+        <div class="col">
+            <label for="inputFirstName">Fornavn:</label>
+            <input id="inputFirstName" type="text" class="form-control form-control-sm" placeholder="Fornavn" />
+        </div>
 
-    <div class="bg-image" style="background-image: url('assets/images/cloud_left_right.svg'); background-repeat: no-repeat; background-position: bottom right; width: 101%; height: 43vh; overflow:hidden;"></div>
+        <div class="col">
+            <label for="inputLastName">Efternavn:</label>
+            <input id="inputLastName" type="text" class="form-control form-control-sm" placeholder="Efternavn" />
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col">
+            <label for="inputConsultantArea">Konsulent Område:</label>
+            <select class="form-control form-control-sm">
+            </select>
+        </div>
+
+        <div class="col">
+            <label for="inputLocation">Lokation:</label>
+            <select class="form-control form-control-sm">
+            </select>
+        </div>
+    </div>
+    <hr />
+    <button type="submit" class="btn btn-info float-right ml-auto mt-5">
+        <span>Gem bruger oplysninger</span>
+    </button>
+    <button type="submit" class="btn btn-danger float-left ml-auto mt-5">
+        <span>Slet bruger</span>
+    </button>
+
+    <div id="myprofilepic"></div>
+</div>
