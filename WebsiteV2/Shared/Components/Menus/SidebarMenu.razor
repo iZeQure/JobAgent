@@ -1,0 +1,167 @@
+﻿<div class="pb-3">
+    <AuthorizeView>
+        <Authorized>
+            <h4>Kontrolpanel</h4>
+        </Authorized>
+        <NotAuthorized>
+            <h4>Uddannelser</h4>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+
+<AuthorizeView>
+    <Authorized>
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mb-1 text-light">
+            <span>Administrer</span>
+        </h6>
+        <ul class="nav flex-column">
+
+            @if (context.User.IsInRole("Konsulent") ||
+                context.User.IsInRole("System Administrator") ||
+                context.User.IsInRole("Udvikler"))
+            {
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/admin/settings/job-vacancies">
+                        <span><i class="fas fa-clipboard-list"></i></span>
+                        Stillingsopslag
+                    </NavLink>
+                </li>
+
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/admin/settings/contracts">
+                        <span><i class="fas fa-file-signature"></i></span>
+                        Kontrakter
+                    </NavLink>
+                </li>
+
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/admin/settings/companies">
+                        <span><i class="fas fa-building"></i></span>
+                        Virksomheder
+                    </NavLink>
+                </li>
+            }
+
+            @if (context.User.IsInRole("System Administrator") ||
+                context.User.IsInRole("Udvikler"))
+            {
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/admin/settings/register-user">
+                        <span><i class="fas fa-user-plus"></i></span>
+                        Opret Praktikkonsulent
+                    </NavLink>
+                </li>
+            }
+        </ul>
+
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-light">
+            <span>Bruger Indstillinger</span>
+        </h6>
+        <ul class="nav flex-column">
+            @if (context.User.IsInRole("Konsulent") ||
+                   context.User.IsInRole("System Administrator") ||
+                   context.User.IsInRole("Udvikler"))
+            {
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/admin/account/my-profile">
+                        <span><i class="fas fa-user-cog"></i></span>
+                        Min Bruger
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/admin/account/change-password">
+                        <span><i class="fas fa-user-lock"></i></span>
+                        Ændre Adgangskode
+                    </NavLink>
+                </li>
+            }
+        </ul>
+
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-light">
+            <span>Robot Indstillinger</span>
+        </h6>
+        <ul class="nav flex-column">
+            @if (context.User.IsInRole("Konsulent") ||
+                   context.User.IsInRole("System Administrator") ||
+                   context.User.IsInRole("Udvikler"))
+            {
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/admin/robot/settings/vacant-jobs">
+                        <span><i class="fas fa-user-cog"></i></span>
+                        Stillinger
+                    </NavLink>
+                </li>
+
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/admin/robot/settings/job-pages">
+                        <span><i class="fas fa-user-cog"></i></span>
+                        Job Sider
+                    </NavLink>
+                </li>
+
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/admin/robot/settings/dynamic/search-filter">
+                        <span><i class="fas fa-user-cog"></i></span>
+                        Dynamisk Søge Filter
+                    </NavLink>
+                </li>
+            }
+
+            @if (context.User.IsInRole("System Administrator") ||
+                   context.User.IsInRole("Udvikler"))
+            {
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/admin/robot/settings/static/search-filter">
+                        <span><i class="fas fa-user-cog"></i></span>
+                        Statisk Søge Filter
+                    </NavLink>
+                </li>
+            }
+        </ul>
+
+
+        @if (context.User.IsInRole("System Administrator") ||
+               context.User.IsInRole("Udvikler"))
+        {
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-light">
+                <span>System Indstillinger</span>
+            </h6>
+            <ul class="nav flex-column">
+                @if (context.User.IsInRole("System Administrator") ||
+                 context.User.IsInRole("Udvikler"))
+                {
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="/admin/system/settings/view-log">
+                            <span><i class="fas fa-user-cog"></i></span>
+                            Log
+                        </NavLink>
+                    </li>
+                }
+
+                @if (context.User.IsInRole("Udvikler"))
+                {
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="/admin/system/settings/versioning">
+                            <span><i class="fas fa-user-cog"></i></span>
+                            Versionering
+                        </NavLink>
+                    </li>
+                }
+            </ul>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <div class="input-group px-1">
+            <input class="form-control" type="text" placeholder="Søg Uddannelse..." aria-label="Søg Uddannelse" aria-describedby="search-addon">
+            <span class="input-group-text" id="search-addon"><i class="fas fa-search menu-icons"></i></span>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/job">
+                    <span class="me-auto">wudqwokidopasklcjxz</span>
+                    <span class="badge bg-purple-300">1</span>
+                </NavLink>
+            </li>
+        </ul>
+    </NotAuthorized>
+</AuthorizeView>

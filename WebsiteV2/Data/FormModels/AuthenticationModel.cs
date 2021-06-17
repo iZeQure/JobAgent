@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net.Mail;
 using System.Threading.Tasks;
 
-namespace WebsiteV2.Data.Models
+namespace WebsiteV2.Data.FormModels
 {
     public class AuthenticationModel
     {

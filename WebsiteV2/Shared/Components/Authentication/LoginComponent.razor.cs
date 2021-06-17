@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebsiteV2.Data.Models;
+using WebsiteV2.Data.FormModels;
 
 namespace WebsiteV2.Shared.Components.Authentication
 {
@@ -49,7 +49,7 @@ namespace WebsiteV2.Shared.Components.Authentication
 
         private Task ClearValidationMessageAfterInterval(int milliseconds = 3000)
         {
-            var x = Task.Delay(3000)
+            var x = Task.Delay(milliseconds)
                 .ContinueWith(x =>
                 {
                     ValidationMessage = string.Empty;
