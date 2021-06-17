@@ -1,0 +1,20 @@
+﻿:root {
+    --ff-h4: nerislight, Aria, sans-serif;
+    --ff-h5: nerissemibold, Arial, sans-serif;
+    --ff-heading-text: nerisblack, Arial, sans-serif;
+    --ff-info-text: nerisblack, Aria, sans-serif;
+    --ff-small-text: nerislight, Arial, sans-serif;
+    --ff-placeholder-text: nerissemibold_italic, Arial, sans-serif;
+    --clr-primary: #F3F7FD;
+    --clr-bg: #432874;
+    --clr-neutral-100: #e2d9f3;
+    --clr-neutral-900: #432874;
+    --clr-purple-300: #A98EDA;
+    --clr-accent-400: #a98eda;
+    --clr-after: #a98eda;
+    --clr-valid: #A98EDA;
+    --clr-invalid: #F3CD52;
+    --border-radius: .5rem;
+    --scrollbar-background-color: #212529 !important;
+    --scrollbar-wheel-color: #A98EDA !important;
+}

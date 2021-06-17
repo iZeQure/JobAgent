@@ -1,10 +1,4 @@
-﻿:root {
-    --clr-neutral-900: #432874;
-    --clr-neutral-100: #e2d9f3;
-    --clr-accent-400: #a98eda;
-}
-
-*,
+﻿*,
 *::before,
 *::after {
     box-sizing: border-box;

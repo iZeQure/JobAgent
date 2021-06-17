@@ -1,22 +1,7 @@
 @import "web-fonts/neris/css/neris-webfont.css";
+@import "_custom-root.css";
 @import "custom-card.css";
 @import "scrollbar.css";
-
-:root {
-    --ff-h4: nerislight, Aria, sans-serif;
-    --ff-h5: nerissemibold, Arial, sans-serif;
-    --ff-heading-text: nerisblack, Arial, sans-serif;
-    --ff-info-text: nerisblack, Aria, sans-serif;
-    --ff-small-text: nerislight, Arial, sans-serif;
-    --ff-placeholder-text: nerissemibold_italic, Arial, sans-serif;
-    --clr-valid: #A98EDA;
-    --clr-invalid: #F3CD52;
-    --clr-after: #a98eda;
-    --clr-purple-300: #A98EDA;
-    --clr-bg: #432874;
-    --clr-primary: #F3F7FD;
-    --border-radius: .5rem;
-}
 
 .text-light {
     color: var(--clr-primary) !important;

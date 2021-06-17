@@ -1,9 +1,4 @@
-﻿html {
-    --scrollbar-background-color: #212529 !important;
-    --scrollbar-wheel-color: #A98EDA !important;
-}
-
-::-webkit-scrollbar-thumb {
+﻿::-webkit-scrollbar-thumb {
     background-color: var(--scrollbar-wheel-color) !important;
     border-radius: 5px !important;
 }
