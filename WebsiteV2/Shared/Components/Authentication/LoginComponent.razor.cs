@@ -38,6 +38,9 @@ namespace WebsiteV2.Shared.Components.Authentication
         private void LoginForm_OnFieldChanged(object sender, FieldChangedEventArgs e)
         {
             Console.WriteLine($"{e.FieldIdentifier.FieldName} has been changed.");
+
+            ValidationMessage = $"{e.FieldIdentifier.FieldName} has been changed.";
+            ClearValidationMessageAfterInterval();
         }
 
         private Task OnValidSubmit_LogInAsync()
