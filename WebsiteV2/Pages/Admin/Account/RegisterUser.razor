@@ -1,0 +1,58 @@
+﻿@page "/admin/settings/createuser"
+
+@*@attribute [Authorize(Roles = "system administrator, udvikler")];*@
+
+<div class="container pt-5">
+
+    <div class="row">
+        <div class="col">
+            <label for="inputEmail" class="admin-label">Email Adresse :</label>
+            <input id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" />
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col">
+            <label for="inputFirstName" class="admin-label">Fornavn :</label>
+            <input id="inputFirstName" type="text" class="form-control form-control-sm" placeholder="Fornavn" />
+        </div>
+
+        <div class="col">
+            <label for="inputLastName" class="admin-label">Efternavn :</label>
+            <input id="inputLastName" type="text" class="form-control form-control-sm" placeholder="Efternavn" />
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col">
+            <label for="inputConsultantArea" class="admin-label">Konsulent Område :</label>
+            <select class="form-control form-control-sm">
+                <option value="0" selected>Vælg et konsulent område</option>
+            </select>
+        </div>
+
+        <div class="col">
+            <label for="inputLocation" class="admin-label">Lokation :</label>
+            <select class="form-control form-control-sm">
+                <option value="0" selected>Vælg en lokation</option>
+            </select>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col">
+            <label for="inputPassword" class="admin-label">Adgangskode :</label>
+            <input id="inputPassword" type="password" class="form-control form-control-sm" placeholder="Adgangskode" />
+        </div>
+
+        <div class="col">
+            <label for="inputConfirmPassword" class="admin-label">Bekræft Adgangskode :</label>
+            <input id="inputConfirmPassword" type="password" class="form-control form-control-sm" placeholder="Bekræft adgangskode" />
+        </div>
+    </div>
+    <button type="submit" class="btn btn-info float-right ml-auto mt-5">
+        <span>Opret Praktikkonsulent</span>
+    </button>
+
+    <div id="myprofilepic"></div>
+</div>
