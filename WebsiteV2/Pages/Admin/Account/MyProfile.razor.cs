@@ -11,7 +11,7 @@ namespace WebsiteV2.Pages.Admin.Account
     public partial class MyProfile : ComponentBase
     {
         private EditContext _editContext;
-        private AccountProfileModel _accountProfileModel = new();
+        private readonly AccountProfileModel _accountProfileModel = new();
 
         protected override Task OnInitializedAsync()
         {

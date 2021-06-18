@@ -2,10 +2,11 @@
 
 @*@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]*@
 
+<PageDocumentTitle DocumentTitle="Bruger Indstillinger - Min Profil" />
+
 <div class="page-content pt-2">
 
-    <h3 class="display-4">Min Profil</h3>
-    <hr class="mb-4" />
+    <PageHeadingTitle DisplayTitle="Min Profil" />
 
     <EditForm EditContext="@(_editContext)" OnValidSubmit="OnValidSubmit_ChangeUserInformation">
         <div class="row mb-3">
