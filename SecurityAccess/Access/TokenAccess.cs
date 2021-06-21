@@ -10,7 +10,7 @@ namespace SecurityAccess.Access
 {
     public class TokenAccess : IAccess
     {
-        public string GenerateAccess(User user)
+        public string GenerateAccessToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var claims = GetClaimsIdentity(user);
