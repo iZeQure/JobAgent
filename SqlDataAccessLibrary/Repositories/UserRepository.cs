@@ -319,6 +319,8 @@ namespace SqlDataAccessLibrary.Repositories
                 new SqlParameter("@AccessToken", updateEntity.AccessToken)
             };
 
+            //Needs to also update ConsultingAreas
+
             return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
 
 
