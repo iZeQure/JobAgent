@@ -1,10 +1,10 @@
-﻿using Pocos;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
+using ObjectLibrary.Common;
 
-namespace SecurityAccess.Access
+namespace SecurityLibrary.Interfaces
 {
     public interface IAccess
     {

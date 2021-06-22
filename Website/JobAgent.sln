@@ -15,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SecurityAccess", "..\Securi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebsiteV2", "..\WebsiteV2\WebsiteV2.csproj", "{6BDE31B8-DCAE-4B24-BF58-B8BB77FA8680}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectLibrary", "..\ObjectLibrary\ObjectLibrary.csproj", "{9C8D9D60-F3FC-484D-BA1E-C8060BC19C4C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObjectLibrary", "..\ObjectLibrary\ObjectLibrary.csproj", "{9C8D9D60-F3FC-484D-BA1E-C8060BC19C4C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SecurityLibrary", "..\SecurityLibrary\SecurityLibrary.csproj", "{353F3B7A-68CE-4C5B-886A-6B951DF4951B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{9C8D9D60-F3FC-484D-BA1E-C8060BC19C4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C8D9D60-F3FC-484D-BA1E-C8060BC19C4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C8D9D60-F3FC-484D-BA1E-C8060BC19C4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{353F3B7A-68CE-4C5B-886A-6B951DF4951B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{353F3B7A-68CE-4C5B-886A-6B951DF4951B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{353F3B7A-68CE-4C5B-886A-6B951DF4951B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{353F3B7A-68CE-4C5B-886A-6B951DF4951B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
