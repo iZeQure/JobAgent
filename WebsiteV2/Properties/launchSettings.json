@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "WebsiteV2": {
+    "BlazorServerWebsite": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
       "launchBrowser": true,

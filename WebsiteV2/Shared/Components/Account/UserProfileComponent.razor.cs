@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebsiteV2.Shared.Components.Account
+namespace BlazorServerWebsite.Shared.Components.Account
 {
     /// <summary>
     /// A partial class of User Profile Component View.

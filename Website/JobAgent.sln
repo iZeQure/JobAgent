@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pocos", "..\Pocos\Pocos.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SecurityAccess", "..\SecurityAccess\SecurityAccess.csproj", "{4CA88E54-131C-49D7-9EE0-8602475F331E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebsiteV2", "..\WebsiteV2\WebsiteV2.csproj", "{6BDE31B8-DCAE-4B24-BF58-B8BB77FA8680}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorServerWebsite", "..\WebsiteV2\BlazorServerWebsite.csproj", "{6BDE31B8-DCAE-4B24-BF58-B8BB77FA8680}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObjectLibrary", "..\ObjectLibrary\ObjectLibrary.csproj", "{9C8D9D60-F3FC-484D-BA1E-C8060BC19C4C}"
 EndProject

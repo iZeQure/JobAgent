@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebsiteV2.Shared.Components.Redirects
+namespace BlazorServerWebsite.Shared.Components.Redirects
 {
     /// <summary>
     /// Handles the redirecting to Home Page.

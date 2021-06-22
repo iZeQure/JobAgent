@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebsiteV2.Data.FormModels;
+using BlazorServerWebsite.Data.FormModels;
 
-namespace WebsiteV2.Pages.Admin.Account
+namespace BlazorServerWebsite.Pages.Admin.Account
 {
     public partial class MyProfile : ComponentBase
     {

@@ -9,9 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebsiteV2.Data;
+using BlazorServerWebsite.Data;
 
-namespace WebsiteV2
+namespace BlazorServerWebsite
 {
     public class Startup
     {

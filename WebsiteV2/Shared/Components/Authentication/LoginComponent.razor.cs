@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebsiteV2.Data.FormModels;
+using BlazorServerWebsite.Data.FormModels;
 
-namespace WebsiteV2.Shared.Components.Authentication
+namespace BlazorServerWebsite.Shared.Components.Authentication
 {
     public partial class LoginComponent : ComponentBase
     {
