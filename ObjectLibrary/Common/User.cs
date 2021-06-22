@@ -61,6 +61,18 @@ namespace ObjectLibrary.Common
         /// </summary>
         public IEnumerable<Area> GetConsultantAreas { get { return _consultantAreas; } }
 
+
+        /// <summary>
+        /// Get the firstname of the user.
+        /// </summary>
+        public string GetFirstName { get { return $"{_firstName}"; } }
+
+
+        /// <summary>
+        /// Get the lastname of the user.
+        /// </summary>
+        public string GetLastName { get { return $"{_lastName}"; } }
+
         /// <summary>
         /// Get the full name of the user.
         /// </summary>
