@@ -92,7 +92,12 @@ namespace SqlDataAccessLibrary.Repositories
             try
             {
                 string cmdText = "EXEC [JA.spGetLocationById];";
-                using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation);
+                SqlParameter[] parameters = new[]
+                {
+                    new SqlParameter("@locationId", id)
+                };
+
+                using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
 
                 if (reader.HasRows)
                 {

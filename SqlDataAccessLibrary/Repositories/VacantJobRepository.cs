@@ -11,25 +11,24 @@ using System.Threading.Tasks;
 
 namespace SqlDataAccessLibrary.Repositories
 {
-    public class CompanyRepository : ICompanyRepository
+    public class VacantJobRepository : IVacantJobRepository
     {
         private readonly ISqlDatabase _sqlDatabase;
 
-        public CompanyRepository(ISqlDatabase sqlDatabase)
+        public VacantJobRepository(ISqlDatabase sqlDatabase)
         {
             _sqlDatabase = sqlDatabase;
         }
 
-        public async Task<int> CreateAsync(Company createEntity, CancellationToken cancellation)
+        public async Task<int> CreateAsync(VacantJob createEntity, CancellationToken cancellation)
         {
             try
             {
-                string cmdText = "EXEC [JA.spCreateCompany];";
+                string cmdText = "EXEC [JA.spCreateVacantJob];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@companyCVR", createEntity.CVR),
-                    new SqlParameter("@companyName", createEntity.Name),
-                    new SqlParameter("@contactPerson", createEntity.ContactPerson)
+                    new SqlParameter("@companyId", createEntity.Company.Id),
+                    new SqlParameter("@vacantJobUrl", createEntity.URL)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -40,113 +39,108 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
-        public async Task<int> DeleteAsync(Company deleteEntity, CancellationToken cancellation)
+        public async Task<int> DeleteAsync(VacantJob deleteEntity, CancellationToken cancellation)
         {
             try
             {
-                string cmdText = "EXEC [JA.spDeleteCompany];";
+                string cmdText = "EXEC [JA.spDeleteVacantJob];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@companyId", deleteEntity.Id)
+                    new SqlParameter("@vacantJobId", deleteEntity.Id)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
 
-        public async Task<IEnumerable<Company>> GetAllAsync(CancellationToken cancellation)
+        public async Task<IEnumerable<VacantJob>> GetAllAsync(CancellationToken cancellation)
         {
             try
             {
-                string cmdText = "EXEC [JA.spGetCompanies];";
+                string cmdText = "EXEC [JA.spGetVacantJobs];";
 
                 using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation);
 
                 if (reader.HasRows)
                 {
-                    List<Company> companies = new();
+                    List<VacantJob> vacantJobs = new();
 
                     while (await reader.ReadAsync(cancellation))
                     {
-                        companies.Add(new Company(
+                        vacantJobs.Add(new VacantJob(
                             reader.GetInt32(0),
-                            reader.GetInt32(1),
-                            reader.GetString(2),
-                            reader.GetString(3)));
+                            new Company(
+                                reader.GetInt32(1),
+                                0,
+                                string.Empty,
+                                string.Empty),
+                            reader.GetString(2)));
                     }
 
-                    return await Task.FromResult(companies);
+                    return await Task.FromResult(vacantJobs);
                 }
 
-                return await Task.FromResult(Enumerable.Empty<Company>());
+                return await Task.FromResult(Enumerable.Empty<VacantJob>());
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
 
-        public async Task<Company> GetByIdAsync(int id, CancellationToken cancellation)
+        public async Task<VacantJob> GetByIdAsync(int id, CancellationToken cancellation)
         {
             try
             {
-                string cmdText = "EXEC [JA.spGetCompanyById];";
+                string cmdText = "EXEC [JA.spGetVacantJobById];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@companyId", id)
+                    new SqlParameter("@vacantJobId", id)
                 };
 
                 using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
 
                 if (reader.HasRows)
                 {
-                    Company company = null;
+                    VacantJob job = null;
 
                     while (await reader.ReadAsync(cancellation))
                     {
-                        company = new Company(
+                        job = new VacantJob(
                             reader.GetInt32(0),
-                            reader.GetInt32(1),
-                            reader.GetString(2),
-                            reader.GetString(3));
+                            new Company(reader.GetInt32(1), 0, string.Empty, string.Empty),
+                            reader.GetString(2));
                     }
-
-                    return await Task.FromResult(company);
                 }
 
                 return null;
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
 
-        public async Task<int> UpdateAsync(Company updateEntity, CancellationToken cancellation)
+        public async Task<int> UpdateAsync(VacantJob updateEntity, CancellationToken cancellation)
         {
             try
             {
-                string cmdText = "EXEC [JA.spUpdateCompany];";
+                string cmdText = "EXEC [JA.spUpdateVacantJob];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@companyId", updateEntity.Id),
-                    new SqlParameter("@companyCVR", updateEntity.CVR),
-                    new SqlParameter("@companyName", updateEntity.Name),
-                    new SqlParameter("@contactPerson", updateEntity.ContactPerson)
+                    new SqlParameter("@vacantJobId", updateEntity.Id),
+                    new SqlParameter("@companyId", updateEntity.Company.Id),
+                    new SqlParameter("@vacantJobUrl", updateEntity.URL)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
