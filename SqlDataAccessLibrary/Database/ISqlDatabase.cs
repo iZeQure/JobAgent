@@ -28,7 +28,7 @@ namespace SqlDataAccessLibrary.Database
         /// <param name="commandType">The type of which the command text is formed as.</param>
         /// <param name="cancellation">Provides the ability to cancel the request.</param>
         /// <param name="parameters">Represents a collection of <see cref="SqlParameter"/>.</param>
-        /// <returns>A task representing the asynchronous opereation of the execute reader.</returns>
+        /// <returns>A task representing the asynchronous operation of the execute reader.</returns>
         Task<SqlDataReader> ExecuteReaderAsync(string commandText, CommandType commandType, CancellationToken cancellation, params SqlParameter[] parameters);
     }
 }
