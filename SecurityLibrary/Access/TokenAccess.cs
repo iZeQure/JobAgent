@@ -26,6 +26,7 @@ namespace SecurityLibrary.Access
         /// <returns>An authenticated access token.</returns>
         public string GenerateAccessToken(User user)
         {
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var claims = GetClaimsIdentity(user);
 
@@ -58,7 +59,7 @@ namespace SecurityLibrary.Access
             if (ObjectIsNotNull(user))
             {
                 // Check if the obj is correct.
-                if (HasValidIdentiy(user.Id))
+                if (HasValidIdentity(user.Id))
                 {
                     var generatedConsultantAreaClaims = GenerateConsultantAreaClaimsEntities(user.GetConsultantAreas, "ConsultantArea");
                     List<Claim> identityClaims = new()
@@ -91,7 +92,7 @@ namespace SecurityLibrary.Access
             return obj != null;
         }
 
-        private static bool HasValidIdentiy(int id)
+        private static bool HasValidIdentity(int id)
         {
             return id != 0;
         }
