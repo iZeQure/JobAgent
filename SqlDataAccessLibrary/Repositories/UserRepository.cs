@@ -21,16 +21,82 @@ namespace SqlDataAccessLibrary.Repositories
             _sqlDatabase = sqlDatabase;
         }
 
-        public Task<IUser> AuthenticateUserLoginAsync(User user)
+        /// <summary>
+        /// Check to Authenticate a user login
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
+        public async Task<bool> AuthenticateUserLoginAsync(User user, CancellationToken cancellation)
         {
-            throw new NotImplementedException();
+            try
+            {
+                string cmdText = "EXEC [JA.spValidateUserLogin]";
+
+                SqlParameter outputParameter = new() { Direction = ParameterDirection.Output, ParameterName = "@returnResult", SqlDbType = SqlDbType.Bit };
+
+                SqlParameter[] parameters = new[]
+                {
+                    new SqlParameter("@userEmail", user.GetEmail),
+                    new SqlParameter("@userPassword", user.Password),
+                    outputParameter
+
+                };
+
+                await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
+
+                bool output = Convert.ToBoolean(parameters[1].Value);
+
+                return await Task.FromResult(output);
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
-        public Task<bool> CheckUserExistsAsync(User user)
+        /// <summary>
+        /// Checks if user exists in database
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
+        public async Task<bool> CheckUserExistsAsync(User user, CancellationToken cancellation)
         {
-            throw new NotImplementedException();
+            try
+            {
+                string cmdText = "EXEC [JA.spValidateUserExists]";
+
+                SqlParameter outputParameter = new() { Direction = ParameterDirection.Output, ParameterName = "@returnResult", SqlDbType = SqlDbType.Bit };
+
+                SqlParameter[] parameters = new[]
+                {
+                    new SqlParameter("@userEmail", user.GetEmail),
+                    outputParameter
+                };
+
+                await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
+
+                bool output = Convert.ToBoolean(parameters[1].Value);
+
+                return await Task.FromResult(output);
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
+        /// <summary>
+        /// Creates new User
+        /// </summary>
+        /// <param name="createEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> CreateAsync(User createEntity, CancellationToken cancellation)
         {
             try
@@ -59,6 +125,12 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Delete User
+        /// </summary>
+        /// <param name="deleteEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> DeleteAsync(User deleteEntity, CancellationToken cancellation)
         {
             try
@@ -67,8 +139,8 @@ namespace SqlDataAccessLibrary.Repositories
 
                 SqlParameter[] parameters = new[]
                 {
-                new SqlParameter("@userId", deleteEntity.Id)
-            };
+                    new SqlParameter("@userId", deleteEntity.Id)
+                };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
             }
@@ -80,21 +152,156 @@ namespace SqlDataAccessLibrary.Repositories
 
         }
 
-        public Task<IEnumerable<User>> GetAllAsync(CancellationToken cancellation)
+        /// <summary>
+        /// Gets all users
+        /// </summary>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<User>> GetAllAsync(CancellationToken cancellation)
         {
-            throw new NotImplementedException();
+            try
+            {
+                string cmdText = "EXEC [JA.spGetUsers]";
+                List<User> tempUserList = new();
+
+                SqlParameter[] parameters = new SqlParameter[] { };
+
+                using SqlDataReader reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
+
+                if (reader.HasRows)
+                {
+                    while (await reader.ReadAsync(cancellation))
+                    {
+                        User tempUser = new(
+                            id: reader.GetInt32(0),
+                            firstName: reader.GetString(1),
+                            lastName: reader.GetString(2),
+                            email: reader.GetString(4),
+                            userRole: new Role(0, reader.GetString(5), ""),
+                            userLocation: new Location(0, reader.GetString(6)),
+                            consultantAreas: null
+                            );
+
+                        tempUserList.Add(tempUser);
+                    }
+                }
+
+                return tempUserList;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
-        public Task<User> GetByIdAsync(int id, CancellationToken cancellation)
+        /// <summary>
+        /// Gets user by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
+        public async Task<User> GetByIdAsync(int id, CancellationToken cancellation)
         {
-            throw new NotImplementedException();
+            try
+            {
+                string cmdText = "EXEC [JA.spGetUserById]";
+
+
+                SqlParameter[] parameters = new[]
+                {
+                    new SqlParameter("@userAccessToken", id),
+                };
+
+
+                using SqlDataReader reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
+
+                if (reader.HasRows)
+                {
+                    while (await reader.ReadAsync(cancellation))
+                    {
+                        User tempuser = new(
+
+
+                            id: reader.GetInt32(0),
+                            firstName: reader.GetString(1),
+                            lastName: reader.GetString(2),
+                            email: reader.GetString(4),
+                            userRole: new Role(0, reader.GetString(5), ""),
+                            userLocation: new Location(0, reader.GetString(6)),
+                            consultantAreas: null
+
+                            );
+
+                        return tempuser;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
-        public Task<User> GetUserByAccessTokenAsync(string accessToken)
+        /// <summary>
+        /// Gets user by Access Token
+        /// </summary>
+        /// <param name="accessToken"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
+        public async Task<User> GetUserByAccessTokenAsync(string accessToken, CancellationToken cancellation)
         {
-            throw new NotImplementedException();
+            try
+            {
+                string cmdText = "EXEC [JA.spGetUserByAccessToken]";
+
+                SqlParameter[] parameters = new[]
+                {
+                    new SqlParameter("@userAccessToken", accessToken),
+                };
+
+
+                using SqlDataReader reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
+
+                if (reader.HasRows)
+                {
+                    while (await reader.ReadAsync(cancellation))
+                    {
+                        User tempuser = new(
+
+
+                            id: reader.GetInt32(0),
+                            firstName: reader.GetString(1),
+                            lastName: reader.GetString(2),
+                            email: reader.GetString(4),
+                            userRole: new Role(0, reader.GetString(5), ""),
+                            userLocation: new Location(0, reader.GetString(6)),
+                            consultantAreas: null
+
+                            );
+
+                        return tempuser;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
+        /// <summary>
+        /// Updates a user
+        /// </summary>
+        /// <param name="updateEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> UpdateAsync(User updateEntity, CancellationToken cancellation)
         {
             string cmdText = "EXEC [JA.spUpdateUser]";
@@ -117,9 +324,36 @@ namespace SqlDataAccessLibrary.Repositories
 
         }
 
-        public Task<int> UpdateUserPasswordAsync(User user)
+        /// <summary>
+        /// Updates a user's password
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateUserPasswordAsync(User user, CancellationToken cancellation)
         {
-            throw new NotImplementedException();
+            try
+            {
+                string cmdText = "EXEC [JA.spUpdateUserSecurity]";
+
+                SqlParameter[] parameters = new[]
+                {
+                    new SqlParameter("@userId", user.Id),
+                    new SqlParameter("userNewPassword", user.Id),
+                    new SqlParameter("@userldPassword", user.Password),
+                    new SqlParameter("@userNewSalt", user.Salt),
+                    new SqlParameter("@resultReturn", user.Id)
+
+                };
+
+                return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }
