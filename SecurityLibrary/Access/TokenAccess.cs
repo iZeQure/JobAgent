@@ -1,5 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using ObjectLibrary.Common;
+using ObjectLibrary.Common.Configuration;
 using SecurityLibrary.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,9 @@ using System.Text;
 
 namespace SecurityLibrary.Access
 {
+    /// <summary>
+    /// Represents a Token Access Handler.
+    /// </summary>
     public class TokenAccess : IAccess
     {
         private readonly IConfigurationSettings _configurationSettings;
