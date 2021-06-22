@@ -10,7 +10,7 @@ namespace SqlDataAccessLibrary.Repositories.Abstractions
 {
     public interface IUserRepository : IRepository<User>
     {
-        Task<IUser> AuthenticateUserLoginAsync(User user, CancellationToken cancellation);
+        Task<bool> AuthenticateUserLoginAsync(User user, CancellationToken cancellation);
 
         Task<User> GetUserByAccessTokenAsync(string accessToken, CancellationToken cancellation);
 
