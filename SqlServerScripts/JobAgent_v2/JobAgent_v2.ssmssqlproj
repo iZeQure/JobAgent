@@ -2,39 +2,26 @@
 <SqlWorkbenchSqlProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="JobAgent_v2">
   <Items>
     <LogicalFolder Name="Connections" Type="2" Sorted="true">
-      <Items>
-        <ConnectionNode Name="172.17.0.62\Freidr,1433:sa">
-          <Created>2021-06-01T09:27:18.8143232+02:00</Created>
-          <Type>SQL</Type>
-          <Server>172.17.0.62\Freidr,1433</Server>
-          <UserName>sa</UserName>
-          <Authentication>SQL</Authentication>
-          <InitialDB />
-          <LoginTimeout>30</LoginTimeout>
-          <ExecutionTimeout>0</ExecutionTimeout>
-          <ConnectionProtocol>NotSpecified</ConnectionProtocol>
-          <ApplicationName>Microsoft SQL Server Management Studio - Query</ApplicationName>
-        </ConnectionNode>
-      </Items>
+      <Items />
     </LogicalFolder>
     <LogicalFolder Name="Queries" Type="0" Sorted="true">
       <Items>
         <FileNode Name="SETUP.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:172.17.0.62\Freidr,1433:False:sa</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>172.17.0.62\Freidr,1433</AssociatedConnSrvName>
-          <AssociatedConnUserName>sa</AssociatedConnUserName>
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
           <FullPath>SETUP.sql</FullPath>
         </FileNode>
         <FileNode Name="STORED_PROCEDURES.SETUP.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:172.17.0.62\Freidr,1433:False:sa</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>172.17.0.62\Freidr,1433</AssociatedConnSrvName>
-          <AssociatedConnUserName>sa</AssociatedConnUserName>
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
           <FullPath>STORED_PROCEDURES.SETUP.sql</FullPath>
         </FileNode>
         <FileNode Name="Test Data.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:172.17.0.62\Freidr,1433:False:sa</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>172.17.0.62\Freidr,1433</AssociatedConnSrvName>
-          <AssociatedConnUserName>sa</AssociatedConnUserName>
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
           <FullPath>Test Data.sql</FullPath>
         </FileNode>
       </Items>
