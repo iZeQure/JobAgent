@@ -1051,11 +1051,7 @@ CREATE PROCEDURE [JA.spCreateJobAdvert] (
     @specializationId int,
 	@jobAdvertTitle varchar(100),
 	@jobAdvertSummary varchar(250),
-	@jobAdvertDescription varchar(max),
-	@jobAdvertEmail varchar(50),
-	@jobAdvertPhoneNr varchar(25),
-	@jobAdvertRegistrationDateTime datetime,
-	@jobAdvertApplicationDeadlineDateTime datetime)
+	@jobAdvertRegistrationDateTime datetime)
 AS
 	DECLARE @TranName varchar(20)
 	SELECT @TranName = 'JobAdvertInsert';
@@ -1064,9 +1060,9 @@ AS
 		WITH MARK N'Inserting a JobAdvert';
 
 	BEGIN TRY
-		INSERT INTO [JobAdvert] ([VacantJobId], [CategoryId], [SpecializationId], [Title], [Summary], [Description], [Email], [PhoneNumber], [RegistrationDateTime], [ApplicationDeadlineDateTime])
+		INSERT INTO [JobAdvert] ([VacantJobId], [CategoryId], [SpecializationId], [Title], [Summary], [RegistrationDateTime])
 		VALUES
-		(@vacantJobId, @specializationId, @categoryId, @jobAdvertTitle, @jobAdvertSummary, @jobAdvertDescription, @jobAdvertEmail, @jobAdvertPhoneNr, @jobAdvertRegistrationDateTime, @jobAdvertApplicationDeadlineDateTime);
+		(@vacantJobId, @categoryId, @specializationId, @jobAdvertTitle, @jobAdvertSummary, @jobAdvertRegistrationDateTime);
 
 		COMMIT TRANSACTION @TranName;			
 	END TRY
@@ -1081,11 +1077,7 @@ CREATE PROCEDURE [JA.spUpdateJobAdvert] (
 	@categoryId int,
 	@jobAdvertTitle varchar(100),
 	@jobAdvertSummary varchar(250),
-	@jobAdvertDescription varchar(max),
-	@jobAdvertEmail varchar(50),
-	@jobAdvertPhoneNr varchar(25),
-	@jobAdvertRegistrationDateTime datetime,
-	@jobAdvertApplicationDeadlineDateTime datetime)
+	@jobAdvertRegistrationDateTime datetime)
 AS
 	DECLARE @TranName varchar(20)
 	SELECT @TranName = 'JobAdvertUpdate';
@@ -1100,11 +1092,7 @@ AS
 			[SpecializationId] = @specializationId,
 			[Title] = @jobAdvertTitle,
 			[Summary] = @jobAdvertSummary,
-			[Description] = @jobAdvertDescription,
-			[Email] = @jobAdvertEmail,
-			[PhoneNumber] = @jobAdvertPhoneNr,
-			[RegistrationDateTime] = @jobAdvertRegistrationDateTime,
-			[ApplicationDeadlineDateTime] = @jobAdvertApplicationDeadlineDateTime
+			[RegistrationDateTime] = @jobAdvertRegistrationDateTime
 			WHERE [VacantJobId] = @vacantJobId;
 
 		COMMIT TRANSACTION @TranName;
@@ -1150,11 +1138,7 @@ AS
 			j.[SpecializationId] AS 'Specialization ID',
 			j.[Title] AS 'JobAdvert Title',
 			j.[Summary] AS 'JobAdvert Summary',
-			j.[Description] AS 'JobAdvert Description',
-			j.[Email] AS 'JobAdvert Email',
-			j.[PhoneNumber] AS 'JobAdvert Phone Number',
-			j.[RegistrationDateTime] AS 'JobAdvert Registration Date',
-			j.[ApplicationDeadlineDateTime] AS 'JobAdvert Application Deadline Date'
+			j.[RegistrationDateTime] AS 'JobAdvert Registration Date'
 		FROM
 			[JobAdvert] j WHERE [VacantJobId] = @vacantJobId;
 
@@ -1180,11 +1164,7 @@ AS
 			j.[SpecializationId] AS 'Specialization ID',
 			j.[Title] AS 'JobAdvert Title',
 			j.[Summary] AS 'JobAdvert Summary',
-			j.[Description] AS 'JobAdvert Description',
-			j.[Email] AS 'JobAdvert Email',
-			j.[PhoneNumber] AS 'JobAdvert Phone Number',
-			j.[RegistrationDateTime] AS 'JobAdvert Registration Date',
-			j.[ApplicationDeadlineDateTime] AS 'JobAdvert Application Deadline Date'
+			j.[RegistrationDateTime] AS 'JobAdvert Registration Date'
 		FROM
 			[JobAdvert] j;
 
@@ -1351,6 +1331,7 @@ AS
 
 	BEGIN TRY
 		SELECT 
+			JobAdvertVacantJobId AS 'JobAdvert AddressID',
 			StreetAddress AS 'Street Address', 
 			City AS 'City', 
 			Country AS 'Country', 
@@ -1375,6 +1356,7 @@ AS
 
 	BEGIN TRY
 		SELECT 
+		JobAdvertVacantJobId AS 'JobAdvert AddressID',
 		StreetAddress AS 'Street Address', 
 		City AS 'City', 
 		Country AS 'Country', 

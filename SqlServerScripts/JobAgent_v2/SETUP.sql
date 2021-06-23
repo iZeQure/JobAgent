@@ -57,11 +57,7 @@ CREATE TABLE [JobAdvert] (
 [SpecializationId] int not null,
 [Title] varchar(100) default 'Oplysninger mangler',
 [Summary] varchar(250) default 'Oplysninger mangler',
-[Description] varchar(max) default 'Oplysninger mangler',
-[Email] varchar(50) default 'Oplysninger mangler',
-[PhoneNumber] varchar(25) default 'Oplysninger mangler',
-[RegistrationDateTime] datetime default GETDATE(),
-[ApplicationDeadlineDateTime] datetime default DATEADD(MONTH, 1, GETDATE()))
+[RegistrationDateTime] datetime default GETDATE())
 GO
 
 CREATE TABLE [Address](
@@ -75,8 +71,8 @@ GO
 
 CREATE TABLE [VacantJob] (
 [Id] int not null identity(1,1),
-[URL] varchar(2048) not null,
-[CompanyId] int not null)
+[CompanyId] int not null,
+[URL] varchar(2048) not null)
 GO
 
 CREATE TABLE [Company] (
