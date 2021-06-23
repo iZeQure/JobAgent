@@ -304,10 +304,12 @@ namespace SqlDataAccessLibrary.Repositories
         /// <returns></returns>
         public async Task<int> UpdateAsync(User updateEntity, CancellationToken cancellation)
         {
-            string cmdText = "EXEC [JA.spUpdateUser]";
-
-            SqlParameter[] parameters = new[]
+            try
             {
+                string cmdText = "EXEC [JA.spUpdateUser]";
+
+                SqlParameter[] parameters = new[]
+                {
                 new SqlParameter("@userId", updateEntity.Id),
                 new SqlParameter("@RoleId", updateEntity.GetRole.Id),
                 new SqlParameter("@LocationId", updateEntity.GetLocation.Id),
@@ -319,9 +321,15 @@ namespace SqlDataAccessLibrary.Repositories
                 new SqlParameter("@AccessToken", updateEntity.AccessToken)
             };
 
-            //Needs to also update ConsultingAreas
+                //Needs to also update ConsultingAreas
 
-            return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
+                return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
 
 
         }
