@@ -21,6 +21,12 @@ namespace SqlDataAccessLibrary.Repositories
             _sqlDatabase = sqlDatabase;
         }
 
+        /// <summary>
+        /// Creates a new Role
+        /// </summary>
+        /// <param name="createEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> CreateAsync(Role createEntity, CancellationToken cancellation)
         {
             try
@@ -41,6 +47,12 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Deletes a Role
+        /// </summary>
+        /// <param name="deleteEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> DeleteAsync(Role deleteEntity, CancellationToken cancellation)
         {
             try
@@ -60,6 +72,11 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Returns a collection with all Roles
+        /// </summary>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<Role>> GetAllAsync(CancellationToken cancellation)
         {
             try
@@ -90,7 +107,12 @@ namespace SqlDataAccessLibrary.Repositories
                 throw;
             }
         }
-
+        /// <summary>
+        /// Returns a specific role by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<Role> GetByIdAsync(int id, CancellationToken cancellation)
         {
             try
@@ -123,6 +145,12 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Updates a Role
+        /// </summary>
+        /// <param name="updateEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> UpdateAsync(Role updateEntity, CancellationToken cancellation)
         {
             try

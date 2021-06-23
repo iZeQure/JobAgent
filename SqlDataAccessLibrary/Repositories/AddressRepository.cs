@@ -20,6 +20,12 @@ namespace SqlDataAccessLibrary.Repositories
             _sqlDatabase = sqlDatabase;
         }
 
+        /// <summary>
+        /// Creates an Address
+        /// </summary>
+        /// <param name="createEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> CreateAsync(Address createEntity, CancellationToken cancellation)
         {
             try
@@ -42,6 +48,12 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Deletes an Address
+        /// </summary>
+        /// <param name="deleteEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> DeleteAsync(Address deleteEntity, CancellationToken cancellation)
         {
             try
@@ -60,6 +72,11 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Returns a collection of all Addresses
+        /// </summary>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<Address>> GetAllAsync(CancellationToken cancellation)
         {
             try
@@ -93,6 +110,12 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Returns a specific Address by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<Address> GetByIdAsync(int id, CancellationToken cancellation)
         {
             try
@@ -130,6 +153,12 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Updates an Address
+        /// </summary>
+        /// <param name="updateEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> UpdateAsync(Address updateEntity, CancellationToken cancellation)
         {
             try

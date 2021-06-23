@@ -20,6 +20,12 @@ namespace SqlDataAccessLibrary.Repositories
             _sqlDatabase = sqlDatabase;
         }
 
+        /// <summary>
+        /// Creates new VacantJob
+        /// </summary>
+        /// <param name="createEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> CreateAsync(VacantJob createEntity, CancellationToken cancellation)
         {
             try
@@ -39,6 +45,12 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Deletes a VacantJob
+        /// </summary>
+        /// <param name="deleteEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> DeleteAsync(VacantJob deleteEntity, CancellationToken cancellation)
         {
             try
@@ -57,6 +69,11 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Returns a collection of all VacantJobs
+        /// </summary>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<VacantJob>> GetAllAsync(CancellationToken cancellation)
         {
             try
@@ -92,6 +109,12 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Returns a specific VacantJob by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<VacantJob> GetByIdAsync(int id, CancellationToken cancellation)
         {
             try
@@ -125,6 +148,12 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Updates a VacantJob
+        /// </summary>
+        /// <param name="updateEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> UpdateAsync(VacantJob updateEntity, CancellationToken cancellation)
         {
             try

@@ -20,6 +20,12 @@ namespace SqlDataAccessLibrary.Repositories
             _sqlDatabase = sqlDatabase;
         }
 
+        /// <summary>
+        /// Creates a Location
+        /// </summary>
+        /// <param name="createEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> CreateAsync(Location createEntity, CancellationToken cancellation)
         {
             try
@@ -39,6 +45,12 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Deletes a Location
+        /// </summary>
+        /// <param name="deleteEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> DeleteAsync(Location deleteEntity, CancellationToken cancellation)
         {
             try
@@ -58,6 +70,11 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Returns a collection with all Locations
+        /// </summary>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<Location>> GetAllAsync(CancellationToken cancellation)
         {
             try
@@ -87,6 +104,12 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Returns a specific Location by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<Location> GetByIdAsync(int id, CancellationToken cancellation)
         {
             try
@@ -122,6 +145,12 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Updates a Location
+        /// </summary>
+        /// <param name="updateEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> UpdateAsync(Location updateEntity, CancellationToken cancellation)
         {
             try

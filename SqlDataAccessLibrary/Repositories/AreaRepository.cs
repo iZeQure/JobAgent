@@ -20,6 +20,12 @@ namespace SqlDataAccessLibrary.Repositories
             _sqlDatabase = sqlDatabase;
         }
 
+        /// <summary>
+        /// Creates an Area
+        /// </summary>
+        /// <param name="createEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> CreateAsync(Area createEntity, CancellationToken cancellation)
         {
             try
@@ -38,6 +44,12 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Deletes an Area
+        /// </summary>
+        /// <param name="deleteEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> DeleteAsync(Area deleteEntity, CancellationToken cancellation)
         {
             try
@@ -56,6 +68,11 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Returns a collection of all Areas
+        /// </summary>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<Area>> GetAllAsync(CancellationToken cancellation)
         {
             try
@@ -84,6 +101,12 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Returns a specific Area by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<Area> GetByIdAsync(int id, CancellationToken cancellation)
         {
             try
@@ -117,6 +140,12 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Updates an Area
+        /// </summary>
+        /// <param name="updateEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> UpdateAsync(Area updateEntity, CancellationToken cancellation)
         {
             try

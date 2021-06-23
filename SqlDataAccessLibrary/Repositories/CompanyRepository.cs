@@ -20,6 +20,12 @@ namespace SqlDataAccessLibrary.Repositories
             _sqlDatabase = sqlDatabase;
         }
 
+        /// <summary>
+        /// Creates a new Company
+        /// </summary>
+        /// <param name="createEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> CreateAsync(Company createEntity, CancellationToken cancellation)
         {
             try
@@ -40,6 +46,12 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Deletes a Company
+        /// </summary>
+        /// <param name="deleteEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> DeleteAsync(Company deleteEntity, CancellationToken cancellation)
         {
             try
@@ -59,6 +71,11 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Returns a collection of all Companies
+        /// </summary>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<Company>> GetAllAsync(CancellationToken cancellation)
         {
             try
@@ -92,6 +109,12 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Returns a specific Company by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<Company> GetByIdAsync(int id, CancellationToken cancellation)
         {
             try
@@ -129,16 +152,32 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        /// <summary>
+        /// Returns Companies with contracts
+        /// </summary>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public Task<IEnumerable<Company>> GetCompaniesWithContract(CancellationToken cancellation)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Returns Companies without contracts
+        /// </summary>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public Task<IEnumerable<Company>> GetCompaniesWithOutContract(CancellationToken cancellation)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Updates a Company
+        /// </summary>
+        /// <param name="updateEntity"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
         public async Task<int> UpdateAsync(Company updateEntity, CancellationToken cancellation)
         {
             try

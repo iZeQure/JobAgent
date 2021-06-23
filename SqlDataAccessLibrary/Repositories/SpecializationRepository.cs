@@ -77,7 +77,7 @@ namespace SqlDataAccessLibrary.Repositories
         }
 
         /// <summary>
-        /// Returns an Enumerable of all Specializations
+        /// Returns a collection of all Specializations
         /// </summary>
         /// <param name="cancellation"></param>
         /// <returns></returns>
