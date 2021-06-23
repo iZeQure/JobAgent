@@ -129,6 +129,16 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        public Task<IEnumerable<Company>> GetCompaniesWithContract(CancellationToken cancellation)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<Company>> GetCompaniesWithOutContract(CancellationToken cancellation)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<int> UpdateAsync(Company updateEntity, CancellationToken cancellation)
         {
             try
