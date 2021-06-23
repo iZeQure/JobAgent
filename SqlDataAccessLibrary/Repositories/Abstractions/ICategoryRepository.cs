@@ -15,7 +15,5 @@ namespace SqlDataAccessLibrary.Repositories.Abstractions
         /// </summary>
         /// <returns>Returns a list of <see cref="Category"/>, with a list of <see cref="Specialization"/>, if the category owns a specialization.</returns>
         Task<IEnumerable<Category>> GetAllCategoriesWithSpecializations(CancellationToken cancellation);
-
-        Task<IEnumerable<Category>> GetAllCategories(CancellationToken cancellation);
     }
 }
