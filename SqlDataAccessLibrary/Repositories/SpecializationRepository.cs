@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace SqlDataAccessLibrary.Repositories
 {
-    class SpecializationRepository : ISpecializationRepository
+    public class SpecializationRepository : ISpecializationRepository
     {
         private readonly ISqlDatabase _sqlDatabase;
 
