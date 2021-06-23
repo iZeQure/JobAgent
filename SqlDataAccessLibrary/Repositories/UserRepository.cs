@@ -330,8 +330,6 @@ namespace SqlDataAccessLibrary.Repositories
 
                 throw;
             }
-
-
         }
 
         /// <summary>
