@@ -15,109 +15,111 @@ GO
 CREATE PROCEDURE [JA.spCreateArea] (
 	@areaName varchar(50))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'AreaInsert';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Inserting an Area';
-
+DECLARE @TName varchar(20) = 'AreaCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		INSERT INTO [Area] ([Name])
 		VALUES
 		(@areaName);
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRAN @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		  BEGIN
+			ROLLBACK TRAN @TName;
+		  END 
 	END CATCH
+END;	
 GO
 
 CREATE PROCEDURE [JA.spUpdateArea] (
 	@areaId int,
 	@areaName varchar(50))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'AreaUpdate';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Updating an Area';
-
+DECLARE @TName varchar(20) = 'AreaUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		UPDATE [Area]
 			SET [Name] = @areaName
 		WHERE [Area].[Id] = @areaId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		ROLLBACK TRANSACTION @TName;
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spRemoveArea] (
 	@areaId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'AreaRemove';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Removing an Area';
-
+DECLARE @TName varchar(20) = 'AreaRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		-- Remove all references to the primary key.
 		DELETE FROM [ConsultantArea] WHERE [AreaId] = @areaId;
 		DELETE FROM [Area] WHERE [Id] = @areaId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetAreaById] (
 	@areaId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'AreaGetById';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Getting an area by id';
-
+DECLARE @TName varchar(20) = 'AreaGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
-			[dbo].[Area].[Id] AS 'Area ID',
-			[dbo].[Area].[Name] as 'Area Name'
-		FROM [Area]
+			a.[Id] AS 'Area ID',
+			a.[Name] as 'Area Name'
+		FROM [Area] a
 		WHERE [Id] = @areaId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetAreas]
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'AreaGetAll';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Get collection of area';
-
+DECLARE @TName varchar(20) = 'AreaGetAllTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
 			[dbo].[Area].[Id] AS 'Area ID',
 			[dbo].[Area].[Name] as 'Area Name'
 		FROM [Area];
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 /*##################################################
@@ -135,22 +137,23 @@ CREATE PROCEDURE [JA.spCreateRole] (
 	@roleName varchar(30),
 	@roleDesription varchar(100))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'RoleInsert';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Inserting a Role';
-
+DECLARE @TName varchar(20) = 'RoleCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		INSERT INTO [Role] ([Name], [Description])
 		VALUES
 		(@roleName, @roleDesription);
 
-		COMMIT TRANSACTION @TranName;			
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spUpdateRole] (
@@ -158,89 +161,93 @@ CREATE PROCEDURE [JA.spUpdateRole] (
 	@roleName varchar(30),
 	@roleDescription varchar(100))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'RoleUpdate';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Updating a Role';
-
+DECLARE @TName varchar(20) = 'RoleUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		UPDATE [Role]
 			SET [Name] = @roleName,
 				[Description] = @roleDescription
 		WHERE [Role].[Id] = @roleId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spRemoveRole] (
 	@roleId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'RoleRemove';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Removing a Role';
-
+DECLARE @TName varchar(20) = 'RoleRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		DELETE FROM [Role]
 		WHERE [Role].[Id] = @roleId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetRoleById] (
 	@roleId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'RoleGetById';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Getting a role by id';
-
+DECLARE @TName varchar(20) = 'RoleGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
-			[dbo].[Role].[Id] AS 'Role ID',
-			[dbo].[Role].[Name] AS 'Role Name',
-			[dbo].[Role].[Description] AS 'Role Description'
-		FROM [Role]
+			r.[Id] AS 'Role ID',
+			r.[Name] AS 'Role Name',
+			r.[Description] AS 'Role Description'
+		FROM [Role] r
 		WHERE [Id] = @roleId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetRoles]
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'RoleGetAll';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Get collection of Role';
-
+DECLARE @TName varchar(20) = 'RoleGetAllTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
-			[dbo].[Role].[Id] AS 'Role ID',
-			[dbo].[Role].[Name] AS 'Role Name',
-			[dbo].[Role].[Description] AS 'Role Description'
-		FROM [Role];
+			r.[Id] AS 'Role ID',
+			r.[Name] AS 'Role Name',
+			r.[Description] AS 'Role Description'
+		FROM [Role] r;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 /*##################################################
@@ -257,108 +264,113 @@ GO
 CREATE PROCEDURE [JA.spCreateLocation] (
 	@locationName varchar(30))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'LocationInsert';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Inserting a Location';
-
+DECLARE @TName varchar(20) = 'LocationCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		INSERT INTO [Location] ([Name])
 		VALUES
 		(@locationName);
 
-		COMMIT TRANSACTION @TranName;			
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spUpdateLocation] (
 	@locationId int,
 	@locationName varchar(30))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'LocationUpdate';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Updating a Location';
-
+DECLARE @TName varchar(20) = 'LocationUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		UPDATE [Location]
 			SET [Name] = @locationName
 		WHERE [dbo].[Location].[Id] = @locationId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spRemoveLocation] (
 	@locationId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'LocationRemove';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Removing a Location';
-
+DECLARE @TName varchar(20) = 'LocationRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		DELETE FROM [Location]
 		WHERE [Location].[Id] = @locationId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetLocationById] (
 	@locationId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'LocationGetById';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Getting a location by id';
-
+DECLARE @TName varchar(20) = 'LocationGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
-			[dbo].[Location].[Id] AS 'Location ID',
-			[dbo].[Location].[Name] AS 'Location Name'
-		FROM [Location]
-		WHERE [Id] = @locationId;
+			l.[Id] AS 'Location ID',
+			l.[Name] AS 'Location Name'
+		FROM [Location] l
+		WHERE l.[Id] = @locationId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetLocations]
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'LocationGetAll';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Get collection of Location';
-
+DECLARE @TName varchar(20) = 'LocationGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
-			[dbo].[Location].[Id] AS 'Location ID',
-			[dbo].[Location].[Name] AS 'Location Name'
-		FROM [Location];
+			l.[Id] AS 'Location ID',
+			l.[Name] AS 'Location Name'
+		FROM [Location] l;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 /*##################################################
@@ -379,12 +391,9 @@ CREATE PROCEDURE [JA.spCreateContract] (
 	@regiDateTime datetime = NULL,
 	@expDateTime datetime = NULL)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'ContractInsert';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Inserting a Contract';
-
+DECLARE @TName varchar(20) = 'ContractCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		DECLARE @registration DATETIME = GETDATE(), 
 				@expiry DATETIME = DATEADD(YEAR,5,GETDATE())
@@ -396,11 +405,15 @@ AS
 		VALUES
 		(@companyId, @userId, @name, @registration, @expiry);
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spUpdateContract] (
@@ -410,12 +423,9 @@ CREATE PROCEDURE [JA.spUpdateContract] (
 	@registrationDateTime datetime,
 	@expiryDateTime datetime)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'ContractUpdate';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Updating a Contract';
-
+DECLARE @TName varchar(20) = 'ContractUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		UPDATE [Contract]
 			SET 
@@ -425,81 +435,88 @@ AS
 				[ExpiryDateTime] = @expiryDateTime
 		WHERE [Contract].[CompanyId] = @companyId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spRemoveContract] (
 	@companyId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'ContractRemove';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Removing a Contract';
-
+DECLARE @TName varchar(20) = 'ContractRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		DELETE FROM [Contract]
 		WHERE [CompanyId] = @companyId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetContractById] (
 	@companyId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'ContractGetById';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Getting a contract by id';
-
+DECLARE @TName varchar(20) = 'ContractGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
-			[dbo].[Contract].[CompanyId] AS 'Contract ID',
-			[dbo].[Contract].[UserId] AS 'User ID',
-			[dbo].[Contract].[Name] AS 'Contract Name',
-			[dbo].[Contract].[RegistrationDateTime] AS 'Registered Date',
-			[dbo].[Contract].[ExpiryDateTime] AS 'Expiration Date'
-		FROM [Contract]
+			c.[CompanyId] AS 'Contract ID',
+			c.[UserId] AS 'User ID',
+			c.[Name] AS 'Contract Name',
+			c.[RegistrationDateTime] AS 'Registered Date',
+			c.[ExpiryDateTime] AS 'Expiration Date'
+		FROM [Contract] c
 		WHERE [CompanyId] = @companyId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetContracts]
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'ContractGetAll';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Get collection of contract';
-
+DECLARE @TName varchar(20) = 'ContractGetAllTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
-			[dbo].[Contract].[CompanyId] AS 'Contract ID',
-			[dbo].[Contract].[UserId] AS 'User ID',
-			[dbo].[Contract].[Name] AS 'Contract Name',
-			[dbo].[Contract].[RegistrationDateTime] AS 'Registered Date',
-			[dbo].[Contract].[ExpiryDateTime] AS 'Expiration Date'
-		FROM [Contract];
+			c.[CompanyId] AS 'Contract ID',
+			c.[UserId] AS 'User ID',
+			c.[Name] AS 'Contract Name',
+			c.[RegistrationDateTime] AS 'Registered Date',
+			c.[ExpiryDateTime] AS 'Expiration Date'
+		FROM [Contract] c;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 /*##################################################
@@ -518,22 +535,23 @@ CREATE PROCEDURE [JA.spCreateCompany] (
 	@companyName varchar(50),
 	@contactPerson varchar(50))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'CompanyInsert';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Inserting a Company';
-
+DECLARE @TName varchar(20) = 'CompanyCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		INSERT INTO [Company] ([CVR], [Name], [ContactPerson])
 		VALUES
-		(@CompanyCVR, @companyname, @contactPerson);
+		(@companyCVR, @companyname, @contactPerson);
 
-		COMMIT TRANSACTION @TranName;			
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spUpdateCompany] (
@@ -542,12 +560,9 @@ CREATE PROCEDURE [JA.spUpdateCompany] (
 	@companyName varchar(50),
 	@contactPerson varchar(50))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'CompanyUpdate';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Updating a Company';
-
+DECLARE @TName varchar(20) = 'CompanyUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		UPDATE [Company]
 			SET [CVR] = @companyCVR,
@@ -555,22 +570,23 @@ AS
 				[ContactPerson] = @contactPerson
 		WHERE [Company].[CVR] = @companyCVR;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spRemoveCompany] (
 	@companyId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'CompanyRemove';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Removing an Company';
-
+DECLARE @TName varchar(20) = 'CompanyRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		DECLARE @vacantJobId int
 		SET @vacantJobId = (SELECT [Id] FROM [VacantJob] WHERE [CompanyId] = @companyId)
@@ -578,61 +594,195 @@ AS
 		-- Remove all references to the primary key.
 		DELETE FROM [JobAdvert] WHERE [VacantJobId] = @vacantJobId;
 		DELETE FROM [VacantJob] WHERE [CompanyId] = @companyId;
+		DELETE FROM [JobPage] WHERE [CompanyId] = @companyId;
 		DELETE FROM [Contract] WHERE [CompanyId] = @companyId;
 		DELETE FROM [Company] WHERE [Id] = @companyId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetCompanyById] (
 	@companyId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'CompanyGetById';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Getting a Company by ID';
-
+DECLARE @TName varchar(20) = 'CompanyGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
-			[dbo].[Company].[CVR] AS 'Company CVR',
-			[dbo].[Company].[Name] AS 'Company Name',
-			[dbo].[Company].[ContactPerson] AS 'Contact Person'
-		FROM [Company]
+			c.[CVR] AS 'Company CVR',
+			c.[Name] AS 'Company Name',
+			c.[ContactPerson] AS 'Contact Person'
+		FROM [Company] c
 		WHERE [Id] = @companyId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetCompanies]
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'CompanyGetAll';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Get collection of Company';
-
+DECLARE @TName varchar(20) = 'CompanyGetAllTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
-			[dbo].[Company].[Id] AS 'ID',
-			[dbo].[Company].[CVR] AS 'Company CVR',
-			[dbo].[Company].[Name] as 'Company Name',
-			[dbo].[Company].[ContactPerson] as 'Contact person'
-		FROM [Company];
+			c.[Id] AS 'ID',
+			c.[CVR] AS 'Company CVR',
+			c.[Name] as 'Company Name',
+			c.[ContactPerson] as 'Contact person'
+		FROM [Company] c;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
+GO
+
+/*##################################################
+			## Job Page Section ##
+####################################################*/
+
+DROP PROCEDURE IF EXISTS [JA.spCreateJobPage]
+DROP PROCEDURE IF EXISTS [JA.spUpdateJobPage]
+DROP PROCEDURE IF EXISTS [JA.spRemoveJobPage]
+DROP PROCEDURE IF EXISTS [JA.spGetJobPageById]
+DROP PROCEDURE IF EXISTS [JA.spGetJobPages]
+GO
+
+CREATE PROCEDURE [JA.spCreateJobPage] (
+	@companyId int,
+	@url varchar(2048))
+AS
+DECLARE @TName varchar(20) = 'JobPageCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
+	BEGIN TRY
+		INSERT INTO [JobPage] ([URL], [CompanyId])
+		VALUES
+		(@url, @companyId);
+
+		COMMIT TRANSACTION @TName;
+	END TRY
+	BEGIN CATCH
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
+	END CATCH
+END;
+GO
+
+CREATE PROCEDURE [JA.spUpdateJobPage] (
+	@jobPageId int,
+	@companyId int,
+	@url varchar(2048))
+AS
+DECLARE @TName varchar(20) = 'JobPageUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
+	BEGIN TRY
+		UPDATE [JobPage]
+			SET [URL] = @url,
+				[CompanyId] = @companyId
+		WHERE [JobPage].[Id] = @jobPageId;
+
+		COMMIT TRANSACTION @TName;
+	END TRY
+	BEGIN CATCH
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
+	END CATCH
+END;
+GO
+
+CREATE PROCEDURE [JA.spRemoveJobPage] (
+	@jobPageId int)
+AS
+DECLARE @TName varchar(20) = 'JobPageRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
+	BEGIN TRY
+		DELETE FROM [JobPage] WHERE [Id] = @jobPageId;
+
+		COMMIT TRANSACTION @TName;
+	END TRY
+	BEGIN CATCH
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
+	END CATCH
+END;
+GO
+
+CREATE PROCEDURE [JA.spGetJobPageById] (
+	@jobPageId int)
+AS
+DECLARE @TName varchar(20) = 'JobPageGetbyIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
+	BEGIN TRY
+		SELECT
+			j.[Id] AS 'JobPage ID',
+			j.[URL] AS 'JobPage URL',
+			j.[CompanyId] AS 'Company ID'				
+		FROM [JobPage] j
+		WHERE [Id] = @jobPageId;
+
+		COMMIT TRANSACTION @TName;
+	END TRY
+	BEGIN CATCH
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
+	END CATCH
+END;
+GO
+
+CREATE PROCEDURE [JA.spGetJobPages]
+AS
+DECLARE @TName varchar(20) = 'JobPageGetAllTransaction';
+BEGIN
+	BEGIN TRAN @TName;
+	BEGIN TRY
+		SELECT
+			j.[Id] AS 'JobPage ID',
+			j.[URL] AS 'JobPage URL',
+			j.[CompanyId] AS 'Company ID'
+		FROM [JobPage] j
+
+		COMMIT TRANSACTION @TName;
+	END TRY
+	BEGIN CATCH
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
+	END CATCH
+END;
 GO
 
 /*##################################################
@@ -650,22 +800,23 @@ CREATE PROCEDURE [JA.spCreateVacantJob] (
 	@companyId int,
 	@url varchar(2048))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'VacantJobInsert';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Inserting a VacantJob';
-
+DECLARE @TName varchar(20) = 'VacantJobCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		INSERT INTO [VacantJob] ([URL], [CompanyId])
 		VALUES
 		(@url, @companyId);
 
-		COMMIT TRANSACTION @TranName;			
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spUpdateVacantJob] (
@@ -673,91 +824,95 @@ CREATE PROCEDURE [JA.spUpdateVacantJob] (
 	@companyId int,
 	@url varchar(2048))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'VacantJobUpdate';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Updating a VacantJob';
-
+DECLARE @TName varchar(20) = 'VacantJobUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		UPDATE [VacantJob]
 			SET [URL] = @url,
 				[CompanyId] = @companyId
 		WHERE [VacantJob].[Id] = @vacantJobId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spRemoveVacantJob] (
 	@vacantJobId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'VacantJobRemove';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Removing a VacantJob';
-
+DECLARE @TName varchar(20) = 'VacantJobRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		-- Remove all references to the primary key.
 		DELETE FROM [Address] WHERE [JobAdvertVacantJobId] = @vacantJobId;
 		DELETE FROM [JobAdvert] WHERE [VacantJobId] = @vacantJobId;
 		DELETE FROM [VacantJob] WHERE [Id] = @vacantJobId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetVacantJobById] (
 	@vacantJobId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'VacantJobById';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Getting a vacantjob by Id';
-
+DECLARE @TName varchar(20) = 'VacantJobGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
-			[dbo].[VacantJob].[Id] AS 'Vacant job ID',
-			[dbo].[VacantJob].[URL] AS 'VacantJob URL',
-			[dbo].[VacantJob].[CompanyId] AS 'Company ID'				
-		FROM [VacantJob]
+			v.[Id] AS 'Vacant job ID',
+			v.[URL] AS 'VacantJob URL',
+			v.[CompanyId] AS 'Company ID'				
+		FROM [VacantJob] v
 		WHERE [Id] = @vacantJobId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetVacantJobs]
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'VacantJobGetAll';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Get collection of VacantJob';
-
+DECLARE @TName varchar(20) = 'VacantJobGetAllTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
-			[dbo].[VacantJob].[Id] AS 'Vacant job ID',
-			[dbo].[VacantJob].[URL] AS 'VacantJob URL',
-			[dbo].[VacantJob].[CompanyId] AS 'Company ID'
-		FROM [VacantJob]
+			v.[Id] AS 'Vacant job ID',
+			v.[URL] AS 'VacantJob URL',
+			v.[CompanyId] AS 'Company ID'
+		FROM [VacantJob] v
 
-		COMMIT TRANSACTION @TranName
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 /*##################################################
@@ -775,136 +930,143 @@ GO
 CREATE PROCEDURE [JA.spCreateCategory] (
 	@categoryName varchar(100))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'CategoryInsert';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Inserting a category';
-
+DECLARE @TName varchar(20) = 'CategoryCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		INSERT INTO [Category] ([Name])
 		VALUES
 		(@categoryName);
 
-		COMMIT TRANSACTION @TranName;			
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spUpdateCategory] (
 	@categoryId int,
 	@categoryName varchar(100))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'CategoryUpdate';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Updating a category';
-
+DECLARE @TName varchar(20) = 'CategoryUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		UPDATE [Category]
 			SET [Name] = @categoryName
 		WHERE [Category].[Id] = @categoryId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spRemoveCategory] (
 	@categoryId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'categoryRemove';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Removing a Category';
-
+DECLARE @TName varchar(20) = 'CategoryRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		-- Remove all references to the primary key.
 		DELETE FROM [JobAdvert] WHERE [CategoryId] = @categoryId;
+		DELETE FROM [DynamicSearchFilter] WHERE [CategoryId] = @categoryId;
 		DELETE FROM [Category]	WHERE [Id] = @categoryId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetCategoryById] (
 	@categoryId int,
 	@categoryName varchar(100))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'CategoryById';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Getting a Category by Id';
-
+DECLARE @TName varchar(20) = 'CategoryGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
-			[dbo].[Category].[Id] AS 'Category ID',
-			[dbo].[Category].[Name] AS 'Category Name'
-		FROM [Category]
+			c.[Id] AS 'Category ID',
+			c.[Name] AS 'Category Name'
+		FROM [Category] c
 		WHERE [Id] = @categoryId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetCategories]
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'CategoryGetAll';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Get collection of Category';
-
+DECLARE @TName varchar(20) = 'CategoryGetAllTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
-			[dbo].[Category].[Id] AS 'Category ID',
-			[dbo].[Category].[Name] AS 'Category Name'
-		FROM [Category];
+			c.[Id] AS 'Category ID',
+			c.[Name] AS 'Category Name'
+		FROM [Category] c;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetCategoryMenu]
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'CategoryGetMenu';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Get Category Menu';
-
+DECLARE @TName varchar(20) = 'CategoryGetMenuTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
-			[Category].[Id] AS 'Category ID',
-			[Category].[Name] AS 'Category Name',
+			c.[Id] AS 'Category ID',
+			c.[Name] AS 'Category Name',
 
-			[Specialization].[Id] AS 'Spec Id',
-			[Specialization].[Name] AS 'Specialization Name',
-			[Specialization].[CategoryId] AS 'Specialization Category ID'
-		FROM [Category]
-		LEFT OUTER JOIN [Specialization] ON [Category].[Id] = [Specialization].[CategoryId];
+			s.[Id] AS 'Spec Id',
+			s.[Name] AS 'Specialization Name',
+			s.[CategoryId] AS 'Specialization Category ID'
+		FROM [Category] c 
+		LEFT OUTER JOIN [Specialization] s ON s.[CategoryId] = c.[Id];
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 /*##################################################
@@ -922,22 +1084,23 @@ CREATE PROCEDURE [JA.spCreateSpecialization] (
 	@specializationName varchar(100),
 	@categoryId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'SpecializationInsert';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Inserting a Specialization';
-
+DECLARE @TName varchar(20) = 'SpecializationCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		INSERT INTO [Specialization] ([Name], [CategoryId])
 		VALUES
 		(@specializationName, @categoryId);
 
-		COMMIT TRANSACTION @TranName;			
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spUpdateSpecialization] (
@@ -945,90 +1108,95 @@ CREATE PROCEDURE [JA.spUpdateSpecialization] (
 	@specializationName varchar(100),
 	@categoryId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'SpecializationUpdate';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Updating a Specialization';
-
+DECLARE @TName varchar(20) = 'SpecializationUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		UPDATE [Specialization]
 			SET [Name] = @specializationName,
 				[CategoryId] = @categoryId
 			WHERE [Id] = @specializationId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spRemoveSpecialization] (
 	@specializationId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'SpecializationRemove';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Removing a Specialization';
-
+DECLARE @TName varchar(20) = 'SpecializationRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY	
 		DELETE FROM [JobAdvert] WHERE [SpecializationId] = @specializationId;
+		DELETE FROM [DynamicSearchFilter] WHERE [SpecializationId] = @specializationId;
 		DELETE FROM [Specialization] WHERE [Id] = @specializationId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetSpecializationById] (
 	@specializationId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'SpecializationById';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Getting a Specialization by Id';
-
+DECLARE @TName varchar(20) = 'SpecializationGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
-			[dbo].[Specialization].[Id] AS 'Specialization ID',
-			[dbo].[Specialization].[Name] AS 'Specialization Name',
-			[dbo].[Specialization].[CategoryId] AS 'Category ID'
+			s.[Id] AS 'Specialization ID',
+			s.[Name] AS 'Specialization Name',
+			s.[CategoryId] AS 'Category ID'
 		FROM
-			[Specialization] WHERE [Id] = @specializationId;
+			[Specialization] s WHERE s.[Id] = @specializationId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetSpecializations]
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'SpecializationGetAll';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Get collection of Specialization';
-
+DECLARE @TName varchar(20) = 'SpecializationGetAllTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
-			[dbo].[Specialization].[Id] AS 'Specialization ID',
-			[dbo].[Specialization].[Name] AS 'Specialization Name',
-			[dbo].[Specialization].[CategoryId] AS 'Category ID'
+			s.[Id] AS 'Specialization ID',
+			s.[Name] AS 'Specialization Name',
+			s.[CategoryId] AS 'Category ID'
 		FROM
-			[Specialization];
+			[Specialization] s;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 /*##################################################
@@ -1053,22 +1221,23 @@ CREATE PROCEDURE [JA.spCreateJobAdvert] (
 	@jobAdvertSummary varchar(250),
 	@jobAdvertRegistrationDateTime datetime)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'JobAdvertInsert';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Inserting a JobAdvert';
-
+DECLARE @TName varchar(20) = 'JobAdvertCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		INSERT INTO [JobAdvert] ([VacantJobId], [CategoryId], [SpecializationId], [Title], [Summary], [RegistrationDateTime])
 		VALUES
 		(@vacantJobId, @categoryId, @specializationId, @jobAdvertTitle, @jobAdvertSummary, @jobAdvertRegistrationDateTime);
 
-		COMMIT TRANSACTION @TranName;			
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spUpdateJobAdvert] (
@@ -1079,12 +1248,9 @@ CREATE PROCEDURE [JA.spUpdateJobAdvert] (
 	@jobAdvertSummary varchar(250),
 	@jobAdvertRegistrationDateTime datetime)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'JobAdvertUpdate';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Updating a JobAdvert';
-
+DECLARE @TName varchar(20) = 'JobAdvertUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		UPDATE [JobAdvert]
 			SET	
@@ -1093,44 +1259,46 @@ AS
 			[Title] = @jobAdvertTitle,
 			[Summary] = @jobAdvertSummary,
 			[RegistrationDateTime] = @jobAdvertRegistrationDateTime
-			WHERE [VacantJobId] = @vacantJobId;
+			WHERE [JobAdvert].[VacantJobId] = @vacantJobId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spRemoveJobAdvert] (
 	@vacantJobId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'JobAdvertRemove';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Removing a JobAdvert';
-
+DECLARE @TName varchar(20) = 'JobAdvertRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		DELETE FROM [Address] WHERE [JobAdvertVacantJobId] = @vacantJobId;
 		DELETE FROM [JobAdvert] WHERE [VacantJobId] = @vacantJobId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetJobAdvertById] (
 	@vacantJobId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'JobAdvertById';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Getting a JobAdvert by Id';
-
+DECLARE @TName varchar(20) = 'JobAdvertGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
 			j.[VacantJobId] AS 'JobAdvert ID',
@@ -1140,23 +1308,24 @@ AS
 			j.[Summary] AS 'JobAdvert Summary',
 			j.[RegistrationDateTime] AS 'JobAdvert Registration Date'
 		FROM
-			[JobAdvert] j WHERE [VacantJobId] = @vacantJobId;
+			[JobAdvert] j WHERE j.[VacantJobId] = @vacantJobId;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetJobAdverts]
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'JobAdvertGetAll';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Get collection of JobAdvert';
-
+DECLARE @TName varchar(20) = 'JobAdvertGetAllTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT
 			j.[VacantJobId] AS 'JobAdvert ID',
@@ -1168,72 +1337,77 @@ AS
 		FROM
 			[JobAdvert] j;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetTotalJobAdvertCountByCategoryId](
 	@categoryId int,
 	@countByCategory int OUTPUT)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'JobAdvertGetCountByCategoryId';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Get count by Category';
-
+DECLARE @TName varchar(20) = 'JobAdvertCategoryIdCountTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SET @countByCategory = (SELECT COUNT (*) FROM [JobAdvert] WHERE [CategoryId] = @categoryId);
 
-		COMMIT TRANSACTION @TranName;
-		
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetTotalJobAdvertCountBySpecializationId](
 	@specializationId int,
 	@countBySpecialization int OUTPUT)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'JobAdvertGetCountBySpecializationId';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Get count by Specialization';
-
+DECLARE @TName varchar(20) = 'JobAdvertSpecializationIdCountTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SET @countBySpecialization = (SELECT COUNT (*) FROM [JobAdvert] WHERE [SpecializationId] = @specializationId);
 
-		COMMIT TRANSACTION @TranName
-		
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetTotalJobAdvertCountByNonCategorized](
 	@countByNonCategorized int OUTPUT)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'JobAdvertGetCountByNonCategorized';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Get count by NonCategorized JobAdvert';
-
+DECLARE @TName varchar(20) = 'JobAdvertUncategorizedCountTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SET @countByNonCategorized = (SELECT COUNT (*) FROM [JobAdvert] WHERE [CategoryId] = 0 AND [SpecializationId] = 0);
 
-			COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 /*##################################################
@@ -1254,22 +1428,23 @@ CREATE PROCEDURE [JA.spCreateAddress](
 	@country varchar(100),
 	@postalCode varchar(10))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'AddressInsert';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Inserting an Address';
-
+DECLARE @TName varchar(20) = 'AddressCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		INSERT INTO [Address] ([JobAdvertVacantJobId], [StreetAddress], [City], [Country], [PostalCode])
 		VALUES
 		(@jobAdvertVacantJobId, @streetAddress, @city, @country, @postalCode);
 		
-		COMMIT TRANSACTION @TranName;			
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spUpdateAddress](
@@ -1279,95 +1454,99 @@ CREATE PROCEDURE [JA.spUpdateAddress](
 	@country varchar(100),
 	@postalCode varchar(10))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'AddressUpdate';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Updating an Address';
-
+DECLARE @TName varchar(20) = 'AddressUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		UPDATE [Address]
-		SET
-		[StreetAddress] = @streetAddress,
-		[City] = @city,
-		[Country] = @country,
-		[PostalCode] = @postalCode
+			SET
+			[StreetAddress] = @streetAddress,
+			[City] = @city,
+			[Country] = @country,
+			[PostalCode] = @postalCode
 		WHERE [JobAdvertVacantJobId] = @jobAdvertVacantJobId;
 
-		COMMIT TRANSACTION @TranName;			
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spRemoveAddress](
 	@jobAdvertVacantJobId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'AddressRemove';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Removing an Address';
-
+DECLARE @TName varchar(20) = 'AddressRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		DELETE FROM [Address] WHERE [JobAdvertVacantJobId] = @jobAdvertVacantJobId;
 
-		COMMIT TRANSACTION @TranName;			
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetAddressById](
 	@jobAdvertVacantJobId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'AddressGetById';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Getting an Address by ID';
-
+DECLARE @TName varchar(20) = 'AddressGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT 
-			JobAdvertVacantJobId AS 'JobAdvert AddressID',
-			StreetAddress AS 'Street Address', 
-			City AS 'City', 
-			Country AS 'Country', 
-			PostalCode AS 'Postal Code' 
-		FROM [Address] 
-		WHERE [JobAdvertVacantJobId] = @jobAdvertVacantJobId;
+			a.[JobAdvertVacantJobId] AS 'JobAdvert AddressID',
+			a.[StreetAddress] AS 'Street Address', 
+			a.[City] AS 'City', 
+			a.[Country] AS 'Country', 
+			a.[PostalCode] AS 'Postal Code' 
+		FROM [Address] a
+		WHERE a.[JobAdvertVacantJobId] = @jobAdvertVacantJobId;
 
-		COMMIT TRANSACTION @TranName;			
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetAddresses]
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'GetAddresses';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Getting Address collection';
-
+DECLARE @TName varchar(20) = 'AddressGetAllTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT 
-		JobAdvertVacantJobId AS 'JobAdvert AddressID',
-		StreetAddress AS 'Street Address', 
-		City AS 'City', 
-		Country AS 'Country', 
-		PostalCode AS 'Postal Code'
-		FROM [Address];
+			a.[JobAdvertVacantJobId] AS 'JobAdvert AddressID',
+			a.[StreetAddress] AS 'Street Address', 
+			a.[City] AS 'City', 
+			a.[Country] AS 'Country', 
+			a.[PostalCode] AS 'Postal Code'
+		FROM [Address] a;
 
-		COMMIT TRANSACTION @TranName;			
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 /*##################################################
@@ -1398,22 +1577,23 @@ CREATE PROCEDURE [JA.spCreateUser](
 	@userSalt varchar(1000),
 	@userAccessToken varchar(max))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'UserInsert';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Inserting a User';
-
+DECLARE @TName varchar(20) = 'UserCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		INSERT INTO [User] ([RoleId], [LocationId], [FirstName], [LastName], [Email], [Password], [Salt],[AccessToken])
 		VALUES
 		(@roleId, @locationId, @userFirstName, @userLastName, @userEmail, @userPass, @userSalt, @userAccessToken);
 		
-		COMMIT TRANSACTION @TranName;			
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spUpdateUser](
@@ -1427,62 +1607,61 @@ CREATE PROCEDURE [JA.spUpdateUser](
 	@userSalt varchar(1000),
 	@userAccessToken varchar(max))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'UserUpdate';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Updating a User';
-
+DECLARE @TName varchar(20) = 'UserUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		UPDATE [User]
 		SET
-		[RoleId] = @roleId,
-		[LocationId] = @locationId,
-		[FirstName] = @userFirstName,
-		[LastName] = @userLastName,
-		[Email] = @userEmail,
-		[Password] = @userPass,
-		[salt] = @userSalt,
-		[AccessToken] = @userAccessToken
+			[RoleId] = @roleId,
+			[LocationId] = @locationId,
+			[FirstName] = @userFirstName,
+			[LastName] = @userLastName,
+			[Email] = @userEmail,
+			[Password] = @userPass,
+			[salt] = @userSalt,
+			[AccessToken] = @userAccessToken
 		WHERE [Id] = @userId;
 		
-		COMMIT TRANSACTION @TranName;			
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spRemoveUser](
 	@userId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'UserRemove';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Removing a User';
-
+DECLARE @TName varchar(20) = 'UserRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		DELETE FROM [Contract] WHERE [UserId] = @userId;
 		DELETE FROM [ConsultantArea] WHERE [UserId] = @userId;
 		DELETE FROM [User] WHERE [Id] = @userId;
 
-		COMMIT TRANSACTION @TranName;			
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetUserById](
 	@userId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'UserGetById';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Getting a User by ID';
-
+DECLARE @TName varchar(20) = 'UserGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT 
 			u.[Id] AS 'User ID',
@@ -1496,7 +1675,7 @@ AS
 			STUFF((	SELECT '; ' + a.[Name]
 					FROM [ConsultantArea] c
 						INNER JOIN [Area] a ON a.[Id] = c.[AreaId]
-					WHERE c.[UserId] = 1), 1, 1, '') AS 'Consultant Areas'
+					WHERE c.[UserId] = @userId), 1, 1, '') AS 'Consultant Areas'
 
 		FROM [User] u
 			INNER JOIN [Role] r ON r.[Id] = u.[RoleId]
@@ -1505,21 +1684,22 @@ AS
 			INNER JOIN [Area] a ON a.[Id] = c.[AreaId]
 		WHERE u.[Id] = @userId
 
-		COMMIT TRANSACTION @TranName;			
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetUsers]
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'UserGetAll';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Getting a collection of User';
-
+DECLARE @TName varchar(20) = 'UserGetAllTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT 
 			u.[Id] AS 'User ID',
@@ -1533,7 +1713,7 @@ AS
 			STUFF((	SELECT '; ' + a.[Name]
 					FROM [ConsultantArea] c
 						INNER JOIN [Area] a ON a.[Id] = c.[AreaId]
-					WHERE c.[UserId] = 1), 1, 1, '') AS 'Consultant Areas'
+					WHERE c.[UserId] = u.[Id]), 1, 1, '') AS 'Consultant Areas'
 
 		FROM [User] u
 			INNER JOIN [Role] r ON r.[Id] = u.[RoleId]
@@ -1541,85 +1721,89 @@ AS
 			INNER JOIN [ConsultantArea] c ON c.[UserId] = u.[Id]
 			INNER JOIN [Area] a ON a.[Id] = c.[AreaId];
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGrantUserArea](
 	@userId int,
 	@areaId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'UserGrantArea';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Granting an area to User';
-
+DECLARE @TName varchar(20) = 'UserGrantAreaTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		INSERT INTO [ConsultantArea] ([UserId], [AreaId])
 		VALUES (@userId, @areaId);
 			
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spRemoveUserArea](
 	@userId int,
 	@areaId int)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'UserRemoveArea';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Removing an area from User';
-
+DECLARE @TName varchar(20) = 'UserRemoveAreaTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 			DELETE FROM [ConsultantArea] WHERE [UserId] = @userId AND [AreaId] = @areaId;
 			
-			COMMIT TRANSACTION @TranName;
+			COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetUserSaltByEmail](
 	@userEmail varchar(50))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'UserGetSaltByEmail';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Getting a User salt by email';
-
+DECLARE @TName varchar(20) = 'UserGetSaltByEmailTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT 
 			[Salt] AS 'User Salt'
 		FROM [User]
 		WHERE [Email] = @userEmail;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetUserByAccessToken](
 	@userAccessToken varchar(max))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'UserGetByAccessToken';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Getting a User by AccessToken';
-
+DECLARE @TName varchar(20) = 'UserGetByAccessTokenTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SELECT 
 			u.[Id] AS 'User ID',
@@ -1642,26 +1826,25 @@ AS
 			INNER JOIN [Area] a ON a.[Id] = c.[AreaId]
 		WHERE u.[AccessToken] = @userAccessToken;
 
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spUpdateUserSecurity](
 	@userId int,
 	@userNewPassword varchar(1000),
-	@userOldPassword varchar(1000),
-	@userNewSalt varchar(1000),
-	@resultReturn bit = 0 OUTPUT)
+	@userNewSalt varchar(1000))
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'UserUpdateSecurity';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Updates security info of User';
-
+DECLARE @TName varchar(20) = 'UserUpdatePasswordTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		UPDATE [User]
 			SET
@@ -1669,31 +1852,36 @@ AS
 			[Salt] = @userNewSalt
 		WHERE [Id] = @userId;
 
-		SET @resultReturn = 1;
-		COMMIT TRANSACTION @TranName;
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spValidateUserExists](
 	@userEmail varchar(50),
 	@returnResult bit = 0 OUTPUT)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'UserValidateExists';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Validates the existance of a User';
-
+DECLARE @TName varchar(20) = 'UserValidateExistenceTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SET @returnResult = 1;
-		COMMIT TRANSACTION @TranName;
+
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spValidateUserLogin](
@@ -1701,19 +1889,21 @@ CREATE PROCEDURE [JA.spValidateUserLogin](
 	@userPassword varchar(1000),
 	@returnResult bit = 0 OUTPUT)
 AS
-	DECLARE @TranName varchar(20)
-	SELECT @TranName = 'UserValidateLogin';
-
-	BEGIN TRANSACTION @TranName
-		WITH MARK N'Validating a User login';
-
+DECLARE @TName varchar(20) = 'UserValidateLoginTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
 		SET @returnResult = 1;
-		COMMIT TRANSACTION @TranName;
+
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @TranName;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 /*##################################################
@@ -1734,28 +1924,22 @@ CREATE PROCEDURE [JA.spCreateLog] (
 	@action varchar(250),
 	@message varchar(500))
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Log Transaction';
-
-	BEGIN TRANSACTION @transaction WITH MARK N'Logging Action';
-
+DECLARE @TName varchar(20) = 'LogCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
+		INSERT INTO [Log] ([LogSeverityId], [CreatedDateTime], [CreatedBy], [Action], [Message]) VALUES
+		(@severityId, @currentTime, @createdBy, @action, @message);
 
-		BEGIN
-			INSERT INTO [Log] ([LogSeverityId], [CreatedDateTime], [CreatedBy], [Action], [Message]) VALUES
-			(@severityId, @currentTime, @createdBy, @action, @message);
-
-			COMMIT TRANSACTION @transaction;
-		END
-
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		
+		IF @@TRANCOUNT > 0
 		BEGIN
-			ROLLBACK TRANSACTION @transaction;
-		END
-		
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spUpdateLog] (
@@ -1766,79 +1950,81 @@ CREATE PROCEDURE [JA.spUpdateLog] (
 	@action varchar(250),
 	@message varchar(500))
 AS
-	DECLARE @transaction varchar(20);
-	SET @transaction = 'Log Transaction';
-
-
+DECLARE @TName varchar(20) = 'LogUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			BEGIN TRANSACTION @transaction WITH MARK N'Updating Log';
-			UPDATE [Log]
-				SET
-				[LogSeverityId] = @severityId,
-				[CreatedDateTime] = @createdDateTime,
-				[CreatedBy] = @createdBy,
-				[Action] = @action,
-				[Message] = @message
-				WHERE
-				[Id] = @logId;
+		UPDATE [Log]
+			SET
+			[LogSeverityId] = @severityId,
+			[CreatedDateTime] = @createdDateTime,
+			[CreatedBy] = @createdBy,
+			[Action] = @action,
+			[Message] = @message
+			WHERE
+			[Id] = @logId;
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spRemoveLog] (
 	@logId int)
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Log Transaction';
-
+DECLARE @TName varchar(20) = 'LogRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			BEGIN TRANSACTION @transaction WITH MARK N'Deleting Log';
+		DELETE FROM [Log]
+		WHERE
+		[Log].[Id] = @logId;
 
-			DELETE FROM [Log]
-			WHERE
-			[Log].[Id] = @logId;
-
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetLogById] (
 	@logId int)
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Log Transaction';
-
+DECLARE @TName varchar(20) = 'LogGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			SELECT 
-				l.[Id] AS 'Log ID',
-				logS.[Severity] AS 'Log Severity',
-				l.[CreatedBy],
-				l.[CreatedDateTime],
-				l.[Action],
-				l.[Message]
-			FROM [Log] l
-			INNER JOIN [LogSeverity] logS ON logS.Id = l.LogSeverityId
-			WHERE
-				l.[Id] = @logId;
+		SELECT 
+			l.[Id] AS 'Log ID',
+			logS.[Severity] AS 'Log Severity',
+			l.[CreatedBy],
+			l.[CreatedDateTime],
+			l.[Action],
+			l.[Message]
+		FROM [Log] l
+		INNER JOIN [LogSeverity] logS ON logS.Id = l.LogSeverityId
+		WHERE
+			l.[Id] = @logId;
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 /*##################################################
@@ -1864,20 +2050,22 @@ CREATE PROCEDURE [JA.spCreateStaticSearchFilter] (
 	@filterTypeId int,
 	@key varchar(50))
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Search Filter Transaction';
-
+DECLARE @TName varchar(20) = 'StatichSearchFilterCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			INSERT INTO [StaticSearchFilter] ([FilterTypeId], [Key]) VALUES
-			(@filterTypeId, @key);
+		INSERT INTO [StaticSearchFilter] ([FilterTypeId], [Key]) VALUES
+		(@filterTypeId, @key);
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spUpdateStaticSearchFilter] (
@@ -1885,69 +2073,75 @@ CREATE PROCEDURE [JA.spUpdateStaticSearchFilter] (
 	@filterTypeId int,
 	@key varchar(50))
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Search Filter Transaction';
-
+DECLARE @TName varchar(20) = 'StaticSearchFilterUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			UPDATE [StaticSearchFilter]
-				SET
-				[FilterTypeId] = @filterTypeId,
-				[Key] = @key
-				WHERE
-				[Id] = @id;
+		UPDATE [StaticSearchFilter]
+			SET
+			[FilterTypeId] = @filterTypeId,
+			[Key] = @key
+			WHERE
+			[Id] = @id;
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spRemoveStaticSearchFilter] (
 	@id int)
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Search Filter Transaction';
-
+DECLARE @TName varchar(20) = 'StaticSearchFilterRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			DELETE FROM [StaticSearchFilter]
-			WHERE
-			[Id] = @id;
+		DELETE FROM [StaticSearchFilter]
+		WHERE
+		[Id] = @id;
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetStaticSearchFilterById] (
 	@id int)
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Search Filter Transaction';
-
+DECLARE @TName varchar(20) = 'StaticSearchFilterGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			SELECT
-				s.[Id] AS 'Static Search Filter ID',
-				s.[Key],
-				f.[Id] AS 'Filter Type ID',
-				f.[Name] AS 'Filter Name',
-				f.[Description] AS 'Filter Desription'
-			FROM [StaticSearchFilter] s
-			INNER JOIN [FilterType] f ON f.[Id] = s.[Id]
+		SELECT
+			s.[Id] AS 'Static Search Filter ID',
+			s.[Key],
+			f.[Id] AS 'Filter Type ID',
+			f.[Name] AS 'Filter Name',
+			f.[Description] AS 'Filter Desription'
+		FROM [StaticSearchFilter] s
+		INNER JOIN [FilterType] f ON f.[Id] = s.[Id]
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spCreateDynamicSearchFilter] (
@@ -1955,20 +2149,22 @@ CREATE PROCEDURE [JA.spCreateDynamicSearchFilter] (
 	@specializationId int,
 	@key varchar(50))
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Search Filter Transaction';
-
+DECLARE @TName varchar(20) = 'DynamicSearchFilterCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			INSERT INTO [DynamicSearchFilter] ([CategoryId], [SpecializationId], [Key]) VALUES
-			(@categoryId, @specializationId, @key);
+		INSERT INTO [DynamicSearchFilter] ([CategoryId], [SpecializationId], [Key]) VALUES
+		(@categoryId, @specializationId, @key);
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spUpdateDynamicSearchFilter] (
@@ -1977,115 +2173,112 @@ CREATE PROCEDURE [JA.spUpdateDynamicSearchFilter] (
 	@specializationId int,
 	@key varchar(50))
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Search Filter Transaction';
-
+DECLARE @TName varchar(20) = 'DynamicSearchFilterUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			UPDATE [DynamicSearchFilter]
-				SET
-				[CategoryId] = @categoryId,
-				[SpecializationId] = @specializationId,
-				[Key] = @key
-				WHERE
-				[Id] = @id;
+		UPDATE [DynamicSearchFilter]
+			SET
+			[CategoryId] = @categoryId,
+			[SpecializationId] = @specializationId,
+			[Key] = @key
+			WHERE
+			[Id] = @id;
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spRemoveDynamicSearchFilter] (
 	@id int)
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Search Filter Transaction';
-
+DECLARE @TName varchar(20) = 'DynamicSearchFilterRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			DELETE FROM [DynamicSearchFilter]
-			WHERE
-			[Id] = @id;
+		DELETE FROM [DynamicSearchFilter]
+		WHERE
+		[Id] = @id;
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetDynamicSearchFilterById] (
 	@id int)
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Search Filter Transaction';
-
+DECLARE @TName varchar(20) = 'DynamicSearchFilterGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			SELECT
-				d.[Id] AS 'Dynamic Search Filter ID',
-				d.[Key],
-				c.[Id] AS 'Category ID',
-				c.[Name] AS 'Category Name',
-				s.[Id] AS 'Specialization ID',
-				s.[CategoryId] AS 'Specialization Category Association ID',
-				s.[Name] AS 'Specialization Name'
-			FROM [DynamicSearchFilter] d
-			INNER JOIN [Category] c ON c.[Id] = d.[CategoryId]
-			INNER JOIN [Specialization] s ON s.[Id] = d.[SpecializationId]
+		SELECT
+			d.[Id] AS 'Dynamic Search Filter ID',
+			d.[Key],
+			c.[Id] AS 'Category ID',
+			c.[Name] AS 'Category Name',
+			s.[Id] AS 'Specialization ID',
+			s.[CategoryId] AS 'Specialization Category Association ID',
+			s.[Name] AS 'Specialization Name'
+		FROM [DynamicSearchFilter] d
+		INNER JOIN [Category] c ON c.[Id] = d.[CategoryId]
+		INNER JOIN [Specialization] s ON s.[Id] = d.[SpecializationId]
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetStaticFilterKeys]
 AS
-	DECLARE @t varchar(50)
-	SET @t = 'Static Filter Search Transaction';
-
-	BEGIN TRANSACTION @t WITH MARK 'Getting static filter keys.';
-
+DECLARE @TName varchar(20) = 'StaticSearchFilterGetKeysTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
+		SELECT
+			ssf.[Id] AS 'Key ID',
+			ft.[Name] AS 'Filter Name',
+			ssf.[Key] AS 'Key'
+		FROM [StaticSearchFilter] ssf
+		INNER JOIN [FilterType] ft ON ft.[Id] = ssf.[FilterTypeId]
 
-		BEGIN
-			SELECT
-				ssf.[Id] AS 'Key ID',
-				ft.[Name] AS 'Filter Name',
-				ssf.[Key] AS 'Key'
-			FROM [StaticSearchFilter] ssf
-			INNER JOIN [FilterType] ft ON ft.[Id] = ssf.[FilterTypeId]
-			COMMIT TRANSACTION @t;
-		END
-
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-
+		IF @@TRANCOUNT > 0
 		BEGIN
-			ROLLBACK TRANSACTION @t;
-		END
-
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetStaticFilterKeysByTypeId](
 	@typeId int)
 AS
-	DECLARE @t varchar(50)
-	SET @t = 'Static Filter Search Transaction';
-
-	BEGIN TRANSACTION @t WITH MARK 'Getting static filter keys by type id.';
-
+DECLARE @TName varchar(20) = 'StaticSearchFilterGetKeysByTypeIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-
-		BEGIN
 			SELECT
 				ssf.[Id] AS 'Key ID',
 				ft.[Name] AS 'Filter Name',
@@ -2093,46 +2286,171 @@ AS
 			FROM [StaticSearchFilter] ssf
 			INNER JOIN [FilterType] ft ON ft.[Id] = @typeId
 			WHERE ssf.[FilterTypeId] = @typeId;
-			COMMIT TRANSACTION @t;
-		END
 
+			COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-
+		IF @@TRANCOUNT > 0
 		BEGIN
-			ROLLBACK TRANSACTION @t;
-		END
-
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetDynamicFilterKeys]
 AS
-	DECLARE @transaction varchar(50)
-	SET @transaction = 'Dynamic Filter Search Transaction';
-
-	BEGIN TRANSACTION @transaction WITH MARK 'Getting dynamic filter keys';
-
+DECLARE @TName varchar(20) = 'DynamicSearchFilterGetKeysTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		
-		BEGIN
 			SELECT
 				dsf.[Id] AS 'Key ID',
 				dsf.[Key] AS 'Key',
 				dsf.[CategoryId] AS 'Key Category ID',
 				dsf.[SpecializationId] AS 'Key Specialization ID'
 			FROM [DynamicSearchFilter] dsf;
-			COMMIT TRANSACTION @transaction;
-		END
 
+			COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		
+		IF @@TRANCOUNT > 0
 		BEGIN
-			ROLLBACK TRANSACTION @transaction;
-		END
-
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
+GO
+
+/*##################################################
+			## Filter Type Section ##
+####################################################*/
+
+DROP PROCEDURE IF EXISTS [JA.spCreateFilterType]
+DROP PROCEDURE IF EXISTS [JA.spUpdateFilterType]
+DROP PROCEDURE IF EXISTS [JA.spRemoveFilterType]
+DROP PROCEDURE IF EXISTS [JA.spGetFilterTypeById]
+DROP PROCEDURE IF EXISTS [JA.spGetFilterTypes]
+GO
+
+CREATE PROCEDURE [JA.spCreateFilterType] (
+	@name varchar(50),
+	@description varchar(250))
+AS
+DECLARE @TName varchar(20) = 'FilterTypeCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
+	BEGIN TRY
+		INSERT INTO [FilterType] ([Name], [Description]) VALUES
+		(@name, @description);
+
+		COMMIT TRANSACTION @TName;
+	END TRY
+	BEGIN CATCH
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
+	END CATCH
+END;
+GO
+
+CREATE PROCEDURE [JA.spUpdateFilterType] (
+	@id int,
+	@name varchar(50),
+	@description varchar(250))
+AS
+DECLARE @TName varchar(20) = 'FilterTypeUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
+	BEGIN TRY
+		UPDATE [FilterType]
+			SET
+			[Name] = @name,
+			[Description] = @description
+			WHERE
+			[Id] = @id;
+
+		COMMIT TRANSACTION @TName;
+	END TRY
+	BEGIN CATCH
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
+	END CATCH
+END;
+GO
+
+CREATE PROCEDURE [JA.spRemoveFilterType] (
+	@id int)
+AS
+DECLARE @TName varchar(20) = 'FilterTypeRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
+	BEGIN TRY
+		DELETE FROM [StaticSearchFilter] WHERE [FilterTypeId] = @id;
+
+		DELETE FROM [FilterType]
+		WHERE [Id] = @id;
+
+		COMMIT TRANSACTION @TName;
+	END TRY
+	BEGIN CATCH
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
+	END CATCH
+END;
+GO
+
+CREATE PROCEDURE [JA.spGetFilterTypeById] (
+	@id int)
+AS
+DECLARE @TName varchar(20) = 'FilterTypeGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
+	BEGIN TRY
+		SELECT
+			f.[Id] AS 'Filter Type ID',
+			f.[Name] AS 'Filter Name ID',
+			f.[Description] AS 'Filter Description'
+		FROM [FilterType] f
+		WHERE f.[Id] = @id;
+
+		COMMIT TRANSACTION @TName;
+	END TRY
+	BEGIN CATCH
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
+	END CATCH
+END;
+GO
+
+CREATE PROCEDURE [JA.spGetFilterTypes]
+AS
+DECLARE @TName varchar(20) = 'FilterTypeGetAllTransaction';
+BEGIN
+	BEGIN TRAN @TName;
+	BEGIN TRY
+		SELECT
+			f.[Id] AS 'Filter Type ID',
+			f.[Name] AS 'Filter Name ID',
+			f.[Description] AS 'Filter Description'
+		FROM [FilterType] f
+
+		COMMIT TRANSACTION @TName;
+	END TRY
+	BEGIN CATCH
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
+	END CATCH
+END;
 GO
 
 /*##################################################
@@ -2157,20 +2475,24 @@ CREATE PROCEDURE [JA.spCreateVersionControl] (
 	@patch int,
 	@releaseDateTime datetime)
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Version Control Transaction';
-
+DECLARE @TName varchar(20) = 'VersionControlCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			INSERT INTO [VersionControl] ([ProjectInformationId], [ReleaseTypeId], [CommitId], [Major], [Minor], [Patch], [ReleaseDateTime]) VALUES
-			(@projectInformationId, @releaseTypeId, @commitId, @major, @minor, @patch, @releaseDateTime);
+		BEGIN TRANSACTION @transaction;
 
-			COMMIT TRANSACTION @transaction;
-		END
+		INSERT INTO [VersionControl] ([ProjectInformationId], [ReleaseTypeId], [CommitId], [Major], [Minor], [Patch], [ReleaseDateTime]) VALUES
+		(@projectInformationId, @releaseTypeId, @commitId, @major, @minor, @patch, @releaseDateTime);
+
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spUpdateVersionControl] (
@@ -2183,112 +2505,120 @@ CREATE PROCEDURE [JA.spUpdateVersionControl] (
 	@patch int,
 	@releaseDateTime datetime)
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Version Control Transaction';
-
+DECLARE @TName varchar(20) = 'VersionControlUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			UPDATE [VersionControl]
-				SET
-				[ProjectInformationId] = @projectInformationId,
-				[ReleaseTypeId] = @releaseTypeId,
-				[CommitId] = @commitId,
-				[Major] = @major,
-				[Minor] = @minor,
-				[Patch] = @patch,
-				[ReleaseDateTime] = @releaseDateTime
-				WHERE
-				[Id] = @id;
+		UPDATE [VersionControl]
+			SET
+			[ProjectInformationId] = @projectInformationId,
+			[ReleaseTypeId] = @releaseTypeId,
+			[CommitId] = @commitId,
+			[Major] = @major,
+			[Minor] = @minor,
+			[Patch] = @patch,
+			[ReleaseDateTime] = @releaseDateTime
+			WHERE
+			[Id] = @id;
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spRemoveVersionControl] (
 	@id int)
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Version Control Transaction';
-
+DECLARE @TName varchar(20) = 'VersionControlRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
 			DELETE FROM [VersionControl]
 			WHERE [Id] = @id;
 
-			COMMIT TRANSACTION @transaction;
-		END
+			COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetVersionControlById] (
 	@id int)
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Version Control Transaction';
-
+DECLARE @TName varchar(20) = 'VersionControlGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			SELECT
-				v.[Id] AS 'Version ID',
-				v.[ProjectInformationId] AS 'Project ID',
-				p.[Name] AS 'Project Name',
-				p.[PublishedDateTime] AS 'Project Publish Date',
-				v.[ReleaseTypeId] AS 'Release Type ID',
-				r.[Name] AS 'Release Name',
-				v.[CommitId],
-				v.[Major],
-				v.[Minor],
-				v.[Patch],
-				v.[ReleaseDateTime] AS 'Version Release Date'
-			FROM [VersionControl] v
-			INNER JOIN [ProjectInformation] p ON p.[Id] = v.[ProjectInformationId]
-			INNER JOIN [ReleaseType] r ON r.[Id] = v.[ReleaseTypeId]
-			WHERE v.[Id] = @id;
+		SELECT
+			v.[Id] AS 'Version ID',
+			v.[ProjectInformationId] AS 'Project ID',
+			p.[Name] AS 'Project Name',
+			p.[PublishedDateTime] AS 'Project Publish Date',
+			v.[ReleaseTypeId] AS 'Release Type ID',
+			r.[Name] AS 'Release Name',
+			v.[CommitId],
+			v.[Major],
+			v.[Minor],
+			v.[Patch],
+			v.[ReleaseDateTime] AS 'Version Release Date'
+		FROM [VersionControl] v
+		INNER JOIN [ProjectInformation] p ON p.[Id] = v.[ProjectInformationId]
+		INNER JOIN [ReleaseType] r ON r.[Id] = v.[ReleaseTypeId]
+		WHERE v.[Id] = @id;
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetVersionControls]
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Version Control Transaction';
-
+DECLARE @TName varchar(20) = 'VersionControlGetAllTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			SELECT
-				v.[Id] AS 'Version ID',
-				v.[ProjectInformationId] AS 'Project ID',
-				p.[Name] AS 'Project Name',
-				p.[PublishedDateTime] AS 'Project Publish Date',
-				v.[ReleaseTypeId] AS 'Release Type ID',
-				r.[Name] AS 'Release Name',
-				v.[CommitId],
-				v.[Major],
-				v.[Minor],
-				v.[Patch],
-				v.[ReleaseDateTime] AS 'Version Release Date'
-			FROM [VersionControl] v
-			INNER JOIN [ProjectInformation] p ON p.[Id] = v.[ProjectInformationId]
-			INNER JOIN [ReleaseType] r ON r.[Id] = v.[ReleaseTypeId]
+		SELECT
+			v.[Id] AS 'Version ID',
+			v.[ProjectInformationId] AS 'Project ID',
+			p.[Name] AS 'Project Name',
+			p.[PublishedDateTime] AS 'Project Publish Date',
+			v.[ReleaseTypeId] AS 'Release Type ID',
+			r.[Name] AS 'Release Name',
+			v.[CommitId],
+			v.[Major],
+			v.[Minor],
+			v.[Patch],
+			v.[ReleaseDateTime] AS 'Version Release Date'
+		FROM [VersionControl] v
+		INNER JOIN [ProjectInformation] p ON p.[Id] = v.[ProjectInformationId]
+		INNER JOIN [ReleaseType] r ON r.[Id] = v.[ReleaseTypeId]
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 --CREATE PROCEDURE [JA.spGetSystemInformationByName] (
@@ -2346,20 +2676,22 @@ CREATE PROCEDURE [JA.spCreateProjectInformation] (
 	@name varchar(50),
 	@publishedDateTime datetime)
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Project Information Transaction';
-
+DECLARE @TName varchar(20) = 'ProjectInformationCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			INSERT INTO [ProjectInformation] ([Name], [PublishedDateTime]) VALUES
-			(@name, @publishedDateTime);
+		INSERT INTO [ProjectInformation] ([Name], [PublishedDateTime]) VALUES
+		(@name, @publishedDateTime);
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spUpdateProjectInformation] (
@@ -2367,87 +2699,95 @@ CREATE PROCEDURE [JA.spUpdateProjectInformation] (
 	@name varchar(50),
 	@publishedDateTime datetime)
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Project Information Transaction';
-
+DECLARE @TName varchar(20) = 'ProjectInformationUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			UPDATE [ProjectInformation]
-				SET
-				[Name] = @name,
-				[PublishedDateTime] = @publishedDateTime
-				WHERE
-				[Id] = @id;
+		UPDATE [ProjectInformation]
+			SET
+			[Name] = @name,
+			[PublishedDateTime] = @publishedDateTime
+			WHERE
+			[Id] = @id;
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spRemoveProjectInformation] (
 	@id int)
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Project Information Transaction';
-
+DECLARE @TName varchar(20) = 'ProjectInformationRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			DELETE FROM [ProjectInformation]
-			WHERE [Id] = @id;
+		DELETE FROM [ProjectInformation]
+		WHERE [Id] = @id;
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetProjectInformationById] (
 	@id int)
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Projet Information Transaction';
-
+DECLARE @TName varchar(20) = 'ProjectInformationGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			SELECT
-				p.[Id] AS 'Project ID',
-				p.[Name] AS 'Project Name',
-				p.[PublishedDateTime] AS 'Project Published'
-			FROM [ProjectInformation] p
-			WHERE [Id] = @id;
+		SELECT
+			p.[Id] AS 'Project ID',
+			p.[Name] AS 'Project Name',
+			p.[PublishedDateTime] AS 'Project Published'
+		FROM [ProjectInformation] p
+		WHERE [Id] = @id;
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetProjectInformations]
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Project Information Transaction';
-
+DECLARE @TName varchar(20) = 'ProjectInformationGetAllTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			SELECT
-				p.[Id] AS 'Project ID',
-				p.[Name] AS 'Project Name',
-				p.[PublishedDateTime] AS 'Project Published'
-			FROM [ProjectInformation] p
+		SELECT
+			p.[Id] AS 'Project ID',
+			p.[Name] AS 'Project Name',
+			p.[PublishedDateTime] AS 'Project Published'
+		FROM [ProjectInformation] p
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 /*##################################################
@@ -2464,102 +2804,112 @@ GO
 CREATE PROCEDURE [JA.spCreateReleaseType] (
 	@name varchar(100))
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Release Type Transaction';
-
+DECLARE @TName varchar(20) = 'ReleaseTypeCreateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			INSERT INTO [ReleaseType] ([Name]) VALUES
-			(@name);
+		INSERT INTO [ReleaseType] ([Name]) VALUES
+		(@name);
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spUpdateReleaseType] (
 	@id int,
 	@name varchar(100))
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Release Type Transaction';
-
+DECLARE @TName varchar(20) = 'ReleaeTypeUpdateTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			UPDATE [ReleaseType]
-				SET
-				[Name] = @name
-				WHERE
-				[Id] = @id;
+		UPDATE [ReleaseType]
+			SET
+			[Name] = @name
+			WHERE
+			[Id] = @id;
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spRemoveReleaseType] (
 	@id int)
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Releae Type Transaction';
-
+DECLARE @TName varchar(20) = 'ReleaseTypeRemoveTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			DELETE FROM [ReleaseType]
-			WHERE [Id] = @id;
+		DELETE FROM [ReleaseType]
+		WHERE [Id] = @id;
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetReleaseTypeById] (
 	@id int)
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Release Type Transaction';
-
+DECLARE @TName varchar(20) = 'ReleaseTypeGetByIdTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			SELECT
-				p.[Id] AS 'Release ID',
-				p.[Name] AS 'Release Name'
-			FROM [ReleaseType] p
-			WHERE [Id] = @id;
+		SELECT
+			p.[Id] AS 'Release ID',
+			p.[Name] AS 'Release Name'
+		FROM [ReleaseType] p
+		WHERE [Id] = @id;
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
 
 CREATE PROCEDURE [JA.spGetReleaseTypes]
 AS
-	DECLARE @transaction varchar(20)
-	SET @transaction = 'Release Type Transaction';
-
+DECLARE @TName varchar(20) = 'ReleaseTypeGetAllTransaction';
+BEGIN
+	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN
-			SELECT
-				p.[Id] AS 'Release ID',
-				p.[Name] AS 'Release Name'
-			FROM [ReleaseType] p
+		SELECT
+			p.[Id] AS 'Release ID',
+			p.[Name] AS 'Release Name'
+		FROM [ReleaseType] p
 
-			COMMIT TRANSACTION @transaction;
-		END
+		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION @transaction;
+		IF @@TRANCOUNT > 0
+		BEGIN
+			ROLLBACK TRAN @TName;
+		END 
 	END CATCH
+END;
 GO
