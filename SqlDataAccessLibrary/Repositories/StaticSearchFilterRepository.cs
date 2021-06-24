@@ -125,7 +125,7 @@ namespace SqlDataAccessLibrary
         {
             try
             {
-                string cmdText = "EXEC [JA.spGetStaticcSearchFilterById]";
+                string cmdText = "EXEC [JA.spGetStaticSearchFilterById]";
 
                 SqlParameter[] parameters = new[]
                 {
