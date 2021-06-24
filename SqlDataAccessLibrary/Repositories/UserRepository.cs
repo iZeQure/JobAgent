@@ -103,14 +103,15 @@ namespace SqlDataAccessLibrary.Repositories
 
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@RoleId", createEntity.GetRole.Id),
-                    new SqlParameter("@LocationId", createEntity.GetLocation.Id),
-                    new SqlParameter("@FirstName", createEntity.GetFirstName),
-                    new SqlParameter("@LastName", createEntity.GetLastName),
-                    new SqlParameter("@Email", createEntity.GetEmail),
-                    new SqlParameter("@Password", createEntity.Password),
-                    new SqlParameter("@Salt", createEntity.Salt),
-                    new SqlParameter("@AccessToken", createEntity.AccessToken)
+                    new SqlParameter("@id", createEntity.Id),
+                    new SqlParameter("@roleId", createEntity.GetRole.Id),
+                    new SqlParameter("@locationId", createEntity.GetLocation.Id),
+                    new SqlParameter("@firstName", createEntity.GetFirstName),
+                    new SqlParameter("@lastName", createEntity.GetLastName),
+                    new SqlParameter("@email", createEntity.GetEmail),
+                    new SqlParameter("@password", createEntity.Password),
+                    new SqlParameter("@salt", createEntity.Salt),
+                    new SqlParameter("@accessToken", createEntity.AccessToken)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -308,14 +309,14 @@ namespace SqlDataAccessLibrary.Repositories
                 SqlParameter[] parameters = new[]
                 {
                 new SqlParameter("@userId", updateEntity.Id),
-                new SqlParameter("@RoleId", updateEntity.GetRole.Id),
-                new SqlParameter("@LocationId", updateEntity.GetLocation.Id),
-                new SqlParameter("@FirstName", updateEntity.GetFirstName),
-                new SqlParameter("@LastName", updateEntity.GetLastName),
-                new SqlParameter("@Email", updateEntity.GetEmail),
-                new SqlParameter("@Password", updateEntity.Password),
-                new SqlParameter("@Salt", updateEntity.Salt),
-                new SqlParameter("@AccessToken", updateEntity.AccessToken)
+                new SqlParameter("@roleId", updateEntity.GetRole.Id),
+                new SqlParameter("@locationId", updateEntity.GetLocation.Id),
+                new SqlParameter("@firstName", updateEntity.GetFirstName),
+                new SqlParameter("@lastName", updateEntity.GetLastName),
+                new SqlParameter("@email", updateEntity.GetEmail),
+                new SqlParameter("@password", updateEntity.Password),
+                new SqlParameter("@salt", updateEntity.Salt),
+                new SqlParameter("@accessToken", updateEntity.AccessToken)
             };
 
                 //Needs to also update ConsultingAreas
@@ -344,7 +345,7 @@ namespace SqlDataAccessLibrary.Repositories
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@userId", user.Id),
-                    new SqlParameter("userNewPassword", user.Id),
+                    new SqlParameter("@userNewPassword", user.Id),
                     new SqlParameter("@userldPassword", user.Password),
                     new SqlParameter("@userNewSalt", user.Salt),
                     new SqlParameter("@resultReturn", user.Id)

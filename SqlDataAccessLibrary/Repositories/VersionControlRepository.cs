@@ -33,14 +33,14 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spCreateVersionControl];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@Id", createEntity.Id),
-                    new SqlParameter("@ProjectInformationId", createEntity.ProjectInformation.Id),
-                    new SqlParameter("@ReleaseTypeId", createEntity.ReleaseType.Id),
-                    new SqlParameter("@CommitId", createEntity.CommitId),
-                    new SqlParameter("@Major", createEntity.Major),
-                    new SqlParameter("@Minor", createEntity.Minor),
-                    new SqlParameter("@Path", createEntity.Patch),
-                    new SqlParameter("@ReleaseDateTime", createEntity.ReleaseDateTime)
+                    new SqlParameter("@id", createEntity.Id),
+                    new SqlParameter("@projectInformationId", createEntity.ProjectInformation.Id),
+                    new SqlParameter("@releaseTypeId", createEntity.ReleaseType.Id),
+                    new SqlParameter("@commitId", createEntity.CommitId),
+                    new SqlParameter("@major", createEntity.Major),
+                    new SqlParameter("@minor", createEntity.Minor),
+                    new SqlParameter("@patch", createEntity.Patch),
+                    new SqlParameter("@releaseDateTime", createEntity.ReleaseDateTime)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -64,7 +64,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spDeleteVersionControl];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@Id", deleteEntity.Id)
+                    new SqlParameter("@id", deleteEntity.Id)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -130,7 +130,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spGetVersionControlById];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@Id", id)
+                    new SqlParameter("@id", id)
                 };
 
                 using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -174,14 +174,14 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spUpdateVersionControl];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@Id", updateEntity.Id),
-                    new SqlParameter("@ProjectInformationId", updateEntity.ProjectInformation.Id),
-                    new SqlParameter("@ReleaseTypeId", updateEntity.ReleaseType.Id),
-                    new SqlParameter("@CommitId", updateEntity.CommitId),
-                    new SqlParameter("@Major", updateEntity.Major),
+                    new SqlParameter("@id", updateEntity.Id),
+                    new SqlParameter("@projectInformationId", updateEntity.ProjectInformation.Id),
+                    new SqlParameter("@releaseTypeId", updateEntity.ReleaseType.Id),
+                    new SqlParameter("@commitId", updateEntity.CommitId),
+                    new SqlParameter("@major", updateEntity.Major),
                     new SqlParameter("@Minor", updateEntity.Minor),
-                    new SqlParameter("@Path", updateEntity.Patch),
-                    new SqlParameter("@ReleaseDateTime", updateEntity.ReleaseDateTime)
+                    new SqlParameter("@patch", updateEntity.Patch),
+                    new SqlParameter("@releaseDateTime", updateEntity.ReleaseDateTime)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);

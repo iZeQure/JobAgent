@@ -33,7 +33,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spCreateJobAdvert];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@vacantJobId", createEntity.Id),
+                    new SqlParameter("@id", createEntity.Id),
                     new SqlParameter("@categoryId", createEntity.Category.Id),
                     new SqlParameter("@specializationid", createEntity.Specialization.Id),
                     new SqlParameter("@jobAdvertTitle", createEntity.Title),
@@ -62,7 +62,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spDeleteJobAdvert];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@vacantJobId", deleteEntity.Id)
+                    new SqlParameter("@id", deleteEntity.Id)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -125,7 +125,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spGetJobAdvertById];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@vacantJobId", id)
+                    new SqlParameter("@id", id)
                 };
 
                 using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -169,7 +169,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spUpdateJobAdvert];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@vacantJobId", updateEntity.Id),
+                    new SqlParameter("@id", updateEntity.Id),
                     new SqlParameter("@categoryId", updateEntity.Category.Id),
                     new SqlParameter("@specializationid", updateEntity.Specialization.Id),
                     new SqlParameter("@jobAdvertTitle", updateEntity.Title),

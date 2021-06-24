@@ -33,9 +33,9 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spCreateProjectInformation];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@Id", createEntity.Id),
-                    new SqlParameter("@ProjectInformationId", createEntity.GetSystemName),
-                    new SqlParameter("@ReleaseTypeId", createEntity.PublishedDateTime)
+                    new SqlParameter("@id", createEntity.Id),
+                    new SqlParameter("@projectInformationId", createEntity.GetSystemName),
+                    new SqlParameter("@releaseTypeId", createEntity.PublishedDateTime)
 
                 };
 
@@ -60,7 +60,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spDeleteProjectInformation];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@Id", deleteEntity.Id)
+                    new SqlParameter("@id", deleteEntity.Id)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -121,7 +121,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spGetProjectInformationById];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@Id", id)
+                    new SqlParameter("@id", id)
                 };
 
                 using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -161,9 +161,9 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spUpdateProjectInformation];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@Id", updateEntity.Id),
-                    new SqlParameter("@ProjectInformationId", updateEntity.GetSystemName),
-                    new SqlParameter("@ReleaseTypeId", updateEntity.PublishedDateTime)
+                    new SqlParameter("@id", updateEntity.Id),
+                    new SqlParameter("@projectInformationId", updateEntity.GetSystemName),
+                    new SqlParameter("@releaseTypeId", updateEntity.PublishedDateTime)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);

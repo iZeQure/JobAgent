@@ -33,8 +33,8 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spCreateReleaseType];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@Id", createEntity.Id),
-                    new SqlParameter("@ProjectInformationId", createEntity.Name)
+                    new SqlParameter("@id", createEntity.Id),
+                    new SqlParameter("@projectInformationId", createEntity.Name)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -58,7 +58,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spDeleteReleaseType];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@Id", deleteEntity.Id)
+                    new SqlParameter("@id", deleteEntity.Id)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -118,7 +118,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spGetReleaseTypeById];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@Id", id)
+                    new SqlParameter("@id", id)
                 };
 
                 using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -158,7 +158,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spUpdateReleaseType];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@Id", updateEntity.Id),
+                    new SqlParameter("@id", updateEntity.Id),
                     new SqlParameter("@Name", updateEntity.Name)
                     
                 };

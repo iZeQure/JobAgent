@@ -33,6 +33,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spCreateArea];";
                 SqlParameter[] parameters = new[]
                 {
+                    new SqlParameter("@id", createEntity.Id),
                     new SqlParameter("@areaName", createEntity.Name)
                 };
 
@@ -57,7 +58,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spDeleteArea];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@areaId", deleteEntity.Id)
+                    new SqlParameter("@id", deleteEntity.Id)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -115,7 +116,7 @@ namespace SqlDataAccessLibrary.Repositories
 
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@areaId", id)
+                    new SqlParameter("@id", id)
                 };
 
                 using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -154,7 +155,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spUpdateArea];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@areaId", updateEntity.Id),
+                    new SqlParameter("@id", updateEntity.Id),
                     new SqlParameter("@areaName", updateEntity.Name)
                 };
 

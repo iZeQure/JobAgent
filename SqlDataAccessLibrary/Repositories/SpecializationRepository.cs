@@ -33,8 +33,9 @@ namespace SqlDataAccessLibrary.Repositories
 
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@SpecializationName", createEntity.Name),
-                    new SqlParameter("@CategoryId", createEntity.Category.Id)
+                    new SqlParameter("@id", createEntity.Id),
+                    new SqlParameter("@categoryId", createEntity.Category.Id),
+                    new SqlParameter("@SpecializationName", createEntity.Name)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -62,7 +63,7 @@ namespace SqlDataAccessLibrary.Repositories
 
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@specializationId", deleteEntity.Id)
+                    new SqlParameter("@id", deleteEntity.Id)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -128,7 +129,7 @@ namespace SqlDataAccessLibrary.Repositories
 
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@specializationId", id),
+                    new SqlParameter("@id", id),
                 };
 
                 using SqlDataReader reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -172,7 +173,7 @@ namespace SqlDataAccessLibrary.Repositories
 
                 SqlParameter[] parameters = new[]
                 {
-                new SqlParameter("@specializationId", updateEntity.Id),
+                new SqlParameter("@id", updateEntity.Id),
                 new SqlParameter("@specializationName", updateEntity.Name),
                 new SqlParameter("@categoryId", updateEntity.Category.Id)
                 };

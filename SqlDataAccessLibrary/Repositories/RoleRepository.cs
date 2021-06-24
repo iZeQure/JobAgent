@@ -33,6 +33,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spCreateRole];";
                 SqlParameter[] parameters = new[]
                 {
+                    new SqlParameter("@id", createEntity.Id),
                     new SqlParameter("@roleName", createEntity.Name),
                     new SqlParameter("@roleDescription", createEntity.Description)
                 };
@@ -59,7 +60,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spDeleteRole];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@roleId", deleteEntity.Id)
+                    new SqlParameter("@id", deleteEntity.Id)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -119,7 +120,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spGetRoleById];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@roleId", id)
+                    new SqlParameter("@id", id)
                 };
 
                 using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -159,7 +160,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spUpdateRole];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@roleId", updateEntity.Id),
+                    new SqlParameter("@id", updateEntity.Id),
                     new SqlParameter("@roleName", updateEntity.Name),
                     new SqlParameter("@roleDescription", updateEntity.Description)
                 };

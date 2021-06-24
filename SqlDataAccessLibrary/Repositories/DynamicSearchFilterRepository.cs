@@ -34,10 +34,10 @@ namespace SqlDataAccessLibrary.Repositories
 
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@Id", createEntity.Id),
-                    new SqlParameter("@CategoryId", createEntity.GetCategory.Id),
-                    new SqlParameter("@SpecializationId", createEntity.GetSpecialization.Id),
-                    new SqlParameter("@Key", createEntity.GetKey)
+                    new SqlParameter("@id", createEntity.Id),
+                    new SqlParameter("@categoryId", createEntity.GetCategory.Id),
+                    new SqlParameter("@specializationId", createEntity.GetSpecialization.Id),
+                    new SqlParameter("@key", createEntity.GetKey)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);

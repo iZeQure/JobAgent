@@ -33,6 +33,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spCreateJobPage];";
                 SqlParameter[] parameters = new[]
                 {
+                    new SqlParameter("@id", createEntity.Id),
                     new SqlParameter("@companyId", createEntity.Company.Id),
                     new SqlParameter("@jobPageUrl", createEntity.URL)
                 };
@@ -58,7 +59,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spDeleteJobPage];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@jobPageId", deleteEntity.Id)
+                    new SqlParameter("@id", deleteEntity.Id)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -122,7 +123,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spGetJobPageById];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@jobPageId", id)
+                    new SqlParameter("@id", id)
                 };
 
                 using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -161,7 +162,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "EXEC [JA.spUpdateJobPage];";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@jobPageId", updateEntity.Id),
+                    new SqlParameter("@id", updateEntity.Id),
                     new SqlParameter("@companyId", updateEntity.Company.Id),
                     new SqlParameter("@jobPageUrl", updateEntity.URL)
                 };

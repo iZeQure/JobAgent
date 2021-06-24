@@ -34,9 +34,9 @@ namespace SqlDataAccessLibrary
 
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@Id", createEntity.Id),
-                    new SqlParameter("@CategoryId", createEntity.FilterType.Id),
-                    new SqlParameter("@Key", createEntity.GetKey)
+                    new SqlParameter("@id", createEntity.Id),
+                    new SqlParameter("@categoryId", createEntity.FilterType.Id),
+                    new SqlParameter("@key", createEntity.GetKey)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -63,7 +63,7 @@ namespace SqlDataAccessLibrary
 
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@Id", deleteEntity.Id)
+                    new SqlParameter("@id", deleteEntity.Id)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -129,7 +129,7 @@ namespace SqlDataAccessLibrary
 
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@Id", id),
+                    new SqlParameter("@id", id),
                 };
 
                 StaticSearchFilter tempStaticSearchFilter = null;
@@ -174,9 +174,9 @@ namespace SqlDataAccessLibrary
 
                 SqlParameter[] parameters = new[]
                 {
-                     new SqlParameter("@Id", updateEntity.Id),
-                    new SqlParameter("@CategoryId", updateEntity.FilterType.Id),
-                    new SqlParameter("@Key", updateEntity.GetKey)
+                     new SqlParameter("@id", updateEntity.Id),
+                    new SqlParameter("@categoryId", updateEntity.FilterType.Id),
+                    new SqlParameter("@key", updateEntity.GetKey)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
