@@ -2,25 +2,44 @@
 <SqlWorkbenchSqlProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="JobAgent_v2">
   <Items>
     <LogicalFolder Name="Connections" Type="2" Sorted="true">
-      <Items />
+      <Items>
+        <ConnectionNode Name="VIOLURREOT\DEVELOPMENT:VIOLURREOT\iZeQure">
+          <Created>2021-06-24T23:25:07.4088205+02:00</Created>
+          <Type>SQL</Type>
+          <Server>VIOLURREOT\DEVELOPMENT</Server>
+          <UserName />
+          <Authentication>Windows Authentication</Authentication>
+          <InitialDB>JobAgentDB_v2</InitialDB>
+          <LoginTimeout>30</LoginTimeout>
+          <ExecutionTimeout>0</ExecutionTimeout>
+          <ConnectionProtocol>NotSpecified</ConnectionProtocol>
+          <ApplicationName>Microsoft SQL Server Management Studio - Query</ApplicationName>
+        </ConnectionNode>
+      </Items>
     </LogicalFolder>
     <LogicalFolder Name="Queries" Type="0" Sorted="true">
       <Items>
+        <FileNode Name="MyTestQueriesForSomeRandomTests.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:VIOLURREOT\DEVELOPMENT:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>VIOLURREOT\DEVELOPMENT</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>MyTestQueriesForSomeRandomTests.sql</FullPath>
+        </FileNode>
         <FileNode Name="SETUP.sql">
-          <AssociatedConnectionMoniker />
-          <AssociatedConnSrvName />
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:VIOLURREOT\DEVELOPMENT:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>VIOLURREOT\DEVELOPMENT</AssociatedConnSrvName>
           <AssociatedConnUserName />
           <FullPath>SETUP.sql</FullPath>
         </FileNode>
         <FileNode Name="STORED_PROCEDURES.SETUP.sql">
-          <AssociatedConnectionMoniker />
-          <AssociatedConnSrvName />
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:VIOLURREOT\DEVELOPMENT:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>VIOLURREOT\DEVELOPMENT</AssociatedConnSrvName>
           <AssociatedConnUserName />
           <FullPath>STORED_PROCEDURES.SETUP.sql</FullPath>
         </FileNode>
         <FileNode Name="Test Data.sql">
-          <AssociatedConnectionMoniker />
-          <AssociatedConnSrvName />
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:VIOLURREOT\DEVELOPMENT:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>VIOLURREOT\DEVELOPMENT</AssociatedConnSrvName>
           <AssociatedConnUserName />
           <FullPath>Test Data.sql</FullPath>
         </FileNode>
