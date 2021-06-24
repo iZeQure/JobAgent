@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ObjectLibrary.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,20 +10,20 @@ namespace ObjectLibrary.Versioning
     /// <summary>
     /// Represents class handling the version control for the project.
     /// </summary>
-    public class Version
+    public class Version : BaseEntity
     {
-        private string _hashId;
-        private ProjectSystem _system;
+        private string _commitId;
+        private ProjectInformation _projectInformation;
         private ReleaseType _releaseType;
         private int _major;
         private int _minor;
         private int _patch;
         private DateTime _releaseDateTime;
 
-        public Version(string hashId, ProjectSystem system, ReleaseType releaseType, int major, int minor, int patch, DateTime releaseDateTime)
+        public Version(int id, string commitId, ProjectInformation system, ReleaseType releaseType, int major, int minor, int patch, DateTime releaseDateTime) : base(id)
         {
-            _hashId = hashId;
-            _system = system;
+            _commitId = commitId;
+            _projectInformation = system;
             _releaseType = releaseType;
             _major = major;
             _minor = minor;
@@ -30,8 +31,8 @@ namespace ObjectLibrary.Versioning
             _releaseDateTime = releaseDateTime;
         }
 
-        public string HashId { get => _hashId; set => _hashId = value; }
-        public ProjectSystem System { get => _system; set => _system = value; }
+        public string CommitId { get => _commitId; set => _commitId = value; }
+        public ProjectInformation System { get => _projectInformation; set => _projectInformation = value; }
         public ReleaseType ReleaseType { get => _releaseType; set => _releaseType = value; }
         public int Major { get => _major; set => _major = value; }
         public int Minor { get => _minor; set => _minor = value; }
