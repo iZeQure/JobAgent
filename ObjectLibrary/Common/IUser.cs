@@ -8,6 +8,11 @@ namespace ObjectLibrary.Common
     public interface IUser
     {
         /// <summary>
+        /// Get the user id
+        /// </summary>
+        int UserId { get; }
+
+        /// <summary>
         /// Get the full name of the user entity.
         /// </summary>
         string GetFullName { get; }

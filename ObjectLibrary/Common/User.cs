@@ -31,6 +31,8 @@ namespace ObjectLibrary.Common
             _accessToken = accessToken;
         }
 
+        public int UserId { get { return base.Id; } }
+
         /// <summary>
         /// Get the user secret.
         /// </summary>
