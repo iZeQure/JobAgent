@@ -10,9 +10,6 @@ namespace SqlDataAccessLibrary.Repositories.Abstractions
 {
     public interface ICompanyRepository : IRepository<Company>
     {
-        public Task<IEnumerable<Company>> GetCompaniesWithContract(CancellationToken cancellation);
-
-        public Task<IEnumerable<Company>> GetCompaniesWithOutContract(CancellationToken cancellation);
 
     }
 }

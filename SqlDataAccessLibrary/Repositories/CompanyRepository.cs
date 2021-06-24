@@ -154,26 +154,6 @@ namespace SqlDataAccessLibrary.Repositories
         }
 
         /// <summary>
-        /// Returns Companies with contracts
-        /// </summary>
-        /// <param name="cancellation"></param>
-        /// <returns></returns>
-        public Task<IEnumerable<Company>> GetCompaniesWithContract(CancellationToken cancellation)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Returns Companies without contracts
-        /// </summary>
-        /// <param name="cancellation"></param>
-        /// <returns></returns>
-        public Task<IEnumerable<Company>> GetCompaniesWithOutContract(CancellationToken cancellation)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         /// Updates a Company
         /// </summary>
         /// <param name="updateEntity"></param>
