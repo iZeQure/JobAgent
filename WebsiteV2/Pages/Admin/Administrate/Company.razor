@@ -1,29 +1,9 @@
 ﻿@page "/admin/settings/companies"
+
 @*@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]*@
 
-<div class="d-flex">
-    <div class="d-inline-block">
-        <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#CreateCompanyModal">
-            Opret ny Virksomhed
-        </a>
-    </div>
-</div>
+<h3>Company</h3>
 
-<div class="table-responsive table-responsive-sm table-responsive-md">
-    <table class="table table-sm table-striped table-hover">
-        <caption>Liste over virksomheders kontrakter..</caption>
-        <thead class="thead-dark">
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Virksomhedens CVR</th>
-                <th scope="col">Navn</th>
-                <th scope="col">Link til Virksomhed</th>
-                <th scope="col"></th>
-                <th scope="col"></th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-</div>
- 
+@code {
+
+}

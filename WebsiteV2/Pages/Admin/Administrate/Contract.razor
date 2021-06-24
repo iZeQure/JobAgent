@@ -1,32 +1,9 @@
 ﻿@page "/admin/settings/contracts"
+
 @*@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]*@
 
-<div class="d-flex">
-    <div class="d-inline-block">
-        <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#CreateContractModal">
-            Opret ny Kontrakt
-        </a>
-    </div>
-</div>
+<h3>Contract</h3>
 
-<div class="table-responsive table-responsive-sm table-responsive-md">
-    <table class="table table-sm table-striped table-hover">
-        <caption>Liste over virksomheders kontrakter..</caption>
-        <thead class="thead-dark">
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Virksomhed</th>
-                <th scope="col">Kontakt Person</th>
-                <th scope="col">Praktikkonsulent</th>
-                <th scope="col">Kontrakt</th>
-                <th scope="col">Kontrakt Oprettet</th>
-                <th scope="col">Udløbsdato</th>
-                <th scope="col"></th>
-                <th scope="col"></th>
-            </tr>
-        </thead>
-        <tbody>
+@code {
 
-        </tbody>
-    </table>
-</div>
+}
