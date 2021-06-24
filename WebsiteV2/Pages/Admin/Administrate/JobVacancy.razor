@@ -1,9 +1,53 @@
 ﻿@page "/admin/settings/job-vacancies"
-
 @*@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]*@
 
-<h3>JobVacancy</h3>
+<div class="d-flex">
+    <div class="d-inline-block">
+        <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#CreateJobVacancyModal">
+            Opret nyt Stillingsopslag
+        </a>
 
-@code {
+    </div>
+</div>
 
-}
+
+<section id="filterAdverts" class="mb-1">
+    <div class="d-flex flex-row-reverse">
+        <div class="filter">
+            <select class="custom-select-sm">
+                <option selected value="0">--- Vælg kategori ---</option>
+                <option>Ingen Kategorier fundet!</option>
+            </select>
+        </div>
+    </div>
+</section>
+
+<section id="filterControls" class="mb-3">
+    <div class="d-flex flex-row-reverse">
+        <div class="action">
+            <button class="btn btn-sm btn-outline-info">Filtrér</button>
+            <button class="btn btn-sm btn-outline-dark">Ryd Filtrering</button>
+        </div>
+    </div>
+</section>
+
+<div class="table-responsive table-responsive-sm table-responsive-md">
+    <table class="table table-sm table-striped table-hover">
+        <caption>Liste over stillingsopslag..</caption>
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Titel</th>
+                <th scope="col">Job Kategory</th>
+                <th scope="col">Virksomhed</th>
+                <th scope="col">Opslag Registeret</th>
+                <th scope="col">Ansøgningsfrist</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+</div>
