@@ -99,7 +99,7 @@ namespace SqlDataAccessLibrary.Repositories
                         DynamicSearchFilter tempDynamicSearchFilter = new(
                             id: reader.GetInt32(0),
                             category: new Category(reader.GetInt32(1), ""),
-                            specialization: new Specialization(reader.GetInt32(2), new Category(0,""), ""),
+                            specialization: new Specialization(reader.GetInt32(2), new Category(0, ""), ""),
                             key: reader.GetString(3)
 
                             );
@@ -138,9 +138,10 @@ namespace SqlDataAccessLibrary.Repositories
 
                 if (reader.HasRows)
                 {
+                    DynamicSearchFilter tempDynamicSearchFilter = null;
                     while (await reader.ReadAsync(cancellation))
                     {
-                        DynamicSearchFilter tempDynamicSearchFilter = new(
+                        tempDynamicSearchFilter = new(
                             id: reader.GetInt32(0),
                             category: new Category(reader.GetInt32(1), ""),
                             specialization: new Specialization(reader.GetInt32(2), new Category(0, ""), ""),
@@ -148,8 +149,8 @@ namespace SqlDataAccessLibrary.Repositories
 
                             );
 
-                        return tempDynamicSearchFilter;
                     }
+                    return tempDynamicSearchFilter;
                 }
 
                 return null;

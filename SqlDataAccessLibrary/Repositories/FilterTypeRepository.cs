@@ -135,17 +135,17 @@ namespace SqlDataAccessLibrary.Repositories
 
                 if (reader.HasRows)
                 {
+                    FilterType tempFilterType = null;
                     while (await reader.ReadAsync(cancellation))
                     {
-                        FilterType tempFilterType = new(
-
+                        tempFilterType = new(
                             id: reader.GetInt32(0),
                             name: reader.GetString(1),
                             description: reader.GetString(2)
                             );
 
-                        return tempFilterType;
                     }
+                    return tempFilterType;
                 }
 
                 return null;

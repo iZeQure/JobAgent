@@ -216,11 +216,10 @@ namespace SqlDataAccessLibrary.Repositories
 
                 if (reader.HasRows)
                 {
+                    User tempuser = null;
                     while (await reader.ReadAsync(cancellation))
                     {
-                        User tempuser = new(
-
-
+                        tempuser = new(
                             id: reader.GetInt32(0),
                             firstName: reader.GetString(1),
                             lastName: reader.GetString(2),
@@ -231,8 +230,8 @@ namespace SqlDataAccessLibrary.Repositories
 
                             );
 
-                        return tempuser;
                     }
+                    return tempuser;
                 }
 
                 return null;

@@ -135,17 +135,18 @@ namespace SqlDataAccessLibrary.Repositories
 
                 if (reader.HasRows)
                 {
+                    Specialization tempSpecialization = null;
                     while (await reader.ReadAsync(cancellation))
                     {
 
-                        Specialization tempSpecialization = new(
+                        tempSpecialization = new(
                         id: reader.GetInt32(0),
                         category: new Category(reader.GetInt32(1), ""),
                         name: reader.GetString(2)
                         );
 
-                        return tempSpecialization;
                     }
+                    return tempSpecialization;
                 }
 
                 return null;

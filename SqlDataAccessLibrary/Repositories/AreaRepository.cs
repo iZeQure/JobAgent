@@ -130,6 +130,7 @@ namespace SqlDataAccessLibrary.Repositories
                             reader.GetInt32(0),
                             reader.GetString(1));
                     }
+                    return area;
                 }
 
                 return null;

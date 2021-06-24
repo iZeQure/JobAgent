@@ -138,6 +138,7 @@ namespace SqlDataAccessLibrary.Repositories
                             new Company(reader.GetInt32(1), 0, string.Empty, string.Empty),
                             reader.GetString(2));
                     }
+                    return job;
                 }
 
                 return null;

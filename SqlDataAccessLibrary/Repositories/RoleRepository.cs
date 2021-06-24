@@ -126,13 +126,15 @@ namespace SqlDataAccessLibrary.Repositories
 
                 if (reader.HasRows)
                 {
+                    Role role = null;
                     while (await reader.ReadAsync(cancellation))
                     {
-                        Role role = new(
+                        role = new(
                             reader.GetInt32(0),
                             reader.GetString(1),
                             reader.GetString(2));
                     }
+                    return role;
                 }
 
                 return null;

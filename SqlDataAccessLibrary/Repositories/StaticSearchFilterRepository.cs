@@ -132,21 +132,23 @@ namespace SqlDataAccessLibrary
                     new SqlParameter("@Id", id),
                 };
 
+                StaticSearchFilter tempStaticSearchFilter = null;
+
                 using SqlDataReader reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
 
                 if (reader.HasRows)
                 {
                     while (await reader.ReadAsync(cancellation))
                     {
-                        StaticSearchFilter tempStaticSearchFilter = new(
+                        tempStaticSearchFilter = new(
                             id: reader.GetInt32(0),
                             filterType: new(reader.GetInt32(1), "", ""),
                             key: reader.GetString(2)
 
                             );
 
-                        return tempStaticSearchFilter;
                     }
+                    return tempStaticSearchFilter;
                 }
 
                 return null;
