@@ -1,13 +1,10 @@
-﻿using ObjectLibrary.Common;
-using ObjectLibrary.Filter;
+﻿using ObjectLibrary.Filter;
 using SqlDataAccessLibrary.Database;
 using SqlDataAccessLibrary.Repositories.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
