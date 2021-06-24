@@ -2479,8 +2479,6 @@ DECLARE @TName varchar(20) = 'VersionControlCreateTransaction';
 BEGIN
 	BEGIN TRAN @TName;
 	BEGIN TRY
-		BEGIN TRANSACTION @transaction;
-
 		INSERT INTO [VersionControl] ([ProjectInformationId], [ReleaseTypeId], [CommitId], [Major], [Minor], [Patch], [ReleaseDateTime]) VALUES
 		(@projectInformationId, @releaseTypeId, @commitId, @major, @minor, @patch, @releaseDateTime);
 
