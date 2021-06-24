@@ -2,20 +2,7 @@
 <SqlWorkbenchSqlProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="JobAgent_v1">
   <Items>
     <LogicalFolder Name="Connections" Type="2" Sorted="true">
-      <Items>
-        <ConnectionNode Name="IGEIRISS\SQLDEV:IGEIRISS\Tobias Rosenvinge">
-          <Created>2021-05-26T09:16:33.1369598+02:00</Created>
-          <Type>SQL</Type>
-          <Server>IGEIRISS\SQLDEV</Server>
-          <UserName />
-          <Authentication>Windows Authentication</Authentication>
-          <InitialDB />
-          <LoginTimeout>30</LoginTimeout>
-          <ExecutionTimeout>0</ExecutionTimeout>
-          <ConnectionProtocol>NotSpecified</ConnectionProtocol>
-          <ApplicationName />
-        </ConnectionNode>
-      </Items>
+      <Items />
     </LogicalFolder>
     <LogicalFolder Name="Queries" Type="0" Sorted="true">
       <Items>
