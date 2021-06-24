@@ -36,8 +36,8 @@ DROP TABLE IF EXISTS [Contract]
 DROP TABLE IF EXISTS [JobPage]
 DROP TABLE IF EXISTS [Company]
 
-DROP TABLE IF EXISTS [Version]
-DROP TABLE IF EXISTS [System]
+DROP TABLE IF EXISTS [VersionControl]
+DROP TABLE IF EXISTS [ProjectInformation]
 DROP TABLE IF EXISTS [ReleaseType]
 DROP TABLE IF EXISTS [StaticSearchFilter]
 DROP TABLE IF EXISTS [DynamicSearchFilter]
@@ -140,7 +140,8 @@ CREATE TABLE [Specialization] (
 [Name] varchar(100) not null)
 GO
 
-CREATE TABLE [System] (
+CREATE TABLE [ProjectInformation] (
+[Id] int not null identity(1,1),
 [Name] varchar(50) not null,
 [PublishedDateTime] datetime not null default GETDATE())
 GO
@@ -150,10 +151,11 @@ CREATE TABLE [ReleaseType] (
 [Name] varchar(100) not null)
 GO
 
-CREATE TABLE [Version] (
-[HashId] varchar(40) not null,
-[SystemName] varchar(50) not null,
+CREATE TABLE [VersionControl] (
+[Id] int not null identity(1,1),
+[ProjectInformationId] int not null,
 [ReleaseTypeId] int not null,
+[CommitId] varchar(40) not null,
 [Major] int not null default 0,
 [Minor] int not null default 0,
 [Patch] int not null default 0,
@@ -275,9 +277,9 @@ ADD
 	FOREIGN KEY ([JobAdvertVacantJobId]) REFERENCES [JobAdvert] ([VacantJobId])
 GO
 
-ALTER TABLE [System]
+ALTER TABLE [ProjectInformation]
 ADD
-	PRIMARY KEY ([Name])
+	PRIMARY KEY ([Id])
 GO
 
 ALTER TABLE [ReleaseType]
@@ -290,10 +292,10 @@ ADD
 	PRIMARY KEY ([Id])
 GO
 
-ALTER TABLE [Version]
+ALTER TABLE [VersionControl]
 ADD 
-	PRIMARY KEY ([HashId], [SystemName]),
-	FOREIGN KEY ([SystemName]) REFERENCES [System] ([Name]),
+	PRIMARY KEY ([Id]),
+	FOREIGN KEY ([ProjectInformationId]) REFERENCES [ProjectInformation] ([Id]),
 	FOREIGN KEY ([ReleaseTypeId]) REFERENCES [ReleaseType] ([Id])
 GO
 
@@ -617,7 +619,7 @@ GO
 SET IDENTITY_INSERT [dbo].[Specialization] OFF;
 GO
 
-INSERT INTO [System] ([Name], [PublishedDateTime]) VALUES 
+INSERT INTO [ProjectInformation] ([Name], [PublishedDateTime]) VALUES 
 ('Din Job Agent', GETDATE()),
 ('Zombie', GETDATE())
 GO

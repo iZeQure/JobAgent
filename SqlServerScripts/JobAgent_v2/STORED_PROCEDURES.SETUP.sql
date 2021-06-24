@@ -1720,10 +1720,14 @@ GO
 				## Log Section ##
 ####################################################*/
 
-DROP PROCEDURE IF EXISTS [JA.spLog]
+DROP PROCEDURE IF EXISTS [JA.spCreateLog]
+DROP PROCEDURE IF EXISTS [JA.spUpdateLog]
+DROP PROCEDURE IF EXISTS [JA.spRemoveLog]
+DROP PROCEDURE IF EXISTS [JA.spGetLogById]
+DROP PROCEDURE IF EXISTS [JA.spGetLogs]
 GO
 
-CREATE PROCEDURE [JA.spLog] (
+CREATE PROCEDURE [JA.spCreateLog] (
 	@severityId int,
 	@currentTime datetime = GETDATE,
 	@createdBy varchar(250),
@@ -1747,13 +1751,93 @@ AS
 	END TRY
 	BEGIN CATCH
 		
-		BEGIN 
-			INSERT INTO [Log] ([LogSeverityId], [CreatedDateTime], [CreatedBy], [Action], [Message]) VALUES
-			(1, GETDATE(), 'System', 'Failed logging.', 'Could not log action due to invalid');
-
+		BEGIN
 			ROLLBACK TRANSACTION @transaction;
 		END
 		
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spUpdateLog] (
+	@logId int,
+	@severityId int,
+	@createdDateTime datetime,
+	@createdBy varchar(250),
+	@action varchar(250),
+	@message varchar(500))
+AS
+	DECLARE @transaction varchar(20);
+	SET @transaction = 'Log Transaction';
+
+
+	BEGIN TRY
+		BEGIN
+			BEGIN TRANSACTION @transaction WITH MARK N'Updating Log';
+			UPDATE [Log]
+				SET
+				[LogSeverityId] = @severityId,
+				[CreatedDateTime] = @createdDateTime,
+				[CreatedBy] = @createdBy,
+				[Action] = @action,
+				[Message] = @message
+				WHERE
+				[Id] = @logId;
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spRemoveLog] (
+	@logId int)
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Log Transaction';
+
+	BEGIN TRY
+		BEGIN
+			BEGIN TRANSACTION @transaction WITH MARK N'Deleting Log';
+
+			DELETE FROM [Log]
+			WHERE
+			[Log].[Id] = @logId;
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetLogById] (
+	@logId int)
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Log Transaction';
+
+	BEGIN TRY
+		BEGIN
+			SELECT 
+				l.[Id] AS 'Log ID',
+				logS.[Severity] AS 'Log Severity',
+				l.[CreatedBy],
+				l.[CreatedDateTime],
+				l.[Action],
+				l.[Message]
+			FROM [Log] l
+			INNER JOIN [LogSeverity] logS ON logS.Id = l.LogSeverityId
+			WHERE
+				l.[Id] = @logId;
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
 	END CATCH
 GO
 
@@ -1761,9 +1845,205 @@ GO
 			 ## Search Filter Section ##
 ####################################################*/
 
+DROP PROCEDURE IF EXISTS [JA.spCreateStaticSearchFilter]
+DROP PROCEDURE IF EXISTS [JA.spUpdateStaticSearchFilter]
+DROP PROCEDURE IF EXISTS [JA.spRemoveStaticSearchFilter]
+DROP PROCEDURE IF EXISTS [JA.spGetStaticSearchFilterById]
+
+DROP PROCEDURE IF EXISTS [JA.spCreateDynamicSearchFilter]
+DROP PROCEDURE IF EXISTS [JA.spUpdateDynamicSearchFilter]
+DROP PROCEDURE IF EXISTS [JA.spRemoveDynamicSearchFilter]
+DROP PROCEDURE IF EXISTS [JA.spGetDynamicSearchFilterById]
+
 DROP PROCEDURE IF EXISTS [JA.spGetDynamicFilterKeys]
 DROP PROCEDURE IF EXISTS [JA.spGetStaticFilterKeys]
 DROP PROCEDURE IF EXISTS [JA.spGetStaticFilterKeysByTypeId]
+GO
+
+CREATE PROCEDURE [JA.spCreateStaticSearchFilter] (
+	@filterTypeId int,
+	@key varchar(50))
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Search Filter Transaction';
+
+	BEGIN TRY
+		BEGIN
+			INSERT INTO [StaticSearchFilter] ([FilterTypeId], [Key]) VALUES
+			(@filterTypeId, @key);
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spUpdateStaticSearchFilter] (
+	@id int,
+	@filterTypeId int,
+	@key varchar(50))
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Search Filter Transaction';
+
+	BEGIN TRY
+		BEGIN
+			UPDATE [StaticSearchFilter]
+				SET
+				[FilterTypeId] = @filterTypeId,
+				[Key] = @key
+				WHERE
+				[Id] = @id;
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spRemoveStaticSearchFilter] (
+	@id int)
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Search Filter Transaction';
+
+	BEGIN TRY
+		BEGIN
+			DELETE FROM [StaticSearchFilter]
+			WHERE
+			[Id] = @id;
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetStaticSearchFilterById] (
+	@id int)
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Search Filter Transaction';
+
+	BEGIN TRY
+		BEGIN
+			SELECT
+				s.[Id] AS 'Static Search Filter ID',
+				s.[Key],
+				f.[Id] AS 'Filter Type ID',
+				f.[Name] AS 'Filter Name',
+				f.[Description] AS 'Filter Desription'
+			FROM [StaticSearchFilter] s
+			INNER JOIN [FilterType] f ON f.[Id] = s.[Id]
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spCreateDynamicSearchFilter] (
+	@categoryId int,
+	@specializationId int,
+	@key varchar(50))
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Search Filter Transaction';
+
+	BEGIN TRY
+		BEGIN
+			INSERT INTO [DynamicSearchFilter] ([CategoryId], [SpecializationId], [Key]) VALUES
+			(@categoryId, @specializationId, @key);
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spUpdateDynamicSearchFilter] (
+	@id int,
+	@categoryId int,
+	@specializationId int,
+	@key varchar(50))
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Search Filter Transaction';
+
+	BEGIN TRY
+		BEGIN
+			UPDATE [DynamicSearchFilter]
+				SET
+				[CategoryId] = @categoryId,
+				[SpecializationId] = @specializationId,
+				[Key] = @key
+				WHERE
+				[Id] = @id;
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spRemoveDynamicSearchFilter] (
+	@id int)
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Search Filter Transaction';
+
+	BEGIN TRY
+		BEGIN
+			DELETE FROM [DynamicSearchFilter]
+			WHERE
+			[Id] = @id;
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetDynamicSearchFilterById] (
+	@id int)
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Search Filter Transaction';
+
+	BEGIN TRY
+		BEGIN
+			SELECT
+				d.[Id] AS 'Dynamic Search Filter ID',
+				d.[Key],
+				c.[Id] AS 'Category ID',
+				c.[Name] AS 'Category Name',
+				s.[Id] AS 'Specialization ID',
+				s.[CategoryId] AS 'Specialization Category Association ID',
+				s.[Name] AS 'Specialization Name'
+			FROM [DynamicSearchFilter] d
+			INNER JOIN [Category] c ON c.[Id] = d.[CategoryId]
+			INNER JOIN [Specialization] s ON s.[Id] = d.[SpecializationId]
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
 GO
 
 CREATE PROCEDURE [JA.spGetStaticFilterKeys]
@@ -1789,7 +2069,6 @@ AS
 	BEGIN CATCH
 
 		BEGIN
-			EXEC [JA.spLog] 4, GETDATE, 'System', 'Getting Static Filter Keys.', ERROR_MESSAGE;
 			ROLLBACK TRANSACTION @t;
 		END
 
@@ -1821,7 +2100,6 @@ AS
 	BEGIN CATCH
 
 		BEGIN
-			EXEC [JA.spLog] 4, GETDATE, 'System', 'Getting Static Filter Keys by type Id.', ERROR_MESSAGE;
 			ROLLBACK TRANSACTION @t;
 		END
 
@@ -1851,7 +2129,6 @@ AS
 	BEGIN CATCH
 		
 		BEGIN
-			EXEC [JA.spLog] 4, GETDATE, 'System', 'Getting Dynamic Filter Search Keys.', ERROR_MESSAGE;
 			ROLLBACK TRANSACTION @transaction;
 		END
 
@@ -1859,49 +2136,430 @@ AS
 GO
 
 /*##################################################
-				## Version Section ##
+			## Version Control Section ##
 ####################################################*/
 
-DROP PROCEDURE IF EXISTS [JA.spGetSystemInformationByName]
+DROP PROCEDURE IF EXISTS [JA.spCreateVersionControl]
+DROP PROCEDURE IF EXISTS [JA.spUpdateVersionControl]
+DROP PROCEDURE IF EXISTS [JA.spRemoveVersionControl]
+DROP PROCEDURE IF EXISTS [JA.spGetVersionControlById]
+DROP PROCEDURE IF EXISTS [JA.spGetVersionControls]
+
+--DROP PROCEDURE IF EXISTS [JA.spGetSystemInformationByName]
 GO
 
-CREATE PROCEDURE [JA.spGetSystemInformationByName] (
-	@systemName varchar(50))
+CREATE PROCEDURE [JA.spCreateVersionControl] (
+	@projectInformationId int,
+	@releaseTypeId int,
+	@commitId varchar(32),
+	@major int,
+	@minor int,
+	@patch int,
+	@releaseDateTime datetime)
 AS
 	DECLARE @transaction varchar(20)
-	SET @transaction = 'Getting Information for System ' + @systemName;
-
-	BEGIN TRANSACTION @transaction WITH MARK N'Acquiring System Information';
+	SET @transaction = 'Version Control Transaction';
 
 	BEGIN TRY
-
 		BEGIN
-			SELECT TOP (1)
-				v.[HashId] as 'Commit ID',
-				s.[Name] as 'System Name',
-				CONCAT('v',
-					CONCAT_WS (
-						'.'
-						,v.[Major], v.[Minor], v.[Patch]
-				), '-', r.[Name]) AS 'Version',
-				s.[PublishedDateTime] as 'Published Date',
-				v.[ReleaseDateTime] as 'Released Date'
-			FROM [Version] v
+			INSERT INTO [VersionControl] ([ProjectInformationId], [ReleaseTypeId], [CommitId], [Major], [Minor], [Patch], [ReleaseDateTime]) VALUES
+			(@projectInformationId, @releaseTypeId, @commitId, @major, @minor, @patch, @releaseDateTime);
 
-			INNER JOIN [System] s ON s.[Name] = @systemName
-			INNER JOIN [ReleaseType] r ON r.[Id] = v.[ReleaseTypeId]
-			WHERE v.[SystemName] = @systemName
-			ORDER BY v.[ReleaseDateTime] DESC;
 			COMMIT TRANSACTION @transaction;
 		END
-
 	END TRY
 	BEGIN CATCH
-		
-		BEGIN
-			EXEC [JA.spLog] 4, GETDATE, 'System', 'Getting System Information.', ERROR_MESSAGE;
-			ROLLBACK TRANSACTION @transaction;
-		END
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
 
+CREATE PROCEDURE [JA.spUpdateVersionControl] (
+	@id int,
+	@projectInformationId int,
+	@releaseTypeId int,
+	@commitId varchar(32),
+	@major int,
+	@minor int,
+	@patch int,
+	@releaseDateTime datetime)
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Version Control Transaction';
+
+	BEGIN TRY
+		BEGIN
+			UPDATE [VersionControl]
+				SET
+				[ProjectInformationId] = @projectInformationId,
+				[ReleaseTypeId] = @releaseTypeId,
+				[CommitId] = @commitId,
+				[Major] = @major,
+				[Minor] = @minor,
+				[Patch] = @patch,
+				[ReleaseDateTime] = @releaseDateTime
+				WHERE
+				[Id] = @id;
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spRemoveVersionControl] (
+	@id int)
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Version Control Transaction';
+
+	BEGIN TRY
+		BEGIN
+			DELETE FROM [VersionControl]
+			WHERE [Id] = @id;
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetVersionControlById] (
+	@id int)
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Version Control Transaction';
+
+	BEGIN TRY
+		BEGIN
+			SELECT
+				v.[Id] AS 'Version ID',
+				v.[ProjectInformationId] AS 'Project ID',
+				p.[Name] AS 'Project Name',
+				p.[PublishedDateTime] AS 'Project Publish Date',
+				v.[ReleaseTypeId] AS 'Release Type ID',
+				r.[Name] AS 'Release Name',
+				v.[CommitId],
+				v.[Major],
+				v.[Minor],
+				v.[Patch],
+				v.[ReleaseDateTime] AS 'Version Release Date'
+			FROM [VersionControl] v
+			INNER JOIN [ProjectInformation] p ON p.[Id] = v.[ProjectInformationId]
+			INNER JOIN [ReleaseType] r ON r.[Id] = v.[ReleaseTypeId]
+			WHERE v.[Id] = @id;
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetVersionControls]
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Version Control Transaction';
+
+	BEGIN TRY
+		BEGIN
+			SELECT
+				v.[Id] AS 'Version ID',
+				v.[ProjectInformationId] AS 'Project ID',
+				p.[Name] AS 'Project Name',
+				p.[PublishedDateTime] AS 'Project Publish Date',
+				v.[ReleaseTypeId] AS 'Release Type ID',
+				r.[Name] AS 'Release Name',
+				v.[CommitId],
+				v.[Major],
+				v.[Minor],
+				v.[Patch],
+				v.[ReleaseDateTime] AS 'Version Release Date'
+			FROM [VersionControl] v
+			INNER JOIN [ProjectInformation] p ON p.[Id] = v.[ProjectInformationId]
+			INNER JOIN [ReleaseType] r ON r.[Id] = v.[ReleaseTypeId]
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+--CREATE PROCEDURE [JA.spGetSystemInformationByName] (
+--	@systemName varchar(50))
+--AS
+--	DECLARE @transaction varchar(20)
+--	SET @transaction = 'Getting Information for System ' + @systemName;
+
+--	BEGIN TRANSACTION @transaction WITH MARK N'Acquiring System Information';
+
+--	BEGIN TRY
+
+--		BEGIN
+--			SELECT TOP (1)
+--				v.[HashId] as 'Commit ID',
+--				s.[Name] as 'System Name',
+--				CONCAT('v',
+--					CONCAT_WS (
+--						'.'
+--						,v.[Major], v.[Minor], v.[Patch]
+--				), '-', r.[Name]) AS 'Version',
+--				s.[PublishedDateTime] as 'Published Date',
+--				v.[ReleaseDateTime] as 'Released Date'
+--			FROM [Version] v
+
+--			INNER JOIN [System] s ON s.[Name] = @systemName
+--			INNER JOIN [ReleaseType] r ON r.[Id] = v.[ReleaseTypeId]
+--			WHERE v.[SystemName] = @systemName
+--			ORDER BY v.[ReleaseDateTime] DESC;
+--			COMMIT TRANSACTION @transaction;
+--		END
+
+--	END TRY
+--	BEGIN CATCH
+		
+--		BEGIN
+--			ROLLBACK TRANSACTION @transaction;
+--		END
+
+--	END CATCH
+--GO
+
+/*##################################################
+		 ## Project Information Section ##
+####################################################*/
+
+DROP PROCEDURE IF EXISTS [JA.spCreateProjectInformation]
+DROP PROCEDURE IF EXISTS [JA.spUpdateProjectInformation]
+DROP PROCEDURE IF EXISTS [JA.spRemoveProjectInformation]
+DROP PROCEDURE IF EXISTS [JA.spGetProjectInformationById]
+DROP PROCEDURE IF EXISTS [JA.spGetProjectInformations]
+GO
+
+CREATE PROCEDURE [JA.spCreateProjectInformation] (
+	@name varchar(50),
+	@publishedDateTime datetime)
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Project Information Transaction';
+
+	BEGIN TRY
+		BEGIN
+			INSERT INTO [ProjectInformation] ([Name], [PublishedDateTime]) VALUES
+			(@name, @publishedDateTime);
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spUpdateProjectInformation] (
+	@id int,
+	@name varchar(50),
+	@publishedDateTime datetime)
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Project Information Transaction';
+
+	BEGIN TRY
+		BEGIN
+			UPDATE [ProjectInformation]
+				SET
+				[Name] = @name,
+				[PublishedDateTime] = @publishedDateTime
+				WHERE
+				[Id] = @id;
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spRemoveProjectInformation] (
+	@id int)
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Project Information Transaction';
+
+	BEGIN TRY
+		BEGIN
+			DELETE FROM [ProjectInformation]
+			WHERE [Id] = @id;
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetProjectInformationById] (
+	@id int)
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Projet Information Transaction';
+
+	BEGIN TRY
+		BEGIN
+			SELECT
+				p.[Id] AS 'Project ID',
+				p.[Name] AS 'Project Name',
+				p.[PublishedDateTime] AS 'Project Published'
+			FROM [ProjectInformation] p
+			WHERE [Id] = @id;
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetProjectInformations]
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Project Information Transaction';
+
+	BEGIN TRY
+		BEGIN
+			SELECT
+				p.[Id] AS 'Project ID',
+				p.[Name] AS 'Project Name',
+				p.[PublishedDateTime] AS 'Project Published'
+			FROM [ProjectInformation] p
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+/*##################################################
+		 ## Release Type Section ##
+####################################################*/
+
+DROP PROCEDURE IF EXISTS [JA.spCreateReleaseType]
+DROP PROCEDURE IF EXISTS [JA.spUpdateReleaseType]
+DROP PROCEDURE IF EXISTS [JA.spRemoveReleaseType]
+DROP PROCEDURE IF EXISTS [JA.spGetReleaseTypeById]
+DROP PROCEDURE IF EXISTS [JA.spGetReleaseTypes]
+GO
+
+CREATE PROCEDURE [JA.spCreateReleaseType] (
+	@name varchar(100))
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Release Type Transaction';
+
+	BEGIN TRY
+		BEGIN
+			INSERT INTO [ReleaseType] ([Name]) VALUES
+			(@name);
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spUpdateReleaseType] (
+	@id int,
+	@name varchar(100))
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Release Type Transaction';
+
+	BEGIN TRY
+		BEGIN
+			UPDATE [ReleaseType]
+				SET
+				[Name] = @name
+				WHERE
+				[Id] = @id;
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spRemoveReleaseType] (
+	@id int)
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Releae Type Transaction';
+
+	BEGIN TRY
+		BEGIN
+			DELETE FROM [ReleaseType]
+			WHERE [Id] = @id;
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetReleaseTypeById] (
+	@id int)
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Release Type Transaction';
+
+	BEGIN TRY
+		BEGIN
+			SELECT
+				p.[Id] AS 'Release ID',
+				p.[Name] AS 'Release Name'
+			FROM [ReleaseType] p
+			WHERE [Id] = @id;
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
+	END CATCH
+GO
+
+CREATE PROCEDURE [JA.spGetReleaseTypes]
+AS
+	DECLARE @transaction varchar(20)
+	SET @transaction = 'Release Type Transaction';
+
+	BEGIN TRY
+		BEGIN
+			SELECT
+				p.[Id] AS 'Release ID',
+				p.[Name] AS 'Release Name'
+			FROM [ReleaseType] p
+
+			COMMIT TRANSACTION @transaction;
+		END
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION @transaction;
 	END CATCH
 GO
