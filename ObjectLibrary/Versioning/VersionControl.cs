@@ -10,7 +10,7 @@ namespace ObjectLibrary.Versioning
     /// <summary>
     /// Represents class handling the version control for the project.
     /// </summary>
-    public class Version : BaseEntity
+    public class VersionControl : BaseEntity
     {
         private string _commitId;
         private ProjectInformation _projectInformation;
@@ -20,11 +20,11 @@ namespace ObjectLibrary.Versioning
         private int _patch;
         private DateTime _releaseDateTime;
 
-        public Version(int id, string commitId, ProjectInformation system, ReleaseType releaseType, int major, int minor, int patch, DateTime releaseDateTime) : base(id)
+        public VersionControl(int id, ProjectInformation projectInformation, ReleaseType releaseType, string commitId, int major, int minor, int patch, DateTime releaseDateTime) : base(id)
         {
-            _commitId = commitId;
-            _projectInformation = system;
+            _projectInformation = projectInformation;
             _releaseType = releaseType;
+            _commitId = commitId;
             _major = major;
             _minor = minor;
             _patch = patch;
@@ -32,7 +32,7 @@ namespace ObjectLibrary.Versioning
         }
 
         public string CommitId { get => _commitId; set => _commitId = value; }
-        public ProjectInformation System { get => _projectInformation; set => _projectInformation = value; }
+        public ProjectInformation ProjectInformation { get => _projectInformation; set => _projectInformation = value; }
         public ReleaseType ReleaseType { get => _releaseType; set => _releaseType = value; }
         public int Major { get => _major; set => _major = value; }
         public int Minor { get => _minor; set => _minor = value; }
