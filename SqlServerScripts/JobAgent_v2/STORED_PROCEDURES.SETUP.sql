@@ -1663,7 +1663,7 @@ DECLARE @TName varchar(20) = 'UserGetByIdTransaction';
 BEGIN
 	BEGIN TRAN @TName;
 	BEGIN TRY
-		SELECT 
+		SELECT DISTINCT
 			u.[Id] AS 'User ID',
 			u.[FirstName] AS 'User Firstname',
 			u.[LastName] AS 'User Lastname',
@@ -1672,10 +1672,15 @@ BEGIN
 			r.[Name] AS 'User Role',
 			l.[Name] AS 'User Location',
 
-			STUFF((	SELECT '; ' + a.[Name]
-					FROM [ConsultantArea] c
-						INNER JOIN [Area] a ON a.[Id] = c.[AreaId]
-					WHERE c.[UserId] = @userId), 1, 1, '') AS 'Consultant Areas'
+			STUFF ((SELECT '; ' + A.[Name] 
+						FROM [ConsultantArea] CA
+						JOIN [Area] A ON A.[Id] = CA.[AreaId]
+						WHERE CA.[UserId] = U.[Id]
+						FOR XML PATH(''))
+					, 1
+					, 1
+					, ''
+				) [Consultant Areas]
 
 		FROM [User] u
 			INNER JOIN [Role] r ON r.[Id] = u.[RoleId]
@@ -1683,6 +1688,8 @@ BEGIN
 			INNER JOIN [ConsultantArea] c ON c.[UserId] = u.[Id]
 			INNER JOIN [Area] a ON a.[Id] = c.[AreaId]
 		WHERE u.[Id] = @userId
+		GROUP BY u.[Id], u.[FirstName], u.[LastName], u.[Email], r.[Name], l.[Name]
+		ORDER BY 1;
 
 		COMMIT TRANSACTION @TName;
 	END TRY
@@ -1701,25 +1708,22 @@ DECLARE @TName varchar(20) = 'UserGetAllTransaction';
 BEGIN
 	BEGIN TRAN @TName;
 	BEGIN TRY
-		SELECT 
-			u.[Id] AS 'User ID',
-			u.[FirstName] AS 'User Firstname',
-			u.[LastName] AS 'User Lastname',
-			u.[Email] AS 'User Email',
+		SELECT DISTINCT
+			U.[Id], U.[Email],
 
-			r.[Name] AS 'User Role',
-			l.[Name] AS 'User Location',
+			STUFF ((SELECT ';' + A.[Name] 
+						FROM [ConsultantArea] CA
+						LEFT JOIN [Area] A ON A.[Id] = CA.[AreaId]
+						WHERE CA.[UserId] = U.[Id]
+						FOR XML PATH(''))
+					, 1
+					, 1
+					, ''
+				) [Consultant Areas]
 
-			STUFF((	SELECT '; ' + a.[Name]
-					FROM [ConsultantArea] c
-						INNER JOIN [Area] a ON a.[Id] = c.[AreaId]
-					WHERE c.[UserId] = u.[Id]), 1, 1, '') AS 'Consultant Areas'
-
-		FROM [User] u
-			INNER JOIN [Role] r ON r.[Id] = u.[RoleId]
-			INNER JOIN [Location] l ON l.[Id] = u.[LocationId]
-			INNER JOIN [ConsultantArea] c ON c.[UserId] = u.[Id]
-			INNER JOIN [Area] a ON a.[Id] = c.[AreaId];
+		FROM [User] U
+		GROUP BY U.[Id], U.[Email]
+		ORDER BY 1;
 
 		COMMIT TRANSACTION @TName;
 	END TRY
@@ -1805,7 +1809,7 @@ DECLARE @TName varchar(20) = 'UserGetByAccessTokenTransaction';
 BEGIN
 	BEGIN TRAN @TName;
 	BEGIN TRY
-		SELECT 
+		SELECT DISTINCT
 			u.[Id] AS 'User ID',
 			u.[FirstName] AS 'User Firstname',
 			u.[LastName] AS 'User Lastname',
@@ -1814,10 +1818,15 @@ BEGIN
 			r.[Name] AS 'User Role',
 			l.[Name] AS 'User Location',
 
-			STUFF((	SELECT '; ' + a.[Name]
-					FROM [ConsultantArea] c
-						INNER JOIN [Area] a ON a.[Id] = c.[AreaId]
-					WHERE c.[UserId] = 1), 1, 1, '') AS 'Consultant Areas'
+			STUFF ((SELECT '; ' + A.[Name] 
+						FROM [ConsultantArea] CA
+						JOIN [Area] A ON A.[Id] = CA.[AreaId]
+						WHERE CA.[UserId] = U.[Id]
+						FOR XML PATH(''))
+					, 1
+					, 1
+					, ''
+				) [Consultant Areas]
 
 		FROM [User] u
 			INNER JOIN [Role] r ON r.[Id] = u.[RoleId]
