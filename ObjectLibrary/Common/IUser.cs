@@ -5,17 +5,27 @@ namespace ObjectLibrary.Common
     /// <summary>
     /// Encapsulates the <see cref="User"/> properties for security purposes.
     /// </summary>
-    public interface IUser
+    public interface IUser : IBaseEntity
     {
         /// <summary>
         /// Get the user id
         /// </summary>
-        int UserId { get; }
+        int GetUserId { get; }
 
         /// <summary>
         /// Get the full name of the user entity.
         /// </summary>
         string GetFullName { get; }
+
+        string GetFirstName { get; }
+
+        string GetLastName { get; }
+
+        string GetPassword { get; }
+
+        string GetSalt { get; }
+
+        string GetAccessToken { get; }
 
         /// <summary>
         /// Get the email of user entity.

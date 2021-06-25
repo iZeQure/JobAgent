@@ -92,6 +92,8 @@ namespace SqlDataAccessLibrary.Repositories
                             reader.GetInt32(0),
                             reader.GetString(1)));
                     }
+
+                    return await Task.FromResult(areas);
                 }
 
                 return await Task.FromResult(Enumerable.Empty<Area>());

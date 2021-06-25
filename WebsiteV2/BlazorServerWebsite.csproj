@@ -10,7 +10,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Services\" />
+    <ProjectReference Include="..\ObjectLibrary\ObjectLibrary.csproj" />
+    <ProjectReference Include="..\SecurityLibrary\SecurityLibrary.csproj" />
+    <ProjectReference Include="..\SqlDataAccessLibrary\SqlDataAccessLibrary.csproj" />
   </ItemGroup>
 
 </Project>

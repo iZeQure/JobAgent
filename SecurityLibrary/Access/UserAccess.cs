@@ -14,11 +14,11 @@ namespace SecurityLibrary.Access
     /// <summary>
     /// Represents a Token Access Handler.
     /// </summary>
-    public class TokenAccess : IAccess
+    public class UserAccess : IAccess
     {
         private readonly IConfigurationSettings _configurationSettings;
 
-        public TokenAccess(IConfigurationSettings configurationSettings)
+        public UserAccess(IConfigurationSettings configurationSettings)
         {
             _configurationSettings = configurationSettings;
         }
@@ -28,9 +28,8 @@ namespace SecurityLibrary.Access
         /// </summary>
         /// <param name="user">A user to grant access.</param>
         /// <returns>An authenticated access token.</returns>
-        public string GenerateAccessToken(User user)
+        public string GenerateAccessToken(IUser user)
         {
-
             var tokenHandler = new JwtSecurityTokenHandler();
             var claims = GetClaimsIdentity(user);
 
@@ -53,22 +52,22 @@ namespace SecurityLibrary.Access
         /// Acquires a new claims identify, authorized as the given user. Will never return null.
         /// </summary>
         /// <param name="user">A user to authorize.</param>
-        /// <returns>An initialized context of <see cref="ClaimsIdentity"/> authorized by the given <see cref="User"/> else empty.</returns>
-        public ClaimsIdentity GetClaimsIdentity(User user)
+        /// <returns>An initialized context of <see cref="ClaimsIdentity"/> authorized by the given <see cref="IUser"/> else empty.</returns>
+        public ClaimsIdentity GetClaimsIdentity(IUser user)
         {
             // Initialize new identity.
-            ClaimsIdentity identity = new ();
+            ClaimsIdentity identity = new();
 
             // Check if the object isn't initialized.
             if (ObjectIsNotNull(user))
             {
                 // Check if the obj is correct.
-                if (HasValidIdentity(user.Id))
+                if (HasValidIdentity(user.GetUserId))
                 {
                     var generatedConsultantAreaClaims = GenerateConsultantAreaClaimsEntities(user.GetConsultantAreas, "ConsultantArea");
                     List<Claim> identityClaims = new()
                     {
-                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                        new Claim(ClaimTypes.NameIdentifier, user.GetUserId.ToString()),
                         new Claim(ClaimTypes.Authentication, bool.TrueString),
                         new Claim(ClaimTypes.Name, user.GetFullName),
                         new Claim(ClaimTypes.Email, user.GetEmail),

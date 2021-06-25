@@ -16,7 +16,7 @@ namespace SecurityLibrary.Cryptography.Extentions
         {
             try
             {
-                byte[] encodedBytes = Encoding.UTF8.GetBytes(value.Password + value.Salt);
+                byte[] encodedBytes = Encoding.UTF8.GetBytes(value.GetPassword + value.GetSalt);
                 byte[] computedHashCode = new SHA384Managed().ComputeHash(encodedBytes);
 
                 return Convert.ToBase64String(computedHashCode);
@@ -38,12 +38,12 @@ namespace SecurityLibrary.Cryptography.Extentions
         {
             try
             {
-                if (string.IsNullOrEmpty(value.Password))
+                if (string.IsNullOrEmpty(value.GetPassword))
                 {
                     throw new ArgumentException("Could'n generate salt. Password was undefined.");
                 }
 
-                byte[] buffer = new byte[value.Password.Length];
+                byte[] buffer = new byte[value.GetPassword.Length];
 
                 using (var rng = new RNGCryptoServiceProvider())
                 {

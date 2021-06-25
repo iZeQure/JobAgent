@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,7 +26,7 @@ namespace SqlDataAccessLibrary.Repositories
         /// <param name="user"></param>
         /// <param name="cancellation"></param>
         /// <returns></returns>
-        public async Task<bool> AuthenticateUserLoginAsync(User user, CancellationToken cancellation)
+        public async Task<bool> AuthenticateUserLoginAsync(IUser user, CancellationToken cancellation)
         {
             try
             {
@@ -36,7 +37,7 @@ namespace SqlDataAccessLibrary.Repositories
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@userEmail", user.GetEmail),
-                    new SqlParameter("@userPassword", user.Password),
+                    new SqlParameter("@userPassword", user.GetPassword),
                     outputParameter
 
                 };
@@ -61,7 +62,7 @@ namespace SqlDataAccessLibrary.Repositories
         /// <param name="user"></param>
         /// <param name="cancellation"></param>
         /// <returns></returns>
-        public async Task<bool> CheckUserExistsAsync(User user, CancellationToken cancellation)
+        public async Task<bool> CheckUserExistsAsync(IUser user, CancellationToken cancellation)
         {
             try
             {
@@ -90,12 +91,12 @@ namespace SqlDataAccessLibrary.Repositories
         }
 
         /// <summary>
-        /// Creates new User
+        /// Creates new IUser
         /// </summary>
         /// <param name="createEntity"></param>
         /// <param name="cancellation"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(User createEntity, CancellationToken cancellation)
+        public async Task<int> CreateAsync(IUser createEntity, CancellationToken cancellation)
         {
             try
             {
@@ -109,9 +110,9 @@ namespace SqlDataAccessLibrary.Repositories
                     new SqlParameter("@firstName", createEntity.GetFirstName),
                     new SqlParameter("@lastName", createEntity.GetLastName),
                     new SqlParameter("@email", createEntity.GetEmail),
-                    new SqlParameter("@password", createEntity.Password),
-                    new SqlParameter("@salt", createEntity.Salt),
-                    new SqlParameter("@accessToken", createEntity.AccessToken)
+                    new SqlParameter("@password", createEntity.GetPassword),
+                    new SqlParameter("@salt", createEntity.GetSalt),
+                    new SqlParameter("@accessToken", createEntity.GetAccessToken)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -130,7 +131,7 @@ namespace SqlDataAccessLibrary.Repositories
         /// <param name="deleteEntity"></param>
         /// <param name="cancellation"></param>
         /// <returns></returns>
-        public async Task<int> DeleteAsync(User deleteEntity, CancellationToken cancellation)
+        public async Task<int> DeleteAsync(IUser deleteEntity, CancellationToken cancellation)
         {
             try
             {
@@ -138,7 +139,7 @@ namespace SqlDataAccessLibrary.Repositories
 
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@userId", deleteEntity.Id)
+                    new SqlParameter("@userId", deleteEntity.GetUserId)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -156,19 +157,17 @@ namespace SqlDataAccessLibrary.Repositories
         /// </summary>
         /// <param name="cancellation"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<User>> GetAllAsync(CancellationToken cancellation)
+        public async Task<IEnumerable<IUser>> GetAllAsync(CancellationToken cancellation)
         {
             try
             {
                 string cmdText = "EXEC [JA.spGetUsers]";
-                List<User> tempUserList = new();
 
-                SqlParameter[] parameters = new SqlParameter[] { };
-
-                using SqlDataReader reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
+                using SqlDataReader reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation);
 
                 if (reader.HasRows)
                 {
+                    List<IUser> tempUserList = new();
                     while (await reader.ReadAsync(cancellation))
                     {
                         User tempUser = new(
@@ -183,9 +182,11 @@ namespace SqlDataAccessLibrary.Repositories
 
                         tempUserList.Add(tempUser);
                     }
+
+                    return await Task.FromResult(tempUserList);
                 }
 
-                return tempUserList;
+                return await Task.FromResult(Enumerable.Empty<IUser>());
             }
             catch (Exception)
             {
@@ -200,18 +201,16 @@ namespace SqlDataAccessLibrary.Repositories
         /// <param name="id"></param>
         /// <param name="cancellation"></param>
         /// <returns></returns>
-        public async Task<User> GetByIdAsync(int id, CancellationToken cancellation)
+        public async Task<IUser> GetByIdAsync(int id, CancellationToken cancellation)
         {
             try
             {
                 string cmdText = "EXEC [JA.spGetUserById]";
 
-
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@userAccessToken", id),
                 };
-
 
                 using SqlDataReader reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
 
@@ -250,7 +249,7 @@ namespace SqlDataAccessLibrary.Repositories
         /// <param name="accessToken"></param>
         /// <param name="cancellation"></param>
         /// <returns></returns>
-        public async Task<User> GetUserByAccessTokenAsync(string accessToken, CancellationToken cancellation)
+        public async Task<IUser> GetUserByAccessTokenAsync(string accessToken, CancellationToken cancellation)
         {
             try
             {
@@ -261,7 +260,6 @@ namespace SqlDataAccessLibrary.Repositories
                     new SqlParameter("@userAccessToken", accessToken),
                 };
 
-
                 using SqlDataReader reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
 
                 if (reader.HasRows)
@@ -269,8 +267,6 @@ namespace SqlDataAccessLibrary.Repositories
                     while (await reader.ReadAsync(cancellation))
                     {
                         User tempuser = new(
-
-
                             id: reader.GetInt32(0),
                             firstName: reader.GetString(1),
                             lastName: reader.GetString(2),
@@ -278,10 +274,9 @@ namespace SqlDataAccessLibrary.Repositories
                             userRole: new Role(0, reader.GetString(5), ""),
                             userLocation: new Location(0, reader.GetString(6)),
                             consultantAreas: null
-
                             );
 
-                        return tempuser;
+                        return await Task.FromResult(tempuser);
                     }
                 }
 
@@ -300,7 +295,7 @@ namespace SqlDataAccessLibrary.Repositories
         /// <param name="updateEntity"></param>
         /// <param name="cancellation"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(User updateEntity, CancellationToken cancellation)
+        public async Task<int> UpdateAsync(IUser updateEntity, CancellationToken cancellation)
         {
             try
             {
@@ -308,15 +303,15 @@ namespace SqlDataAccessLibrary.Repositories
 
                 SqlParameter[] parameters = new[]
                 {
-                new SqlParameter("@userId", updateEntity.Id),
+                new SqlParameter("@userId", updateEntity.GetUserId),
                 new SqlParameter("@roleId", updateEntity.GetRole.Id),
                 new SqlParameter("@locationId", updateEntity.GetLocation.Id),
                 new SqlParameter("@firstName", updateEntity.GetFirstName),
                 new SqlParameter("@lastName", updateEntity.GetLastName),
                 new SqlParameter("@email", updateEntity.GetEmail),
-                new SqlParameter("@password", updateEntity.Password),
-                new SqlParameter("@salt", updateEntity.Salt),
-                new SqlParameter("@accessToken", updateEntity.AccessToken)
+                new SqlParameter("@password", updateEntity.GetPassword),
+                new SqlParameter("@salt", updateEntity.GetSalt),
+                new SqlParameter("@accessToken", updateEntity.GetAccessToken)
             };
 
                 //Needs to also update ConsultingAreas
@@ -336,7 +331,7 @@ namespace SqlDataAccessLibrary.Repositories
         /// <param name="user"></param>
         /// <param name="cancellation"></param>
         /// <returns></returns>
-        public async Task<int> UpdateUserPasswordAsync(User user, CancellationToken cancellation)
+        public async Task<int> UpdateUserPasswordAsync(IUser user, CancellationToken cancellation)
         {
             try
             {
@@ -344,11 +339,11 @@ namespace SqlDataAccessLibrary.Repositories
 
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@userId", user.Id),
-                    new SqlParameter("@userNewPassword", user.Id),
-                    new SqlParameter("@userldPassword", user.Password),
-                    new SqlParameter("@userNewSalt", user.Salt),
-                    new SqlParameter("@resultReturn", user.Id)
+                    new SqlParameter("@userId", user.GetUserId),
+                    new SqlParameter("@userNewPassword", user.GetUserId),
+                    new SqlParameter("@userldPassword", user.GetPassword),
+                    new SqlParameter("@userNewSalt", user.GetSalt),
+                    new SqlParameter("@resultReturn", user.GetUserId)
 
                 };
 

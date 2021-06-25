@@ -8,8 +8,18 @@ namespace SecurityLibrary.Interfaces
 {
     public interface IAccess
     {
-        string GenerateAccessToken(User user);
+        /// <summary>
+        /// Generates a new access token, to the given <see cref="IUser"/>.
+        /// </summary>
+        /// <param name="user">A user to grant access.</param>
+        /// <returns>An authenticated access token.</returns>
+        string GenerateAccessToken(IUser user);
 
-        ClaimsIdentity GetClaimsIdentity(User user);
+        /// <summary>
+        /// Acquires a new claims identify, authorized as the given user. Will never return null.
+        /// </summary>
+        /// <param name="user">A user to authorize.</param>
+        /// <returns>An initialized context of <see cref="ClaimsIdentity"/> authorized by the given <see cref="IUser"/> else empty.</returns>
+        ClaimsIdentity GetClaimsIdentity(IUser user);
     }
 }

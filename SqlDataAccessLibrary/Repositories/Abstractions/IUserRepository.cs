@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace SqlDataAccessLibrary.Repositories.Abstractions
 {
-    public interface IUserRepository : IRepository<User>
+    public interface IUserRepository : IRepository<IUser>
     {
-        Task<bool> AuthenticateUserLoginAsync(User user, CancellationToken cancellation);
+        Task<bool> AuthenticateUserLoginAsync(IUser user, CancellationToken cancellation);
 
-        Task<User> GetUserByAccessTokenAsync(string accessToken, CancellationToken cancellation);
+        Task<IUser> GetUserByAccessTokenAsync(string accessToken, CancellationToken cancellation);
 
-        Task<bool> CheckUserExistsAsync(User user, CancellationToken cancellation);
+        Task<bool> CheckUserExistsAsync(IUser user, CancellationToken cancellation);
 
-        Task<int> UpdateUserPasswordAsync(User user, CancellationToken cancellation);
+        Task<int> UpdateUserPasswordAsync(IUser user, CancellationToken cancellation);
     }
 }

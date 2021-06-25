@@ -31,22 +31,22 @@ namespace ObjectLibrary.Common
             _accessToken = accessToken;
         }
 
-        public int UserId { get { return base.Id; } }
+        public int GetUserId { get { return Id; } }
 
         /// <summary>
         /// Get the user secret.
         /// </summary>
-        public string Password { get { return _password; } }
+        public string GetPassword { get { return _password; } }
 
         /// <summary>
         /// Get the auto generated salt for the user.
         /// </summary>
-        public string Salt { get { return _salt; } }
+        public string GetSalt { get { return _salt; } }
 
         /// <summary>
         /// Get the auto generated access token for the user.
         /// </summary>
-        public string AccessToken { get { return _accessToken; } }
+        public string GetAccessToken { get { return _accessToken; } }
 
         /// <summary>
         /// Get the role of the user.

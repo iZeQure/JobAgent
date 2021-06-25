@@ -29,7 +29,7 @@ namespace SqlDataAccessLibrary.Repositories
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@id", createEntity.Id),
-                    new SqlParameter("@userId", createEntity.user.UserId),
+                    new SqlParameter("@userId", createEntity.user.GetUserId),
                     new SqlParameter("@name", createEntity.name),
                     new SqlParameter("@registrationDateTime", createEntity.registrationDateTime),
                     new SqlParameter("@expiryDateTime", createEntity.expiryDateTime)
@@ -162,7 +162,7 @@ namespace SqlDataAccessLibrary.Repositories
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@id", updateEntity.Id),
-                    new SqlParameter("@userId", updateEntity.user.UserId),
+                    new SqlParameter("@userId", updateEntity.user.GetUserId),
                     new SqlParameter("@name", updateEntity.name),
                     new SqlParameter("@registrationDateTime", updateEntity.registrationDateTime),
                     new SqlParameter("@expiryDateTime", updateEntity.expiryDateTime)
