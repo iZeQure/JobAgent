@@ -29,7 +29,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spCreateSpecialization];";
+                string cmdText = "JA.spCreateSpecialization";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -59,7 +59,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spRemoveSpecialization]";
+                string cmdText = "JA.spRemoveSpecialization";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -85,7 +85,7 @@ namespace SqlDataAccessLibrary.Repositories
             try
             {
 
-                string cmdText = "EXEC [JA.spGetSpecializations]";
+                string cmdText = "JA.spGetSpecializations";
                 List<Specialization> tempSpecializationList = new();
 
                 SqlParameter[] parameters = new SqlParameter[] { };
@@ -125,7 +125,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spGetSpecializationById]";
+                string cmdText = "JA.spGetSpecializationById";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -169,7 +169,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spUpdateSpecialization]";
+                string cmdText = "JA.spUpdateSpecialization";
 
                 SqlParameter[] parameters = new[]
                 {

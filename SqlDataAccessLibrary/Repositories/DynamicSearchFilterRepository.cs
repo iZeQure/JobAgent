@@ -30,7 +30,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spCreateDynamicSearchFilter];";
+                string cmdText = "JA.spCreateDynamicSearchFilter";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -60,7 +60,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spRemoveDynamicSearchFilter";
+                string cmdText = "JA.spRemoveDynamicSearchFilter";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -85,7 +85,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spGetDynamicSearchFilters]";
+                string cmdText = "JA.spGetDynamicSearchFilters";
                 List<DynamicSearchFilter> tempDynamicSearchFilterList = new();
 
                 SqlParameter[] parameters = new SqlParameter[] { };
@@ -127,7 +127,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spGetStaticSearchFilterById]";
+                string cmdText = "JA.spGetStaticSearchFilterById";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -172,7 +172,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spUpdateDynamicSearchFilter]";
+                string cmdText = "JA.spUpdateDynamicSearchFilter";
 
                 SqlParameter[] parameters = new[]
                 {

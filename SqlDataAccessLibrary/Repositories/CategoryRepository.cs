@@ -30,7 +30,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spCreateCategory];";
+                string cmdText = "JA.spCreateCategory";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@id", createEntity.Id),
@@ -55,7 +55,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spDeleteCategory];";
+                string cmdText = "JA.spDeleteCategory";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@id", deleteEntity.Id)
@@ -79,7 +79,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spGetCategories];";
+                string cmdText = "JA.spGetCategories";
 
                 using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation);
 
@@ -116,7 +116,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spGetCategoryById];";
+                string cmdText = "JA.spGetCategoryById";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@id", id)
@@ -157,7 +157,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spUpdateCategory];";
+                string cmdText = "JA.spUpdateCategory";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@id", updateEntity.Id),

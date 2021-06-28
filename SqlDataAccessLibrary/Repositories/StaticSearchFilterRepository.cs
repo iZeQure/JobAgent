@@ -30,7 +30,7 @@ namespace SqlDataAccessLibrary
         {
             try
             {
-                string cmdText = "EXEC [JA.spCreateStaticSearchFilter];";
+                string cmdText = "JA.spCreateStaticSearchFilter";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -59,7 +59,7 @@ namespace SqlDataAccessLibrary
         {
             try
             {
-                string cmdText = "EXEC [JA.spRemoveStaticSearchFilter";
+                string cmdText = "JA.spRemoveStaticSearchFilter";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -84,7 +84,7 @@ namespace SqlDataAccessLibrary
         {
             try
             {
-                string cmdText = "EXEC [JA.spGetStaticSearchFilters]";
+                string cmdText = "JA.spGetStaticSearchFilters";
                 List<StaticSearchFilter> tempStaticSearchFilterList = new();
 
                 SqlParameter[] parameters = new SqlParameter[] { };
@@ -125,7 +125,7 @@ namespace SqlDataAccessLibrary
         {
             try
             {
-                string cmdText = "EXEC [JA.spGetStaticSearchFilterById]";
+                string cmdText = "JA.spGetStaticSearchFilterById";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -170,7 +170,7 @@ namespace SqlDataAccessLibrary
         {
             try
             {
-                string cmdText = "EXEC [JA.spUpdateStaticSearchFilter]";
+                string cmdText = "JA.spUpdateStaticSearchFilter";
 
                 SqlParameter[] parameters = new[]
                 {
