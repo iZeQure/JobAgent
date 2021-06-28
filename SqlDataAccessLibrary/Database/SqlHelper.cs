@@ -14,9 +14,9 @@ namespace SqlDataAccessLibrary.Database
 
         public static async Task<int> ExecuteNonQueryAsync(string connectionString, string commandText, CommandType commandType, CancellationToken cancellation, params SqlParameter[] parameters)
         {
-            using SqlConnection conn = new(connectionString);
+            SqlConnection conn = new(connectionString);
 
-            using SqlCommand cmd = new()
+            SqlCommand cmd = new()
             {
                 CommandText = commandText,
                 Connection = conn,
@@ -30,9 +30,9 @@ namespace SqlDataAccessLibrary.Database
 
         public static async Task<SqlDataReader> ExecuteReaderAsync(string connectionString, string commandText, CommandType commandType, CancellationToken cancellation, params SqlParameter[] parameters)
         {
-            using SqlConnection conn = new(connectionString);
+            SqlConnection conn = new(connectionString);
 
-            using SqlCommand cmd = new()
+            SqlCommand cmd = new()
             {
                 CommandText = commandText,
                 Connection = conn,

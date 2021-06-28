@@ -19,7 +19,7 @@ namespace BlazorServerWebsite.Data.Services.Abstractions
 
         Task<int> RemoveUserAreaAsync(IUser user, int areaId, CancellationToken cancellation);
 
-        Task<IUser> GetUserByAccessTokenAsync(IUser user, CancellationToken cancellation);
+        Task<IUser> GetUserByAccessTokenAsync(string token, CancellationToken cancellation);
 
         Task<bool> LoginAsync(IUser user, CancellationToken cancellation);
 

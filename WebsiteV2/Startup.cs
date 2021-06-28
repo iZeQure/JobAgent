@@ -10,6 +10,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BlazorServerWebsite.Data;
+using BlazorServerWebsite.Data.Providers;
+using Microsoft.AspNetCore.Components.Authorization;
+using BlazorServerWebsite.Data.Services.Abstractions;
+using BlazorServerWebsite.Data.Services;
+using SecurityLibrary.Access;
+using SecurityLibrary.Interfaces;
+using ObjectLibrary.Common.Configuration;
+using SqlDataAccessLibrary.Repositories.Abstractions;
+using SqlDataAccessLibrary.Repositories;
+using SqlDataAccessLibrary.Database;
+using Blazored.LocalStorage;
 
 namespace BlazorServerWebsite
 {
@@ -26,8 +37,20 @@ namespace BlazorServerWebsite
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            var configurationSettings = Configuration.GetSection("JobAgent").Get<ConfigurationSettings>();
+
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddBlazoredLocalStorage();
+
+            services.AddSingleton<IConfigurationSettings>(configurationSettings);
+            services.AddTransient<ISqlDatabase, SqlDatabase>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IAccess, UserAccess>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<MyAuthStateProvider>();
+            services.AddScoped<AuthenticationStateProvider>(provider =>
+                provider.GetRequiredService<MyAuthStateProvider>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

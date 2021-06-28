@@ -51,8 +51,9 @@ namespace BlazorServerWebsite.Data.Services
             return _access.GetClaimsIdentity((User)user);
         }
 
-        public async Task<IUser> GetUserByAccessTokenAsync(IUser user, CancellationToken cancellation)
+        public async Task<IUser> GetUserByAccessTokenAsync(string token, CancellationToken cancellation)
         {
+            var user = new User(0, null, null, null, string.Empty, string.Empty, string.Empty, accessToken:token);
             return await Repository.GetUserByAccessTokenAsync(user.GetAccessToken, cancellation);
         }
 
