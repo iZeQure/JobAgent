@@ -30,7 +30,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spValidateUserLogin";
+                string cmdText = "[JA.spValidateUserLogin]";
 
                 SqlParameter outputParameter = new() { Direction = ParameterDirection.Output, ParameterName = "@returnResult", SqlDbType = SqlDbType.Bit };
 
@@ -66,7 +66,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spValidateUserExists";
+                string cmdText = "[JA.spValidateUserExists]";
 
                 SqlParameter outputParameter = new() { Direction = ParameterDirection.Output, ParameterName = "@returnResult", SqlDbType = SqlDbType.Bit };
 
@@ -100,7 +100,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spCreateUser";
+                string cmdText = "[JA.spCreateUser]";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -135,7 +135,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spRemoveUser";
+                string cmdText = "[JA.spRemoveUser]";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -161,7 +161,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spGetUsers";
+                string cmdText = "[JA.spGetUsers]";
 
                 using SqlDataReader reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation);
 
@@ -205,7 +205,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spGetUserById";
+                string cmdText = "[JA.spGetUserById]";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -253,7 +253,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spGetUserByAccessToken";
+                string cmdText = "[JA.spGetUserByAccessToken]";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -293,7 +293,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spGrantUserArea";
+                string cmdText = "[JA.spGrantUserArea]";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@userId", user.GetUserId),
@@ -313,7 +313,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spRemoveUserArea";
+                string cmdText = "[JA.spRemoveUserArea]";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@userId", user.GetUserId),
@@ -339,7 +339,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spUpdateUser";
+                string cmdText = "[JA.spUpdateUser]";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -375,7 +375,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spUpdateUserSecurity";
+                string cmdText = "[JA.spUpdateUserSecurity]";
 
                 SqlParameter[] parameters = new[]
                 {
