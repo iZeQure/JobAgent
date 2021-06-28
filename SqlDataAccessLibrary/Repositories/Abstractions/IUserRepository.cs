@@ -17,5 +17,9 @@ namespace SqlDataAccessLibrary.Repositories.Abstractions
         Task<bool> CheckUserExistsAsync(IUser user, CancellationToken cancellation);
 
         Task<int> UpdateUserPasswordAsync(IUser user, CancellationToken cancellation);
+
+        Task<int> GrantUserAreaAsync(IUser user, int areaId, CancellationToken cancellation);
+
+        Task<int> RemoveAreaAsync(IUser user, int areaId, CancellationToken cancellation);
     }
 }

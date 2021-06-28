@@ -31,14 +31,14 @@ namespace BlazorServerWebsite.Data.Services
             return _access.GetClaimsIdentity((User)user);
         }
 
-        public Task<int> GrantUserAreaAsync(IUser user, int areaId, CancellationToken cancellation)
+        public async Task<int> GrantUserAreaAsync(IUser user, int areaId, CancellationToken cancellation)
         {
-            throw new NotImplementedException();
+            return await Repository.GrantUserAreaAsync(user, areaId, cancellation);
         }
 
-        public Task<int> RemoveUserAreaAsync(IUser user, int areaId, CancellationToken cancellation)
+        public async Task<int> RemoveUserAreaAsync(IUser user, int areaId, CancellationToken cancellation)
         {
-            throw new NotImplementedException();
+            return await Repository.RemoveAreaAsync(user, areaId, cancellation);
         }
     }
 }

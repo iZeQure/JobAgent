@@ -30,7 +30,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spValidateUserLogin]";
+                string cmdText = "JA.spValidateUserLogin";
 
                 SqlParameter outputParameter = new() { Direction = ParameterDirection.Output, ParameterName = "@returnResult", SqlDbType = SqlDbType.Bit };
 
@@ -66,7 +66,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spValidateUserExists]";
+                string cmdText = "JA.spValidateUserExists";
 
                 SqlParameter outputParameter = new() { Direction = ParameterDirection.Output, ParameterName = "@returnResult", SqlDbType = SqlDbType.Bit };
 
@@ -100,7 +100,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spCreateUser];";
+                string cmdText = "JA.spCreateUser";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -135,7 +135,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spRemoveUser]";
+                string cmdText = "JA.spRemoveUser";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -161,7 +161,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spGetUsers]";
+                string cmdText = "JA.spGetUsers";
 
                 using SqlDataReader reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation);
 
@@ -205,7 +205,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spGetUserById]";
+                string cmdText = "JA.spGetUserById";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -253,7 +253,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spGetUserByAccessToken]";
+                string cmdText = "JA.spGetUserByAccessToken";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -289,6 +289,46 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        public async Task<int> GrantUserAreaAsync(IUser user, int areaId, CancellationToken cancellation)
+        {
+            try
+            {
+                string cmdText = "JA.spGrantUserArea";
+                SqlParameter[] parameters = new[]
+                {
+                    new SqlParameter("@userId", user.GetUserId),
+                    new SqlParameter("@areaId", areaId)
+                };
+
+                return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public async Task<int> RemoveAreaAsync(IUser user, int areaId, CancellationToken cancellation)
+        {
+            try
+            {
+                string cmdText = "JA.spRemoveUserArea";
+                SqlParameter[] parameters = new[]
+                {
+                    new SqlParameter("@userId", user.GetUserId),
+                    new SqlParameter("@areaId", areaId)
+                };
+
+                return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
         /// <summary>
         /// Updates a user
         /// </summary>
@@ -299,7 +339,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spUpdateUser]";
+                string cmdText = "JA.spUpdateUser";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -335,7 +375,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "EXEC [JA.spUpdateUserSecurity]";
+                string cmdText = "JA.spUpdateUserSecurity";
 
                 SqlParameter[] parameters = new[]
                 {
