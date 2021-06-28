@@ -1880,8 +1880,14 @@ DECLARE @TName varchar(20) = 'UserValidateExistenceTransaction';
 BEGIN
 	BEGIN TRAN @TName;
 	BEGIN TRY
-		SET @returnResult = 1;
-
+		SET @returnResult =
+			CASE 
+				WHEN EXISTS (
+					SELECT * FROM [User]
+					WHERE [Email] = @userEmail)
+				THEN 1
+				ELSE 0
+			END;
 		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
@@ -1901,9 +1907,17 @@ AS
 DECLARE @TName varchar(20) = 'UserValidateLoginTransaction';
 BEGIN
 	BEGIN TRAN @TName;
-	BEGIN TRY
-		SET @returnResult = 1;
-
+	BEGIN TRY		
+		SET @returnResult =
+			CASE 
+				WHEN EXISTS (
+					SELECT * FROM [User]
+					WHERE 
+						[Email] = @userEmail AND
+						[Password] = @userPassword) 
+				THEN 1
+				ELSE 0
+			END;
 		COMMIT TRANSACTION @TName;
 	END TRY
 	BEGIN CATCH
