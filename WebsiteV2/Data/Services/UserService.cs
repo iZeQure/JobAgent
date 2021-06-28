@@ -21,6 +21,11 @@ namespace BlazorServerWebsite.Data.Services
             _access = access;
         }
 
+        public Task<bool> CheckUserExistsAsync(IUser user, CancellationToken cancellation)
+        {
+            throw new NotImplementedException();
+        }
+
         public string GenerateAccessToken(IUser user)
         {
             return user is User u ? _access.GenerateAccessToken(u) : string.Empty;
@@ -34,6 +39,16 @@ namespace BlazorServerWebsite.Data.Services
         public async Task<int> GrantUserAreaAsync(IUser user, int areaId, CancellationToken cancellation)
         {
             return await Repository.GrantUserAreaAsync(user, areaId, cancellation);
+        }
+
+        public Task<IUser> LoginAsync(IUser user, CancellationToken cancellation)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IUser> RegisterUserAsync(IUser user, CancellationToken cancellation)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<int> RemoveUserAreaAsync(IUser user, int areaId, CancellationToken cancellation)

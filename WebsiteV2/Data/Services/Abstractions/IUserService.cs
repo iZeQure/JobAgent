@@ -25,5 +25,12 @@ namespace BlazorServerWebsite.Data.Services.Abstractions
         /// <returns>A generated token if the user is found; else <see cref="string.Empty"/>.</returns>
         string GenerateAccessToken(IUser user);
         ClaimsIdentity GetClaimsIdentity(IUser user);
+
+        Task<IUser> RegisterUserAsync(IUser user, CancellationToken cancellation);
+
+        Task<bool> CheckUserExistsAsync(IUser user, CancellationToken cancellation);
+
+        Task<IUser> LoginAsync(IUser user, CancellationToken cancellation);
+
     }
 }
