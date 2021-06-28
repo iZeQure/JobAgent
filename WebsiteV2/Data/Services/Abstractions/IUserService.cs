@@ -18,6 +18,11 @@ namespace BlazorServerWebsite.Data.Services.Abstractions
         Task<int> GrantUserAreaAsync(IUser user, int areaId, CancellationToken cancellation);
         Task<int> RemoveUserAreaAsync(IUser user, int areaId, CancellationToken cancellation);
 
+        /// <summary>
+        /// Generates an authenticated access token to the <see cref="IUser"/>.
+        /// </summary>
+        /// <param name="user">A user to authenticate.</param>
+        /// <returns>A generated token if the user is found; else <see cref="string.Empty"/>.</returns>
         string GenerateAccessToken(IUser user);
         ClaimsIdentity GetClaimsIdentity(IUser user);
     }
