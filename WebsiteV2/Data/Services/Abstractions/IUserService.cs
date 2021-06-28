@@ -35,10 +35,5 @@ namespace BlazorServerWebsite.Data.Services.Abstractions
         ClaimsIdentity GetClaimsIdentity(IUser user);
 
         Task<IUser> RegisterUserAsync(IUser user, CancellationToken cancellation);
-
-        Task<bool> CheckUserExistsAsync(IUser user, CancellationToken cancellation);
-
-        Task<IUser> LoginAsync(IUser user, CancellationToken cancellation);
-
     }
 }
