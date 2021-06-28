@@ -57,7 +57,7 @@ namespace BlazorServerWebsite.Pages.Admin.Account
                 {
                     try
                     {
-                        await service.ValidateUserExistsByEmail(_accountProfileModel.Email, token);
+                        UserAlreadyExists = await service.ValidateUserExistsByEmail(_accountProfileModel.Email, token);
                     }
                     catch (Exception ex)
                     {

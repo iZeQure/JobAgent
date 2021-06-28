@@ -12,6 +12,7 @@ namespace SqlDataAccessLibrary.Database
     /// </summary>
     public class SqlDatabase : ISqlDatabase
     {
+        private static readonly CommandBehavior _commandBehavior = CommandBehavior.CloseConnection;
         private readonly IConfigurationSettings _settings;
 
         public SqlDatabase(IConfigurationSettings settings)
@@ -21,12 +22,36 @@ namespace SqlDataAccessLibrary.Database
 
         public async Task<int> ExecuteNonQueryAsync(string commandText, CommandType commandType, CancellationToken cancellation, params SqlParameter[] parameters)
         {
-            return await SqlHelper.ExecuteNonQueryAsync(_settings.ConnectionString, commandText, commandType, cancellation, parameters);
+            SqlConnection conn = new(_settings.ConnectionString);
+
+            SqlCommand cmd = new()
+            {
+                CommandText = commandText,
+                Connection = conn,
+                CommandType = commandType
+            };
+            cmd.Parameters.AddRange(parameters);
+            await conn.OpenAsync(cancellation);
+
+            return await cmd.ExecuteNonQueryAsync(cancellation);
         }
 
         public async Task<SqlDataReader> ExecuteReaderAsync(string commandText, CommandType commandType, CancellationToken cancellation, params SqlParameter[] parameters)
         {
-            return await SqlHelper.ExecuteReaderAsync(_settings.ConnectionString, commandText, commandType, cancellation, parameters);
+            SqlConnection conn = new(_settings.ConnectionString);
+
+            SqlCommand cmd = new()
+            {
+                CommandText = commandText,
+                Connection = conn,
+                CommandType = commandType
+            };
+
+            cmd.Parameters.AddRange(parameters);
+            await conn.OpenAsync(cancellation);
+
+            SqlDataReader reader = await cmd.ExecuteReaderAsync(_commandBehavior);
+            return await Task.FromResult(reader);
         }
     }
 }

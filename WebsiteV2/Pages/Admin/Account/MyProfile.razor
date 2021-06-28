@@ -14,7 +14,7 @@
                 <label for="inputEmail">Email Adresse:</label>
                 @if (UserAlreadyExists)
                 {
-                    <span class="d-inline-flex"><small class="text-danger font-weight-bolder">* Email er allerede tilknyttet en Praktikkonsulent.</small></span>
+                    <span class="d-inline-flex ps-1"><small class="text-danger font-weight-bolder">* Email er allerede tilknyttet en Praktikkonsulent.</small></span>
                 }
                 <InputText @bind-Value="_accountProfileModel.Email" id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" @onfocusout="OnFocusOut_CheckUserAlreadyExists" />
                 <ValidationMessage For="@(() => _accountProfileModel.Email)" />
