@@ -33,7 +33,5 @@ namespace BlazorServerWebsite.Data.Services.Abstractions
         string GenerateAccessToken(IUser user);
 
         ClaimsIdentity GetClaimsIdentity(IUser user);
-
-        Task<IUser> RegisterUserAsync(IUser user, CancellationToken cancellation);
     }
 }
