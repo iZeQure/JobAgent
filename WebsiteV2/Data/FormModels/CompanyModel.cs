@@ -9,11 +9,11 @@ namespace BlazorServerWebsite.Data.FormModels
         [Required]
         public int CompanyId { get; set; }
 
-        [Required(AllowEmptyStrings = false, ErrorMessage = "CVR er påkrævet")]
-        [StringLength(maximumLength: 255, MinimumLength = 1)]
+        [Required]
+        [Range(10000000, 99999999, ErrorMessage = "Indtast et gyldigt CVR Nummer. (8 siffer)")]
         public int CVR { get; set; }
 
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Firma Navn er påkrævet")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Indtast et gyldigt navn.")]
         [StringLength(maximumLength: 255, MinimumLength = 1)]
         public string Name { get; set; }
 
