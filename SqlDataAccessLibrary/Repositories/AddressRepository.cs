@@ -30,7 +30,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spCreateAddress";
+                string cmdText = "[JA.spCreateAddress]";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@jobAdvertVacantJobId", createEntity.Id),
@@ -58,7 +58,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spDeleteAddress";
+                string cmdText = "[JA.spDeleteAddress]";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@jobAdvertVacantJobId", deleteEntity.Id)
@@ -81,7 +81,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spGetAddresses";
+                string cmdText = "[JA.spGetAddresses]";
 
                 using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation);
 
@@ -120,7 +120,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spGetAddressById";
+                string cmdText = "[JA.spGetAddressById]";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@jobAdvertVacantJobId", id)
@@ -163,7 +163,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spUpdateAddress";
+                string cmdText = "[JA.spUpdateAddress]";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@jobAdvertVacantJobId", updateEntity.Id),

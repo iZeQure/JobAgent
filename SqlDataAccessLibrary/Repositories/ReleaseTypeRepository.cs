@@ -30,7 +30,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spCreateReleaseType";
+                string cmdText = "[JA.spCreateReleaseType]";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@id", createEntity.Id),
@@ -55,7 +55,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spDeleteReleaseType";
+                string cmdText = "[JA.spDeleteReleaseType]";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@id", deleteEntity.Id)
@@ -78,7 +78,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spGetReleaseTypes";
+                string cmdText = "[JA.spGetReleaseTypes]";
 
                 using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation);
 
@@ -115,7 +115,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spGetReleaseTypeById";
+                string cmdText = "[JA.spGetReleaseTypeById]";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@id", id)
@@ -155,7 +155,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spUpdateReleaseType";
+                string cmdText = "[JA.spUpdateReleaseType]";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@id", updateEntity.Id),

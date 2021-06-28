@@ -30,7 +30,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spCreateLocation";
+                string cmdText = "[JA.spCreateLocation]";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@id", createEntity.Id),
@@ -56,7 +56,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spRemoveLocation";
+                string cmdText = "[JA.spRemoveLocation]";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@id", deleteEntity.Id)
@@ -80,7 +80,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spGetLocations";
+                string cmdText = "[JA.spGetLocations]";
 
                 using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation);
                 List<Location> locations = new();
@@ -115,7 +115,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spGetLocationById";
+                string cmdText = "[JA.spGetLocationById]";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@id", id)
@@ -156,7 +156,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spUpdateLocation";
+                string cmdText = "[JA.spUpdateLocation]";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@id", updateEntity.Id),

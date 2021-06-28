@@ -29,7 +29,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spCreateFilterType";
+                string cmdText = "[JA.spCreateFilterType]";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -58,7 +58,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spRemoveFilterType";
+                string cmdText = "[JA.spRemoveFilterType]";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -83,7 +83,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spGetFilterTypes";
+                string cmdText = "[JA.spGetFilterTypes]";
                 List<FilterType> tempFilterTypeList = new();
 
                 SqlParameter[] parameters = new SqlParameter[] { };
@@ -124,7 +124,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spGetFilterTypeById";
+                string cmdText = "[JA.spGetFilterTypeById]";
 
                 SqlParameter[] parameters = new[]
                 {
@@ -167,7 +167,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "JA.spUpdateFilterType";
+                string cmdText = "[JA.spUpdateFilterType]";
 
                 SqlParameter[] parameters = new[]
                 {
