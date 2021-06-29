@@ -48,9 +48,12 @@ namespace BlazorServerWebsite
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IAccess, UserAccess>();
             services.AddScoped<IUserService, UserService>();
+
+            services.AddScoped<IRefreshProvider, RefreshProvider>();
             services.AddScoped<MyAuthStateProvider>();
             services.AddScoped<AuthenticationStateProvider>(provider =>
                 provider.GetRequiredService<MyAuthStateProvider>());
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
