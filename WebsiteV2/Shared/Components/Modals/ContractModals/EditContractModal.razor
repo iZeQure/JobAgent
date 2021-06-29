@@ -1,0 +1,106 @@
+﻿<div class="modal fade" id="EditContractModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+
+            @if (ContractModel != null)
+            {
+                <EditForm Model="ContractModel" OnValidSubmit="OnValidSubmit_UpdateContract">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Kontrakt Information :</h5>
+                    </div>
+
+                    @if (ShowError)
+                    {
+                        <MessageAlert Alert="MessageAlert.AlertType.Error" Message="@ErrorMessage" />
+                    }
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col">
+                                <label for="inputCompany" class="admin-label col-form-label col-form-label-sm">Kontrakt for :</label>
+                                <select id="inputCompany" class="form-control form-control-sm" @bind="ContractModel.SignedWithCompany">
+                                    @if (Companies != null)
+                                    {
+                                        @foreach (var company in Companies)
+                                        {
+                                            if (company.Identifier == ContractModel.SignedWithCompany)
+                                            {
+                                                <option value="@company.Identifier" selected>@company.Name</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@company.Identifier">@company.Name</option>
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option value="0" selected>Kunne ikke hente virksomheder!</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label for="inputSignedByUser" class="admin-label col-form-label col-form-label-sm">Underskrevet af :</label>
+                                <select id="inputSignedByUser" class="form-control form-control-sm" @bind="ContractModel.SignedByUser">
+                                    @if (Users != null)
+                                    {
+                                        @foreach (var user in Users)
+                                        {
+                                            if (user.Identifier == ContractModel.SignedByUser)
+                                            {
+                                                <option value="@user.Identifier" selected>@user.FullName</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@user.Identifier">@user.FullName</option>
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option value="0" selected>Kunne ikke hente brugere!</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="row">
+                            <div class="col">
+                                <label for="inputContactPerson" class="admin-label col-form-label col-form-label-sm">Virksomheds Kontakt Person :</label>
+                                <input id="inputContactPerson" class="form-control form-control-sm" type="text" placeholder="Indtast en kontakt person.." @bind="ContractModel.ContactPerson" />
+                            </div>
+                            <div class="col">
+                                <label for="inputContractName" class="admin-label col-form-label col-form-label-sm">Kontraktens Navn : <span class="font-italic small" style="color: red;">*Ikke ændre dette hvis navnet på kontrakten ikke bliver ændret.</span></label>
+                                <input id="inputContractName" class="form-control form-control-sm" type="text" placeholder="Indtast kontraktens fil navn / lokation.." disabled @bind="ContractModel.ContractFileName" />
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="row">
+                            <div class="col">
+                                <label for="inputRegisteredDate" class="admin-label col-form-label col-form-label-sm">Kontrakt Registreret Dato :</label>
+                                <InputDate @bind-Value="@ContractModel.RegistrationDate" TValue="DateTime" class="form-control form-control-sm"></InputDate>
+                            </div>
+                            <div class="col">
+                                <label for="inputExpiryDate" class="admin-label col-form-label col-form-label-sm">Udløbsdato :</label>
+                                <InputDate @bind-Value="@ContractModel.ExpiryDate" TValue="DateTime" class="form-control form-control-sm"></InputDate>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="CancelRequest" @onclick:preventDefault>Annuller</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit">Gem ændringer</button>
+                    </div>
+
+                </EditForm>
+            }
+
+        </div>
+    </div>
+</div>

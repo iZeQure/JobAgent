@@ -1,0 +1,54 @@
+﻿@if (Model != null)
+{
+    <div class="modal fade" id="ShowContractModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    @if (!string.IsNullOrEmpty(Model.ContractForCompanyName))
+                    {
+                        <h5 class="modal-title">Kontrakt for @Model.ContractForCompanyName</h5>
+                    }
+                    else
+                    {
+                        <h5 class="modal-title">Kontrakt</h5>
+                    }
+                </div>
+
+                <div class="modal-body">
+
+                    @if (Model.ContractIsLoading)
+                    {
+                        <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="Model.ContractIsLoading" Message="Indlæser kontrakten, vent venligst.." />
+                    }
+                    else
+                    {
+                        @if (!string.IsNullOrEmpty(Model.ViewContractMessage))
+                        {
+                            <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="@(Model.ViewContractMessage)" />
+                        }
+                        else
+                        {
+                            <div class="container-fluid justify-content-center">
+                                <div class="embed-responsive embed-responsive-16by9">
+                                    <iframe src="data:application/pdf;base64,@(Model.EncodedContractData)"
+                                            class="embed-responsive-item"
+                                            lang="da"
+                                            title="Kontrakt Information"
+                                            frameborder="1"
+                                            allowtransparency="true">
+                                    </iframe>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal">Luk kontrakt</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
