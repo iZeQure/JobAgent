@@ -12,7 +12,7 @@ namespace BlazorServerWebsite.Data.Services.Abstractions
     /// Represents a genric class for services.
     /// </summary>
     /// <typeparam name="TBaseRepository"></typeparam>
-    public abstract class BaseService<TBaseRepository, TBaseEntity>
+    public abstract class BaseService<TBaseRepository, TBaseEntity> : IBaseService<TBaseEntity>
     {
         private readonly TBaseRepository _repository;
 
@@ -20,7 +20,7 @@ namespace BlazorServerWebsite.Data.Services.Abstractions
         /// Instantiates a service with the gerric <see cref="TBaseRepository"/>.
         /// </summary>
         /// <param name="repository">A repository uesd within the service.</param>
-        public BaseService (TBaseRepository repository)
+        public BaseService(TBaseRepository repository)
         {
             _repository = repository;
         }

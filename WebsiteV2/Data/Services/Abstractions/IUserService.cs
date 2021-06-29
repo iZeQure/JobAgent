@@ -13,7 +13,7 @@ namespace BlazorServerWebsite.Data.Services.Abstractions
     /// <summary>
     /// Represents a User specific interface.
     /// </summary>
-    public interface IUserService
+    public interface IUserService : IBaseService<IUser>
     {
         Task<IUser> GetUserByAccessTokenAsync(string token, CancellationToken cancellation);
 
