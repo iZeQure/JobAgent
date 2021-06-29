@@ -15,11 +15,15 @@ namespace BlazorServerWebsite.Data.Services.Abstractions
     /// </summary>
     public interface IUserService
     {
+        Task<IUser> GetUserByAccessTokenAsync(string token, CancellationToken cancellation);
+
+        Task<IUser> GetUserByEmailAsync(string email, CancellationToken cancellation);
+
         Task<int> GrantUserAreaAsync(IUser user, int areaId, CancellationToken cancellation);
 
         Task<int> RemoveUserAreaAsync(IUser user, int areaId, CancellationToken cancellation);
 
-        Task<IUser> GetUserByAccessTokenAsync(string token, CancellationToken cancellation);
+        Task<int> UpdateUserPasswordAsync(IUser user, CancellationToken cancellation);
 
         Task<bool> LoginAsync(IUser user, CancellationToken cancellation);
 

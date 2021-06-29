@@ -170,23 +170,62 @@ namespace SqlDataAccessLibrary.Repositories
                     List<IUser> tempUserList = new();
                     while (await reader.ReadAsync(cancellation))
                     {
-                        User tempUser = new(
+                        IUser user = new User(
                             id: reader.GetInt32(0),
-                            firstName: reader.GetString(1),
-                            lastName: reader.GetString(2),
-                            email: reader.GetString(4),
-                            userRole: new Role(0, reader.GetString(5), ""),
-                            userLocation: new Location(0, reader.GetString(6)),
-                            consultantAreas: null
-                            );
+                            userRole: new Role(0, reader.GetString(4)),
+                            userLocation: new Location(0, reader.GetString(5)),
+                            consultantAreas: SplitConsultantAreas(reader.GetString(6)),
+                            reader.GetString(1),
+                            reader.GetString(2),
+                            reader.GetString(3));
 
-                        tempUserList.Add(tempUser);
+                        tempUserList.Add(user);
                     }
 
                     return await Task.FromResult(tempUserList);
                 }
 
                 return await Task.FromResult(Enumerable.Empty<IUser>());
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public async Task<IUser> GetByEmailAsync(string email, CancellationToken cancellation)
+        {
+            try
+            {
+                string cmdText = "[JA.spGetUserByEmail]";
+                SqlParameter[] parameters = new[]
+                {
+                    new SqlParameter("@email", email)
+                };
+
+                using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
+
+                if (reader.HasRows)
+                {
+                    IUser user = null;
+
+                    while (await reader.ReadAsync(cancellation))
+                    {
+                        user = new User(
+                            id: reader.GetInt32(0),
+                            userRole: new Role(0, reader.GetString(4)),
+                            userLocation: new Location(0, reader.GetString(5)),
+                            consultantAreas: SplitConsultantAreas(reader.GetString(6)),
+                            reader.GetString(1),
+                            reader.GetString(2),
+                            reader.GetString(3));
+                    }
+
+                    return await Task.FromResult(user);
+                }
+
+                return null;
             }
             catch (Exception)
             {
@@ -216,22 +255,20 @@ namespace SqlDataAccessLibrary.Repositories
 
                 if (reader.HasRows)
                 {
-                    User tempuser = null;
+                    IUser user = null;
                     while (await reader.ReadAsync(cancellation))
                     {
-                        tempuser = new(
+                        user = new User(
                             id: reader.GetInt32(0),
-                            firstName: reader.GetString(1),
-                            lastName: reader.GetString(2),
-                            email: reader.GetString(4),
-                            userRole: new Role(0, reader.GetString(5), ""),
-                            userLocation: new Location(0, reader.GetString(6)),
-                            consultantAreas: null
-
-                            );
+                            userRole: new Role(0, reader.GetString(4)),
+                            userLocation: new Location(0, reader.GetString(5)),
+                            consultantAreas: SplitConsultantAreas(reader.GetString(6)),
+                            reader.GetString(1),
+                            reader.GetString(2),
+                            reader.GetString(3));
 
                     }
-                    return tempuser;
+                    return await Task.FromResult(user);
                 }
 
                 return null;
@@ -264,20 +301,20 @@ namespace SqlDataAccessLibrary.Repositories
 
                 if (reader.HasRows)
                 {
+                    IUser user = null;
                     while (await reader.ReadAsync(cancellation))
                     {
-                        User tempuser = new(
+                        user = new User(
                             id: reader.GetInt32(0),
-                            firstName: reader.GetString(1),
-                            lastName: reader.GetString(2),
-                            email: reader.GetString(4),
-                            userRole: new Role(0, reader.GetString(5), ""),
-                            userLocation: new Location(0, reader.GetString(6)),
-                            consultantAreas: null
-                            );
+                            userRole: new Role(0, reader.GetString(4)),
+                            userLocation: new Location(0, reader.GetString(5)),
+                            consultantAreas: SplitConsultantAreas(reader.GetString(6)),
+                            reader.GetString(1),
+                            reader.GetString(2),
+                            reader.GetString(3));
 
-                        return await Task.FromResult(tempuser);
                     }
+                    return await Task.FromResult(user);
                 }
 
                 return null;
@@ -343,18 +380,16 @@ namespace SqlDataAccessLibrary.Repositories
 
                 SqlParameter[] parameters = new[]
                 {
-                new SqlParameter("@userId", updateEntity.GetUserId),
-                new SqlParameter("@roleId", updateEntity.GetRole.Id),
-                new SqlParameter("@locationId", updateEntity.GetLocation.Id),
-                new SqlParameter("@firstName", updateEntity.GetFirstName),
-                new SqlParameter("@lastName", updateEntity.GetLastName),
-                new SqlParameter("@email", updateEntity.GetEmail),
-                new SqlParameter("@password", updateEntity.GetPassword),
-                new SqlParameter("@salt", updateEntity.GetSalt),
-                new SqlParameter("@accessToken", updateEntity.GetAccessToken)
-            };
-
-                //Needs to also update ConsultingAreas
+                    new SqlParameter("@userId", updateEntity.GetUserId),
+                    new SqlParameter("@roleId", updateEntity.GetRole.Id),
+                    new SqlParameter("@locationId", updateEntity.GetLocation.Id),
+                    new SqlParameter("@firstName", updateEntity.GetFirstName),
+                    new SqlParameter("@lastName", updateEntity.GetLastName),
+                    new SqlParameter("@email", updateEntity.GetEmail),
+                    new SqlParameter("@password", updateEntity.GetPassword),
+                    new SqlParameter("@salt", updateEntity.GetSalt),
+                    new SqlParameter("@accessToken", updateEntity.GetAccessToken)
+                };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
             }
@@ -380,21 +415,38 @@ namespace SqlDataAccessLibrary.Repositories
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@userId", user.GetUserId),
-                    new SqlParameter("@userNewPassword", user.GetUserId),
-                    new SqlParameter("@userldPassword", user.GetPassword),
+                    new SqlParameter("@userNewPassword", user.GetPassword),
                     new SqlParameter("@userNewSalt", user.GetSalt),
                     new SqlParameter("@resultReturn", user.GetUserId)
 
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
-
             }
             catch (Exception)
             {
 
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Splits a delimitered string, containing the consultant areas.
+        /// </summary>
+        /// <param name="delimiterSeparatedValues">A string with the values to split.</param>
+        /// <param name="separator">A separator used to determine the delimitered string.</param>
+        /// <returns>A <see cref="List{Area}"/> containing the consultant areas; else empty list of none.</returns>
+        private static List<Area> SplitConsultantAreas(string delimiterSeparatedValues, string separator = ";")
+        {
+            var splitConsultantAreas = delimiterSeparatedValues.Split(separator, StringSplitOptions.RemoveEmptyEntries).ToList();
+            List<Area> consultantAreas = new();
+
+            foreach (var area in splitConsultantAreas)
+            {
+                consultantAreas.Add(new Area(0, area));
+            }
+
+            return consultantAreas;
         }
     }
 }

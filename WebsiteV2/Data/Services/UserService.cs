@@ -57,6 +57,11 @@ namespace BlazorServerWebsite.Data.Services
             return await Repository.GetUserByAccessTokenAsync(user.GetAccessToken, cancellation);
         }
 
+        public async Task<IUser> GetUserByEmailAsync(string email, CancellationToken cancellation)
+        {
+            return await Repository.GetByEmailAsync(email, cancellation);
+        }
+
         public async Task<int> GrantUserAreaAsync(IUser user, int areaId, CancellationToken cancellation)
         {
             return await Repository.GrantUserAreaAsync(user, areaId, cancellation);
@@ -75,6 +80,11 @@ namespace BlazorServerWebsite.Data.Services
         public override async Task<int> UpdateAsync(IUser updateEntity, CancellationToken cancellation)
         {
             return await Repository.UpdateAsync(updateEntity, cancellation);
+        }
+
+        public async Task<int> UpdateUserPasswordAsync(IUser user, CancellationToken cancellation)
+        {
+            return await Repository.UpdateUserPasswordAsync(user, cancellation);
         }
 
         public async Task<bool> ValidateUserExistsByEmail(string userEmail, CancellationToken cancellation)

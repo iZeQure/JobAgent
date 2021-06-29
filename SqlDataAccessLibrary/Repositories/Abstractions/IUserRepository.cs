@@ -14,6 +14,8 @@ namespace SqlDataAccessLibrary.Repositories.Abstractions
 
         Task<IUser> GetUserByAccessTokenAsync(string accessToken, CancellationToken cancellation);
 
+        Task<IUser> GetByEmailAsync(string email, CancellationToken cancellation);
+
         Task<bool> CheckUserExistsAsync(IUser user, CancellationToken cancellation);
 
         Task<int> UpdateUserPasswordAsync(IUser user, CancellationToken cancellation);
