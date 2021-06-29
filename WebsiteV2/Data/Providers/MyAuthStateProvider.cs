@@ -17,7 +17,7 @@ namespace BlazorServerWebsite.Data.Providers
     {
         private readonly ILocalStorageService _localStorageService;
         private readonly IUserService _userService;
-        private readonly IAccess _access;
+        private readonly IAuthenticationAccess _access;
 
         /// <summary>
         /// Access the value for the access token in the memory.
@@ -32,7 +32,7 @@ namespace BlazorServerWebsite.Data.Providers
 
         }
 
-        public MyAuthStateProvider(ILocalStorageService localStorageService, IUserService userService, IAccess userAccess)
+        public MyAuthStateProvider(ILocalStorageService localStorageService, IUserService userService, IAuthenticationAccess userAccess)
         {
             _localStorageService = localStorageService;
             _userService = userService;

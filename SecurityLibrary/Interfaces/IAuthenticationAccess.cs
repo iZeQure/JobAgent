@@ -6,7 +6,7 @@ using ObjectLibrary.Common;
 
 namespace SecurityLibrary.Interfaces
 {
-    public interface IAccess
+    public interface IAuthenticationAccess
     {
         /// <summary>
         /// Generates a new access token, to the given <see cref="IUser"/>.

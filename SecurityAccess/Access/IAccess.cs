@@ -8,7 +8,7 @@ namespace SecurityAccess.Access
 {
     public interface IAccess
     {
-        string GenerateAccessToken(User user);
+        string GenerateAccess(User user);
 
         ClaimsIdentity GetClaimsIdentity(User user);
     }

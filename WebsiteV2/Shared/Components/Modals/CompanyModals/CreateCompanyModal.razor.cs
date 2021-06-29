@@ -1,70 +1,66 @@
 ﻿using BlazorServerWebsite.Data.FormModels;
 using BlazorServerWebsite.Data.Providers;
-using BlazorServerWebsite.Data.Services;
+using BlazorServerWebsite.Data.Services.Abstractions;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using ObjectLibrary.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BlazorServerWebsite.Shared.Components.Modals
+namespace BlazorServerWebsite.Shared.Components.Modals.CompanyModals
 {
     public partial class CreateCompanyModal
     {
         [Inject] protected IJSRuntime JSRuntime { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
-        [Inject] protected CompanyService CompanyService { get; set; }
+        [Inject] protected ICompanyService CompanyService { get; set; }
 
-        protected private CompanyModel CompanyModel = new CompanyModel();
+        private readonly CancellationTokenSource _tokenSource = new();
+        private EditContext _editContext;
+        private CompanyModel _companyModel = new();
+        private bool _isProcessing = false;
+        private bool _showError = false;
+        private string _errorMessage = string.Empty;
 
-        private CancellationTokenSource tokensource = new();
-        private bool IsProcessing { get; set; } = false;
-        private bool ShowError { get; set; } = false;
+        protected override Task OnInitializedAsync()
+        {
+            _editContext = new(_companyModel);
+            _editContext.AddDataAnnotationsValidation();
 
-        private string ErrorMessage { get; set; } = string.Empty;
+            return base.OnInitializedAsync();
+        }
 
         private async Task OnValidSubmit_CreateCompany()
         {
-            if (CompanyModel != null)
+            if (_companyModel != null)
             {
-                IsProcessing = true;
+                _isProcessing = true;
 
                 Company company = new(
-                    CompanyModel.CompanyId,
-                    CompanyModel.CVR,
-                    CompanyModel.Name,
-                    CompanyModel.ContactPerson);
+                    _companyModel.CompanyId,
+                    _companyModel.CVR,
+                    _companyModel.Name,
+                    _companyModel.ContactPerson);
 
-                var result = await CompanyService.CreateAsync(company, tokensource.Token);
+                var result = await CompanyService.CreateAsync(company, _tokenSource.Token);
+                _isProcessing = false;
 
                 if (result == 1)
                 {
-                    CompanyModel = new CompanyModel();
-
-                    IsProcessing = false;
-
+                    _companyModel = new CompanyModel();
                     RefreshProvider.CallRefreshRequest();
-
-                    await JSRuntime.InvokeVoidAsync("modalToggle", "CreateCompanyModal");
-
-                    return;
-                }
-                if(result == 0)
-                {
-                    RefreshProvider.CallRefreshRequest();
-                }
-
-                
+                    await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateCompany");
+                    await Task.CompletedTask;
+                }                
             }
         }
 
         private void CancelRequest(MouseEventArgs e)
         {
-            CompanyModel = new CompanyModel();
+            _tokenSource.Cancel();
+            _companyModel = new CompanyModel();
         }
     }
 }

@@ -14,9 +14,9 @@ namespace BlazorServerWebsite.Data.Services
 {
     public class UserService : BaseService<IUserRepository, IUser>, IUserService
     {
-        private readonly IAccess _access;
+        private readonly IAuthenticationAccess _access;
 
-        public UserService(IUserRepository userRepository, IAccess access) : base(userRepository)
+        public UserService(IUserRepository userRepository, IAuthenticationAccess access) : base(userRepository)
         {
             _access = access;
         }

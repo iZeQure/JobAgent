@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -37,32 +38,32 @@ namespace BlazorServerWebsite.Data.FormModels
         [Range(1, int.MaxValue, ErrorMessage = "Vælg venligst en virksomhed fra listen.")]
         public int SignedWithCompany { get; set; }
 
-        //[Required(ErrorMessage = "Upload venlist en kontrakt.")]
-        //[FileValidation(new[] { ".pdf" })]
-        //public IBrowserFile Contract { get; set; }
+        [Required(ErrorMessage = "Upload venlist en kontrakt.")]
+        [FileValidation(new[] { ".pdf" })]
+        public IBrowserFile ContractFile { get; set; }
     }
 
-    //class FileValidationAttribute : ValidationAttribute
-    //{
-    //    public FileValidationAttribute(string[] allowedExtensions)
-    //    {
-    //        AllowedExtensions = allowedExtensions;
-    //    }
+    class FileValidationAttribute : ValidationAttribute
+    {
+        public FileValidationAttribute(string[] allowedExtensions)
+        {
+            AllowedExtensions = allowedExtensions;
+        }
 
-    //    private string[] AllowedExtensions { get; }
+        private string[] AllowedExtensions { get; }
 
-    //    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
-    //    {
-    //        var file = (IBrowserFile)value;
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            var file = (IBrowserFile)value;
 
-    //        var extension = System.IO.Path.GetExtension(file.Name);
+            var extension = System.IO.Path.GetExtension(file.Name);
 
-    //        if (!AllowedExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
-    //        {
-    //            return new ValidationResult($"Filen skal være af en af disse udvidelser: {string.Join(", ", AllowedExtensions)}.", new[] { validationContext.MemberName });
-    //        }
+            if (!AllowedExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
+            {
+                return new ValidationResult($"Filen skal være af en af disse udvidelser: {string.Join(", ", AllowedExtensions)}.", new[] { validationContext.MemberName });
+            }
 
-    //        return ValidationResult.Success;
-    //    }
-    //}
+            return ValidationResult.Success;
+        }
+    }
 }

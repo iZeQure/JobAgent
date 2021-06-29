@@ -3,15 +3,15 @@
 @*@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]*@
 
 
-@if (companies != null)
+@if (_companies != null)
 {
-    @if (dataIsLoading)
+    @if (_isLoadingData)
     {
-        <MessageAlert IsLoading="dataIsLoading" Message="Indlæser data..."></MessageAlert>
+        <MessageAlert IsLoading="_isLoadingData" Message="Indlæser data..."></MessageAlert>
     }
     else
     {
-        @if (companies.Count() == 0)
+        @if (_companies.Count() == 0)
         {
             <lazorServerWebsite.Components.Notification.MessageAlert Alert="MessageAlert.AlertType.Warning"
                           Message="Der blev ikke fundet nogen virksomheder."
@@ -34,20 +34,20 @@
                     </thead>
                     <tbody>
 
-                        @foreach (var company in companies)
+                        @foreach (var company in _companies)
                         {
-                            <tr id="@(company.CompanyId)">
-                                <th scope="row">@(company.CompanyId)</th>
+                            <tr id="@(company.Id)">
+                                <th scope="row">@(company.Id)</th>
                                 <td>@(company.CVR)</td>
                                 <td>@(company.Name)</td>
                                 <td>@(company.ContactPerson)</td>
                                 <td>
-                                    <span @onclick="(OnClickEvent => OnClick_OpenEditModal(company.CompanyId))" data-toggle="modal" data-target="#EditCompanyModal">
+                                    <span @onclick="(OnClickEvent => OnClick_OpenEditModal(company.Id))" data-toggle="modal" data-target="#EditCompanyModal">
                                         <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne virksomehd." Color="Popover.PopoverType.Info" />
                                     </span>
                                 </td>
                                 <td>
-                                    <span @onclick="(OnClickEvent => OnClick_RemoveCompanyModal(company.CompanyId))" data-toggle="modal" data-target="#RemoveCompanyModal">
+                                    <span @onclick="(OnClickEvent => OnClick_RemoveCompanyModal(company.Id))" data-toggle="modal" data-target="#RemoveCompanyModal">
                                         <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
                                     </span>
                                 </td>
@@ -59,11 +59,11 @@
             </div>
         }
 
-        <BlazorServerWebsite.Shared.Components.Modals.Company.CreateCompanyModal />
+        <CreateCompanyModal />
 
-        <BlazorServerWebsite.Shared.Components.Modals.Company.EditCompanyModal CompanyModel="model" />
+        <EditCompanyModal CompanyModel="@(_companyEditContext)" />
 
-        <BlazorServerWebsite.Shared.Components.Modals.RemoveCompanyModal CompanyId="_companyId" />
+        <RemoveCompanyModal CompanyId="_companyId" />
     }
 }
 else

@@ -1,73 +1,99 @@
 ﻿using BlazorServerWebsite.Data.FormModels;
 using BlazorServerWebsite.Data.Providers;
+using BlazorServerWebsite.Data.Services.Abstractions;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using ObjectLibrary.Common;
+using SecurityLibrary.Providers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace BlazorServerWebsite.Shared.Components.Modals.Contract
+namespace BlazorServerWebsite.Shared.Components.Modals.ContractModals
 {
     public partial class EditContractModal
     {
-        [Parameter]
-        public ContractModel ContractModel { get; set; }
+        [Parameter] public EditContext ContractModelContext { get; set; }
+        [Inject] protected IContractService ContractService { get; set; }
+        [Inject] protected IUserService UserService { get; set; }
+        [Inject] protected ICompanyService CompanyService { get; set; }
+        [Inject] protected IRefreshProvider RefreshProvider { get; set; }
+        [Inject] protected IJSRuntime JSRuntime { get; set; }
 
-        [Inject]
-        protected DataService DataService { get; set; }
+        private readonly CancellationTokenSource _tokenSource = new();
+        private IEnumerable<Company> _companies = new List<Company>();
+        private IEnumerable<IUser> _users = new List<User>();
 
-        [Inject]
-        protected ContractService ContractService { get; set; }
+        private bool _isProcessing = false;
+        private bool _isLoadingData = false;
+        private bool _showError = false;
+        private string _errorMessage = string.Empty;
 
-        [Inject]
-        protected IRefreshProvider RefreshProvider { get; set; }
-
-        [Inject]
-        protected IJSRuntime JSRuntime { get; set; }
-
-        protected private IEnumerable<Company> Companies { get; set; }
-        protected private IEnumerable<User> Users { get; set; }
-
-        private bool IsProcessing { get; set; } = false;
-        private bool ShowError { get; set; } = false;
-
-        private string ErrorMessage { get; set; } = string.Empty;
-
-        protected override async Task OnInitializedAsync()
+        protected override Task OnInitializedAsync()
         {
-            await LoadData();
+            return base.OnInitializedAsync();
         }
 
-        private Task LoadData()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            Task.Run(async () =>
+            if (firstRender)
             {
-                Companies = await DataService.GetAllCompaniesAsync();
-                Users = await DataService.GetUsersAsync();
-            });
+                _isLoadingData = true;
 
-            return Task.CompletedTask;
+                // Get tasks to load.
+                var companiesTask = CompanyService.GetAllAsync(_tokenSource.Token);
+                var usersTask = UserService.GetAllAsync(_tokenSource.Token);
+
+                // Wait for data to be loaded.
+                try
+                {
+                    await TaskExtProvider.WhenAll(companiesTask, usersTask);
+
+                    _companies = companiesTask.Result;
+                    _users = usersTask.Result;
+
+                    _isLoadingData = false;
+                }
+                catch (Exception)
+                {
+                    _isLoadingData = false;
+                    throw;
+                }
+            }
+
+            await base.OnAfterRenderAsync(firstRender);
         }
 
         private async Task OnValidSubmit_UpdateContract()
         {
-            IsProcessing = true;
+            _isProcessing = true;
 
-            await ContractService.UpdateContractAsync(ContractModel);
+            if (ContractModelContext.Model is ContractModel model)
+            {
 
-            IsProcessing = false;
+                var contract = new Contract(
+                new Company(model.SignedWithCompany, 0, "", ""),
+                new User(model.SignedByUser, null, null, null, "", "", ""),
+                model.ContractFileName, model.RegistrationDate, model.ExpiryDate);
 
-            RefreshProvider.CallRefreshRequest();
+                await ContractService.UpdateAsync(contract, _tokenSource.Token);
 
-            await JSRuntime.InvokeVoidAsync("modalToggle", "EditContractModal");
-            await JSRuntime.InvokeVoidAsync("OnInformationChangeAnimation", $"{ContractModel.Id}");
+                _isProcessing = false;
+
+                RefreshProvider.CallRefreshRequest();
+
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditContract");
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{model.Id}");
+            }
         }
 
         private void CancelRequest(MouseEventArgs e)
         {
+            _tokenSource.Cancel();
             RefreshProvider.CallRefreshRequest();
         }
     }

@@ -4,20 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BlazorServerWebsite.Components.Notification
+namespace BlazorServerWebsite.Shared.Components.Diverse
 {
-    public partial class MessageAlert
+    public partial class MessageAlert : ComponentBase
     {
-        [Parameter]
-        public string Message { get; set; } = string.Empty;
-        [Parameter]
-        public string MessageOptional { get; set; } = string.Empty;
-        [Parameter]
-        public AlertType Alert { get; set; }
-        [Parameter]
-        public bool IsLoading { get; set; } = false;
-        [Parameter]
-        public bool FullWidth { get; set; } = true;
+        [Parameter] public string Message { get; set; } = string.Empty;
+        [Parameter] public string MessageOptional { get; set; } = string.Empty;
+        [Parameter] public AlertType Alert { get; set; }
+        [Parameter] public bool IsLoading { get; set; } = false;
+        [Parameter] public bool FullWidth { get; set; } = true;
 
         public string Container
         {

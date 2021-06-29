@@ -1,6 +1,4 @@
 ﻿using BlazorServerWebsite.Data.FormModels;
-using BlazorServerWebsite.Components.Notification;
-using BlazorServerWebsite.Shared.Components.Modals;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
@@ -9,58 +7,54 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BlazorServerWebsite.Data.Providers;
+using BlazorServerWebsite.Data.Services.Abstractions;
+using System.Threading;
+using ObjectLibrary.Common;
 
 namespace BlazorServerWebsite.Pages.Admin.Administrate
 {
-    public partial class Company : ComponentBase
+    public partial class CompanyPage : ComponentBase
     {
-        private EditContext _editContext;
-
-        private readonly CompanyModel _companyModel = new();
-
-        [Inject] protected CompanyService CompanyService { get; set; }
-
+        [Inject] protected ICompanyService CompanyService { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
-
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
 
-        private IEnumerable<Company> companies = new List<Company>();
+        private readonly CancellationTokenSource _tokenSource = new();
+        private EditContext _companyEditContext;
+        private CompanyModel _companyModel = new();
+        private IEnumerable<Company> _companies = new List<Company>();
 
         private int _companyId = 0;
-        
-        private CompanyModel model { get; set; } = new CompanyModel();
         private string errorMessage = string.Empty;
-        private bool dataIsLoading = false;
+        private bool _isLoadingData = false;
 
-        protected override async Task OnInitializedAsync()
+        protected override Task OnInitializedAsync()
         {
             RefreshProvider.RefreshRequest += UpdateContentAsync;
+            _companyEditContext = new(_companyModel);
 
-            companies = await LoadData();
-
-            dataIsLoading = false;
+            return base.OnInitializedAsync();
         }
 
-        private async Task<IEnumerable<Company>> LoadData()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            dataIsLoading = true;
+            if (firstRender)
+            {
+                _isLoadingData = true;
 
-            return await CompanyService.GetAllCompaniesAsync();
+                _companies = await CompanyService.GetAllAsync(_tokenSource.Token);
+
+                _isLoadingData = false;
+            }
+
+            await base.OnAfterRenderAsync(firstRender);
         }
 
         private async Task UpdateContentAsync()
         {
             try
             {
-                var companies = await CompanyService.GetAllCompaniesAsync();
-
-                if (companies != null)
-                {
-                    this.companies = companies;
-                    return;
-                }
-
-                this.companies = null;
+                _companies = await CompanyService.GetAllAsync(_tokenSource.Token);
             }
             catch (Exception) { errorMessage = "Ukendt Fejl ved opdatering af virksomheder."; }
             finally { StateHasChanged(); }
@@ -68,11 +62,11 @@ namespace BlazorServerWebsite.Pages.Admin.Administrate
 
         private async void OnClick_OpenEditModal(int id)
         {
-            var company = await CompanyService.GetCompanyByIdAsync(id);
+            var company = await CompanyService.GetByIdAsync(id, _tokenSource.Token);
 
-            model = new CompanyModel()
+            _companyModel = new CompanyModel()
             {
-                CompanyId = company.Identifier,
+                CompanyId = company.Id,
                 CVR = company.CVR,
                 Name = company.Name,
                 ContactPerson = company.ContactPerson
@@ -83,7 +77,5 @@ namespace BlazorServerWebsite.Pages.Admin.Administrate
         {
             _companyId = id;
         }
-
-
     }
 }

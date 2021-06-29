@@ -14,7 +14,7 @@ namespace SecurityLibrary.Access
     /// <summary>
     /// Represents a Token Access Handler.
     /// </summary>
-    public class UserAccess : IAccess
+    public class UserAccess : IAuthenticationAccess
     {
         private readonly IConfigurationSettings _configurationSettings;
 

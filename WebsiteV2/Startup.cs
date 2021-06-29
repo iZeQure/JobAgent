@@ -21,6 +21,7 @@ using SqlDataAccessLibrary.Repositories.Abstractions;
 using SqlDataAccessLibrary.Repositories;
 using SqlDataAccessLibrary.Database;
 using Blazored.LocalStorage;
+using SecurityLibrary.Providers;
 
 namespace BlazorServerWebsite
 {
@@ -45,10 +46,25 @@ namespace BlazorServerWebsite
 
             services.AddSingleton<IConfigurationSettings>(configurationSettings);
             services.AddTransient<ISqlDatabase, SqlDatabase>();
+
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IAccess, UserAccess>();
+            services.AddScoped<IContractRepository, ContractRepository>();
+            services.AddScoped<ICompanyRepository, CompanyRepository>();
+            services.AddScoped<ILogRepository, LogRepository>();
+            services.AddScoped<ILocationRepository, LocationRepository>();
+            services.AddScoped<IAreaRepository, AreaRepository>();
+
+            services.AddScoped<IFileAccess, ContractFileAccess>();
+            services.AddScoped<IAuthenticationAccess, UserAccess>();
+
+            services.AddScoped<IAreaService, AreaService>();
+            services.AddScoped<ILocationService, LocationService>();
+            services.AddScoped<ILogService, LogService>();
+            services.AddScoped<ICompanyService, CompanyService>();
+            services.AddScoped<IContractService, ContractService>();
             services.AddScoped<IUserService, UserService>();
 
+            services.AddScoped<FileAccessProvider>();
             services.AddScoped<IRefreshProvider, RefreshProvider>();
             services.AddScoped<MyAuthStateProvider>();
             services.AddScoped<AuthenticationStateProvider>(provider =>

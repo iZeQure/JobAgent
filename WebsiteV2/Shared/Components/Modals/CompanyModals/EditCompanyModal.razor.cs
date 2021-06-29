@@ -2,6 +2,7 @@
 using BlazorServerWebsite.Data.Providers;
 using BlazorServerWebsite.Data.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using ObjectLibrary.Common;
 using System;
@@ -10,38 +11,41 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BlazorServerWebsite.Shared.Components.Modals
+namespace BlazorServerWebsite.Shared.Components.Modals.CompanyModals
 {
-    public partial class EditCompanyModal
+    public partial class EditCompanyModal : ComponentBase
     {
-        [Parameter] public CompanyModel CompanyModel { get; set; }
+        [Parameter] public EditContext CompanyModelContext { get; set; }
         [Inject] protected CompanyService CompanyService { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
 
         private CancellationTokenSource tokenSource = new();
-        private bool IsProcessing { get; set; } = false;
-        private bool ShowError { get; set; } = false;
-        private string ErrorMessage { get; set; } = string.Empty;
+        private bool _isProcessing = false;
+        private bool _showError = false;
+        private string _errorMessage = string.Empty;
 
         private async Task OnValidSubmit_UpdateCompany()
         {
-            IsProcessing = true;
+            _isProcessing = true;
 
-            Company company = new(
-                    CompanyModel.CompanyId,
-                    CompanyModel.CVR,
-                    CompanyModel.Name,
-                    CompanyModel.ContactPerson);
+            if (CompanyModelContext.Model is CompanyModel model)
+            {
+                Company company = new(
+                    model.CompanyId,
+                    model.CVR,
+                    model.Name,
+                    model.ContactPerson);
 
-            await CompanyService.UpdateAsync(company, tokenSource.Token);
+                await CompanyService.UpdateAsync(company, tokenSource.Token);
 
-            IsProcessing = false;
+                _isProcessing = false;
 
-            RefreshProvider.CallRefreshRequest();
+                RefreshProvider.CallRefreshRequest();
 
-            await JSRuntime.InvokeVoidAsync("modalToggle", "EditCompanyModal");
-            await JSRuntime.InvokeVoidAsync("OnInformationChangeAnimation", $"{CompanyModel.CompanyId}");
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditCompany");
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{model.CompanyId}");
+            }
         }
     }
 }

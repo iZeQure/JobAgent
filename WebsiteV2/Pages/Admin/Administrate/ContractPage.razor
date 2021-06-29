@@ -1,0 +1,117 @@
+﻿@page "/admin/settings/contracts"
+@*@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]*@
+
+<PageDocumentTitle DocumentTitle="Administrer - Kontrakt Indstillinger" />
+
+<div class="d-flex">
+    <PageHeadingTitle DisplayName="Kontrakt Indstillinger" />
+    <div class="d-inline-block">
+
+        @if (_isDisabled)
+        {
+            <a class="btn btn-sm btn-info cursor-pointer text-white disabled">
+                <span>Ikke Aktiveret</span>
+            </a>
+            <span class="d-inline-block"><small class="text-danger font-weight-bolder">* Opret en Virksomhed for at benytte kontrakter.</small></span>
+        }
+        else
+        {
+            <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#CreateContractModal" @onclick="RefreshContent">
+                Opret ny Kontrakt
+            </a>
+        }
+
+    </div>
+</div>
+
+@if (_isLoadingData)
+{
+    <MessageAlert IsLoading="_isLoadingData" Message="Indlæser kontrakter..." />
+}
+else
+{
+    @if (_contracts != null)
+    {
+        @if (!_contracts.Any())
+        {
+            <MessageAlert Alert="MessageAlert.AlertType.Warning"
+                          Message="Der blev ikke fundet nogen kontrakter."
+                          MessageOptional="Opret kontrakter, ved at trykke på knappen : Opret ny Kontrakt. - Hvis knappen ikke er aktiveret, er det fordi der ikke blev fundet nogen virksomheder." />
+        }
+        else
+        {
+            <div class="table-responsive table-responsive-sm table-responsive-md">
+                <table class="table table-sm table-striped table-hover">
+                    <caption>Liste over virksomheders kontrakter..</caption>
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Virksomhed</th>
+                            <th scope="col">Kontakt Person</th>
+                            <th scope="col">Praktikkonsulent</th>
+                            <th scope="col">Kontrakt</th>
+                            <th scope="col">Kontrakt Oprettet</th>
+                            <th scope="col">Udløbsdato</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var contract in _contracts)
+                        {
+                            <tr id="@(contract.Id)">
+                                <th scope="row">@(contract.Id)</th>
+                                <td>@(contract.company.Name)</td>
+                                <td>@(contract.company.ContactPerson)</td>
+                                <td>@(contract.user.GetFullName)</td>
+                                @if (!string.IsNullOrEmpty(contract.name))
+                                {
+                                    <td>
+                                        <span @onclick="@(mouseClickEvent => OnClick_ShowContractModal(contract.name, contract.company.Name))" class="table-icons" data-toggle="modal" data-target="#ShowContractModal">
+                                            <i class="fas fa-file-invoice"></i>
+                                        </span>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>Ingen kontrakt fundet.</td>
+                                }
+                                <td>@(contract.registrationDateTime.ToString("D"))</td>
+                                <td>@(contract.expiryDateTime.ToString("D"))</td>
+                                <td>
+                                    <span @onclick="(id => OnClick_OpenEditModal(contract.Id))" data-toggle="modal" data-target="#EditContractModal">
+                                        <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne kontrakt." Color="Popover.PopoverType.Info" />
+                                    </span>
+                                </td>
+                                <td>
+                                    <span @onclick="@(mouseEvent => OnClick_RemoveContractModal(contract.Id))" data-toggle="modal" data-target="#RemoveContractModal">
+                                        <Popover Title="Forsigtig!" Body="Denne knap sletter den valgte kontrakt, forevigt!" Color="Popover.PopoverType.Danger" />
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+    else
+    {
+        <MessageAlert Alert="MessageAlert.AlertType.Error"
+                      Message="Prøv at genindlæs siden."
+                      MessageOptional="@(_errorMessage)" />
+    }
+}
+
+@if (!_isDisabled)
+{
+    <CreateContractModal />
+
+    <EditContractModal ContractModelContext="@_contractModelEditContext" />
+
+    <RemoveContractModal ContractId="@_contractId" />
+
+    <ShowContractModal Model="_showContractModel" />
+}

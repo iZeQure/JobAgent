@@ -2,16 +2,15 @@
 using Microsoft.AspNetCore.Components.Forms;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using BlazorServerWebsite.Data.FormModels;
 using BlazorServerWebsite.Data.Services.Abstractions;
-using BlazorServerWebsite.Data.Providers;
 using Microsoft.AspNetCore.Components.Web;
 using ObjectLibrary.Common;
 using System.Threading;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
+using SecurityLibrary.Providers;
 
 namespace BlazorServerWebsite.Pages.Admin.Account
 {
@@ -45,6 +44,8 @@ namespace BlazorServerWebsite.Pages.Admin.Account
         {
             if (firstRender)
             {
+                _isLoadingData = true;
+
                 // Load Session Data.
                 var session = await AuthenticationState;
 
@@ -56,18 +57,35 @@ namespace BlazorServerWebsite.Pages.Admin.Account
                     }
                 }
 
-                // Load User Data.
-                var user = await UserService.GetUserByEmailAsync(_sessionUserEmail, _tokenSource.Token);
-                _accountProfileModel = new()
-                {
-                    AccountId = user.GetUserId,
-                    FirstName = user.GetFirstName,
-                    LastName = user.GetLastName,
-                    Email = user.GetEmail
-                };
+                // Get tasks to load.
+                var userTask = UserService.GetUserByEmailAsync(_sessionUserEmail, _tokenSource.Token);
+                var locationsTask = LocationService.GetAllAsync(_tokenSource.Token);
+                var areasTask = AreaService.GetAllAsync(_tokenSource.Token);
 
-                _locations = await LocationService.GetAllAsync(_tokenSource.Token);
-                _areas = await AreaService.GetAllAsync(_tokenSource.Token);
+                // Wait for data to be loaded.
+                try
+                {
+                    await TaskExtProvider.WhenAll(userTask, locationsTask, areasTask);
+
+                    _locations = locationsTask.Result;
+                    _areas = areasTask.Result;
+                    var user = userTask.Result;
+
+                    _accountProfileModel = new()
+                    {
+                        AccountId = user.GetUserId,
+                        FirstName = user.GetFirstName,
+                        LastName = user.GetLastName,
+                        Email = user.GetEmail
+                    };
+
+                    _isLoadingData = false;
+                }
+                catch (Exception)
+                {
+                    _isLoadingData = false;
+                    throw;
+                }                
             }
 
             await base.OnAfterRenderAsync(firstRender);
@@ -85,16 +103,13 @@ namespace BlazorServerWebsite.Pages.Admin.Account
 
         private async Task OnFocusOut_CheckUserAlreadyExists(FocusEventArgs e)
         {
-            var tokenSource = new CancellationTokenSource();
-            var token = tokenSource.Token;
-
             if (UserService is IUserService service)
             {
-                if (UserEmail != _accountProfileModel.Email)
+                if (_sessionUserEmail != _accountProfileModel.Email)
                 {
                     try
                     {
-                        UserAlreadyExists = await service.ValidateUserExistsByEmail(_accountProfileModel.Email, token);
+                        _userEmailAlreadyExists = await service.ValidateUserExistsByEmail(_accountProfileModel.Email, _tokenSource.Token);
                     }
                     catch (Exception ex)
                     {

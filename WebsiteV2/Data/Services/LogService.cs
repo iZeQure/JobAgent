@@ -1,5 +1,5 @@
 ﻿using BlazorServerWebsite.Data.Services.Abstractions;
-using ObjectLibrary.Common;
+using ObjectLibrary.Logging;
 using SqlDataAccessLibrary.Repositories.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -9,34 +9,34 @@ using System.Threading.Tasks;
 
 namespace BlazorServerWebsite.Data.Services
 {
-    public class LocationService : BaseService<ILocationRepository, Location>, ILocationService
+    public class LogService : BaseService<ILogRepository, Log>, ILogService
     {
-        public LocationService(ILocationRepository repository) : base(repository)
+        public LogService(ILogRepository logRepository) : base(logRepository)
         {
 
         }
 
-        public override async Task<int> CreateAsync(Location createEntity, CancellationToken cancellation)
+        public override async Task<int> CreateAsync(Log createEntity, CancellationToken cancellation)
         {
             return await Repository.CreateAsync(createEntity, cancellation);
         }
 
-        public override async Task<int> DeleteAsync(Location deleteEntity, CancellationToken cancellation)
+        public override async Task<int> DeleteAsync(Log deleteEntity, CancellationToken cancellation)
         {
             return await Repository.DeleteAsync(deleteEntity, cancellation);
         }
 
-        public override async Task<IEnumerable<Location>> GetAllAsync(CancellationToken cancellation)
+        public override async Task<IEnumerable<Log>> GetAllAsync(CancellationToken cancellation)
         {
             return await Repository.GetAllAsync(cancellation);
         }
 
-        public override async Task<Location> GetByIdAsync(int id, CancellationToken cancellation)
+        public override async Task<Log> GetByIdAsync(int id, CancellationToken cancellation)
         {
             return await Repository.GetByIdAsync(id, cancellation);
         }
 
-        public override async Task<int> UpdateAsync(Location updateEntity, CancellationToken cancellation)
+        public override async Task<int> UpdateAsync(Log updateEntity, CancellationToken cancellation)
         {
             return await Repository.UpdateAsync(updateEntity, cancellation);
         }

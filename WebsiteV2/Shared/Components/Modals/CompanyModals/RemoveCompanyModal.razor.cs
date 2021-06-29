@@ -11,36 +11,35 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BlazorServerWebsite.Shared.Components.Modals
+namespace BlazorServerWebsite.Shared.Components.Modals.CompanyModals
 {
-    public partial class RemoveCompanyModal
+    public partial class RemoveCompanyModal : ComponentBase
     {
         [Parameter] public int CompanyId { get; set; }
         [Inject] protected RefreshProvider RefreshProvider { get; set; }
         [Inject] protected private CompanyService CompanyService { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
 
-        private CancellationTokenSource tokenSource = new();
-        protected private CompanyModel CompanyModel { get; set; }
-        private bool IsProcessing { get; set; }
+        private CancellationTokenSource _tokenSource = new();
+        private bool _isProcessing = false;
 
         private async Task OnClick_RemoveCompany(int id)
         {
-            IsProcessing = true;
+            _isProcessing = true;
 
             Company company = new(
-                   CompanyModel.CompanyId,
-                   CompanyModel.CVR,
-                   CompanyModel.Name,
-                   CompanyModel.ContactPerson);
+                   CompanyId,
+                   0,
+                   "",
+                   "");
 
-            await CompanyService.DeleteAsync(company, tokenSource.Token);
+            await CompanyService.DeleteAsync(company, _tokenSource.Token);
 
-            IsProcessing = false;
+            _isProcessing = false;
 
             RefreshProvider.CallRefreshRequest();
 
-            await JSRuntime.InvokeVoidAsync("modalToggle", "RemoveCompanyModal");
+            await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalRemoveCompany");
         }
 
         private void CancelRequest(MouseEventArgs e)

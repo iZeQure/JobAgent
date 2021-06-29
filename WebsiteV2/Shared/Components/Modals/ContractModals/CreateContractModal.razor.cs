@@ -1,103 +1,133 @@
 ﻿using BlazorServerWebsite.Data.FormModels;
 using BlazorServerWebsite.Data.Providers;
+using BlazorServerWebsite.Data.Services.Abstractions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using ObjectLibrary.Common;
+using SecurityLibrary.Providers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BlazorServerWebsite.Shared.Components.Modals.Contract
+namespace BlazorServerWebsite.Shared.Components.Modals.ContractModals
 {
-    public partial class CreateContractModal
+    public partial class CreateContractModal : ComponentBase
     {
         [Inject] protected IJSRuntime JSRuntime { get; set; }
         [Inject] protected IRefreshProvider RefreshService { get; set; }
-        [Inject] protected IFileService FileService { get; set; }
-        [Inject] protected ContractService ContractService { get; set; }
+        [Inject] protected IContractService ContractService { get; set; }
+        [Inject] protected IUserService UserService { get; set; }
+        [Inject] protected ICompanyService CompanyService { get; set; }
 
-        private CancellationTokenSource cancellation;
-        private ContractModel contractModel;
-        private IEnumerable<User> users;
-        private IEnumerable<Company> companies;
+        private readonly CancellationTokenSource _tokenSource = new();
+        private readonly long _maxFileSize = 1024 * 1024 * 15;
+        private IEnumerable<IUser> _users = new List<User>();
+        private IEnumerable<Company> _companies = new List<Company>();
+        private EditContext _editContext;
+        private ContractModel _model = new();
 
-        long maxFileSize = 1024 * 1024 * 15;
+        private bool _isProcessing = false;
+        private bool _isLoadingData = false;
 
-        private bool isProcessing = false;
-        private bool isLoadingData = false;
+        private string _contractDataUrlForPreview = string.Empty;
 
-        private string contractDataUrlForPreview = string.Empty;
-
-        protected override async Task OnInitializedAsync()
+        protected override Task OnInitializedAsync()
         {
-            cancellation = new();
-            contractModel = new();
+            _editContext = new(_model);
+            _editContext.AddDataAnnotationsValidation();
 
-            users = new List<User>();
-            companies = new List<Company>();
+            return base.OnInitializedAsync();
+        }
 
-            isLoadingData = true;
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                _isLoadingData = true;
+                // Get tasks to load.
+                var companiesTask = CompanyService.GetAllAsync(_tokenSource.Token);
+                var usersTask = UserService.GetAllAsync(_tokenSource.Token);
 
-            companies = await DataService.GetCompaniesWithOutContractAsync();
-            users = await DataService.GetUsersAsync();
+                // Wait for data to be loaded.
+                try
+                {
+                    await TaskExtProvider.WhenAll(companiesTask, usersTask);
 
-            isLoadingData = false;
+                    _companies = companiesTask.Result;
+                    _users = usersTask.Result;
+
+                    _isLoadingData = false;
+                }
+                catch (Exception)
+                {
+                    _isLoadingData = false;
+                    throw;
+                }
+            }
+
+            await base.OnAfterRenderAsync(firstRender);
         }
 
         private async Task OnValidSubmit_CreateContract()
         {
-            isProcessing = true;
+            _isProcessing = true;
 
-            var buffer = new byte[contractModel.Contract.Size];
+            var buffer = new byte[_model.ContractFile.Size];
 
-            await contractModel.Contract.OpenReadStream(maxFileSize).ReadAsync(buffer, cancellation.Token);
+            await _model.ContractFile.OpenReadStream(_maxFileSize).ReadAsync(buffer, _tokenSource.Token);
 
-            string uploadedFileName = await FileService.UploadFileAsync(buffer);
+            string uploadedFileName = await ContractService.UploadFIleAsync(buffer, _tokenSource.Token);
 
             if (string.IsNullOrEmpty(uploadedFileName))
             {
-                isProcessing = false;
+                _isProcessing = false;
                 return;
             }
 
             // Process Contract Request.
-            contractModel.ContractFileName = uploadedFileName;
-            await ContractService.CreateContractAsync(contractModel);
+            _model.ContractFileName = uploadedFileName;
+            var contract = new Contract(
+                new Company(_model.SignedWithCompany, 0, "", ""),
+                new User(_model.SignedByUser, null, null, null, "", "", ""),
+                _model.ContractFileName, _model.RegistrationDate, _model.ExpiryDate);
 
-            isProcessing = false;
+            await ContractService.CreateAsync(contract, _tokenSource.Token);
+
+            _isProcessing = false;
 
             RefreshService.CallRefreshRequest();
-            await JSRuntime.InvokeVoidAsync("modalToggle", "CreateContractModal");
+            await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateContract");
 
-            contractModel = new();
-            contractDataUrlForPreview = string.Empty;
+            _model = new();
+            _contractDataUrlForPreview = string.Empty;
         }
 
         private async Task OnInputFileChange(InputFileChangeEventArgs e)
         {
-            contractModel.Contract = e.File;
-            contractModel.ContractFileName = contractModel.Contract.Name;
+            _model.ContractFile = e.File;
+            _model.ContractFileName = _model.ContractFile.Name;
 
-            var buffer = new byte[contractModel.Contract.Size];
+            var buffer = new byte[_model.ContractFile.Size];
 
-            await contractModel.Contract.OpenReadStream().ReadAsync(buffer, cancellation.Token);
-            contractDataUrlForPreview = $"data:{contractModel.Contract.ContentType};base64,{FileService.EncodeFileToBase64(buffer)}";
+            await _model.ContractFile.OpenReadStream().ReadAsync(buffer, _tokenSource.Token);
+            _contractDataUrlForPreview = $"data:{_model.ContractFile.ContentType};base64,{ContractService.EncodeFileToBase64(buffer)}";
         }
 
         private void RemoveUploadedFile(MouseEventArgs e)
         {
-            contractModel.ContractFileName = string.Empty;
-            contractDataUrlForPreview = string.Empty;
+            _model.ContractFileName = string.Empty;
+            _contractDataUrlForPreview = string.Empty;
         }
 
         private void CancelRequest(MouseEventArgs e)
         {
-            contractModel = new ContractModel();
-            contractDataUrlForPreview = string.Empty;
+            _tokenSource.Cancel();
+            _model = new ContractModel();
+            _contractDataUrlForPreview = string.Empty;
         }
     }
 }

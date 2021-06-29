@@ -19,14 +19,9 @@
 @code {
     public enum PopoverType { Danger = 0, Info = 1 }
 
-    [Parameter]
-    public string Title { get; set; }
-
-    [Parameter]
-    public string Body { get; set; }
-
-    [Parameter]
-    public PopoverType Color { get; set; }
+    [Parameter] public string Title { get; set; }
+    [Parameter] public string Body { get; set; }
+    [Parameter] public PopoverType Color { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -40,7 +35,7 @@
 
     private async Task SetPopover()
     {
-        await JSRunTime.InvokeVoidAsync("PopoverInformation", $"{Title}", $"{Body}", $"{Color}");
+        await JSRunTime.InvokeVoidAsync("tooltipInformation", $"{Title}", $"{Body}", $"{Color}");
         await InvokeAsync(() =>
         {
             StateHasChanged();
