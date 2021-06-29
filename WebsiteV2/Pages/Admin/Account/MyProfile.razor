@@ -12,7 +12,7 @@
         <div class="row mb-3">
             <div class="col">
                 <label for="inputEmail">Email Adresse:</label>
-                @if (UserAlreadyExists)
+                @if (_userEmailAlreadyExists)
                 {
                     <span class="d-inline-flex ps-1"><small class="text-danger font-weight-bolder">* Email er allerede tilknyttet en Praktikkonsulent.</small></span>
                 }

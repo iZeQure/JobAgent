@@ -10,23 +10,28 @@ using BlazorServerWebsite.Data.Providers;
 using Microsoft.AspNetCore.Components.Web;
 using ObjectLibrary.Common;
 using System.Threading;
+using Microsoft.AspNetCore.Components.Authorization;
+using System.Security.Claims;
 
 namespace BlazorServerWebsite.Pages.Admin.Account
 {
     public partial class MyProfile : ComponentBase
     {
+        [CascadingParameter] protected Task<AuthenticationState> AuthenticationState { get; set; }
+        [Inject] protected IUserService UserService { get; set; }
+        [Inject] protected ILocationService LocationService { get; set; }
+        [Inject] protected IAreaService AreaService { get; set; }
+
+        private readonly CancellationTokenSource _tokenSource = new();
         private EditContext _editContext;
-        private readonly AccountProfileModel _accountProfileModel = new();
-        [Inject] private MyAuthStateProvider MyAuthStateProvider { get; set; }
-        ////[Inject] private IDataService DataService { get; set; }
-        //[Inject] private NavigationManager NavigationManager { get; set; }
-        [Inject] private IUserService UserService { get; set; }
+        private AccountProfileModel _accountProfileModel = new();
+        private IEnumerable<Location> _locations = new List<Location>();
+        private IEnumerable<Area> _areas = new List<Area>();
 
-        private string ErrorMessage { get; set; }
-        private string Message { get; set; }
-        private string UserEmail { get; set; }
-
-        private bool UserAlreadyExists = false;
+        private string _processMessage = string.Empty;
+        private string _sessionUserEmail = string.Empty;
+        private bool _userEmailAlreadyExists = false;
+        private bool _isLoadingData = false;
 
         protected override Task OnInitializedAsync()
         {
@@ -34,6 +39,38 @@ namespace BlazorServerWebsite.Pages.Admin.Account
             _editContext.AddDataAnnotationsValidation();
 
             return base.OnInitializedAsync();
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                // Load Session Data.
+                var session = await AuthenticationState;
+
+                foreach (var sessionClaim in session.User.Claims)
+                {
+                    if (sessionClaim.Type == ClaimTypes.Email)
+                    {
+                        _sessionUserEmail = sessionClaim.Value;
+                    }
+                }
+
+                // Load User Data.
+                var user = await UserService.GetUserByEmailAsync(_sessionUserEmail, _tokenSource.Token);
+                _accountProfileModel = new()
+                {
+                    AccountId = user.GetUserId,
+                    FirstName = user.GetFirstName,
+                    LastName = user.GetLastName,
+                    Email = user.GetEmail
+                };
+
+                _locations = await LocationService.GetAllAsync(_tokenSource.Token);
+                _areas = await AreaService.GetAllAsync(_tokenSource.Token);
+            }
+
+            await base.OnAfterRenderAsync(firstRender);
         }
 
         private Task OnValidSubmit_ChangeUserInformation()
