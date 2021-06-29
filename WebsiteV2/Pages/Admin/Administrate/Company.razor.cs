@@ -1,29 +1,40 @@
 ﻿using BlazorServerWebsite.Data.FormModels;
+using BlazorServerWebsite.Components.Notification;
+using BlazorServerWebsite.Shared.Components.Modals;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BlazorServerWebsite.Data.Providers;
 
 namespace BlazorServerWebsite.Pages.Admin.Administrate
 {
     public partial class Company : ComponentBase
     {
-        //[Inject] protected DataService DataService { get; set; }
-        //[Inject] protected IJSRuntime JSRuntime { get; set; }
-        //[Inject] protected IRefresh RefreshService { get; set; }
+        private EditContext _editContext;
+
+        private readonly CompanyModel _companyModel = new();
+
+        [Inject] protected CompanyService CompanyService { get; set; }
+
+        [Inject] protected IJSRuntime JSRuntime { get; set; }
+
+        [Inject] protected IRefreshProvider RefreshProvider { get; set; }
 
         private IEnumerable<Company> companies = new List<Company>();
 
+        private int _companyId = 0;
+        
         private CompanyModel model { get; set; } = new CompanyModel();
-        private int companyId { get; set; }
         private string errorMessage = string.Empty;
         private bool dataIsLoading = false;
 
         protected override async Task OnInitializedAsync()
         {
-            RefreshService.RefreshRequest += UpdateContentAsync;
+            RefreshProvider.RefreshRequest += UpdateContentAsync;
 
             companies = await LoadData();
 
@@ -34,14 +45,14 @@ namespace BlazorServerWebsite.Pages.Admin.Administrate
         {
             dataIsLoading = true;
 
-            return await DataService.GetAllCompaniesAsync();
+            return await CompanyService.GetAllCompaniesAsync();
         }
 
         private async Task UpdateContentAsync()
         {
             try
             {
-                var companies = await DataService.GetAllCompaniesAsync();
+                var companies = await CompanyService.GetAllCompaniesAsync();
 
                 if (companies != null)
                 {
@@ -57,20 +68,20 @@ namespace BlazorServerWebsite.Pages.Admin.Administrate
 
         private async void OnClick_OpenEditModal(int id)
         {
-            var company = await DataService.GetCompanyByIdAsync(id);
+            var company = await CompanyService.GetCompanyByIdAsync(id);
 
             model = new CompanyModel()
             {
-                Id = company.Identifier,
+                CompanyId = company.Identifier,
                 CVR = company.CVR,
                 Name = company.Name,
-                URL = company.URL
+                ContactPerson = company.ContactPerson
             };
         }
 
         private void OnClick_RemoveCompanyModal(int id)
         {
-            companyId = id;
+            _companyId = id;
         }
 
 
