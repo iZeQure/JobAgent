@@ -1,5 +1,4 @@
 ﻿@page "/admin/account/my-profile"
-
 @*@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]*@
 
 <PageDocumentTitle DocumentTitle="Bruger Indstillinger - Min Profil" />
@@ -8,46 +7,68 @@
 
     <PageHeadingTitle DisplayTitle="Min Profil" />
 
-    <EditForm EditContext="@(_editContext)" OnValidSubmit="OnValidSubmit_ChangeUserInformation">
-        <div class="row mb-3">
-            <div class="col">
-                <label for="inputEmail">Email Adresse:</label>
-                @if (_userEmailAlreadyExists)
-                {
-                    <span class="d-inline-flex ps-1"><small class="text-danger font-weight-bolder">* Email er allerede tilknyttet en Praktikkonsulent.</small></span>
-                }
-                <InputText @bind-Value="_accountProfileModel.Email" id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" @onfocusout="OnFocusOut_CheckUserAlreadyExists" />
-                <ValidationMessage For="@(() => _accountProfileModel.Email)" />
+    <MessageAlert Message="@_errorMessage" FullWidth="false" Alert="MessageAlert.AlertType.Error" />
+
+    @if (_isLoadingData)
+    {
+        <MessageAlert Message="Indlæser nødvendig data; vent venligst." Alert="MessageAlert.AlertType.Info" IsLoading="_isLoadingData" />
+    }
+
+    @if (!string.IsNullOrEmpty(_sessionUserEmail))
+    {
+        <EditForm EditContext="@(_editContext)" OnValidSubmit="OnValidSubmit_ChangeUserInformation">
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="inputEmail">Email Adresse:</label>
+                    @if (_userEmailAlreadyExists)
+                    {
+                        <span class="d-inline-flex ps-1"><small class="text-danger font-weight-bolder">* Email er allerede tilknyttet en Praktikkonsulent.</small></span>
+                    }
+                    <InputText @bind-Value="_accountProfileModel.Email" id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" @onfocusout="OnFocusOut_CheckUserAlreadyExists" />
+                    <ValidationMessage For="@(() => _accountProfileModel.Email)" />
+                </div>
             </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col">
-                <label for="inputFirstName">Fornavn:</label>
-                <InputText @bind-Value="_accountProfileModel.FirstName" id="inputFirstName" type="text" class="form-control form-control-sm" placeholder="Fornavn" />
-                <ValidationMessage For="@(() => _accountProfileModel.FirstName)" />
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="inputFirstName">Fornavn:</label>
+                    <InputText @bind-Value="_accountProfileModel.FirstName" id="inputFirstName" type="text" class="form-control form-control-sm" placeholder="Fornavn" />
+                    <ValidationMessage For="@(() => _accountProfileModel.FirstName)" />
+                </div>
+
+                <div class="col">
+                    <label for="inputLastName">Efternavn:</label>
+                    <InputText @bind-Value="_accountProfileModel.LastName" id="inputLastName" type="text" class="form-control form-control-sm" placeholder="Efternavn" />
+                    <ValidationMessage For="@(() => _accountProfileModel.LastName)" />
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="inputLocation">Lokation:</label>
+                    <InputSelect @bind-Value="_accountProfileModel.LocationId" class="form-control form-control-sm">
+                        @foreach (var location in _locations)
+                            {
+                            @if (location.Id == _accountProfileModel.LocationId)
+                                {
+                                <option selected value="@location.Id">@location.Name</option>
+                                }
+                            <option value="@location.Id">@location.Name</option>
+                            }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => _accountProfileModel.LocationId)" />
+                </div>
+
+                <div class="col">
+                    <label for="fakeInputRole">Rolle:</label>
+                    <span id="fakeInputRole" type="text" class="form-control form-control-sm" readonly>@(_roles.FirstOrDefault(r => r.Id == _accountProfileModel.RoleId).Name ?? "Kunne ikke finde rolle.")</span>
+                </div>
             </div>
 
-            <div class="col">
-                <label for="inputLastName">Efternavn:</label>
-                <InputText @bind-Value="_accountProfileModel.LastName" id="inputLastName" type="text" class="form-control form-control-sm" placeholder="Efternavn" />
-                <ValidationMessage For="@(() => _accountProfileModel.LastName)" />
+            <div class="d-grid gap-2 d-md-flex justify-content-sm-start justify-content-md-between justify-lg-content-between">
+                <button class="btn btn-outline-primary me-md-2" type="submit" disabled="@_isProcessingRequest">Gem bruger oplysninger</button>
+                <button class="btn btn-outline-warning" type="button">Slet bruger</button>
             </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col">
-                <label for="inputLocation">Lokation:</label>
-                <InputSelect @bind-Value="_accountProfileModel.LocationId" class="form-control form-control-sm">
-
-                </InputSelect>
-                <ValidationMessage For="@(() => _accountProfileModel.LocationId)" />
-            </div>
-        </div>
-
-        <div class="d-grid gap-2 d-md-flex justify-content-sm-start justify-content-md-between justify-lg-content-between">
-            <button class="btn btn-outline-primary me-md-2" type="submit">Gem bruger oplysninger</button>
-            <button class="btn btn-outline-warning" type="button">Slet bruger</button>
-        </div>
-    </EditForm>
+        </EditForm>
+    }
 
     <div id="myprofilepic"></div>
 </div>

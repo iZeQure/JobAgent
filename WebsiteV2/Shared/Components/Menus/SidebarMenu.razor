@@ -10,15 +10,15 @@
 </div>
 
 <AuthorizeView>
-    <Authorized>
+    <Authorized Context="AdminContext">
         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mb-1 text-light">
             <span>Administrer</span>
         </h6>
         <ul class="nav flex-column">
 
-            @if (context.User.IsInRole("Konsulent") ||
-               context.User.IsInRole("System Administrator") ||
-               context.User.IsInRole("Udvikler"))
+            @if (AdminContext.User.IsInRole("Konsulent") ||
+               AdminContext.User.IsInRole("System Administrator") ||
+               AdminContext.User.IsInRole("Udvikler"))
             {
                 <li class="nav-item">
                     <NavLink class="nav-link" href="/admin/settings/job-vacancies">
@@ -42,8 +42,8 @@
                 </li>
             }
 
-            @if (context.User.IsInRole("System Administrator") ||
-               context.User.IsInRole("Udvikler"))
+            @if (AdminContext.User.IsInRole("System Administrator") ||
+               AdminContext.User.IsInRole("Udvikler"))
             {
                 <li class="nav-item">
                     <NavLink class="nav-link" href="/admin/settings/register-user">
@@ -58,9 +58,9 @@
             <span>Bruger Indstillinger</span>
         </h6>
         <ul class="nav flex-column">
-            @if (context.User.IsInRole("Konsulent") ||
-                  context.User.IsInRole("System Administrator") ||
-                  context.User.IsInRole("Udvikler"))
+            @if (AdminContext.User.IsInRole("Konsulent") ||
+                  AdminContext.User.IsInRole("System Administrator") ||
+                  AdminContext.User.IsInRole("Udvikler"))
             {
                 <li class="nav-item">
                     <NavLink class="nav-link" href="/admin/account/my-profile">
@@ -81,9 +81,9 @@
             <span>Robot Indstillinger</span>
         </h6>
         <ul class="nav flex-column">
-            @if (context.User.IsInRole("Konsulent") ||
-                  context.User.IsInRole("System Administrator") ||
-                  context.User.IsInRole("Udvikler"))
+            @if (AdminContext.User.IsInRole("Konsulent") ||
+                  AdminContext.User.IsInRole("System Administrator") ||
+                  AdminContext.User.IsInRole("Udvikler"))
             {
                 <li class="nav-item">
                     <NavLink class="nav-link" href="/admin/robot/settings/vacant-jobs">
@@ -107,8 +107,8 @@
                 </li>
             }
 
-            @if (context.User.IsInRole("System Administrator") ||
-                  context.User.IsInRole("Udvikler"))
+            @if (AdminContext.User.IsInRole("System Administrator") ||
+                  AdminContext.User.IsInRole("Udvikler"))
             {
                 <li class="nav-item">
                     <NavLink class="nav-link" href="/admin/robot/settings/static/search-filter">
@@ -120,15 +120,15 @@
         </ul>
 
 
-        @if (context.User.IsInRole("System Administrator") ||
-              context.User.IsInRole("Udvikler"))
+        @if (AdminContext.User.IsInRole("System Administrator") ||
+              AdminContext.User.IsInRole("Udvikler"))
         {
             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-light">
                 <span>System Indstillinger</span>
             </h6>
             <ul class="nav flex-column">
-                @if (context.User.IsInRole("System Administrator") ||
-               context.User.IsInRole("Udvikler"))
+                @if (AdminContext.User.IsInRole("System Administrator") ||
+               AdminContext.User.IsInRole("Udvikler"))
                 {
                     <li class="nav-item">
                         <NavLink class="nav-link" href="/admin/system/settings/user-access">
@@ -145,7 +145,7 @@
                     </li>
                 }
 
-                @if (context.User.IsInRole("Udvikler"))
+                @if (AdminContext.User.IsInRole("Udvikler"))
                 {
                     <li class="nav-item">
                         <NavLink class="nav-link" href="/admin/system/settings/versioning">

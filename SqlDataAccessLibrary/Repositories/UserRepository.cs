@@ -170,16 +170,9 @@ namespace SqlDataAccessLibrary.Repositories
                     List<IUser> tempUserList = new();
                     while (await reader.ReadAsync(cancellation))
                     {
-                        string delimiterAreas = await IsDataNull(reader, 6, cancellation);
+                        string delimiterAreas = await GetColumnDataOrEmptyStringAsync(reader, 6, cancellation);
 
-                        IUser user = new User(
-                            id: reader.GetInt32(0),
-                            userRole: new Role(0, reader.GetString(4)),
-                            userLocation: new Location(0, reader.GetString(5)),
-                            consultantAreas: SplitConsultantAreas(delimiterAreas),
-                            reader.GetString(1),
-                            reader.GetString(2),
-                            reader.GetString(3));
+                        IUser user = await GetUserDataFromReaderAsync(reader, cancellation);
 
                         tempUserList.Add(user);
                     }
@@ -214,16 +207,7 @@ namespace SqlDataAccessLibrary.Repositories
 
                     while (await reader.ReadAsync(cancellation))
                     {
-                        string delimiterAreas = await IsDataNull(reader, 6, cancellation);
-
-                        user = new User(
-                            id: reader.GetInt32(0),
-                            userRole: new Role(0, reader.GetString(4)),
-                            userLocation: new Location(0, reader.GetString(5)),
-                            consultantAreas: SplitConsultantAreas(delimiterAreas),
-                            reader.GetString(1),
-                            reader.GetString(2),
-                            reader.GetString(3));
+                        user = await GetUserDataFromReaderAsync(reader, cancellation);
                     }
 
                     return await Task.FromResult(user);
@@ -233,7 +217,6 @@ namespace SqlDataAccessLibrary.Repositories
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -262,17 +245,7 @@ namespace SqlDataAccessLibrary.Repositories
                     IUser user = null;
                     while (await reader.ReadAsync(cancellation))
                     {
-                        string delimiterAreas = await IsDataNull(reader, 6, cancellation);
-
-                        user = new User(
-                            id: reader.GetInt32(0),
-                            userRole: new Role(0, reader.GetString(4)),
-                            userLocation: new Location(0, reader.GetString(5)),
-                            consultantAreas: SplitConsultantAreas(delimiterAreas),
-                            reader.GetString(1),
-                            reader.GetString(2),
-                            reader.GetString(3));
-
+                        user = await GetUserDataFromReaderAsync(reader, cancellation);
                     }
                     return await Task.FromResult(user);
                 }
@@ -310,17 +283,7 @@ namespace SqlDataAccessLibrary.Repositories
                     IUser user = null;
                     while (await reader.ReadAsync(cancellation))
                     {
-                        string delimiterAreas = await IsDataNull(reader, 6, cancellation);
-
-                        user = new User(
-                            id: reader.GetInt32(0),
-                            userRole: new Role(0, reader.GetString(4)),
-                            userLocation: new Location(0, reader.GetString(5)),
-                            consultantAreas: SplitConsultantAreas(delimiterAreas),
-                            reader.GetString(1),
-                            reader.GetString(2),
-                            reader.GetString(3));
-
+                        user = await GetUserDataFromReaderAsync(reader, cancellation);
                     }
                     return await Task.FromResult(user);
                 }
@@ -439,6 +402,26 @@ namespace SqlDataAccessLibrary.Repositories
         }
 
         /// <summary>
+        /// Extracts the user information from the data reader.
+        /// </summary>
+        /// <param name="reader">A reader containing the stream of rows.</param>
+        /// <param name="cancellation">A token used to cancel the request.</param>
+        /// <returns>A <see cref="IUser"/> with the extracted data from the reader.</returns>
+        private static async Task<IUser> GetUserDataFromReaderAsync(SqlDataReader reader, CancellationToken cancellation)
+        {
+            string delimiterAreas = await GetColumnDataOrEmptyStringAsync(reader, 10, cancellation);
+            IUser user = new User(
+                id: reader.GetInt32(0),
+                userRole: new Role(reader.GetInt32(1), reader.GetString(2), reader.GetString(3)),
+                userLocation: new Location(reader.GetInt32(4), reader.GetString(5)),
+                consultantAreas: SplitConsultantAreas(delimiterAreas),
+                reader.GetString(6),
+                reader.GetString(7),
+                reader.GetString(8));
+            return user;
+        }
+
+        /// <summary>
         /// Splits a delimitered string, containing the consultant areas.
         /// </summary>
         /// <param name="delimiterSeparatedValues">A string with the values to split.</param>
@@ -458,13 +441,18 @@ namespace SqlDataAccessLibrary.Repositories
         }
 
         /// <summary>
-        /// Check if the column contains non-existent or missing data.
+        /// Gets the data within the column.
         /// </summary>
+        /// <remarks>
+        /// Checks if the column in the reader is null from the DB.
+        /// Is null, then returns empty string.
+        /// Is not null, then returns the data within the column.
+        /// </remarks>
         /// <param name="reader"></param>
         /// <param name="columnIndex"></param>
         /// <param name="cancellation"></param>
-        /// <returns>A string containing the data in the column if not null; otherwise empty string.</returns>
-        private static async Task<string> IsDataNull(SqlDataReader reader, int columnIndex, CancellationToken cancellation)
+        /// <returns><see cref="string.Empty"/> if column data is null; otherwise the column data.</returns>
+        private static async Task<string> GetColumnDataOrEmptyStringAsync(SqlDataReader reader, int columnIndex, CancellationToken cancellation)
         {
             return await reader.IsDBNullAsync(columnIndex, cancellation) ? reader.GetString(columnIndex) : string.Empty;
         }

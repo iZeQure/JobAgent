@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ObjectLibrary.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -24,12 +25,12 @@ namespace BlazorServerWebsite.Data.FormModels
         [StringLength(maximumLength: 128, MinimumLength = 1)]
         public string LastName { get; set; }
 
-        [Required(ErrorMessage = "Vælg venligst en eller flere områder fra listen.")]
-        [MinLength(1, ErrorMessage = "Vælg venligst en eller flere områder fra listen.")]
-        public List<int> ConsultantAreaIds { get; set; }
-
         [Required]
         [Range(1 , 1, ErrorMessage = "Vælg venligst en lokation fra listen.")]
         public int LocationId { get; set; }
+
+        [Required]
+        [Range(1, 1, ErrorMessage = "Vælg venligst en rolle fra listen.")]
+        public int RoleId { get; set; }
     }
 }

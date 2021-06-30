@@ -15,6 +15,7 @@ namespace SecurityLibrary.Providers
             try
             {
                 await allTasks;
+                Console.WriteLine("Exception Happened.");
             }
             catch (Exception)
             {
