@@ -1,8 +1,10 @@
 ﻿@page  "/job"
 
+
+
 <div id="job-wrapper">
     <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 g-4 px-3 py-3">
-        @for (int i = 0; i < 8; i++)
+        @foreach(var job in _vacantJobs)
         {
             <div class="col">
                 <div class="card" style="max-width: 540px;">
