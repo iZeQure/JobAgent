@@ -65,7 +65,7 @@ namespace BlazorServerWebsite.Pages.Admin.Account
                 // Wait for data to be loaded.
                 try
                 {
-                    await TaskExtProvider.WhenAll(userTask, locationsTask, areasTask);
+                    await Task.WhenAll(userTask, locationsTask, areasTask);
 
                     _locations = locationsTask.Result;
                     _areas = areasTask.Result;
@@ -81,10 +81,10 @@ namespace BlazorServerWebsite.Pages.Admin.Account
 
                     _isLoadingData = false;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     _isLoadingData = false;
-                    throw;
+                    Console.WriteLine(ex.Message);
                 }                
             }
 

@@ -51,7 +51,7 @@ namespace BlazorServerWebsite.Shared.Components.Modals.ContractModals
                 // Wait for data to be loaded.
                 try
                 {
-                    await TaskExtProvider.WhenAll(companiesTask, usersTask);
+                    await Task.WhenAll(companiesTask, usersTask);
 
                     _companies = companiesTask.Result;
                     _users = usersTask.Result;
