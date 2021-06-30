@@ -5,18 +5,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BlazorServerWebsite.Data.FormModels;
+using BlazorServerWebsite.Data.Providers;
+using BlazorServerWebsite.Data.Services.Abstractions;
+using ObjectLibrary.Common;
+using System.Threading;
 
 namespace BlazorServerWebsite.Shared.Components.Authentication
 {
     public partial class LoginComponent : ComponentBase
     {
+        [Inject] protected MyAuthStateProvider MyAuthStateProvider { get; set; }
+        [Inject] protected NavigationManager NavigationManager { get; set; }
+        [Inject] protected IUserService UserService { get; set; }
+
+        private readonly CancellationTokenSource _tokenSource = new();
+        private IUser user;
         private EditContext _editContext;
-        private bool _processingRequest;
-        private readonly AuthenticationModel _authenticationModel = new();
-
-        public string ValidationMessage { get; set; }
-
-        public bool ProcessingRequest { get { return _processingRequest; } }
+        private AuthenticationModel _authenticationModel = new();
+        private bool _processingRequest = false;
+        private string _message = string.Empty;
 
         protected override void OnInitialized()
         {
@@ -24,30 +31,44 @@ namespace BlazorServerWebsite.Shared.Components.Authentication
             _editContext.AddDataAnnotationsValidation();
         }
 
-        protected override Task OnAfterRenderAsync(bool firstRender)
+        private async Task OnValidSubmit_LogInAsync()
         {
-            if (firstRender)
+            _processingRequest = true;
+
+            _message = "Logger ind, vent venligst..";
+
+            if (_authenticationModel.IsValidEmail(_authenticationModel.Email))
             {
-                _editContext.OnFieldChanged += LoginForm_OnFieldChanged;
-                Console.WriteLine($"Rendered Login Component");
+                user = new User(
+                    0, null, null, null, "", "",
+                    _authenticationModel.Email,
+                    _authenticationModel.Password);
+
+                // Get the task to load.
+                var loginTask = UserService.LoginAsync(user, _tokenSource.Token);
+
+                // Await the task to finish.
+                await Task.WhenAll(loginTask);
+
+                if (loginTask.Result)
+                {
+                    await MyAuthStateProvider.MarkUserAsAuthenticated(user);
+
+                    NavigationManager.NavigateTo("Admin", true);
+                }
+                else
+                {
+                    _message = "Email eller adgangskode er forkert.";
+                    _processingRequest = false;
+                }
+            }
+            else
+            {
+                _message = "Email eller adgangskode er forkert.";
+                _processingRequest = false;
             }
 
-            return base.OnAfterRenderAsync(firstRender);
-        }
-
-        private void LoginForm_OnFieldChanged(object sender, FieldChangedEventArgs e)
-        {
-            Console.WriteLine($"{e.FieldIdentifier.FieldName} has been changed.");
-
-            ValidationMessage = $"{e.FieldIdentifier.FieldName} has been changed.";
-            ClearValidationMessageAfterInterval();
-        }
-
-        private Task OnValidSubmit_LogInAsync()
-        {
-            ValidationMessage = "Logger ind, vent venligst..";
-
-            return ClearValidationMessageAfterInterval();
+            await ClearValidationMessageAfterInterval();
         }
 
         private Task ClearValidationMessageAfterInterval(int milliseconds = 3000)
@@ -55,7 +76,7 @@ namespace BlazorServerWebsite.Shared.Components.Authentication
             var x = Task.Delay(milliseconds)
                 .ContinueWith(x =>
                 {
-                    ValidationMessage = string.Empty;
+                    _message = string.Empty;
                     return x.IsCompleted;
                 });
 

@@ -7,6 +7,10 @@
     color: var(--clr-white) !important;
 }
 
+.text-warning {
+    color: var(--clr-gold) !important;
+}
+
 .bg-purple {
     background: var(--clr-bg) !important;
 }
@@ -14,36 +18,6 @@
 .bg-purple-300 {
     background: var(--clr-purple-300) !important;
 }
-
-.btn-outline-primary {
-    color: var(--bs-purple) !important;
-    border-color: var(--bs-purple) !important;
-}
-
-    .btn-outline-primary:hover,
-    .btn-outline-primary:active {
-        color: var(--clr-white) !important;
-        background-color: var(--bs-purple);
-    }
-
-    .btn-outline-primary:focus {
-        box-shadow: 0 0 0 0.25rem rgb(146 87 255 / 25%) !important;
-    }
-
-.btn-outline-warning {
-    color: var(--bs-purple) !important;
-    border-color: var(--clr-gold) !important;
-}
-
-    .btn-outline-warning:hover,
-    .btn-outline-warning:active {
-        color: var(--bs-purple) !important;
-        background-color: var(--clr-gold);
-    }
-
-    .btn-outline-warning:focus {
-        box-shadow: 0 0 0 0.25rem rgb(255 237 86 / 70%) !important;
-    }
 
 h1, h2, h3, h4, h5 {
     font-family: var(--ff-heading-text);
@@ -243,6 +217,36 @@ input::placeholder {
 .page-content hr {
     color: var(--clr-neutral-900);
 }
+
+.btn-outline-primary {
+    color: var(--bs-purple) !important;
+    border-color: var(--bs-purple) !important;
+}
+
+    .btn-outline-primary:hover,
+    .btn-outline-primary:active {
+        color: var(--clr-white) !important;
+        background-color: var(--bs-purple);
+    }
+
+    .btn-outline-primary:focus {
+        box-shadow: 0 0 0 0.25rem rgb(146 87 255 / 25%) !important;
+    }
+
+.btn-outline-warning {
+    color: var(--bs-purple) !important;
+    border-color: var(--clr-gold) !important;
+}
+
+    .btn-outline-warning:hover,
+    .btn-outline-warning:active {
+        color: var(--bs-purple) !important;
+        background-color: var(--clr-gold);
+    }
+
+    .btn-outline-warning:focus {
+        box-shadow: 0 0 0 0.25rem rgb(255 237 86 / 70%) !important;
+    }
 
 /*.navbar {
     background-color: var(--primary-background-color) !important;

@@ -1,10 +1,10 @@
 ﻿<EditForm class="px-1 px-sm-2 px-md-2 px-lg-4 py-3" EditContext="_editContext" OnValidSubmit="OnValidSubmit_LogInAsync">
-    @if (!string.IsNullOrEmpty(ValidationMessage))
+    @if (!string.IsNullOrEmpty(_message))
     {
         <div class="alert alert-warning d-flex align-items-center small" role="alert">
             <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="assets/images/sprites.svg#exclamation-triangle-fill" /></svg>
             <div>
-                @ValidationMessage
+                @_message
             </div>
         </div>
     }
@@ -19,5 +19,19 @@
         <InputText @bind-Value="@_authenticationModel.Password" class="form-control" type="password" placeholder="Password" />
         <ValidationMessage For="@(() => _authenticationModel.Password)" />
     </div>
-    <button type="submit" class="btn btn-outline-light btn-sm">Log ind</button>
+    <button type="submit" class="btn btn-outline-light btn-sm" disabled="@_processingRequest">
+
+        @if (_processingRequest)
+        {
+            <div class="d-flex align-items-center">
+                <span>Logger ind...</span>
+                <div class="spinner-border spinner-border-sm text-warning m-2 me-auto"></div>
+            </div>
+        }
+        else
+        {
+            <span>Log ind</span>
+        }
+
+    </button>
 </EditForm>

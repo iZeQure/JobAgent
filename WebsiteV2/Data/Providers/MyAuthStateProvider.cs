@@ -77,7 +77,7 @@ namespace BlazorServerWebsite.Data.Providers
         /// </summary>
         /// <param name="user">Used to authenticate the current user.</param>
         /// <returns>A authentication notification task changed.</returns>
-        public async Task MarkUserAsAuthenticated(User user)
+        public async Task MarkUserAsAuthenticated(IUser user)
         {
             // Set the access token in the local memory.
             await _localStorageService.SetItemAsync(ACCESS_TOKEN, user.GetAccessToken);
@@ -124,7 +124,7 @@ namespace BlazorServerWebsite.Data.Providers
         /// </summary>
         /// <param name="user">Used to express to definition of the claims identity.</param>
         /// <returns>An identity with the user.</returns>
-        public ClaimsIdentity GetClaimsIdentity(User user)
+        public ClaimsIdentity GetClaimsIdentity(IUser user)
         {
             return _access.GetClaimsIdentity(user);
         }

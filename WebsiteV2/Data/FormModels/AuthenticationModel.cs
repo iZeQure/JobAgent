@@ -19,5 +19,18 @@ namespace BlazorServerWebsite.Data.FormModels
         [StringLength(255)]
         [DataType(DataType.Password)]
         public string Password { get; set; }
+
+        public bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

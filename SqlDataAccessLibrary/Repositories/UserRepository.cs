@@ -44,7 +44,7 @@ namespace SqlDataAccessLibrary.Repositories
 
                 await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
 
-                bool output = Convert.ToBoolean(parameters[1].Value);
+                bool output = Convert.ToBoolean(parameters[2].Value);
 
                 return await Task.FromResult(output);
 
