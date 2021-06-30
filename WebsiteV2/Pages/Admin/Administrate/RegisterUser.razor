@@ -1,58 +1,118 @@
 ﻿@page "/admin/settings/register-user"
-
 @*@attribute [Authorize(Roles = "System Administrator, Udvikler")];*@
+
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    @if (errorOcurred)
+    {
+        <MessageAlert Alert="MessageAlert.AlertType.Error" Message="@errorMessage" FullWidth="false" />
+    }
+    else
+    {
+        <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="@errorMessage" FullWidth="false" />
+    }
+}
+
+@if (!string.IsNullOrEmpty(infoMessage))
+{
+    <MessageAlert Alert="MessageAlert.AlertType.Success" Message="@infoMessage" FullWidth="false" />
+}
+
 
 <div class="container pt-5">
 
-    <div class="row">
-        <div class="col">
-            <label for="inputEmail" class="admin-label">Email Adresse :</label>
-            <input id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" />
-        </div>
-    </div>
-    <hr />
-    <div class="row">
-        <div class="col">
-            <label for="inputFirstName" class="admin-label">Fornavn :</label>
-            <input id="inputFirstName" type="text" class="form-control form-control-sm" placeholder="Fornavn" />
-        </div>
+    @if (dataIsLoading)
+    {
+        <MessageAlert Alert="MessageAlert.AlertType.Info" Message="Henter oplysninger.." IsLoading="@dataIsLoading" />
+    }
+    else
+    {
+        <EditForm Model="_regAccModel" OnValidSubmit="OnValidSubmit_RegisterAccountAsync" autocomplete="off">
 
-        <div class="col">
-            <label for="inputLastName" class="admin-label">Efternavn :</label>
-            <input id="inputLastName" type="text" class="form-control form-control-sm" placeholder="Efternavn" />
-        </div>
-    </div>
-    <hr />
-    <div class="row">
-        <div class="col">
-            <label for="inputConsultantArea" class="admin-label">Konsulent Område :</label>
-            <select class="form-control form-control-sm">
-                <option value="0" selected>Vælg et konsulent område</option>
-            </select>
-        </div>
+            <div class="row">
+                <div class="col">
+                    <label for="inputEmail" class="admin-label">Email Adresse :</label>
+                    <input id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" @bind-value="_regAccModel.Email" @onfocusout="OnEmailFocusOut_CheckForExistence" />
+                    <ValidationMessage For="@(() => _regAccModel.Email)" />
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col">
+                    <label for="inputFirstName" class="admin-label">Fornavn :</label>
+                    <input id="inputFirstName" type="text" class="form-control form-control-sm" placeholder="Fornavn" @bind-value="_regAccModel.FirstName" />
+                    <ValidationMessage For="@(() => _regAccModel.FirstName)" />
+                </div>
 
-        <div class="col">
-            <label for="inputLocation" class="admin-label">Lokation :</label>
-            <select class="form-control form-control-sm">
-                <option value="0" selected>Vælg en lokation</option>
-            </select>
-        </div>
-    </div>
-    <hr />
-    <div class="row">
-        <div class="col">
-            <label for="inputPassword" class="admin-label">Adgangskode :</label>
-            <input id="inputPassword" type="password" class="form-control form-control-sm" placeholder="Adgangskode" />
-        </div>
+                <div class="col">
+                    <label for="inputLastName" class="admin-label">Efternavn :</label>
+                    <input id="inputLastName" type="text" class="form-control form-control-sm" placeholder="Efternavn" @bind-value="_regAccModel.LastName" />
+                    <ValidationMessage For="@(() => _regAccModel.LastName)" />
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col">
+                    <label for="inputConsultantArea" class="admin-label">Konsulent Område :</label>
+                    <select class="form-control form-control-sm" @bind="_regAccModel.ConsultantAreaId">
+                        @if (!_areas.Any())
+                        {
+                            <option value="0" selected>Fandt ikke nogen områder..</option>
+                        }
+                        else
+                        {
+                            <option value="0" selected>Vælg et konsulent område</option>
 
-        <div class="col">
-            <label for="inputConfirmPassword" class="admin-label">Bekræft Adgangskode :</label>
-            <input id="inputConfirmPassword" type="password" class="form-control form-control-sm" placeholder="Bekræft adgangskode" />
-        </div>
-    </div>
-    <button type="submit" class="btn btn-info float-right ml-auto mt-5">
-        <span>Opret Praktikkonsulent</span>
-    </button>
+                            @foreach (var c in _areas)
+                            {
+                                <option value="@c.Id">@c.Name</option>
+                            }
+                        }
+                    </select>
+                    <ValidationMessage For="@(() => _regAccModel.ConsultantAreaId)" />
+                </div>
 
-    <div id="myprofilepic"></div>
+                <div class="col">
+                    <label for="inputLocation" class="admin-label">Lokation :</label>
+                    <select class="form-control form-control-sm" @bind="_regAccModel.LocationId">
+                        @if (!_locations.Any())
+                        {
+                            <option value="0" selected>Fandt ikke nogen lokationer..</option>
+                        }
+                        else
+                        {
+                            <option value="0" selected>Vælg en lokation</option>
+
+                            @foreach (var l in _locations)
+                            {
+                                <option value="@l.Id">@l.Name</option>
+                            }
+                        }
+                    </select>
+                    <ValidationMessage For="@(() => _regAccModel.LocationId)" />
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col">
+                    <label for="inputPassword" class="admin-label">Adgangskode :</label>
+                    <input id="inputPassword" type="password" class="form-control form-control-sm" placeholder="Adgangskode" @bind="_regAccModel.Password" />
+                    <ValidationMessage For="@(() => _regAccModel.Password)" />
+                </div>
+
+                <div class="col">
+                    <label for="inputConfirmPassword" class="admin-label">Bekræft Adgangskode :</label>
+                    <input id="inputConfirmPassword" type="password" class="form-control form-control-sm" placeholder="Bekræft adgangskode" @bind="_regAccModel.ConfirmPassword" />
+                    <ValidationMessage For="@(() => _regAccModel.Password)" />
+                </div>
+            </div>
+            <button type="submit" class="btn btn-info float-right ml-auto mt-5">
+                <span>Opret Praktikkonsulent</span>
+            </button>
+
+            <div id="myprofilepic"></div>
+
+        </EditForm>
+    }
 </div>
