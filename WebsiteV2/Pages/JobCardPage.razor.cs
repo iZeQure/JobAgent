@@ -27,9 +27,9 @@ namespace BlazorServerWebsite.Pages
 
         protected override async Task OnInitializedAsync()
         {
+            _tokenSource = new();
             _vacantJobModel = new(); 
 
-            await LoadInformation();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -74,11 +74,5 @@ namespace BlazorServerWebsite.Pages
             }
         }
 
-        private async Task LoadInformation()
-        {
-            await LoadInformation();
-        }
-
-        
     }
 }
