@@ -1,26 +1,54 @@
 ﻿@page  "/job"
 
-
+@if (cards.Count == 0)
+{
+    <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="Beklager, kunne ikke indlæse indholdet begrundet af en fejl." />
+}
 
 <div id="job-wrapper">
     <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 g-4 px-3 py-3">
-        @foreach(var job in _vacantJobs)
+        @if (chosenCategoryId == 0)
         {
-            <div class="col">
-                <div class="card" style="max-width: 540px;">
-                    <div class="row g-0">
-                        <div class="col-md-12">
-                            <div class="card-body">
-                                <h5 class="card-title">gravida rutrum quisque non tellus orci ac auctor augue mauris</h5>
-                                <p class="card-subtitle"><small>Firmanavn</small></p>
-                                <p class="card-text card-content">mi tempus imperdiet nulla malesuada pellentesque elit eget gravida cum sociis natoque penatibus et magnis dis parturient montes nascetur ridiculus mus mauris vitae ultricies leo integer malesuada nunc vel risus commodo viverra maecenas accumsan lacus vel facilisis volutpat est velit egestas dui id ornare arcu odio ut sem nulla pharetra diam sit amet nisl suscipit adipiscing bibendum est ultricies integer quis auctor elit sed vulputate mi sit amet mauris commodo quis imperdiet massa tincidunt nunc pulvinar sapien et ligula ullamcorper malesuada proin libero nunc consequat interdum varius sit amet mattis vulputate enim nulla aliquet porttitor lacus luctus accumsan tortor posuere ac ut consequat semper viverra nam libero justo laoreet sit amet cursus sit amet dictum sit amet justo donec enim diam vulputate ut pharetra sit amet aliquam id diam maecenas ultricies mi eget mauris pharetra et ultrices neque ornare aenean euismod elementum nisi quis eleifend quam adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus urna neque viverra justo nec ultrices dui sapien eget mi proin sed libero enim sed faucibus turpis in eu mi bibendum neque egestas congue quisque egestas diam in arcu cursus euismod quis viverra nibh cras pulvinar mattis nunc sed blandit libero volutpat sed cras ornare arcu</p>
-                                <p class="card-subtitle"><small>Oprettet: 10-06-2021</small></p>
-                                <button class="btn btn-outline-light">Learn More</button>
+            @foreach (var card in cards)
+            {
+                <div class="col">
+                    <div class="card" style="max-width: 540px;">
+                        <div class="row g-0">
+                            <div class="col-md-12">
+                                <div class="card-body">
+                                    <h5 class="card-title">@card.Item2</h5>
+                                    <p class="card-subtitle"><small>@card.Item3</small></p>
+                                    <p class="card-text card-content">@card.Item4</p>
+                                    <p class="card-subtitle"><small>Oprettet: @card.Item5</small></p>
+                                    <a href="@card.Item6" class="btn btn-outline-light">Learn More</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            }
+            @if (chosenCategoryId != 0)
+            {
+                @foreach (var card in cards.Where(n => n.Item7 == chosenCategoryId))
+                {
+                    <div class="col">
+                        <div class="card" style="max-width: 540px;">
+                            <div class="row g-0">
+                                <div class="col-md-12">
+                                    <div class="card-body">
+                                        <h5 class="card-title">@card.Item2</h5>
+                                        <p class="card-subtitle"><small>@card.Item3</small></p>
+                                        <p class="card-text card-content">@card.Item4</p>
+                                        <p class="card-subtitle"><small>Oprettet: @card.Item5</small></p>
+                                        <a href="@card.Item6" class="btn btn-outline-light">Learn More</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+
         }
     </div>
 </div>

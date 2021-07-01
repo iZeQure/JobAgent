@@ -21,7 +21,8 @@ namespace BlazorServerWebsite.Pages
         private IEnumerable<JobAdvert> _jobAdverts;
         private VacantJobModel _vacantJobModel;
 
-        private List<string> cards = new List<string>();
+        private int chosenCategoryId;
+        private List<(int, string, string, string, DateTime, string, int)> cards = new List<(int, string, string, string, DateTime, string, int)>();
         private bool _isLoadingData = false;
 
         protected override async Task OnInitializedAsync()
@@ -33,6 +34,8 @@ namespace BlazorServerWebsite.Pages
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+            var tuplelist = new List<(int, string, string, string, DateTime, string)>();
+
             if(firstRender)
             {
                 _isLoadingData = true;
@@ -47,12 +50,16 @@ namespace BlazorServerWebsite.Pages
                         {
                             if (vacantJob.Id == advert.Id)
                             {
-                                cards.Add(vacantJob.Id.ToString());
-                                cards.Add(advert.Title);
-                                cards.Add(vacantJob.Company.Name);
-                                cards.Add(advert.Summary);
-                                cards.Add(advert.RegistrationDateTime.ToString());
-                                cards.Add(vacantJob.URL);
+                                var tuple = (
+                                    id: vacantJob.Id, 
+                                    title: advert.Title, 
+                                    name: vacantJob.Company.Name, 
+                                    summary: advert.Summary, 
+                                    RegDateTime: advert.RegistrationDateTime,
+                                    url: vacantJob.URL, 
+                                    categoryid: advert.Category.Id);
+
+                                cards.Add(tuple);
                             }
                         }
                     }
