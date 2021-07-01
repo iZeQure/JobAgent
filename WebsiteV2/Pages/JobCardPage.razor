@@ -27,28 +27,27 @@
                     </div>
                 </div>
             }
-            @if (chosenCategoryId != 0)
+        }
+        @if (chosenCategoryId != 0)
+        {
+            @foreach (var card in cards.Where(n => n.Item7 == chosenCategoryId))
             {
-                @foreach (var card in cards.Where(n => n.Item7 == chosenCategoryId))
-                {
-                    <div class="col">
-                        <div class="card" style="max-width: 540px;">
-                            <div class="row g-0">
-                                <div class="col-md-12">
-                                    <div class="card-body">
-                                        <h5 class="card-title">@card.Item2</h5>
-                                        <p class="card-subtitle"><small>@card.Item3</small></p>
-                                        <p class="card-text card-content">@card.Item4</p>
-                                        <p class="card-subtitle"><small>Oprettet: @card.Item5</small></p>
-                                        <a href="@card.Item6" class="btn btn-outline-light">Learn More</a>
-                                    </div>
+                <div class="col">
+                    <div class="card" style="max-width: 540px;">
+                        <div class="row g-0">
+                            <div class="col-md-12">
+                                <div class="card-body">
+                                    <h5 class="card-title">@card.Item2</h5>
+                                    <p class="card-subtitle"><small>@card.Item3</small></p>
+                                    <p class="card-text card-content">@card.Item4</p>
+                                    <p class="card-subtitle"><small>Oprettet: @card.Item5</small></p>
+                                    <a href="@card.Item6" class="btn btn-outline-light">Learn More</a>
                                 </div>
                             </div>
                         </div>
                     </div>
-                }
+                </div>
             }
-
         }
     </div>
 </div>
