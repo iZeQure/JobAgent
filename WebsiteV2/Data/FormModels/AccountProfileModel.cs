@@ -32,5 +32,8 @@ namespace BlazorServerWebsite.Data.FormModels
         [Required]
         [Range(1, 1, ErrorMessage = "Vælg venligst en rolle fra listen.")]
         public int RoleId { get; set; }
+
+        public int ConsultantAreaIdToBeAssigned { get; set; }
+        public int ConsultantAreaIdToBeRemoved { get; set; }
     }
 }

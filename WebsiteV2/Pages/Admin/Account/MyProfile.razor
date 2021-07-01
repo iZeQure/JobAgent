@@ -9,6 +9,8 @@
 
     <MessageAlert Message="@_errorMessage" FullWidth="false" Alert="MessageAlert.AlertType.Error" />
 
+    <MessageAlert Message="@_successMessage" Alert="MessageAlert.AlertType.Success" />
+
     @if (_isLoadingData)
     {
         <MessageAlert Message="Indlæser nødvendig data; vent venligst." Alert="MessageAlert.AlertType.Info" IsLoading="_isLoadingData" />
@@ -63,8 +65,33 @@
                 </div>
             </div>
 
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="selectConsultantArea">Konsulentområder:</label>
+                    <InputSelect id="selectConsultantArea" @bind-Value="_accountProfileModel.ConsultantAreaIdToBeAssigned" class="form-control form-control-sm">
+                        <option selected value="0">Vælg et område for at tilføje det</option>
+                        @foreach (var area in _areas)
+                            {
+                            <option value="@area.Id">@area.Name</option>
+                            }
+                    </InputSelect>
+                    <button type="button" class="btn btn-outline-primary mt-2" @onclick="async () => await OnButtonClick_AssignUserConsultantArea(_accountProfileModel.ConsultantAreaIdToBeAssigned)" disabled="@_isProcessingUpdateConsultantAreaRequest">Tilføj Konsulentområde</button>
+                </div>
+                <div class="col">
+                    <label for="activeConsultantAreas">Tildelte Konsulentområder:</label>
+                    <InputSelect id="activeConsultantAreas" @bind-Value="_accountProfileModel.ConsultantAreaIdToBeRemoved" class="form-control form-control-sm">
+                        <option selected value="0">Vælg et område for at fjerne det</option>
+                        @foreach (var area in _assignedConsultantAreas)
+                            {
+                            <option value="@area.Id">@area.Name</option>
+                            }
+                    </InputSelect>
+                    <button type="button" class="btn btn-outline-primary mt-2" @onclick="async () => await OnButtonClick_RemoveUserConsultantArea(_accountProfileModel.ConsultantAreaIdToBeRemoved)" disabled="@_isProcessingUpdateConsultantAreaRequest">Fjern Konsulentområde</button>
+                </div>
+            </div>
+
             <div class="d-grid gap-2 d-md-flex justify-content-sm-start justify-content-md-between justify-lg-content-between">
-                <button class="btn btn-outline-primary me-md-2" type="submit" disabled="@_isProcessingRequest">Gem bruger oplysninger</button>
+                <button class="btn btn-outline-primary me-md-2" type="submit" disabled="@_isProcessingUpdateUserRequest">Gem bruger oplysninger</button>
                 <button class="btn btn-outline-warning" type="button">Slet bruger</button>
             </div>
         </EditForm>

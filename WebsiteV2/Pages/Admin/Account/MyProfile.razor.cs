@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BlazorServerWebsite.Data.FormModels;
@@ -25,6 +26,7 @@ namespace BlazorServerWebsite.Pages.Admin.Account
         [Inject] protected IMessageClearProvider MessageClearProvider { get; set; }
 
         private readonly CancellationTokenSource _tokenSource = new();
+        private IUser _userSession;
         private EditContext _editContext;
         private AccountProfileModel _accountProfileModel = new();
         private IEnumerable<Location> _locations = new List<Location>();
@@ -35,10 +37,11 @@ namespace BlazorServerWebsite.Pages.Admin.Account
         private string _successMessage = string.Empty;
         private string _errorMessage = string.Empty;
         private string _sessionUserEmail = string.Empty;
+        private bool _hasValidSession = true;
         private bool _userEmailAlreadyExists = false;
         private bool _isLoadingData = false;
-        private bool _hasValidSession = true;
-        private bool _isProcessingRequest = false;
+        private bool _isProcessingUpdateUserRequest = false;
+        private bool _isProcessingUpdateConsultantAreaRequest = false;
 
         protected override async Task OnInitializedAsync()
         {
@@ -92,17 +95,17 @@ namespace BlazorServerWebsite.Pages.Admin.Account
                         _locations = locationsTask.Result;
                         _areas = areasTask.Result;
                         _roles = roleTask.Result;
-                        var user = userTask.Result;
+                        _userSession = userTask.Result;
 
-                        _assignedConsultantAreas = user.GetConsultantAreas;
+                        _assignedConsultantAreas = _userSession.GetConsultantAreas;
                         _accountProfileModel = new()
                         {
-                            AccountId = user.GetUserId,
-                            RoleId = user.GetRole.Id,
-                            LocationId = user.GetLocation.Id,
-                            FirstName = user.GetFirstName,
-                            LastName = user.GetLastName,
-                            Email = user.GetEmail
+                            AccountId = _userSession.GetUserId,
+                            RoleId = _userSession.GetRole.Id,
+                            LocationId = _userSession.GetLocation.Id,
+                            FirstName = _userSession.GetFirstName,
+                            LastName = _userSession.GetLastName,
+                            Email = _userSession.GetEmail
                         };
 
                         _isLoadingData = false;
@@ -122,7 +125,7 @@ namespace BlazorServerWebsite.Pages.Admin.Account
         {
             if (_hasValidSession)
             {
-                _isProcessingRequest = true;
+                _isProcessingUpdateUserRequest = true;
 
                 IUser user = new User(
                     _accountProfileModel.AccountId,
@@ -176,6 +179,100 @@ namespace BlazorServerWebsite.Pages.Admin.Account
                     }
                 }
                 Console.WriteLine("Email is not modified.");
+            }
+        }
+
+        private async Task OnButtonClick_AssignUserConsultantArea(int selectedAreaId)
+        {
+            try
+            {
+                _isProcessingUpdateConsultantAreaRequest = true;
+
+                if (selectedAreaId == 0)
+                {
+                    _errorMessage = "Fejl, vælg venligst et område fra listen, før du trykker tilføj.";
+
+                    await MessageClearProvider.ClearMessageOnIntervalAsync(_errorMessage);
+                    return;
+                }
+
+                if (_assignedConsultantAreas.Any(x => x.Id == selectedAreaId))
+                {
+                    _errorMessage = "Kunne ikke tilføje konsulentområde; allerede tilføjet.";
+                    return;
+                }
+
+                try
+                {
+                    var tempList = _assignedConsultantAreas.ToList();
+                    var getAreaById = _areas.FirstOrDefault(x => x.Id == selectedAreaId);
+
+                    int result = await UserService.GrantUserAreaAsync(_userSession, selectedAreaId, _tokenSource.Token);
+
+                    if (result == 1)
+                    {
+                        tempList.Add(getAreaById);
+                        _assignedConsultantAreas = tempList;
+                        _successMessage = "Konsulentområde blev tilføjet!";
+                        return;
+                    }
+
+                    _errorMessage = "Der skete en uventet fejl ved tilføjelse af konsulentområdet.";
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            }
+            finally
+            {
+                _isProcessingUpdateConsultantAreaRequest = false;
+            }
+        }
+
+        private async Task OnButtonClick_RemoveUserConsultantArea(int selectedAreaId)
+        {
+            try
+            {
+                _isProcessingUpdateConsultantAreaRequest = true;
+
+                if (selectedAreaId == 0)
+                {
+                    _errorMessage = "Fejl, vælg venligst et område fra listen, for at fjerne det.";
+                    return;
+                }
+
+                if (_assignedConsultantAreas.Count() == 1)
+                {
+                    _errorMessage = "Fejl, kan ikke fjerne alle områder, der skal minimum være et.";
+                    return;
+                }
+
+                try
+                {
+                    var tempList = _assignedConsultantAreas.ToList();
+                    var getAreaById = _areas.FirstOrDefault(x => x.Id == selectedAreaId);
+
+                    int result = await UserService.RemoveUserAreaAsync(_userSession, selectedAreaId, _tokenSource.Token);
+
+                    if (result == 1)
+                    {
+                        tempList.Remove(getAreaById);
+                        _assignedConsultantAreas = tempList;
+                        _successMessage = "Konsulentområde blev fjernet!";
+                        return;
+                    }
+
+                    _errorMessage = "Der skete en uventet fejl ved fjernelse af konsulentområdet.";
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            }
+            finally
+            {
+                _isProcessingUpdateConsultantAreaRequest = false;
             }
         }
     }
