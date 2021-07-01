@@ -46,5 +46,9 @@ namespace ObjectLibrary.Common
         /// Get a collection of consultant areas for the user.
         /// </summary>
         IEnumerable<Area> GetConsultantAreas { get; }
+
+        public void SetPassword(string password);
+
+        public void SetSalt(string salt);
     }
 }

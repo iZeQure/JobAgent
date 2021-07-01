@@ -14,8 +14,8 @@ namespace ObjectLibrary.Common
         private readonly string _firstName;
         private readonly string _lastName;
         private readonly string _email;
-        private readonly string _password;
-        private readonly string _salt;
+        private string _password;
+        private string _salt;
         private readonly string _accessToken;
 
         public User(int id, Role userRole, Location userLocation, List<Area> consultantAreas, string firstName, string lastName, string email, string password = null, string salt = null, string accessToken = null) : base(id)
@@ -84,5 +84,15 @@ namespace ObjectLibrary.Common
         /// Get the email for the user.
         /// </summary>
         public string GetEmail { get { return _email; } }
+
+        public void SetPassword(string password)
+        {
+            _password = password;
+        }
+
+        public void SetSalt(string salt)
+        {
+            _salt = salt;
+        }
     }
 }

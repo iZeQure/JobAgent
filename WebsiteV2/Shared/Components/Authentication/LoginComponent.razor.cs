@@ -8,6 +8,7 @@ using BlazorServerWebsite.Data.FormModels;
 using BlazorServerWebsite.Data.Providers;
 using BlazorServerWebsite.Data.Services.Abstractions;
 using ObjectLibrary.Common;
+using SecurityLibrary.Cryptography.Extentions;
 using System.Threading;
 
 namespace BlazorServerWebsite.Shared.Components.Authentication
@@ -19,7 +20,7 @@ namespace BlazorServerWebsite.Shared.Components.Authentication
         [Inject] protected IUserService UserService { get; set; }
 
         private readonly CancellationTokenSource _tokenSource = new();
-        private IUser user;
+        private IUser _user;
         private EditContext _editContext;
         private AuthenticationModel _authenticationModel = new();
         private bool _processingRequest = false;
@@ -33,52 +34,51 @@ namespace BlazorServerWebsite.Shared.Components.Authentication
 
         private async Task OnValidSubmit_LogInAsync()
         {
-            _processingRequest = true;
-
-            _message = "Logger ind, vent venligst..";
-
-            if (_authenticationModel.IsValidEmail(_authenticationModel.Email))
+            try
             {
-                user = new User(
-                    0, null, null, null, "", "",
-                    _authenticationModel.Email,
-                    _authenticationModel.Password);
+                _processingRequest = true;
 
-                // Get the task to load.
-                var loginTask = UserService.LoginAsync(user, _tokenSource.Token);
+                _message = "Logger ind, vent venligst..";
 
-                // Await the task to finish.
-                await Task.WhenAll(loginTask);
-
-                if (loginTask.Result)
+                if (_authenticationModel.IsValidEmail(_authenticationModel.Email))
                 {
-                    await MyAuthStateProvider.MarkUserAsAuthenticated(user);
+                    _user = await UserService.LoginAsync(_authenticationModel.Email, _authenticationModel.Password, _tokenSource.Token);
 
-                    NavigationManager.NavigateTo("Admin", true);
+                    if (_user != null)
+                    {
+                        await MyAuthStateProvider.MarkUserAsAuthenticated(_user);
+
+                        NavigationManager.NavigateTo("/admin", true);
+                    }
+                    else
+                    {
+                        _message = "Email eller adgangskode er forkert.";
+                    }
                 }
                 else
                 {
-                    _message = "Email eller adgangskode er forkert.";
-                    _processingRequest = false;
-                }
+                    _message = "Email eller adgangskode er forkert.";                    
+                }                
             }
-            else
+            catch(Exception ex)
             {
-                _message = "Email eller adgangskode er forkert.";
+                Console.WriteLine(ex.Message);
+                _message = "Uventent fejl.";
+            }
+            finally
+            {
                 _processingRequest = false;
             }
-
-            await ClearValidationMessageAfterInterval();
         }
 
         private Task ClearValidationMessageAfterInterval(int milliseconds = 3000)
         {
             var x = Task.Delay(milliseconds)
-                .ContinueWith(x =>
-                {
-                    _message = string.Empty;
-                    return x.IsCompleted;
-                });
+            .ContinueWith(x =>
+            {
+                _message = string.Empty;
+                return x.IsCompleted;
+            });
 
             return x;
         }

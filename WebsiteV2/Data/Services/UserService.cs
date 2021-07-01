@@ -67,9 +67,41 @@ namespace BlazorServerWebsite.Data.Services
             return await Repository.GrantUserAreaAsync(user, areaId, cancellation);
         }
 
-        public async Task<bool> LoginAsync(IUser user, CancellationToken cancellation)
+        public async Task<IUser> LoginAsync(string email, string password, CancellationToken cancellation)
         {
-            return await Repository.AuthenticateUserLoginAsync(user, cancellation);
+            // Get user's salt to hash the given password.
+            var salt = await Repository.GetSaltByEmailAddressAsync(email, cancellation);
+
+            if (string.IsNullOrEmpty(salt))
+            {
+                return null;
+            }
+
+            // Initialize the user.
+            IUser _user = new User(
+                0, null, null, null, "", "",
+                email,
+                password,
+                salt: salt);
+
+            // Hash Password.
+            _user.HashPassword();
+
+            // Get the task to load.
+            var loginTask = Repository.AuthenticateUserLoginAsync(_user, cancellation);
+
+            // Await the task to finish.
+            await Task.WhenAll(loginTask);
+
+            Console.WriteLine($"Login Result : {loginTask.Result}");
+
+            if (loginTask.Result)
+            {
+                return await Repository.GetByEmailAsync(email, cancellation);
+            }
+
+            // Return null if the user isn't authorized.
+            return null;
         }
 
         public async Task<int> RemoveUserAreaAsync(IUser user, int areaId, CancellationToken cancellation)

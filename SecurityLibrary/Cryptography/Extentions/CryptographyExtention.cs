@@ -11,15 +11,14 @@ namespace SecurityLibrary.Cryptography.Extentions
         /// Hashes the given password of the specified user.
         /// </summary>
         /// <param name="value"></param>
-        /// <returns>A hashed password.</returns>
-        public static string HashPassword(this User value)
+        public static void HashPassword(this IUser value)
         {
             try
             {
                 byte[] encodedBytes = Encoding.UTF8.GetBytes(value.GetPassword + value.GetSalt);
                 byte[] computedHashCode = new SHA384Managed().ComputeHash(encodedBytes);
 
-                return Convert.ToBase64String(computedHashCode);
+                value.SetPassword(Convert.ToBase64String(computedHashCode));
             }
             catch (Exception)
             {
@@ -33,8 +32,7 @@ namespace SecurityLibrary.Cryptography.Extentions
         /// <param name="value"></param>
         /// <exception cref="ArgumentException">Is thrown if password is null or empty.</exception>
         /// <exception cref="ArgumentNullException">Is thrown when the converted array is null.</exception>
-        /// <returns>A generated salt.</returns>
-        public static string GenerateSalt(this User value)
+        public static void GenerateSalt(this IUser value)
         {
             try
             {
@@ -50,7 +48,7 @@ namespace SecurityLibrary.Cryptography.Extentions
                     rng.GetNonZeroBytes(buffer);
                 }
 
-                return Convert.ToBase64String(buffer);
+                value.SetSalt(Convert.ToBase64String(buffer));
             }
             catch (ArgumentNullException)
             {

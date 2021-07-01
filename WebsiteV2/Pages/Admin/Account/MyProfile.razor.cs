@@ -19,13 +19,14 @@ namespace BlazorServerWebsite.Pages.Admin.Account
     public partial class MyProfile : ComponentBase
     {
         [CascadingParameter] protected Task<AuthenticationState> AuthenticationState { get; set; }
+        [Inject] protected MyAuthStateProvider MyAuthStateProvider { get; set; }
         [Inject] protected IUserService UserService { get; set; }
         [Inject] protected ILocationService LocationService { get; set; }
         [Inject] protected IAreaService AreaService { get; set; }
         [Inject] protected IRoleService RoleService { get; set; }
-        [Inject] protected IMessageClearProvider MessageClearProvider { get; set; }
 
         private readonly CancellationTokenSource _tokenSource = new();
+        private readonly AccountProfileDiverseModel _accountProfileDiverseModel = new();
         private IUser _userSession;
         private EditContext _editContext;
         private AccountProfileModel _accountProfileModel = new();
@@ -43,92 +44,95 @@ namespace BlazorServerWebsite.Pages.Admin.Account
         private bool _isProcessingUpdateUserRequest = false;
         private bool _isProcessingUpdateConsultantAreaRequest = false;
 
+        protected override void OnInitialized()
+        {
+            _editContext = new EditContext(_accountProfileModel);
+            _editContext.AddDataAnnotationsValidation();
+        }
+
         protected override async Task OnInitializedAsync()
         {
             _isLoadingData = true;
-
-            _editContext = new(_accountProfileModel);
-            _editContext.AddDataAnnotationsValidation();
-
-            // Load Session Data.
-            var session = await AuthenticationState;
-
-            foreach (var sessionClaim in session.User.Claims)
+            try
             {
-                if (sessionClaim.Type == ClaimTypes.Email)
+                // Load Session Data.
+                var session = await AuthenticationState;
+
+                foreach (var sessionClaim in session.User.Claims)
                 {
-                    _sessionUserEmail = sessionClaim.Value;                    
+                    if (sessionClaim.Type == ClaimTypes.Email)
+                    {
+                        _sessionUserEmail = sessionClaim.Value;
+                    }
                 }
-            }
-            _isLoadingData = false;
 
-            if (string.IsNullOrEmpty(_sessionUserEmail))
+                if (string.IsNullOrEmpty(_sessionUserEmail))
+                {
+                    _errorMessage = "Fejl, Kunne ikke indlæse session. Prøv at logge ud og ind.";
+                    _hasValidSession = false;
+                }
+
+                await LoadingData();
+            }
+            finally
             {
-                _errorMessage = "Fejl, Kunne ikke indlæse session. Prøv at logge ud og ind.";
-                _hasValidSession = false;
+                _isLoadingData = false;
             }
-
-            await MessageClearProvider.ClearMessageOnIntervalAsync(_errorMessage);
-
-            await base.OnInitializedAsync();
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        private async Task LoadingData()
         {
-            if (firstRender)
+            if (!string.IsNullOrEmpty(_sessionUserEmail))
             {
-                if (!string.IsNullOrEmpty(_sessionUserEmail))
+                // Get tasks to load.
+                var userTask = UserService.GetUserByEmailAsync(_sessionUserEmail, _tokenSource.Token);
+                var locationsTask = LocationService.GetAllAsync(_tokenSource.Token);
+                var areasTask = AreaService.GetAllAsync(_tokenSource.Token);
+                var roleTask = RoleService.GetAllAsync(_tokenSource.Token);
+
+                // Wait for data to be loaded.
+                try
                 {
-                    _isLoadingData = true;
+                    await Task.WhenAll(userTask, locationsTask, areasTask, roleTask);
 
-                    // Get tasks to load.
-                    var userTask = UserService.GetUserByEmailAsync(_sessionUserEmail, _tokenSource.Token);
-                    var locationsTask = LocationService.GetAllAsync(_tokenSource.Token);
-                    var areasTask = AreaService.GetAllAsync(_tokenSource.Token);
-                    var roleTask = RoleService.GetAllAsync(_tokenSource.Token);
+                    _locations = locationsTask.Result;
+                    _areas = areasTask.Result;
+                    _roles = roleTask.Result;
+                    _userSession = userTask.Result;
 
-                    // Wait for data to be loaded.
-                    try
+                    if (_userSession == null)
                     {
-                        await Task.WhenAll(userTask, locationsTask, areasTask, roleTask);
-
-                        _locations = locationsTask.Result;
-                        _areas = areasTask.Result;
-                        _roles = roleTask.Result;
-                        _userSession = userTask.Result;
-
-                        _assignedConsultantAreas = _userSession.GetConsultantAreas;
-                        _accountProfileModel = new()
-                        {
-                            AccountId = _userSession.GetUserId,
-                            RoleId = _userSession.GetRole.Id,
-                            LocationId = _userSession.GetLocation.Id,
-                            FirstName = _userSession.GetFirstName,
-                            LastName = _userSession.GetLastName,
-                            Email = _userSession.GetEmail
-                        };
-
-                        _isLoadingData = false;
+                        _errorMessage = "Fejl, kunne ikke indlæse session.";
+                        return;
                     }
-                    catch (Exception ex)
+
+                    _assignedConsultantAreas = _userSession.GetConsultantAreas;
+                    _accountProfileModel = new()
                     {
-                        _isLoadingData = false;
-                        Console.WriteLine(ex.Message);
-                    }
+                        RoleId = _userSession.GetRole.Id,
+                        LocationId = _userSession.GetLocation.Id,
+                        FirstName = _userSession.GetFirstName,
+                        LastName = _userSession.GetLastName,
+                        Email = _userSession.GetEmail
+                    };
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
                 }
             }
-
-            await base.OnAfterRenderAsync(firstRender);
         }
 
         private async Task OnValidSubmit_ChangeUserInformation()
         {
+            Console.WriteLine($"Form Submitted");
+
             if (_hasValidSession)
             {
                 _isProcessingUpdateUserRequest = true;
 
                 IUser user = new User(
-                    _accountProfileModel.AccountId,
+                    _userSession.Id,
                     new Role(_accountProfileModel.RoleId, "", ""),
                     new Location(_accountProfileModel.LocationId, ""),
                     null,
@@ -141,12 +145,10 @@ namespace BlazorServerWebsite.Pages.Admin.Account
                 if (result == 1)
                 {
                     _successMessage = "Din bruger blev opdateret!";
-                    await MessageClearProvider.ClearMessageOnIntervalAsync(_successMessage);
                     return;
                 }
 
                 _errorMessage = "Fejl, noget gik galt ved opdatering af din bruger.";
-                await MessageClearProvider.ClearMessageOnIntervalAsync(_errorMessage);
             }
         }
 
@@ -177,8 +179,11 @@ namespace BlazorServerWebsite.Pages.Admin.Account
                     {
                         Console.WriteLine(ex.Message);
                     }
+
+                    return;
                 }
                 Console.WriteLine("Email is not modified.");
+                _userEmailAlreadyExists = false;
             }
         }
 
@@ -191,8 +196,6 @@ namespace BlazorServerWebsite.Pages.Admin.Account
                 if (selectedAreaId == 0)
                 {
                     _errorMessage = "Fejl, vælg venligst et område fra listen, før du trykker tilføj.";
-
-                    await MessageClearProvider.ClearMessageOnIntervalAsync(_errorMessage);
                     return;
                 }
 
@@ -212,8 +215,10 @@ namespace BlazorServerWebsite.Pages.Admin.Account
                     if (result == 1)
                     {
                         tempList.Add(getAreaById);
-                        _assignedConsultantAreas = tempList;
+                        _assignedConsultantAreas = tempList.OrderBy(x => x.Id);
                         _successMessage = "Konsulentområde blev tilføjet!";
+                        MyAuthStateProvider.NotifyAuthenticationStateChanged((await AuthenticationState).User);
+
                         return;
                     }
 
@@ -250,16 +255,19 @@ namespace BlazorServerWebsite.Pages.Admin.Account
 
                 try
                 {
-                    var tempList = _assignedConsultantAreas.ToList();
-                    var getAreaById = _areas.FirstOrDefault(x => x.Id == selectedAreaId);
+                    var areaToBeRemoved = _areas.FirstOrDefault(x => x.Id == selectedAreaId);
 
-                    int result = await UserService.RemoveUserAreaAsync(_userSession, selectedAreaId, _tokenSource.Token);
+                    int result = await UserService.RemoveUserAreaAsync(_userSession, areaToBeRemoved.Id, _tokenSource.Token);
 
                     if (result == 1)
                     {
-                        tempList.Remove(getAreaById);
-                        _assignedConsultantAreas = tempList;
+                        var areas = _assignedConsultantAreas.ToList();
+                        areas.RemoveAll(x => x.Name.Equals(areaToBeRemoved.Name));
+
+                        _assignedConsultantAreas = areas;
                         _successMessage = "Konsulentområde blev fjernet!";
+                        MyAuthStateProvider.NotifyAuthenticationStateChanged((await AuthenticationState).User);
+
                         return;
                     }
 
@@ -275,5 +283,10 @@ namespace BlazorServerWebsite.Pages.Admin.Account
                 _isProcessingUpdateConsultantAreaRequest = false;
             }
         }
+
+        private void Test()
+        {
+            Console.WriteLine($"Form Invalid.");
+        } 
     }
 }

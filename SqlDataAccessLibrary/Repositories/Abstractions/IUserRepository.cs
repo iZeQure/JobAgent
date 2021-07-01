@@ -23,5 +23,6 @@ namespace SqlDataAccessLibrary.Repositories.Abstractions
         Task<int> GrantUserAreaAsync(IUser user, int areaId, CancellationToken cancellation);
 
         Task<int> RemoveAreaAsync(IUser user, int areaId, CancellationToken cancellation);
+        Task<string> GetSaltByEmailAddressAsync(string email, CancellationToken cancellation);
     }
 }

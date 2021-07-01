@@ -27,11 +27,6 @@ namespace BlazorServerWebsite.Data.Providers
         public static bool IsAuthenticated { get; set; }
         public static bool IsAuthenticating { get; set; }
 
-        public MyAuthStateProvider()
-        {
-
-        }
-
         public MyAuthStateProvider(ILocalStorageService localStorageService, IUserService userService, IAuthenticationAccess userAccess)
         {
             _localStorageService = localStorageService;
@@ -41,8 +36,7 @@ namespace BlazorServerWebsite.Data.Providers
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            CancellationTokenSource tokenSource = new();
-            
+            CancellationTokenSource tokenSource = new();            
 
             // Declare a variable to store the identity.
             ClaimsIdentity identity;
@@ -79,11 +73,16 @@ namespace BlazorServerWebsite.Data.Providers
         /// <returns>A authentication notification task changed.</returns>
         public async Task MarkUserAsAuthenticated(IUser user)
         {
+            if (string.IsNullOrEmpty(user.GetAccessToken))
+            {
+                throw new NullReferenceException("Couldn't authenticate user. Access token not found.");
+            }
+
             // Set the access token in the local memory.
             await _localStorageService.SetItemAsync(ACCESS_TOKEN, user.GetAccessToken);
 
             // Get current identity for the user.
-            ClaimsIdentity identity = GetClaimsIdentity(user);
+            ClaimsIdentity identity = _access.GetClaimsIdentity(user);
 
             // Associate the identity with a principal.
             ClaimsPrincipal principal = new ClaimsPrincipal(identity);
@@ -117,16 +116,6 @@ namespace BlazorServerWebsite.Data.Providers
         public void NotifyAuthenticationStateChanged(ClaimsPrincipal user)
         {
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
-        }
-
-        /// <summary>
-        /// Get claims identity access.
-        /// </summary>
-        /// <param name="user">Used to express to definition of the claims identity.</param>
-        /// <returns>An identity with the user.</returns>
-        public ClaimsIdentity GetClaimsIdentity(IUser user)
-        {
-            return _access.GetClaimsIdentity(user);
         }
     }
 }

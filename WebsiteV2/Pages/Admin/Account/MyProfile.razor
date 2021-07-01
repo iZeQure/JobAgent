@@ -1,5 +1,5 @@
 ﻿@page "/admin/account/my-profile"
-@*@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]*@
+@attribute [Authorize]
 
 <PageDocumentTitle DocumentTitle="Bruger Indstillinger - Min Profil" />
 
@@ -18,7 +18,7 @@
 
     @if (!string.IsNullOrEmpty(_sessionUserEmail))
     {
-        <EditForm EditContext="@(_editContext)" OnValidSubmit="OnValidSubmit_ChangeUserInformation">
+        <EditForm Model="_accountProfileModel" OnValidSubmit="OnValidSubmit_ChangeUserInformation" class="mb-3">
             <div class="row mb-3">
                 <div class="col">
                     <label for="inputEmail">Email Adresse:</label>
@@ -26,34 +26,37 @@
                     {
                         <span class="d-inline-flex ps-1"><small class="text-danger font-weight-bolder">* Email er allerede tilknyttet en Praktikkonsulent.</small></span>
                     }
-                    <InputText @bind-Value="_accountProfileModel.Email" id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" @onfocusout="OnFocusOut_CheckUserAlreadyExists" />
+                    <InputText @bind-Value="@_accountProfileModel.Email" id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" @onfocusout="OnFocusOut_CheckUserAlreadyExists" />
                     <ValidationMessage For="@(() => _accountProfileModel.Email)" />
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col">
                     <label for="inputFirstName">Fornavn:</label>
-                    <InputText @bind-Value="_accountProfileModel.FirstName" id="inputFirstName" type="text" class="form-control form-control-sm" placeholder="Fornavn" />
+                    <InputText @bind-Value="@_accountProfileModel.FirstName" id="inputFirstName" type="text" class="form-control form-control-sm" placeholder="Fornavn" />
                     <ValidationMessage For="@(() => _accountProfileModel.FirstName)" />
                 </div>
 
                 <div class="col">
                     <label for="inputLastName">Efternavn:</label>
-                    <InputText @bind-Value="_accountProfileModel.LastName" id="inputLastName" type="text" class="form-control form-control-sm" placeholder="Efternavn" />
+                    <InputText @bind-Value="@_accountProfileModel.LastName" id="inputLastName" type="text" class="form-control form-control-sm" placeholder="Efternavn" />
                     <ValidationMessage For="@(() => _accountProfileModel.LastName)" />
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col">
                     <label for="inputLocation">Lokation:</label>
-                    <InputSelect @bind-Value="_accountProfileModel.LocationId" class="form-control form-control-sm">
+                    <InputSelect @bind-Value="@_accountProfileModel.LocationId" class="form-control form-control-sm">
                         @foreach (var location in _locations)
                             {
                             @if (location.Id == _accountProfileModel.LocationId)
                                 {
                                 <option selected value="@location.Id">@location.Name</option>
                                 }
-                            <option value="@location.Id">@location.Name</option>
+                                else
+                                {
+                                <option value="@location.Id">@location.Name</option>
+                                }
                             }
                     </InputSelect>
                     <ValidationMessage For="@(() => _accountProfileModel.LocationId)" />
@@ -61,38 +64,45 @@
 
                 <div class="col">
                     <label for="fakeInputRole">Rolle:</label>
-                    <span id="fakeInputRole" type="text" class="form-control form-control-sm" readonly>@(_roles.FirstOrDefault(r => r.Id == _accountProfileModel.RoleId).Name ?? "Kunne ikke finde rolle.")</span>
+                    @if (_roles.FirstOrDefault() != null)
+                    {
+                        <span id="fakeInputRole" type="text" class="form-control form-control-sm" readonly>@(_roles.FirstOrDefault(r => r.Id == _accountProfileModel.RoleId).Name ?? "Kunne ikke finde rolle.")</span>
+                        <ValidationMessage For="@(() => _accountProfileModel.RoleId)" />
+                    }
                 </div>
             </div>
 
+            <div class="d-grid gap-2 d-md-flex justify-content-sm-start justify-content-md-between justify-lg-content-between">
+                <button type="submit" class="btn btn-outline-primary me-md-2" disabled="@_isProcessingUpdateUserRequest">Gem bruger oplysninger</button>
+                <button class="btn btn-outline-warning" type="button">Slet bruger</button>
+            </div>
+        </EditForm>
+
+        <EditForm Model="_accountProfileDiverseModel">
             <div class="row mb-3">
                 <div class="col">
                     <label for="selectConsultantArea">Konsulentområder:</label>
-                    <InputSelect id="selectConsultantArea" @bind-Value="_accountProfileModel.ConsultantAreaIdToBeAssigned" class="form-control form-control-sm">
+                    <InputSelect id="selectConsultantArea" @bind-Value="@_accountProfileDiverseModel.ConsultantAreaIdToBeAssigned" class="form-control form-control-sm">
                         <option selected value="0">Vælg et område for at tilføje det</option>
                         @foreach (var area in _areas)
                             {
                             <option value="@area.Id">@area.Name</option>
                             }
                     </InputSelect>
-                    <button type="button" class="btn btn-outline-primary mt-2" @onclick="async () => await OnButtonClick_AssignUserConsultantArea(_accountProfileModel.ConsultantAreaIdToBeAssigned)" disabled="@_isProcessingUpdateConsultantAreaRequest">Tilføj Konsulentområde</button>
+                    <button type="button" class="btn btn-outline-primary mt-2" @onclick="async () => await OnButtonClick_AssignUserConsultantArea(_accountProfileDiverseModel.ConsultantAreaIdToBeAssigned)" disabled="@_isProcessingUpdateConsultantAreaRequest">Tilføj Konsulentområde</button>
                 </div>
                 <div class="col">
                     <label for="activeConsultantAreas">Tildelte Konsulentområder:</label>
-                    <InputSelect id="activeConsultantAreas" @bind-Value="_accountProfileModel.ConsultantAreaIdToBeRemoved" class="form-control form-control-sm">
+                    <InputSelect id="activeConsultantAreas" @bind-Value="@_accountProfileDiverseModel.ConsultantAreaIdToBeRemoved" class="form-control form-control-sm" @onselectionchange="@(() => ShouldRender())">
                         <option selected value="0">Vælg et område for at fjerne det</option>
                         @foreach (var area in _assignedConsultantAreas)
                             {
-                            <option value="@area.Id">@area.Name</option>
+                                var areaId = _areas.FirstOrDefault(x => x.Name.Equals(area.Name)).Id;
+                            <option value="@(areaId)">@area.Name</option>
                             }
                     </InputSelect>
-                    <button type="button" class="btn btn-outline-primary mt-2" @onclick="async () => await OnButtonClick_RemoveUserConsultantArea(_accountProfileModel.ConsultantAreaIdToBeRemoved)" disabled="@_isProcessingUpdateConsultantAreaRequest">Fjern Konsulentområde</button>
+                    <button type="button" class="btn btn-outline-primary mt-2" @onclick="async () => await OnButtonClick_RemoveUserConsultantArea(_accountProfileDiverseModel.ConsultantAreaIdToBeRemoved)" disabled="@_isProcessingUpdateConsultantAreaRequest">Fjern Konsulentområde</button>
                 </div>
-            </div>
-
-            <div class="d-grid gap-2 d-md-flex justify-content-sm-start justify-content-md-between justify-lg-content-between">
-                <button class="btn btn-outline-primary me-md-2" type="submit" disabled="@_isProcessingUpdateUserRequest">Gem bruger oplysninger</button>
-                <button class="btn btn-outline-warning" type="button">Slet bruger</button>
             </div>
         </EditForm>
     }

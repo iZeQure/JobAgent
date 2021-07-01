@@ -12,6 +12,8 @@ namespace SecurityLibrary.Providers
         {
             var allTasks = Task.WhenAll(tasks);
 
+            Console.WriteLine( $"Processing Task : {allTasks}");
+
             try
             {
                 await allTasks;

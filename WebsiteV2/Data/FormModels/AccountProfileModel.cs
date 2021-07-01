@@ -9,9 +9,6 @@ namespace BlazorServerWebsite.Data.FormModels
 {
     public class AccountProfileModel
     {
-        [Required]
-        public int AccountId { get; set; }
-
         [Required(AllowEmptyStrings = false, ErrorMessage = "Email adresse er påkrævet.")]
         [StringLength(maximumLength: 255, MinimumLength = 1)]
         [EmailAddress(ErrorMessage = "Indtast en gyldig email adresse.")]
@@ -26,14 +23,10 @@ namespace BlazorServerWebsite.Data.FormModels
         public string LastName { get; set; }
 
         [Required]
-        [Range(1 , 1, ErrorMessage = "Vælg venligst en lokation fra listen.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Vælg venligst en lokation fra listen.")]
         public int LocationId { get; set; }
 
         [Required]
-        [Range(1, 1, ErrorMessage = "Vælg venligst en rolle fra listen.")]
         public int RoleId { get; set; }
-
-        public int ConsultantAreaIdToBeAssigned { get; set; }
-        public int ConsultantAreaIdToBeRemoved { get; set; }
     }
 }

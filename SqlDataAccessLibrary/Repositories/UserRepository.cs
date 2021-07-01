@@ -30,6 +30,11 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
+                if (user == null)
+                {
+                    throw new NullReferenceException("Couldn't authenticate user login. User is null.");
+                }
+
                 string cmdText = "[JA.spValidateUserLogin]";
 
                 SqlParameter outputParameter = new() { Direction = ParameterDirection.Output, ParameterName = "@returnResult", SqlDbType = SqlDbType.Bit };
@@ -39,7 +44,6 @@ namespace SqlDataAccessLibrary.Repositories
                     new SqlParameter("@userEmail", user.GetEmail),
                     new SqlParameter("@userPassword", user.GetPassword),
                     outputParameter
-
                 };
 
                 await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -47,7 +51,6 @@ namespace SqlDataAccessLibrary.Repositories
                 bool output = Convert.ToBoolean(parameters[2].Value);
 
                 return await Task.FromResult(output);
-
             }
             catch (Exception)
             {
@@ -214,6 +217,38 @@ namespace SqlDataAccessLibrary.Repositories
                 }
 
                 return null;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<string> GetSaltByEmailAddressAsync(string email, CancellationToken cancellation)
+        {
+            try
+            {
+                string cmdText = "[JA.spGetUserSaltByEmail]";
+                SqlParameter[] parameters = new[]
+                {
+                    new SqlParameter("@userEmail", email)
+                };
+
+                using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
+
+                if (reader.HasRows)
+                {
+                    var salt = string.Empty;
+
+                    while (await reader.ReadAsync(cancellation))
+                    {
+                        salt = reader.GetString(0);
+                    }
+
+                    return await Task.FromResult(salt);
+                }
+
+                return await Task.FromResult(string.Empty);
             }
             catch (Exception)
             {
@@ -417,7 +452,8 @@ namespace SqlDataAccessLibrary.Repositories
                 consultantAreas: SplitConsultantAreas(delimiterAreas),
                 reader.GetString(6),
                 reader.GetString(7),
-                reader.GetString(8));
+                reader.GetString(8),
+                accessToken: reader.GetString(9));
             return user;
         }
 
@@ -429,7 +465,7 @@ namespace SqlDataAccessLibrary.Repositories
         /// <returns>A <see cref="List{Area}"/> containing the consultant areas; else empty list of none.</returns>
         private static List<Area> SplitConsultantAreas(string delimiterSeparatedValues, string separator = ";")
         {
-            var splitConsultantAreas = delimiterSeparatedValues.Split(separator, StringSplitOptions.RemoveEmptyEntries).ToList();
+            var splitConsultantAreas = delimiterSeparatedValues.Split(separator).ToList();
             List<Area> consultantAreas = new();
 
             foreach (var area in splitConsultantAreas)
@@ -454,7 +490,7 @@ namespace SqlDataAccessLibrary.Repositories
         /// <returns><see cref="string.Empty"/> if column data is null; otherwise the column data.</returns>
         private static async Task<string> GetColumnDataOrEmptyStringAsync(SqlDataReader reader, int columnIndex, CancellationToken cancellation)
         {
-            return await reader.IsDBNullAsync(columnIndex, cancellation) ? reader.GetString(columnIndex) : string.Empty;
-        }
+            return await Task.FromResult(reader.GetString(columnIndex)) ?? string.Empty;
+        }        
     }
 }
