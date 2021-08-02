@@ -428,9 +428,8 @@ namespace SqlDataAccessLibrary.Repositories
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
                 throw;
             }
         }
