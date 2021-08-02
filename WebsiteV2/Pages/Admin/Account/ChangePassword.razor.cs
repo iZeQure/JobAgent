@@ -11,13 +11,15 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using SecurityLibrary.Cryptography.Extentions;
+using System.Diagnostics;
 
 namespace BlazorServerWebsite.Pages.Admin.Account
 {
     public partial class ChangePassword
     {
         [CascadingParameter] private Task<AuthenticationState> AuthState { get; set; }
-        [Inject] public IUserService _userService { get; set; }
+        [Inject] public IUserService UserService { get; set; }
         [Inject] protected IMessageClearProvider MessageClearProvider { get; set; }
 
         private CancellationTokenSource _tokenSource = new();
@@ -26,13 +28,11 @@ namespace BlazorServerWebsite.Pages.Admin.Account
         private string _successMessage = string.Empty;
         private string _errorMessage = string.Empty;
         private string _sessionUserEmail = string.Empty;
-        private bool _userEmailAlreadyExists = false;
         private bool _isLoadingData = false;
         private bool _hasValidSession = true;
         private bool _isProcessingRequest = false;
 
         private ChangePasswordModel changePasswordModel;
-        private ClaimsPrincipal claim;
 
         protected async override Task OnInitializedAsync()
         {
@@ -57,9 +57,7 @@ namespace BlazorServerWebsite.Pages.Admin.Account
                 _hasValidSession = false;
             }
 
-            await MessageClearProvider.ClearMessageOnIntervalAsync(_errorMessage);
-
-            changePasswordModel.Email = claim.FindFirstValue(ClaimTypes.Email);
+            changePasswordModel.Email = _sessionUserEmail;
 
             await base.OnInitializedAsync();
         }
@@ -75,18 +73,26 @@ namespace BlazorServerWebsite.Pages.Admin.Account
 
                 _infoMessage = "Arbejder på det, vent venligst..";
 
-                Role role = null;
-                Location location = null;
-                List<Area> areaList = new List<Area>();
+                IUser user = await UserService.GetUserByEmailAsync(_sessionUserEmail, _tokenSource.Token);
 
-                User user = new(0, role, location, areaList, string.Empty, string.Empty, changePasswordModel.Email, changePasswordModel.Password);
+                //Role role = null;
+                //Location location = null;
+                //List<Area> areaList = new List<Area>();
 
-                await _userService.UpdateUserPasswordAsync(user, _tokenSource.Token);
+                //User user = new(0, role, location, areaList, string.Empty, string.Empty, changePasswordModel.Email, changePasswordModel.Password);
+
+                user.SetPassword(changePasswordModel.Password);
+
+                user.GenerateSalt();
+                user.HashPassword();
+
+                await UserService.UpdateUserPasswordAsync(user, _tokenSource.Token);
 
                 _infoMessage = "Adgangskode blev ændret.";
             }
             catch (Exception)
             {
+                ClearMessages();
                 _errorMessage = "Kunne ikke ændre adgangskode, prøv igen senere.";
             }
             finally
@@ -106,7 +112,7 @@ namespace BlazorServerWebsite.Pages.Admin.Account
         {
             changePasswordModel = new();
 
-            changePasswordModel.Email = claim.FindFirstValue(ClaimTypes.Email);
+            changePasswordModel.Email = _sessionUserEmail;
         }
 
         private void ClearMessages()
