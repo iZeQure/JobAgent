@@ -1,0 +1,110 @@
+﻿@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
+
+<div id="ModalCreateJobAdvert" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+
+            @if (_isLoading)
+            {
+                <MessageAlert FullWidth="false" IsLoading="@_isLoading" Alert="MessageAlert.AlertType.Info" Message="Vent venligst, henter nødvendig information.." />
+            }
+            else
+            {
+                @if (_jobAdvertModel != null)
+                {
+                    <EditForm EditContext="_editContext" OnValidSubmit="OnValidSubmit_CreateJobAdvertAsync">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title">Nyt Stillingsopslag :</h5>
+                        </div>
+
+                        <div class="modal-body">
+
+                            <div class="row">
+                                <div class="col">
+                                    <label for="regInputTitle" class="admin-label">Stillingsopslagets Titel :</label>
+                                    <input id="regInputTitle" class="form-control form-control-sm" type="text" @bind="_jobAdvertModel.Title" placeholder="Eksempel : Kager på en ny måde .." />
+                                    <ValidationMessage For="@(() => _jobAdvertModel.Title)" />
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <div class="row">
+                                <div class="col">
+                                    <label for="regInputDesc" class="admin-label col-form-label col-form-label-sm">Stillingsopslags Kort-Beskrivelse :</label>
+                                    <textarea id="regInputDesc" class="form-control form-control-sm" style="max-height: 450px; min-height: 150px;" @bind="_jobAdvertModel.Summary" placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."></textarea>
+                                    <ValidationMessage For="@(() => _jobAdvertModel.Summary)" />
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <div class="row">
+                                <div class="col">
+                                    <label for="regInputRegistrationDate" class="admin-label col-form-label col-form-label-sm">Kontrakt Registreret Dato :</label>
+                                    <InputDate TValue="DateTime" @bind-Value="@(_jobAdvertModel.RegistrationDateTime)" id="regInputRegistrationDate" class="form-control form-control-sm" />
+                                    <ValidationMessage For="@(() => _jobAdvertModel.RegistrationDateTime)" />
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <div class="row">
+                                <div class="col">
+                                    <label for="regInputCompany" class="admin-label col-form-label col-form-label-sm">Stillingsopslag Tilhører :</label>
+                                    <select id="regInputCompany" class="form-control form-control-sm" @bind="_jobAdvertModel">
+                                        <option value="0" selected>---Vælg en virksomhed fra listen---</option>
+                                        @foreach (var vacantJob in _vacantJobs)
+                                        {
+                                            <option value="@vacantJob.Id">@vacantJob.Company.Name</option>
+                                        }
+                                    </select>
+                                    <ValidationMessage For="@(() => _jobAdvertModel.Id)" />
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <div class="row">
+                                <div class="col">
+                                    <label for="regInputCategory" class="admin-label col-form-label col-form-label-sm">Kategori :</label>
+                                    <select id="regInputCategory" class="form-control form-control-sm" @onchange="OnChange_GetSpecializationByCategoryId">
+                                        <option value="0" selected>---Vælg en kateori fra listen---</option>
+                                        @foreach (var category in _categories)
+                                        {
+                                            <option value="@category.Id">@category.Name</option>
+                                        }
+                                    </select>
+                                    <ValidationMessage For="@(() => _jobAdvertModel.CategoryId)" />
+                                </div>
+                                @if (_sortedSpecializations.Count() != 0)
+                                {
+                                    <div class="col">
+                                        <label for="regInputSpecialization" class="admin-label col-form-label col-form-label-sm">Kategori Speciale :</label>
+                                        <select id="regInputSpecialization" class="form-control form-control-sm" @bind="_jobAdvertModel.SpecializationId">
+                                            <option value="0" selected>---Vælg et speciale fra listen---</option>
+                                            @foreach (var spec in _sortedSpecializations)
+                                            {
+                                                <option value="@spec.Id">@(spec.Name)</option>
+                                            }
+                                        </select>
+                                        <ValidationMessage For="@(() => _jobAdvertModel.SpecializationId)" />
+                                    </div>
+                                }
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="OnClick_CancelRequest" @onclick:preventDefault>Annuller</button>
+                            <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_isProcessing">Opret Stillingsopslag</button>
+                        </div>
+
+                    </EditForm>
+                }
+            }
+
+        </div>
+    </div>
+</div>

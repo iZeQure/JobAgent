@@ -11,17 +11,19 @@ namespace ObjectLibrary.Common
     /// </summary>
     public class JobAdvert : BaseEntity
     {
+        private readonly VacantJob _vacantJob;
         private Category _category;
         private Specialization _specialization;
         private string _title;
         private string _summaray;
         private DateTime _registrationDateTime;
 
-        public JobAdvert(int vacantJobId, Category category, Specialization specialization, string title, string summary, DateTime registrationDateTime) : base(vacantJobId)
+        public JobAdvert(VacantJob vacantJob, Category category, Specialization specialization, string title, string summary, DateTime registrationDateTime) : base(vacantJob.Id)
         {
             _title = title;
             _summaray = summary;
             _registrationDateTime = registrationDateTime;
+            _vacantJob = vacantJob;
             _category = category;
             _specialization = specialization;
         }
@@ -50,5 +52,7 @@ namespace ObjectLibrary.Common
         /// Specifies the Date of which the job advert were created.
         /// </summary>
         public DateTime RegistrationDateTime { get { return _registrationDateTime; } set { _registrationDateTime = value; } }
+
+        public VacantJob VacantJob { get { return _vacantJob; } }
     }
 }

@@ -8,14 +8,20 @@ namespace BlazorServerWebsite.Data.FormModels
 {
     public class JobAdvertPaginationModel
     {
-        private JobAdvert jobAdvert;
-        private Category category;
-        private Specialization specialization;
-        private Company company;
+        public IEnumerable<JobAdvert> JobAdverts { get; set; }
+        public int JobAdvertsPerPage { get; set; }
+        public int CurrentPage { get; set; } = 1;
 
-        public JobAdvert JobAdvert { get => jobAdvert; set => jobAdvert = value; }
-        public Category Category { get => category; set => category = value; }
-        public Specialization Specialization { get => specialization; set => specialization = value; }
-        public Company Company { get => company; set => company = value; }
+        public int PageCount()
+        {
+            return Convert.ToInt32(Math.Ceiling(JobAdverts.Count() / (double)JobAdvertsPerPage));
+        }
+
+        public IEnumerable<JobAdvert> PaginatedJobAdverts()
+        {
+            int start = (CurrentPage - 1) * JobAdvertsPerPage;
+
+            return JobAdverts.OrderBy(j => j.Id).Skip(start).Take(JobAdvertsPerPage);
+        }
     }
 }

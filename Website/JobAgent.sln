@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObjectLibrary", "..\ObjectL
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SecurityLibrary", "..\SecurityLibrary\SecurityLibrary.csproj", "{353F3B7A-68CE-4C5B-886A-6B951DF4951B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlDataAccessLibrary", "..\SqlDataAccessLibrary\SqlDataAccessLibrary.csproj", "{ADB39A30-55F0-4AA7-95E3-E1323D881F89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlDataAccessLibrary", "..\SqlDataAccessLibrary\SqlDataAccessLibrary.csproj", "{ADB39A30-55F0-4AA7-95E3-E1323D881F89}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
