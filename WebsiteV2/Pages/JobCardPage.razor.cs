@@ -28,7 +28,8 @@ namespace BlazorServerWebsite.Pages
         protected override async Task OnInitializedAsync()
         {
             _tokenSource = new();
-            _vacantJobModel = new(); 
+            _vacantJobModel = new();
+            await OnInitializedAsync();
 
         }
 

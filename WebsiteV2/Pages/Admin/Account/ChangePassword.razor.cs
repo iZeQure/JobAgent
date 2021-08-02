@@ -1,5 +1,7 @@
 ﻿using BlazorServerWebsite.Data.FormModels;
+using BlazorServerWebsite.Data.Providers;
 using BlazorServerWebsite.Data.Services;
+using BlazorServerWebsite.Data.Services.Abstractions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using ObjectLibrary.Common;
@@ -15,13 +17,19 @@ namespace BlazorServerWebsite.Pages.Admin.Account
     public partial class ChangePassword
     {
         [CascadingParameter] private Task<AuthenticationState> AuthState { get; set; }
-
-        [Inject] public UserService _userService { get; set; }
+        [Inject] public IUserService _userService { get; set; }
+        [Inject] protected IMessageClearProvider MessageClearProvider { get; set; }
 
         private CancellationTokenSource _tokenSource = new();
-        private string infoMessage = string.Empty;
-        private string errorMessage = string.Empty;
         private bool isProcessingPasswordChangeRequest = false;
+        private string _infoMessage = string.Empty;
+        private string _successMessage = string.Empty;
+        private string _errorMessage = string.Empty;
+        private string _sessionUserEmail = string.Empty;
+        private bool _userEmailAlreadyExists = false;
+        private bool _isLoadingData = false;
+        private bool _hasValidSession = true;
+        private bool _isProcessingRequest = false;
 
         private ChangePasswordModel changePasswordModel;
         private ClaimsPrincipal claim;
@@ -29,25 +37,33 @@ namespace BlazorServerWebsite.Pages.Admin.Account
         protected async override Task OnInitializedAsync()
         {
             changePasswordModel = new();
+            _isLoadingData = true;
 
-            var authState = await AuthState;
+            var session = await AuthState;
 
-            if (authState == null)
+            foreach (var sessionClaim in session.User.Claims)
             {
-                errorMessage = "Noget gik galt da siden blev indlæst.";
-                return;
+                if (sessionClaim.Type == ClaimTypes.Email)
+                {
+                    _sessionUserEmail = sessionClaim.Value;
+                }
+            }
+            
+            _isLoadingData = false;
+
+            if (string.IsNullOrEmpty(_sessionUserEmail))
+            {
+                _errorMessage = "Fejl, Kunne ikke indlæse session. Prøv at logge ud og ind.";
+                _hasValidSession = false;
             }
 
-            claim = authState.User;
-
-            if (claim == null)
-            {
-                errorMessage = "Noget gik galt, prøv at genindlæs siden.";
-                return;
-            }
+            await MessageClearProvider.ClearMessageOnIntervalAsync(_errorMessage);
 
             changePasswordModel.Email = claim.FindFirstValue(ClaimTypes.Email);
+
+            await base.OnInitializedAsync();
         }
+
 
         private async Task OnValidSubmit_ChangeUserPassword()
         {
@@ -57,7 +73,7 @@ namespace BlazorServerWebsite.Pages.Admin.Account
             {
                 isProcessingPasswordChangeRequest = true;
 
-                infoMessage = "Arbejder på det, vent venligst..";
+                _infoMessage = "Arbejder på det, vent venligst..";
 
                 Role role = null;
                 Location location = null;
@@ -67,11 +83,11 @@ namespace BlazorServerWebsite.Pages.Admin.Account
 
                 await _userService.UpdateUserPasswordAsync(user, _tokenSource.Token);
 
-                infoMessage = "Adgangskode blev ændret.";
+                _infoMessage = "Adgangskode blev ændret.";
             }
             catch (Exception)
             {
-                errorMessage = "Kunne ikke ændre adgangskode, prøv igen senere.";
+                _errorMessage = "Kunne ikke ændre adgangskode, prøv igen senere.";
             }
             finally
             {
@@ -83,7 +99,7 @@ namespace BlazorServerWebsite.Pages.Admin.Account
 
         private void OnInvalidSubmit_ChangeUserPassword()
         {
-            errorMessage = "Venligst udfyld de manglende felter, markeret med rød.";
+            _errorMessage = "Venligst udfyld de manglende felter, markeret med rød.";
         }
 
         private void ResetModelInformation()
@@ -95,8 +111,8 @@ namespace BlazorServerWebsite.Pages.Admin.Account
 
         private void ClearMessages()
         {
-            infoMessage = string.Empty;
-            errorMessage = string.Empty;
+            _infoMessage = string.Empty;
+            _errorMessage = string.Empty;
         }
     }
 }
