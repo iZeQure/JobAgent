@@ -28,27 +28,29 @@ namespace BlazorServerWebsite.Pages.Admin.Administrate
         private string errorMessage = string.Empty;
         private bool _isLoadingData = false;
 
-        protected override Task OnInitializedAsync()
+        protected override async Task OnInitializedAsync()
         {
             RefreshProvider.RefreshRequest += UpdateContentAsync;
             _companyEditContext = new(_companyModel);
 
-            return base.OnInitializedAsync();
+            _companies = await CompanyService.GetAllAsync(_tokenSource.Token);
+
+            await base.OnInitializedAsync();
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (firstRender)
-            {
-                _isLoadingData = true;
+        //protected override async Task OnAfterRenderAsync(bool firstRender)
+        //{
+        //    if (firstRender)
+        //    {
+        //        _isLoadingData = true;
 
-                _companies = await CompanyService.GetAllAsync(_tokenSource.Token);
+        //        _companies = await CompanyService.GetAllAsync(_tokenSource.Token);
 
-                _isLoadingData = false;
-            }
+        //        _isLoadingData = false;
+        //    }
 
-            await base.OnAfterRenderAsync(firstRender);
-        }
+        //    await base.OnAfterRenderAsync(firstRender);
+        //}
 
         private async Task UpdateContentAsync()
         {

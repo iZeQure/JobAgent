@@ -1,6 +1,7 @@
 ﻿using BlazorServerWebsite.Data.FormModels;
 using BlazorServerWebsite.Data.Providers;
 using BlazorServerWebsite.Data.Services;
+using BlazorServerWebsite.Data.Services.Abstractions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
@@ -16,7 +17,7 @@ namespace BlazorServerWebsite.Shared.Components.Modals.CompanyModals
     public partial class EditCompanyModal : ComponentBase
     {
         [Parameter] public EditContext CompanyModelContext { get; set; }
-        [Inject] protected CompanyService CompanyService { get; set; }
+        [Inject] protected ICompanyService CompanyService { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
 
