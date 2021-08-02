@@ -4,7 +4,7 @@
 <PageDocumentTitle DocumentTitle="Administrer - Kontrakt Indstillinger" />
 
 <div class="d-flex">
-    <PageHeadingTitle DisplayName="Kontrakt Indstillinger" />
+    <PageHeadingTitle DisplayTitle="Kontrakt Indstillinger" />
     <div class="d-inline-block">
 
         @if (_isDisabled)
@@ -105,7 +105,7 @@ else
     }
 }
 
-@if (!_isDisabled)
+@*@if (!_isDisabled)
 {
     <CreateContractModal />
 
@@ -114,4 +114,4 @@ else
     <RemoveContractModal ContractId="@_contractId" />
 
     <ShowContractModal Model="_showContractModel" />
-}
+}*@
