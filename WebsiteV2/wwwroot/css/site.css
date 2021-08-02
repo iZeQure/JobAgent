@@ -218,6 +218,15 @@ input::placeholder {
     color: var(--clr-neutral-900);
 }
 
+#userprofile-container p {
+    color: var(--clr-white);
+    margin: 0;
+}
+
+#userprofile-container label {
+    /*margin-top: .75rem;*/
+}
+
 .btn-outline-primary {
     color: var(--bs-purple) !important;
     border-color: var(--bs-purple) !important;

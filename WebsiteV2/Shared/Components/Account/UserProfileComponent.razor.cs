@@ -17,6 +17,7 @@ namespace BlazorServerWebsite.Shared.Components.Account
     {
         [CascadingParameter] protected Task<AuthenticationState> AuthenticationState { get; set; }
         [Inject] protected MyAuthStateProvider MyAuthStateProvider { get; set; }
+        [Inject] protected NavigationManager NavigationManager { get; set; }
 
         private readonly string _roleClaimType = ClaimTypes.Role;
         private readonly string _locationClaimType = "Location";
@@ -42,6 +43,8 @@ namespace BlazorServerWebsite.Shared.Components.Account
         private async Task LogOut()
         {
             await (MyAuthStateProvider.MarkUserAsLoggedOut());
+
+            NavigationManager.NavigateTo("/", true);
         }
     }
 }

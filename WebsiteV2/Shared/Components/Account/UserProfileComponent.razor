@@ -1,22 +1,22 @@
 ﻿@attribute [Authorize]
 
-<div class="overflow-auto m-2" style="max-height: 150px;">
-    <div class="d-flex flex-column align-items-start mb-1">
+<div id="userprofile-container" class="overflow-auto m-2" style="max-height: 200px; max-width: 350px;">
+    <div class="d-flex flex-column align-items-start mb-3 me-2">
         <label>Navn:</label>
         <p>@_context.User.Identity.Name</p>
     </div>
 
-    <div class="d-flex flex-column align-items-start mb-1">
+    <div class="d-flex flex-column align-items-start mb-3 me-2">
         <label>Afdeling:</label>
         <p>@(_context.User.Claims.FirstOrDefault(x => x.Type == _locationClaimType) != null ? _context.User.Claims.FirstOrDefault(x => x.Type == _locationClaimType).Value : "Ikke indlæst")</p>
     </div>
 
-    <div class="d-flex flex-column align-items-start mb-1">
+    <div class="d-flex flex-column align-items-start mb-3 me-2">
         <label>Rolle:</label>
         <p>@(_context.User.Claims.FirstOrDefault(x => x.Type == _roleClaimType) != null ? _context.User.Claims.FirstOrDefault(x => x.Type == _roleClaimType).Value : "Ikke indlæst")</p>
     </div>
 
-    <div class="d-flex flex-column align-items-start mb-1">
+    <div class="d-flex flex-column align-items-start mb-3 me-2">
         <label>Konsulentområder:</label>
         @foreach (var claim in _context.User.Claims)
         {
