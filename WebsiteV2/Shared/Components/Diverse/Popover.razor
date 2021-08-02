@@ -1,14 +1,13 @@
-﻿@inject IJSRuntime JSRunTime
-
+﻿
 @switch (Color)
 {
     case PopoverType.Danger:
-        <a class="popover-danger btn btn-outline-danger" role="button" tabindex="0" data-bs-toggl="popover">
+        <a class="popover-danger btn btn-outline-danger" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="Disabled popover">
             <i class="fas fa-trash-alt"></i>
         </a>
         break;
     case PopoverType.Info:
-        <a class="popover-info btn btn-outline-info" role="button" tabindex="0" data-bs-toggle="popover">
+        <a class="popover-info btn btn-outline-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="Disabled popover">
             <i class="far fa-edit"></i>
         </a>
         break;
@@ -22,6 +21,7 @@
     [Parameter] public string Title { get; set; }
     [Parameter] public string Body { get; set; }
     [Parameter] public PopoverType Color { get; set; }
+    [Inject] public IJSRuntime JSRunTime { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -35,10 +35,18 @@
 
     private async Task SetPopover()
     {
-        await JSRunTime.InvokeVoidAsync("tooltipInformation", $"{Title}", $"{Body}", $"{Color}");
-        await InvokeAsync(() =>
+        try
         {
-            StateHasChanged();
-        });
+            await JSRunTime.InvokeVoidAsync("tooltipInformation", $"{Title}", $"{Body}", $"{Color}");
+            await InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Popover Error: " + ex.Message);
+            throw;
+        }
     }
 }

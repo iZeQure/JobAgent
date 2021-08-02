@@ -16,17 +16,39 @@ window.toggleModalVisibility = function (modalId) {
 
 window.tooltipInformation = function (name, body, color) {
 
+    //if (color == 'Danger') {
+    //    $('.popover-danger').popover({
+    //        title: name,
+    //        content: body,
+    //        trigger: 'hover',
+    //        placement: 'left',
+    //        animation: true
+    //    });
+    //}
+    //else {
+    //    $('.popover-info').popover({
+    //        title: name,
+    //        content: body,
+    //        trigger: 'hover',
+    //        placement: 'left',
+    //        animation: true
+    //    });
+    //}
+
+    var popover = null;
+
     if (color == 'Danger') {
-        $('.popover-danger').popover({
+        popover = new bootstrap.Popover(document.querySelector('.popover-danger'), {
             title: name,
             content: body,
             trigger: 'hover',
             placement: 'left',
             animation: true
         });
+
     }
     else {
-        $('.popover-info').popover({
+        popover = new bootstrap.Popover(document.querySelector('.popover-info'), {
             title: name,
             content: body,
             trigger: 'hover',
@@ -34,4 +56,4 @@ window.tooltipInformation = function (name, body, color) {
             animation: true
         });
     }
-};
+}
