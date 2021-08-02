@@ -422,16 +422,15 @@ namespace SqlDataAccessLibrary.Repositories
                 {
                     new SqlParameter("@userId", user.GetUserId),
                     new SqlParameter("@userNewPassword", user.GetPassword),
-                    new SqlParameter("@userNewSalt", user.GetSalt),
-                    new SqlParameter("@resultReturn", user.GetUserId)
+                    new SqlParameter("@userNewSalt", user.GetSalt)
 
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                Console.WriteLine(ex.Message);
                 throw;
             }
         }
