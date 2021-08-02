@@ -41,7 +41,7 @@ namespace SecurityLibrary.Cryptography.Extentions
                     throw new ArgumentException("Could'n generate salt. Password was undefined.");
                 }
 
-                byte[] buffer = new byte[value.GetPassword.Length];
+                byte[] buffer = new byte[256];
 
                 using (var rng = new RNGCryptoServiceProvider())
                 {
