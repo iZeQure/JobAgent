@@ -16,12 +16,14 @@ namespace BlazorServerWebsite.Pages.Admin.Administrate
     {
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IContractService ContractService { get; set; }
+        [Inject] protected ICompanyService CompanyService { get; set; }
 
         private readonly CancellationTokenSource _tokenSource = new();
         private EditContext _contractModelEditContext;
         private ContractModel _contractModel = new();
         private ShowContractModel _showContractModel = new();
         private IEnumerable<Contract> _contracts = new List<Contract>();
+        private IEnumerable<Company> _companies = new List<Company>();
 
         private int _contractId = 0;
         private string _errorMessage = string.Empty;
@@ -43,8 +45,9 @@ namespace BlazorServerWebsite.Pages.Admin.Administrate
                 _isLoadingData = true;
 
                 _contracts = await ContractService.GetAllAsync(_tokenSource.Token);
+                _companies = await CompanyService.GetAllAsync(_tokenSource.Token);
 
-                if (!_contracts.Any()) _isDisabled = true;
+                if (!_companies.Any()) _isDisabled = true;
             }
 
             await base.OnAfterRenderAsync(firstRender);

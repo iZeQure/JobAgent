@@ -1,4 +1,4 @@
-﻿<div id="ModalCreateContract" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+﻿<div id="ModalCreateContract" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
 
@@ -94,7 +94,7 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="CancelRequest" @onclick:preventDefault>Annuller</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="CancelRequest" @onclick:preventDefault>Annuller</button>
                         <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_isProcessing">Gem Ændringer</button>
                     </div>
 

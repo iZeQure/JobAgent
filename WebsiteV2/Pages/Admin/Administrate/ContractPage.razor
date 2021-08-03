@@ -1,5 +1,5 @@
 ﻿@page "/admin/settings/contracts"
-@*@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]*@
+@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
 
 <PageDocumentTitle DocumentTitle="Administrer - Kontrakt Indstillinger" />
 
@@ -16,7 +16,7 @@
         }
         else
         {
-            <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#CreateContractModal" @onclick="RefreshContent">
+            <a class="btn btn-sm btn-info cursor-pointer text-white" data-bs-toggle="modal" data-bs-target="#ModalCreateContract" @onclick="RefreshContent">
                 Opret ny Kontrakt
             </a>
         }
@@ -68,7 +68,7 @@ else
                                 @if (!string.IsNullOrEmpty(contract.name))
                                 {
                                     <td>
-                                        <span @onclick="@(mouseClickEvent => OnClick_ShowContractModal(contract.name, contract.company.Name))" class="table-icons" data-toggle="modal" data-target="#ShowContractModal">
+                                        <span @onclick="@(mouseClickEvent => OnClick_ShowContractModal(contract.name, contract.company.Name))" class="table-icons" data-bs-toggle="modal" data-bs-target="#ModalShowContract">
                                             <i class="fas fa-file-invoice"></i>
                                         </span>
                                     </td>
@@ -80,12 +80,12 @@ else
                                 <td>@(contract.registrationDateTime.ToString("D"))</td>
                                 <td>@(contract.expiryDateTime.ToString("D"))</td>
                                 <td>
-                                    <span @onclick="(id => OnClick_OpenEditModal(contract.Id))" data-toggle="modal" data-target="#EditContractModal">
+                                    <span @onclick="(id => OnClick_OpenEditModal(contract.Id))" data-bs-toggle="modal" data-bs-target="#ModalEditContract">
                                         <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne kontrakt." Color="Popover.PopoverType.Info" />
                                     </span>
                                 </td>
                                 <td>
-                                    <span @onclick="@(mouseEvent => OnClick_RemoveContractModal(contract.Id))" data-toggle="modal" data-target="#RemoveContractModal">
+                                    <span @onclick="@(mouseEvent => OnClick_RemoveContractModal(contract.Id))" data-bs-toggle="modal" data-bs-target="#ModalRemoveContract">
                                         <Popover Title="Forsigtig!" Body="Denne knap sletter den valgte kontrakt, forevigt!" Color="Popover.PopoverType.Danger" />
                                     </span>
                                 </td>
@@ -105,7 +105,7 @@ else
     }
 }
 
-@*@if (!_isDisabled)
+@if (!_isDisabled)
 {
     <CreateContractModal />
 
@@ -114,4 +114,4 @@ else
     <RemoveContractModal ContractId="@_contractId" />
 
     <ShowContractModal Model="_showContractModel" />
-}*@
+}

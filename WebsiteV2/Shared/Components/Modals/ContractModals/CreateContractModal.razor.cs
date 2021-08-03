@@ -62,10 +62,10 @@ namespace BlazorServerWebsite.Shared.Components.Modals.ContractModals
 
                     _isLoadingData = false;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Console.WriteLine(ex.Message);
                     _isLoadingData = false;
-                    throw;
                 }
             }
 

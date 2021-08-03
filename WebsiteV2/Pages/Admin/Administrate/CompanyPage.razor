@@ -1,6 +1,18 @@
 ﻿@page "/admin/settings/companies"
+@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
 
-@*@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]*@
+
+<PageDocumentTitle DocumentTitle="Administrer - Virksomheds Indstillinger"/>
+
+<div class="d-flex">
+    <PageHeadingTitle DisplayTitle="Virksomheds Indstillinger" />
+    
+    <div class="d-inline-block">
+        <a class="btn btn-sm btn-info cursor-pointer text-white" data-bs-toggle="modal" data-bs-target="#ModalCreateCompany">
+            Opret ny Virksomhed
+        </a>
+    </div>
+</div>
 
 
 @if (_companies != null)
@@ -14,8 +26,8 @@
         @if (_companies.Count() == 0)
         {
             <lazorServerWebsite.Components.Notification.MessageAlert Alert="MessageAlert.AlertType.Warning"
-                          Message="Der blev ikke fundet nogen virksomheder."
-                          MessageOptional="Opret virksomheder, ved at trykke på knappen : Opret ny Virksomhed." />
+                                                                     Message="Der blev ikke fundet nogen virksomheder."
+                                                                     MessageOptional="Opret virksomheder, ved at trykke på knappen : Opret ny Virksomhed." />
         }
         else
         {
@@ -42,12 +54,12 @@
                                 <td>@(company.Name)</td>
                                 <td>@(company.ContactPerson)</td>
                                 <td>
-                                    <span @onclick="(OnClickEvent => OnClick_OpenEditModal(company.Id))" data-toggle="modal" data-target="#EditCompanyModal">
+                                    <span @onclick="(OnClickEvent => OnClick_OpenEditModal(company.Id))" data-bs-toggle="modal" data-bs-target="#ModalEditCompany">
                                         <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne virksomehd." Color="Popover.PopoverType.Info" />
                                     </span>
                                 </td>
                                 <td>
-                                    <span @onclick="(OnClickEvent => OnClick_RemoveCompanyModal(company.Id))" data-toggle="modal" data-target="#RemoveCompanyModal">
+                                    <span @onclick="(OnClickEvent => OnClick_RemoveCompanyModal(company.Id))" data-bs-toggle="modal" data-bs-target="#ModalRemoveCompany">
                                         <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
                                     </span>
                                 </td>

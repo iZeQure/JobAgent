@@ -38,20 +38,6 @@ namespace BlazorServerWebsite.Pages.Admin.Administrate
             await base.OnInitializedAsync();
         }
 
-        //protected override async Task OnAfterRenderAsync(bool firstRender)
-        //{
-        //    if (firstRender)
-        //    {
-        //        _isLoadingData = true;
-
-        //        _companies = await CompanyService.GetAllAsync(_tokenSource.Token);
-
-        //        _isLoadingData = false;
-        //    }
-
-        //    await base.OnAfterRenderAsync(firstRender);
-        //}
-
         private async Task UpdateContentAsync()
         {
             try
