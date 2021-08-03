@@ -2,16 +2,14 @@
 @switch (Color)
 {
     case PopoverType.Danger:
-        <a class="popover-danger btn btn-outline-danger" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="Disabled popover">
+        <a class="popover-danger btn btn-outline-danger" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus">
             <i class="fas fa-trash-alt"></i>
         </a>
         break;
     case PopoverType.Info:
-        <a class="popover-info btn btn-outline-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="Disabled popover">
+        <a class="popover-info btn btn-outline-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus">
             <i class="far fa-edit"></i>
         </a>
-        break;
-    default:
         break;
 }
 
@@ -42,6 +40,8 @@
             {
                 StateHasChanged();
             });
+
+
         }
         catch (Exception ex)
         {

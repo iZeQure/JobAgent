@@ -16,44 +16,30 @@ window.toggleModalVisibility = function (modalId) {
 
 window.tooltipInformation = function (name, body, color) {
 
-    //if (color == 'Danger') {
-    //    $('.popover-danger').popover({
-    //        title: name,
-    //        content: body,
-    //        trigger: 'hover',
-    //        placement: 'left',
-    //        animation: true
-    //    });
-    //}
-    //else {
-    //    $('.popover-info').popover({
-    //        title: name,
-    //        content: body,
-    //        trigger: 'hover',
-    //        placement: 'left',
-    //        animation: true
-    //    });
-    //}
+    switch (color) {
+        case 'Danger':
+            $('.popover-danger').popover({
+                title: name,
+                content: body,
+                trigger: 'hover',
+                placement: 'left',
+                animation: true
+            });
+            break;
 
-    var popover = null;
+        case 'Info':
+            $('.popover-info').popover({
+                title: name,
+                content: body,
+                trigger: 'hover',
+                placement: 'left',
+                animation: true
+            });
+            break;
 
-    if (color == 'Danger') {
-        popover = new bootstrap.Popover(document.querySelector('.popover-danger'), {
-            title: name,
-            content: body,
-            trigger: 'hover',
-            placement: 'left',
-            animation: true
-        });
-
+        default:
+            console.log("POPCORN HAR KNÆKKET SIG IGEN FOR SAAATAN HENT SMØREN!");
+            break;
     }
-    else {
-        popover = new bootstrap.Popover(document.querySelector('.popover-info'), {
-            title: name,
-            content: body,
-            trigger: 'hover',
-            placement: 'left',
-            animation: true
-        });
-    }
+
 }

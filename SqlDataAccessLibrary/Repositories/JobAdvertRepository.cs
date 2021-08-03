@@ -92,8 +92,10 @@ namespace SqlDataAccessLibrary.Repositories
 
                     while (await reader.ReadAsync(cancellation))
                     {
+                        VacantJob vacantjob = null;
+
                         jobAdverts.Add(new JobAdvert(
-                            reader.GetInt32(0),
+                            vacantjob,
                             new Category(reader.GetInt32(1), string.Empty),
                             new Specialization(reader.GetInt32(2), null, string.Empty),
                             reader.GetString(3),
@@ -136,8 +138,11 @@ namespace SqlDataAccessLibrary.Repositories
 
                     while (await reader.ReadAsync(cancellation))
                     {
+                        VacantJob vacantjob = null;
+
+
                         jobAdvert = new JobAdvert(
-                            reader.GetInt32(0),
+                            vacantjob,
                             new Category(reader.GetInt32(1), string.Empty),
                             new Specialization(reader.GetInt32(2), null, string.Empty),
                             reader.GetString(3),
