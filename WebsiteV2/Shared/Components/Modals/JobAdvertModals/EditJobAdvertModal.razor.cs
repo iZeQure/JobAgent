@@ -13,8 +13,10 @@ using System.Threading.Tasks;
 
 namespace BlazorServerWebsite.Shared.Components.Modals.JobAdvertModals
 {
-    public partial class CreateJobAdvertModal : ComponentBase
+    public partial class EditJobAdvertModal : ComponentBase
     {
+        [Parameter] public JobAdvertModel Model { get; set; }
+
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
         [Inject] protected IJobAdvertService JobAdvertService { get; set; }
@@ -22,30 +24,27 @@ namespace BlazorServerWebsite.Shared.Components.Modals.JobAdvertModals
         [Inject] protected ICategoryService CategoryService { get; set; }
         [Inject] protected ISpecializationService SpecializationService { get; set; }
 
-        private CancellationTokenSource _tokenSource = new();
-        private JobAdvertModel _jobAdvertModel = new();
         private EditContext _editContext;
+        private CancellationTokenSource _tokenSource = new();
         private IEnumerable<VacantJob> _vacantJobs;
-        private IEnumerable<Category> _categories;
-        private IEnumerable<Specialization> _specializations;
-        private IEnumerable<Specialization> _sortedSpecializations;
+        private IEnumerable<Category> _categories = new List<Category>();
+        private IEnumerable<Specialization> _specializations = new List<Specialization>();
+        private IList<Specialization> _sortedSpecializations = new List<Specialization>();
 
         private string _errorMessage = "";
-        private bool _isLoading = false;
         private bool _isProcessing = false;
+        private bool _isLoading = false;
 
         protected override async Task OnInitializedAsync()
         {
-            _editContext = new(_jobAdvertModel);
+            _editContext = new(Model);
             _editContext.AddDataAnnotationsValidation();
 
-            await LoadModalInformation();
+            await LoadModalInformationAsync();
         }
 
-        private async Task LoadModalInformation()
+        private async Task LoadModalInformationAsync()
         {
-            _jobAdvertModel = new();
-
             _isLoading = true;
 
             try
@@ -71,62 +70,61 @@ namespace BlazorServerWebsite.Shared.Components.Modals.JobAdvertModals
             }
         }
 
-        private async Task OnValidSubmit_CreateJobAdvertAsync()
+        private async Task OnValidSubmit_EditJobVacancy()
         {
+            _isProcessing = true;
+
             try
             {
                 JobAdvert jobAdvert = new(
-                    new VacantJob(
-                        _jobAdvertModel.Id,
-                        null,
-                        ""),
-                    new Category(_jobAdvertModel.CategoryId, ""),
-                    new Specialization(_jobAdvertModel.SpecializationId, null, ""),
-                    _jobAdvertModel.Title, _jobAdvertModel.Summary, _jobAdvertModel.RegistrationDateTime
+                    new VacantJob(Model.Id, null, ""),
+                    new Category(Model.CategoryId, ""),
+                    new Specialization(Model.SpecializationId, null, ""),
+                    Model.Title,
+                    Model.Summary,
+                    Model.RegistrationDateTime
                     );
 
-                var result = await JobAdvertService.CreateAsync(jobAdvert, _tokenSource.Token);
+                var result = await JobAdvertService.UpdateAsync(jobAdvert, _tokenSource.Token);
 
-                if (result == 1)
+                if (result == 0)
                 {
-                    RefreshProvider.CallRefreshRequest();
-                    await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateJobAdvert");
+                    _errorMessage = "Kunne ikke opdatere stillingsopslag.";
                     return;
                 }
 
-                _errorMessage = "Kunne ikke oprette stilingsopslag!";
+                RefreshProvider.CallRefreshRequest();
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditJobAdvert");
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
             }
             catch (Exception ex)
             {
                 _errorMessage = ex.Message;
             }
-        }
-
-        private void OnChange_GetSpecializationByCategoryId(ChangeEventArgs e)
-        {
-            _sortedSpecializations = Enumerable.Empty<Specialization>();
-
-            var parsed = int.TryParse(e.Value.ToString(), out int categoryId);
-
-            try
-            {
-                if (parsed)
-                {
-                    _jobAdvertModel.CategoryId = categoryId;
-                    _jobAdvertModel.SpecializationId = 0;
-
-                    var tempList = new List<Specialization>();
-
-                    for (int i = 0; i < _specializations.Count(); i++)
-                    {
-                        tempList.Add(_specializations.ElementAt(i));
-                    }
-
-                    _sortedSpecializations = tempList;
-                }
-            }
             finally
             {
+                _isProcessing = false;
+            }
+        }
+
+        private void OnChange_SortSpecializationListByCategoryId(ChangeEventArgs e)
+        {
+            _sortedSpecializations.Clear();
+            var parsed = int.TryParse(e.Value.ToString(), out int categoryId);
+
+            if (parsed)
+            {
+                Model.CategoryId = categoryId;
+                Model.SpecializationId = 0;
+
+                foreach (var speciality in _specializations)
+                {
+                    if (speciality.Category.Id == categoryId)
+                    {
+                        _sortedSpecializations.Add(speciality);
+                    }
+                }
+
                 StateHasChanged();
             }
         }
@@ -135,8 +133,9 @@ namespace BlazorServerWebsite.Shared.Components.Modals.JobAdvertModals
         {
             _tokenSource.Cancel();
 
-            _sortedSpecializations = Enumerable.Empty<Specialization>();
-            _jobAdvertModel = new();
+            _sortedSpecializations.Clear();
+            Model = new JobAdvertModel();
+            _editContext = new(Model);
             StateHasChanged();
         }
     }

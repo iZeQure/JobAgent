@@ -17,7 +17,7 @@
         }
         else
         {
-            <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#ModalCreateJobAdvert">
+            <a class="btn btn-sm btn-info cursor-pointer text-white" data-bs-toggle="modal" data-bs-target="#ModalCreateJobAdvert">
                 Opret nyt Stillingsopslag
             </a>
         }
@@ -119,12 +119,12 @@ else
                                     }
                                     <td>@jobAdvert.VacantJob.Company.Name</td>
                                     <td>
-                                        <span @onclick="(id => OnClickEdit_GetJobVacancyDetailsById(jobAdvert.Id))" data-toggle="modal" data-target="#EditJobVacancyModal">
+                                        <span @onclick="(id => OnClickEdit_GetJobVacancyDetailsById(jobAdvert.Id))" data-bs-toggle="modal" data-bs-target="#ModalEditJobAdvert">
                                             <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette opslag." Color="Popover.PopoverType.Info" />
                                         </span>
                                     </td>
                                     <td>
-                                        <span @onclick="@(id => OnClick_StoreId(jobAdvert.Id))" data-toggle="modal" data-target="#RemoveJobVacancyModal">
+                                        <span @onclick="@(id => OnClick_StoreId(jobAdvert.Id))" data-bs-toggle="modal" data-bs-target="#ModalRemoveJobAdvert">
                                             <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
                                         </span>
                                     </td>
@@ -152,9 +152,9 @@ else
 
         <CreateJobAdvertModal />
 
-        <EditJobVacancyModal Model="JobVacancyModel" />
+        <EditJobAdvertModal Model="_jobAdvertModel" />
 
-        <RemoveJobVacancyModal Id="AdvertId" />
+        <RemoveJobAdvertModal Id="_advertId" />
     }
     else
     {

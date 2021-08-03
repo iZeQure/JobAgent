@@ -1,0 +1,26 @@
+﻿@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
+
+<div class="modal fade" id="ModalRemoveJobAdvert" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+
+            <MessageAlert Message="@(_errorMessage)" Alert="MessageAlert.AlertType.Error" />
+
+            @if (Id != 0)
+            {
+                <div class="modal-header">
+                    <h5 class="modal-title">Er du sikker på du vil slette dette stillingsopslag?</h5>
+                </div>
+
+                <div class="modal-body">
+                    <p><small>Ved sletning af et stillingsopslag, bliver alle andre referencer til opslaget også slettet.</small></p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-bs-dismiss="modal" @onclick="CancelRequest">Annuller</button>
+                    <button type="button" class="btn btn-danger" @onclick="@(() => OnClick_RemoveJobVacancy(Id))" disabled="@_isProcessing">Slet Stillingsopslag</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
