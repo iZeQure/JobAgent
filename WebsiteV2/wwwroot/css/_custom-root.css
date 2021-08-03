@@ -18,4 +18,8 @@
     --border-radius: .5rem;
     --scrollbar-background-color: #212529 !important;
     --scrollbar-wheel-color: #A98EDA !important;
+    /*Bootstrap overrides*/
+    --bs-table-striped-bg-override: #A98EDA4D !important;
+    --bs-table-accent-bg-override: #A98EDA80 !important;
+    --bs-table-bg-override: var(--clr-bg) !important;
 }

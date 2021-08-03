@@ -257,11 +257,27 @@ input::placeholder {
         box-shadow: 0 0 0 0.25rem rgb(255 237 86 / 70%) !important;
     }
 
-/*.navbar {
+.table-primary {
+    --bs-table-bg: var(--bs-table-bg-override);
+    font-family: var(--ff-h4);
+    font-size: 1rem;
+    color: var(--clr-white);
+}
+
+.table-striped {
+    --bs-table-striped-bg: var(--bs-table-striped-bg-override);
+
+}
+
+    .table-hover > tbody > tr:hover {
+        --bs-table-accent-bg: var(--bs-table-accent-bg-override);
+    }
+
+
+    /*.navbar {
     background-color: var(--primary-background-color) !important;
 }*/
-
-/*main.page {
+    /*main.page {
     height: 100vh;
     width: 100vw;
     overflow: hidden;
@@ -366,8 +382,7 @@ img.cover-center {
     max-height: 100%;
 }
 */
-
-#indexpage {
+    #indexpage {
     content: "";
     position: absolute;
     margin: 0;
@@ -381,27 +396,18 @@ img.cover-center {
     background-size: 10%, 20%, 20%, 100%;
     background-repeat: no-repeat, no-repeat, repeat-x;
     background-position: bottom center, bottom right, center;
-}
-
-#indextext {
+} #indextext {
     position: absolute;
     text-align: left;
     left: 30%;
     top: 20%;
     max-width: 50%;
     color: white;
-}
-
-    #indextext h1 {
+} #indextext h1 {
         font-size: 3.5rem;
-    }
-
-    #indextext h6 {
+    } #indextext h6 {
         font-size: 2.5rem;
-    }
-
-
-.admin-page-background {
+    } .admin-page-background {
     position: absolute;
     margin: 0;
     padding: 0;
@@ -415,17 +421,13 @@ img.cover-center {
     background-repeat: no-repeat, no-repeat;
     background-position: center bottom, center center;
     overflow: hidden;
-}
-
-.admin-page-text {
+} .admin-page-text {
     position: absolute;
     font-size: 2.5vw;
     left: 36%;
     top: 13%;
     text-align: center;
-}
-
-#myprofilepic {
+} #myprofilepic {
     position: absolute;
     margin: 0;
     padding: 0;
@@ -440,8 +442,7 @@ img.cover-center {
     background-position: bottom right;
     z-index: -1;
 }
-
-/*#userProfileDropdown {
+    /*#userProfileDropdown {
     width: 300px;
 }
 
@@ -467,27 +468,18 @@ img.cover-center {
         right: 1em;
         bottom: 1em;
     }*/
-
-.valid.modified:not([type=checkbox]) {
+    .valid.modified:not([type=checkbox]) {
     outline: 1px solid #26b050;
-}
-
-.invalid {
+} .invalid {
     outline: none !important;
-}
-
-.valid {
+} .valid {
     outline: none !important;
-}
-
-.validation-message {
+} .validation-message {
     font-family: var(--ff-info-text);
     color: var(--clr-invalid);
     font-size: .75em;
     padding: .3em 0 0 .3em;
-}
-
-#blazor-error-ui {
+} #blazor-error-ui {
     background: lightyellow;
     bottom: 0;
     box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
@@ -497,17 +489,12 @@ img.cover-center {
     position: fixed;
     width: 100%;
     z-index: 1000;
-}
-
-    #blazor-error-ui .dismiss {
+} #blazor-error-ui .dismiss {
         cursor: pointer;
         position: absolute;
         right: 0.75rem;
         top: 0.5rem;
-    }
-
-
-@media screen and (max-width: 780px) {
+    } @media screen and (max-width: 780px) {
     .admin-page-picture {
         display: none;
     }
@@ -525,9 +512,7 @@ img.cover-center {
         left: 25%;
         top: 20%;
     }
-}
-
-@media (min-width: 768px) {
+} @media (min-width: 768px) {
     .dropdown-menu {
         min-width: 15rem;
     }
