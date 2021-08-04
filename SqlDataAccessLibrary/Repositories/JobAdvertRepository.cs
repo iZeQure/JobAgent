@@ -114,6 +114,11 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
+        public Task<IEnumerable<JobAdvert>> GetAllUncategorized(CancellationToken cancellation)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Returns a specific JobAdvert by ID
         /// </summary>
@@ -154,6 +159,95 @@ namespace SqlDataAccessLibrary.Repositories
                 }
 
                 return null;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> GetJobAdvertCountByCategoryId(int id, CancellationToken cancellation)
+        {
+            try
+            {
+                string cmdText = "[JA.spGetTotalJobAdvertCountByCategoryId]";
+
+                SqlParameter outputParameter = new() { Direction = ParameterDirection.Output, ParameterName = "@countByCategory", SqlDbType = SqlDbType.Int };
+
+                SqlParameter[] parameters = new[]
+                {
+                    new SqlParameter("@categoryId", id),
+                    outputParameter
+                };
+
+                await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
+
+                bool parsedOutput = int.TryParse(parameters[1].Value.ToString(), out int count);
+                if (parsedOutput)
+                {
+                    return await Task.FromResult(count);
+                }
+
+                return await Task.FromResult(0);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> GetJobAdvertCountBySpecializationId(int id, CancellationToken cancellation)
+        {
+            try
+            {
+                string cmdText = "[JA.spGetTotalJobAdvertCountBySpecializationId]";
+
+                SqlParameter outputParameter = new() { Direction = ParameterDirection.Output, ParameterName = "@countBySpecialization", SqlDbType = SqlDbType.Int };
+
+                SqlParameter[] parameters = new[]
+                {
+                    new SqlParameter("@specializationId", id),
+                    outputParameter
+                };
+
+                await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
+
+                bool parsedOutput = int.TryParse(parameters[1].Value.ToString(), out int count);
+                if (parsedOutput)
+                {
+                    return await Task.FromResult(count);
+                }
+
+                return await Task.FromResult(0);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> GetJobAdvertCountByUncategorized(int id, CancellationToken cancellation)
+        {
+            try
+            {
+                string cmdText = "[JA.spGetTotalJobAdvertCountByNonCategorized]";
+
+                SqlParameter outputParameter = new() { Direction = ParameterDirection.Output, ParameterName = "@countByNonCategorized", SqlDbType = SqlDbType.Int };
+
+                SqlParameter[] parameters = new[]
+                {
+                    outputParameter
+                };
+
+                await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
+
+                bool parsedOutput = int.TryParse(parameters[0].Value.ToString(), out int count);
+                if (parsedOutput)
+                {
+                    return await Task.FromResult(count);
+                }
+
+                return await Task.FromResult(0);
             }
             catch (Exception)
             {
