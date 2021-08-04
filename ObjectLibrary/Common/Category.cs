@@ -12,6 +12,7 @@ namespace ObjectLibrary.Common
     public class Category : BaseEntity
     {
         private string _name;
+        private List<Specialization> _specializations = new List<Specialization>();
 
         public Category(int id, string name) : base (id)
         {
@@ -22,5 +23,14 @@ namespace ObjectLibrary.Common
         /// Defines the name of the category.
         /// </summary>
         public string Name { get { return _name; } set { _name = value; } }
+        public List<Specialization> Specializations { get { return _specializations; }}
+
+
+
+        public void AssignSpecialization(Specialization specialization) 
+        {
+            _specializations.Add(specialization);
+        }
+
     }
 }
