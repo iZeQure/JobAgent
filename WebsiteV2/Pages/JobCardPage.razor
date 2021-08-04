@@ -1,4 +1,6 @@
-﻿@page  "/job"
+﻿@page "/job/uncategorized"
+@page "/job/{JobAdvertId:int}"
+@page "/job/{JobAdvertId:int}/{SpecializationId:int}"
 
 @if (cards.Count == 0)
 {

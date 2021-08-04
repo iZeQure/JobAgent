@@ -13,6 +13,8 @@ namespace BlazorServerWebsite.Pages
 {
     public partial class JobCardPage : ComponentBase
     {
+        [Parameter] public int JobAdvertId { get; set; }
+        [Parameter] public int SpecializationId { get; set; }
         [Inject] protected IVacantJobService VacantJobService { get; set; }
         [Inject] protected IJobAdvertService JobAdvertService { get; set; }
 
@@ -29,9 +31,55 @@ namespace BlazorServerWebsite.Pages
         {
             _tokenSource = new();
             _vacantJobModel = new();
-            await OnInitializedAsync();
-
         }
+        
+        protected override async Task OnParametersSetAsync()
+        {
+            await LoadData();
+        }
+
+        private async Task GetJobAdvertDetails(int advertId)
+        {
+            if (advertId == 0)
+            {
+                await Task.CompletedTask;
+            }
+
+            AdvertDetails = await JobService.GetJobVacancyById(advertId);
+        }
+
+        private async Task LoadData()
+        {
+            try
+            {
+                loadFailed = false;
+
+                if (JobAdvertId == 0 && SpecializationId == 0)
+                {
+                    jobAdverts = await JobService.GetUncategorizedJobVacancies();
+                }
+                else if (SpecializationId == 0)
+                {
+                    jobAdverts = await JobService.GetJobVacanciesAsync(JobAdvertId);
+                }
+                else if (SpecializationId != 0)
+                {
+                    jobAdverts = await JobService.GetJobSpecialVacanciesAsync(SpecializationId);
+                }
+            }
+            catch (Exception ex)
+            {
+                loadFailed = true;
+                Console.WriteLine($"Failed to load Job Adverts : {ex.Message}");
+            }
+        }
+
+
+
+
+
+
+
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -65,15 +113,18 @@ namespace BlazorServerWebsite.Pages
                         }
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    throw;
+                    Console.WriteLine(ex.Message);
                 }
 
                 _isLoadingData = false;
                 await base.OnAfterRenderAsync(firstRender);
             }
         }
+
+
+
 
     }
 }
