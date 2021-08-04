@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace BlazorServerWebsite.Pages.Admin.Administrate
 {
-    public partial class RegisterUser : ComponentBase
+    public partial class RegisterUserPage : ComponentBase
     {
         [Inject] private IUserService UserService { get; set; }
         [Inject] private IAreaService AreaService { get; set; }

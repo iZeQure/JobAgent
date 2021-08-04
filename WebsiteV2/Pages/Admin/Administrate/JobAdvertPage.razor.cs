@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace BlazorServerWebsite.Pages.Admin.Administrate
 {
-    public partial class JobAdvert : ComponentBase
+    public partial class JobAdvertPage : ComponentBase
     {
         [Parameter] public int JobAdvertId { get; set; }
         [Parameter] public int SpecializationId { get; set; }
