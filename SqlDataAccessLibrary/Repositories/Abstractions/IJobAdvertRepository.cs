@@ -13,7 +13,7 @@ namespace SqlDataAccessLibrary.Repositories.Abstractions
         Task<IEnumerable<JobAdvert>> GetAllUncategorized(CancellationToken cancellation);
         Task<int> GetJobAdvertCountByCategoryId(int id, CancellationToken cancellation);
         Task<int> GetJobAdvertCountBySpecializationId(int id, CancellationToken cancellation);
-        Task<int> GetJobAdvertCountByUncategorized(int id, CancellationToken cancellation);
+        Task<int> GetJobAdvertCountByUncategorized(CancellationToken cancellation);
 
     }
 }

@@ -48,6 +48,21 @@ namespace BlazorServerWebsite.Data.Services
             return await Repository.GetByIdAsync(id, cancellation);
         }
 
+        public async Task<int> GetJobAdvertCountByCategoryId(int id, CancellationToken cancellation)
+        {
+            return await Repository.GetJobAdvertCountByCategoryId(id, cancellation);
+        }
+
+        public async Task<int> GetJobAdvertCountBySpecializationId(int id, CancellationToken cancellation)
+        {
+            return await Repository.GetJobAdvertCountBySpecializationId(id, cancellation);
+        }
+
+        public async Task<int> GetJobAdvertCountByUncategorized(CancellationToken cancellation)
+        {
+            return await Repository.GetJobAdvertCountByUncategorized(cancellation);
+        }
+
         public async Task<JobAdvertPaginationModel> JobAdvertPagination(CancellationToken cancellation, int page = 1)
         {
             var paginationModel = new JobAdvertPaginationModel

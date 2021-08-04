@@ -13,5 +13,9 @@ namespace BlazorServerWebsite.Data.Services.Abstractions
         Task<JobAdvertPaginationModel> JobAdvertPagination(CancellationToken cancellation, int page = 1);
         Task<JobAdvertPaginationModel> JobAdvertPagination(CancellationToken cancellation, int resultsPerPage, int page = 1);
         Task<JobAdvertPaginationModel> FilteredJobAdvertPagination(CancellationToken cancellation, int sortByCategoryId, int page = 1);
+        Task<int> GetJobAdvertCountByCategoryId(int id, CancellationToken cancellation);
+        Task<int> GetJobAdvertCountBySpecializationId(int id, CancellationToken cancellation);
+        Task<int> GetJobAdvertCountByUncategorized(CancellationToken cancellation);
+
     }
 }

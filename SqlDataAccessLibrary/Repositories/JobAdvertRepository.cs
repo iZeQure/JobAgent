@@ -226,7 +226,7 @@ namespace SqlDataAccessLibrary.Repositories
             }
         }
 
-        public async Task<int> GetJobAdvertCountByUncategorized(int id, CancellationToken cancellation)
+        public async Task<int> GetJobAdvertCountByUncategorized(CancellationToken cancellation)
         {
             try
             {
