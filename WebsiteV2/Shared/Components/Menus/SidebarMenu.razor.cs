@@ -50,7 +50,10 @@ namespace BlazorServerWebsite.Shared.Components.Menus
             finally { StateHasChanged(); }
         }
 
-
+        private string GetAccordionMenuPanel(int number)
+        {
+            return $"menuAccordionPanel-collapse{number}";
+        }
 
     }
 }
