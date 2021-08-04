@@ -68,6 +68,7 @@ namespace BlazorServerWebsite
             services.AddScoped<ILogService, LogService>();
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IMenuService, MenuService>();
             services.AddScoped<ISpecializationService, SpecializationService>();
             services.AddScoped<IContractService, ContractService>();
             services.AddScoped<IUserService, UserService>();
