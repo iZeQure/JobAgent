@@ -9,16 +9,20 @@
 
         @if (_isDisabled)
         {
-            <a class="btn btn-sm btn-info cursor-pointer text-white disabled">
-                <span>Ikke Aktiveret</span>
-            </a>
-            <span class="d-inline-block"><small class="text-danger font-weight-bolder">* Opret en Virksomhed for at benytte kontrakter.</small></span>
+            <div class="px-4 pt-4">
+                <a class="btn btn-sm btn-info cursor-pointer text-white disabled">
+                    <span>Ikke Aktiveret</span>
+                </a>
+                <span class="d-inline-block"><small class="text-danger font-weight-bolder">* Opret en Virksomhed for at benytte kontrakter.</small></span>
+            </div>
         }
         else
         {
-            <a class="btn btn-sm btn-info cursor-pointer text-white" data-bs-toggle="modal" data-bs-target="#ModalCreateContract" @onclick="RefreshContent">
-                Opret ny Kontrakt
-            </a>
+            <div class="px-4 pt-4">
+                <a class="btn btn-sm btn-info cursor-pointer text-white" data-bs-toggle="modal" data-bs-target="#ModalCreateContract" @onclick="RefreshContent">
+                    Opret ny Kontrakt
+                </a>
+            </div>
         }
 
     </div>
