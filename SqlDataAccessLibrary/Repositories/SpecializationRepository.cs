@@ -98,8 +98,8 @@ namespace SqlDataAccessLibrary.Repositories
                     {
                         Specialization tempSpecialization = new(
                             id: reader.GetInt32(0),
-                            category: new Category(reader.GetInt32(1), ""),
-                            name: reader.GetString(2)
+                            name: reader.GetString(1),
+                            category: new Category(reader.GetInt32(2), "")
                             );
 
                         tempSpecializationList.Add(tempSpecialization);
