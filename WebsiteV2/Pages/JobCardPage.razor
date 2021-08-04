@@ -1,55 +1,44 @@
 ﻿@page "/job/uncategorized"
-@page "/job/{JobAdvertId:int}"
-@page "/job/{JobAdvertId:int}/{SpecializationId:int}"
+@page "/job/{CategoryId:int}"
+@page "/job/{CategoryId:int}/{SpecializationId:int}"
 
-@if (cards.Count == 0)
+@if (_isLoadingData)
+{
+    <MessageAlert Message="Indlæser Stillingsopslag..." IsLoading="_isLoadingData" Alert="MessageAlert.AlertType.Info" />
+}
+
+@if (_loadFailed)
+{
+    <MessageAlert Message="Fejl ved indlæsning af stillingsopslag..." Alert="MessageAlert.AlertType.Error" />
+}
+
+@if (_jobAdverts == null || _jobAdverts.Count() == 0)
 {
     <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="Beklager, kunne ikke indlæse indholdet begrundet af en fejl." />
 }
-
-<div id="job-wrapper">
-    <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 g-4 px-3 py-3">
-        @if (chosenCategoryId == 0)
-        {
-            @foreach (var card in cards)
+else
+{
+    <div id="job-wrapper">
+        <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 g-4 px-3 py-3">
+            @foreach (var jobAdvert in _jobAdverts)
             {
                 <div class="col">
                     <div class="card" style="max-width: 540px;">
                         <div class="row g-0">
                             <div class="col-md-12">
                                 <div class="card-body">
-                                    <h5 class="card-title">@card.Item2</h5>
-                                    <p class="card-subtitle"><small>@card.Item3</small></p>
-                                    <p class="card-text card-content">@card.Item4</p>
-                                    <p class="card-subtitle"><small>Oprettet: @card.Item5</small></p>
-                                    <a href="@card.Item6" class="btn btn-outline-light">Learn More</a>
+                                    <h5 class="card-title">@jobAdvert.Title</h5>
+                                    <p class="card-subtitle"><small>@jobAdvert.VacantJob.Company.Name</small></p>
+                                    <p class="card-text card-content">@jobAdvert.Summary</p>
+                                    <p class="card-subtitle"><small>Oprettet: @jobAdvert.RegistrationDateTime.ToString("dddd, d MMM yyyy", CultureInfo.CreateSpecificCulture("da-DK"))</small></p>
+                                    <a href="@jobAdvert.VacantJob.URL" class="btn btn-outline-light">Se Stilling</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             }
-        }
-        @if (chosenCategoryId != 0)
-        {
-            @foreach (var card in cards.Where(n => n.Item7 == chosenCategoryId))
-            {
-                <div class="col">
-                    <div class="card" style="max-width: 540px;">
-                        <div class="row g-0">
-                            <div class="col-md-12">
-                                <div class="card-body">
-                                    <h5 class="card-title">@card.Item2</h5>
-                                    <p class="card-subtitle"><small>@card.Item3</small></p>
-                                    <p class="card-text card-content">@card.Item4</p>
-                                    <p class="card-subtitle"><small>Oprettet: @card.Item5</small></p>
-                                    <a href="@card.Item6" class="btn btn-outline-light">Learn More</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-        }
+        </div>
     </div>
-</div>
+}
+

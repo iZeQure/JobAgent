@@ -13,24 +13,21 @@ namespace BlazorServerWebsite.Pages
 {
     public partial class JobCardPage : ComponentBase
     {
-        [Parameter] public int JobAdvertId { get; set; }
+        [Parameter] public int CategoryId { get; set; }
         [Parameter] public int SpecializationId { get; set; }
-        [Inject] protected IVacantJobService VacantJobService { get; set; }
         [Inject] protected IJobAdvertService JobAdvertService { get; set; }
 
-        private CancellationTokenSource _tokenSource;
-        private IEnumerable<VacantJob> _vacantJobs;
-        private IEnumerable<JobAdvert> _jobAdverts;
-        private VacantJobModel _vacantJobModel;
+        private readonly CancellationTokenSource _tokenSource = new();
+        private IEnumerable<JobAdvert> _jobAdverts = new List<JobAdvert>();
+        private JobAdvert _jobAdvertDetails;
 
-        private int chosenCategoryId;
-        private List<(int, string, string, string, DateTime, string, int)> cards = new List<(int, string, string, string, DateTime, string, int)>();
+        private int _chosenCategoryId;
         private bool _isLoadingData = false;
+        private bool _loadFailed;
 
         protected override async Task OnInitializedAsync()
         {
-            _tokenSource = new();
-            _vacantJobModel = new();
+            await LoadData();
         }
         
         protected override async Task OnParametersSetAsync()
@@ -45,86 +42,34 @@ namespace BlazorServerWebsite.Pages
                 await Task.CompletedTask;
             }
 
-            AdvertDetails = await JobService.GetJobVacancyById(advertId);
+            _jobAdvertDetails = await JobAdvertService.GetByIdAsync(advertId, _tokenSource.Token);
         }
 
         private async Task LoadData()
         {
             try
             {
-                loadFailed = false;
+                _loadFailed = false;
+                var jobAdverts = await JobAdvertService.GetAllAsync(_tokenSource.Token);
 
-                if (JobAdvertId == 0 && SpecializationId == 0)
+                if (CategoryId == 0 && SpecializationId == 0)
                 {
-                    jobAdverts = await JobService.GetUncategorizedJobVacancies();
+                    _jobAdverts = jobAdverts.Where(x => x.Category.Id == 0 && x.Specialization.Id == 0);
                 }
                 else if (SpecializationId == 0)
                 {
-                    jobAdverts = await JobService.GetJobVacanciesAsync(JobAdvertId);
+                    _jobAdverts = jobAdverts.Where(x => x.Category.Id == CategoryId);
                 }
                 else if (SpecializationId != 0)
                 {
-                    jobAdverts = await JobService.GetJobSpecialVacanciesAsync(SpecializationId);
+                    jobAdverts = jobAdverts.Where(x => x.Category.Id == SpecializationId);
                 }
             }
             catch (Exception ex)
             {
-                loadFailed = true;
+                _loadFailed = true;
                 Console.WriteLine($"Failed to load Job Adverts : {ex.Message}");
             }
         }
-
-
-
-
-
-
-
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            var tuplelist = new List<(int, string, string, string, DateTime, string)>();
-
-            if(firstRender)
-            {
-                _isLoadingData = true;
-                try
-                {
-                    _vacantJobs = await VacantJobService.GetAllAsync(_tokenSource.Token);
-                    _jobAdverts = await JobAdvertService.GetAllAsync(_tokenSource.Token);
-
-                    foreach(var vacantJob in _vacantJobs)
-                    {
-                        foreach(var advert in _jobAdverts)
-                        {
-                            if (vacantJob.Id == advert.Id)
-                            {
-                                var tuple = (
-                                    id: vacantJob.Id, 
-                                    title: advert.Title, 
-                                    name: vacantJob.Company.Name, 
-                                    summary: advert.Summary, 
-                                    RegDateTime: advert.RegistrationDateTime,
-                                    url: vacantJob.URL, 
-                                    categoryid: advert.Category.Id);
-
-                                cards.Add(tuple);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-
-                _isLoadingData = false;
-                await base.OnAfterRenderAsync(firstRender);
-            }
-        }
-
-
-
-
     }
 }
