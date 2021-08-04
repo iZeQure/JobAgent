@@ -24,12 +24,12 @@ namespace BlazorServerWebsite.Shared.Components.Modals.JobAdvertModals
         [Inject] protected ICategoryService CategoryService { get; set; }
         [Inject] protected ISpecializationService SpecializationService { get; set; }
 
-        private EditContext _editContext;
-        private CancellationTokenSource _tokenSource = new();
-        private IEnumerable<VacantJob> _vacantJobs;
+        private readonly CancellationTokenSource _tokenSource = new();
+        private IEnumerable<VacantJob> _vacantJobs = new List<VacantJob>();
         private IEnumerable<Category> _categories = new List<Category>();
         private IEnumerable<Specialization> _specializations = new List<Specialization>();
         private IList<Specialization> _sortedSpecializations = new List<Specialization>();
+        private EditContext _editContext;
 
         private string _errorMessage = "";
         private bool _isProcessing = false;
@@ -37,9 +37,6 @@ namespace BlazorServerWebsite.Shared.Components.Modals.JobAdvertModals
 
         protected override async Task OnInitializedAsync()
         {
-            _editContext = new(Model);
-            _editContext.AddDataAnnotationsValidation();
-
             await LoadModalInformationAsync();
         }
 

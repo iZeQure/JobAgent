@@ -24,7 +24,7 @@ namespace BlazorServerWebsite.Pages.Admin.Administrate
         [Inject] protected NavigationManager NavigationManager { get; set; }
 
         private CancellationTokenSource _tokenSource = new();
-        private JobAdvertModel _jobAdvertModel;
+        private JobAdvertModel _jobAdvertModel = new();
         private JobAdvertPaginationModel _paginationModel;
         private IEnumerable<Category> _categories;
         private int _advertId = 0;
@@ -93,7 +93,7 @@ namespace BlazorServerWebsite.Pages.Admin.Administrate
             finally { StateHasChanged(); }
         }
 
-        public async Task OnClickEdit_GetJobVacancyDetailsById(int id)
+        public async Task OnClickEdit_GetJobAdvertDetailsById(int id)
         {
             var details = await JobService.GetByIdAsync(id, _tokenSource.Token);
 

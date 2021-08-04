@@ -26,6 +26,7 @@ namespace BlazorServerWebsite.Data.FormModels
         public int CategoryId { get; set; }
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "* Vælg et speciale fra listen")]
+        [Range(0, int.MaxValue, ErrorMessage = "Vælg et speciale til den valgte kategori.")]
         public int SpecializationId { get; set; } = 0;
     }
 }

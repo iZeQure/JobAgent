@@ -92,15 +92,19 @@ namespace SqlDataAccessLibrary.Repositories
 
                     while (await reader.ReadAsync(cancellation))
                     {
-                        VacantJob vacantjob = null;
+                        int entityId = reader.GetInt32(0);
+                        Company company = new(reader.GetInt32(1), reader.GetInt32(2), reader.GetString(3), reader.GetString(4));
+                        VacantJob vacantjob = new(entityId, company, reader.GetString(5));
+                        Category category = new(reader.GetInt32(6), reader.GetString(7));
+                        Specialization specialization = new(reader.GetInt32(8), category, reader.GetString(9));
 
                         jobAdverts.Add(new JobAdvert(
                             vacantjob,
-                            new Category(reader.GetInt32(1), string.Empty),
-                            new Specialization(reader.GetInt32(2), null, string.Empty),
-                            reader.GetString(3),
-                            reader.GetString(4),
-                            reader.GetDateTime(5)));
+                            category,
+                            specialization,
+                            reader.GetString(11),
+                            reader.GetString(12),
+                            reader.GetDateTime(13)));
                     }
 
                     return await Task.FromResult(jobAdverts);
@@ -143,16 +147,19 @@ namespace SqlDataAccessLibrary.Repositories
 
                     while (await reader.ReadAsync(cancellation))
                     {
-                        VacantJob vacantjob = null;
-
+                        int entityId = reader.GetInt32(0);
+                        Company company = new(reader.GetInt32(1), reader.GetInt32(2), reader.GetString(3), reader.GetString(4));
+                        VacantJob vacantjob = new(entityId, company, reader.GetString(5));
+                        Category category = new(reader.GetInt32(6), reader.GetString(7));
+                        Specialization specialization = new(reader.GetInt32(8), category, reader.GetString(9));
 
                         jobAdvert = new JobAdvert(
                             vacantjob,
-                            new Category(reader.GetInt32(1), string.Empty),
-                            new Specialization(reader.GetInt32(2), null, string.Empty),
-                            reader.GetString(3),
-                            reader.GetString(4),
-                            reader.GetDateTime(5));
+                            category,
+                            specialization,
+                            reader.GetString(11),
+                            reader.GetString(12),
+                            reader.GetDateTime(13));
                     }
 
                     return await Task.FromResult(jobAdvert);

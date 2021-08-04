@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using ObjectLibrary.Common;
+using SecurityLibrary.Providers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,11 +25,11 @@ namespace BlazorServerWebsite.Shared.Components.Modals.JobAdvertModals
 
         private CancellationTokenSource _tokenSource = new();
         private JobAdvertModel _jobAdvertModel = new();
-        private EditContext _editContext;
         private IEnumerable<VacantJob> _vacantJobs;
         private IEnumerable<Category> _categories;
         private IEnumerable<Specialization> _specializations;
         private IEnumerable<Specialization> _sortedSpecializations;
+        private EditContext _editContext;
 
         private string _errorMessage = "";
         private bool _isLoading = false;
@@ -44,8 +45,6 @@ namespace BlazorServerWebsite.Shared.Components.Modals.JobAdvertModals
 
         private async Task LoadModalInformation()
         {
-            _jobAdvertModel = new();
-
             _isLoading = true;
 
             try
@@ -54,15 +53,23 @@ namespace BlazorServerWebsite.Shared.Components.Modals.JobAdvertModals
                 var categoriesTask = CategoryService.GetAllAsync(_tokenSource.Token);
                 var specializationsTask = SpecializationService.GetAllAsync(_tokenSource.Token);
 
-                await Task.WhenAll(vacantJobsTask, categoriesTask, specializationsTask);
+                try
+                {
+                    await TaskExtProvider.WhenAll(vacantJobsTask, categoriesTask, specializationsTask);
+                }
+                catch (Exception ex)
+                {
+                    _tokenSource.Cancel();
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
 
                 _vacantJobs = vacantJobsTask.Result;
                 _categories = categoriesTask.Result;
                 _specializations = specializationsTask.Result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _errorMessage = ex.Message;
+                _errorMessage = "Uventet fejl. Prøv at genindlæse siden.";
             }
             finally
             {
@@ -137,6 +144,7 @@ namespace BlazorServerWebsite.Shared.Components.Modals.JobAdvertModals
 
             _sortedSpecializations = Enumerable.Empty<Specialization>();
             _jobAdvertModel = new();
+            _editContext = new(_jobAdvertModel);
             StateHasChanged();
         }
     }
