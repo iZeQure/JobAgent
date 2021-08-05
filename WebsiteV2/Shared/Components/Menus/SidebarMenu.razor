@@ -40,6 +40,13 @@ AdminContext.User.IsInRole("Udvikler"))
                         Virksomheder
                     </NavLink>
                 </li>
+            
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/admin/settings/jobpages">
+                        <span><i class="fas fa-building"></i></span>
+                        Virksomheds Sider
+                    </NavLink>
+                </li>
             }
 
             @if (AdminContext.User.IsInRole("System Administrator") ||

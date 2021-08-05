@@ -33,7 +33,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "[JA.spCreateJobPage]";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@id", createEntity.Id),
+                    new SqlParameter("@jobPageId", createEntity.Id),
                     new SqlParameter("@companyId", createEntity.Company.Id),
                     new SqlParameter("@jobPageUrl", createEntity.URL)
                 };
@@ -59,7 +59,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "[JA.spDeleteJobPage]";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@id", deleteEntity.Id)
+                    new SqlParameter("@jobPageId", deleteEntity.Id)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -92,11 +92,11 @@ namespace SqlDataAccessLibrary.Repositories
                         jobPages.Add(new JobPage(
                             reader.GetInt32(0),
                             new Company(
-                                reader.GetInt32(1),
+                                reader.GetInt32(2),
                                 0,
                                 string.Empty,
                                 string.Empty),
-                            reader.GetString(2)));
+                            reader.GetString(1)));
                     }
 
                     return await Task.FromResult(jobPages);
@@ -123,7 +123,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "[JA.spGetJobPageById]";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@id", id)
+                    new SqlParameter("@jobPageId", id)
                 };
 
                 using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -162,7 +162,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "[JA.spUpdateJobPage]";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@id", updateEntity.Id),
+                    new SqlParameter("@jobPageId", updateEntity.Id),
                     new SqlParameter("@companyId", updateEntity.Company.Id),
                     new SqlParameter("@jobPageUrl", updateEntity.URL)
                 };
@@ -174,5 +174,6 @@ namespace SqlDataAccessLibrary.Repositories
                 throw;
             }
         }
+
     }
 }
