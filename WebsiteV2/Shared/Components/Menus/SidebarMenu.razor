@@ -166,26 +166,70 @@ AdminContext.User.IsInRole("Udvikler"))
     </Authorized>
     <NotAuthorized>
         <div class="input-group px-1 pb-2">
-            <input class="form-control" type="text" placeholder="Søg Uddannelse..." aria-label="Søg Uddannelse" aria-describedby="search-addon">
+            <input class="form-control" type="text" placeholder="Søg Uddannelse..." aria-label="Søg Uddannelse" aria-describedby="search-addon" @onchange="OnInputChange_ApplySearchFilter" />
             <span class="input-group-text" id="search-addon"><i class="fas fa-search menu-icons"></i></span>
         </div>
 
         @*<ul class="nav flex-column">*@
         <div class="accordion px-1" id="menuAccordionPanel">
-            @foreach (var category in _menu)
-            {
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="menuAccordionPanel-heading@(category.Id)">
-                        <NavLink class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="@("#" + GetAccordionMenuPanel(category.Id))" aria-expanded="true" aria-controls="@(GetAccordionMenuPanel(category.Id))">
-                            @(category.Name)
+            @*<div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <NavLink class="accordion-button" Match="NavLinkMatch.All" href="@(GenerateNavLinkLocation())">
+                            Ikke Kategoriseret
                         </NavLink>
                     </h2>
-                    <div id="menuAccordionPanel-collapse@(category.Id)" class="accordion-collapse collapse" aria-labelledby="menuAccordionPanel-heading@(category.Id)">
-                        <div class="accordion-body">
-                            <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-                        </div>
+                </div>*@
+
+            @foreach (var category in _menu)
+            {
+                @if (category.Id.Equals(0))
+                {
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button no-after">
+                                <NavLink class="nav-link" Match="NavLinkMatch.All" href="@(GenerateNavLinkLocation())">
+                                    <span>@category.Name</span>
+                                </NavLink>
+                            </button>
+                        </h2>
                     </div>
-                </div>
+                }
+                else
+                {
+                    @if (category.Specializations.Any())
+                    {
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="menuAccordionPanel-heading@(category.Id)">
+                                <button class="accordion-button collapsed text-light" type="button" data-bs-toggle="collapse" data-bs-target="@("#" + GetAccordionMenuPanelCssId(category.Id))" aria-expanded="true" aria-controls="@(GetAccordionMenuPanelCssId(category.Id))">
+                                    @(category.Name)
+                                </button>
+                            </h2>
+                            <div id="menuAccordionPanel-collapse@(category.Id)" class="accordion-collapse collapse" aria-labelledby="menuAccordionPanel-heading@(category.Id)">
+                                <div class="accordion-body">
+                                    @foreach (var specialization in category.Specializations)
+                                    {
+                                        <NavLink class="nav-link" href="@(GenerateNavLinkLocation(category.Id, specialization.Id, "SpecializationJob"))">
+                                            <span>@specialization.Name</span>
+                                        </NavLink>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button no-after">
+                                    <NavLink class="nav-link" Match="NavLinkMatch.All" href="@(GenerateNavLinkLocation(category.Id, linkLocation: "CategoryJob"))">
+                                        <span>@category.Name</span>
+                                    </NavLink>
+                                </button>
+                            </h2>
+                        </div>
+                    }
+                }
+
             }
         </div>
 

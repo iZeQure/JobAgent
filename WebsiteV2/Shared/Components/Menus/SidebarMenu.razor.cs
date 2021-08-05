@@ -16,9 +16,11 @@ namespace BlazorServerWebsite.Shared.Components.Menus
         [Inject] protected IMenuService MenuService { get; set; }
         
 
+        private const string NAVLINK_JOB_PREFIX = "/job/";
         private readonly CancellationTokenSource _tokenSource = new();
 
         private IEnumerable<Category> _menu = new List<Category>();
+        private string _searchForEducation = "";
         private Task<int> _countByUncategorized = null;
         private int _categoryId = 0;
         private string _errorMessage = string.Empty;
@@ -50,10 +52,48 @@ namespace BlazorServerWebsite.Shared.Components.Menus
             finally { StateHasChanged(); }
         }
 
-        private string GetAccordionMenuPanel(int number)
+        private async Task OnInputChange_ApplySearchFilter(ChangeEventArgs e)
+        {
+            string getValue = e.Value.ToString().ToLower();
+
+            if (string.IsNullOrEmpty(getValue))
+            {
+                await UpdateContentAsync();
+                return;
+            }
+
+            _menu = (await MenuService.InitializeMenu(_tokenSource.Token)).Where(x => x.Name.ToLower().Contains(getValue));
+            StateHasChanged();
+        }
+
+        private async Task OnClick_SearchForEducation()
+        {
+            if (string.IsNullOrEmpty(_searchForEducation))
+            {
+                await UpdateContentAsync();
+                return;
+            }
+
+            _menu = (await MenuService.InitializeMenu(_tokenSource.Token)).Where(x => x.Name.ToLower().Contains(_searchForEducation));
+            StateHasChanged();
+        }
+
+        private static string GetAccordionMenuPanelCssId(int number)
         {
             return $"menuAccordionPanel-collapse{number}";
         }
 
+        private static string GenerateNavLinkLocation(int categoryId = 0, int specializationId = 0, string linkLocation = "")
+        {
+            switch (linkLocation)
+            {
+                case "CategoryJob":
+                    return NAVLINK_JOB_PREFIX + $"{categoryId}";
+                case "SpecializationJob":
+                    return NAVLINK_JOB_PREFIX + $"{categoryId}/{specializationId}";
+                default:
+                    return NAVLINK_JOB_PREFIX + "uncategorized";
+            }
+        }
     }
 }

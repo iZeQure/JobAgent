@@ -92,11 +92,13 @@ a {
         font-size: 1.75rem;
     }
 
-    a.nav-link {
+    a.nav-link,
+    button .nav-link {
         font-size: 1.25rem;
     }
 
-        a.nav-link:hover {
+        a.nav-link:hover,
+        button nav-link:hover {
             color: var(--clr-after) !important;
         }
 
@@ -140,7 +142,7 @@ a {
         font-size: 1.75rem;
     }
 
-button {
+button, a {
     font-family: var(--ff-h4);
     font-size: .75rem !important;
     border-radius: var(--border-radius) !important;
@@ -153,6 +155,14 @@ input::placeholder {
     font-size: .85rem;
     color: #a98eda !important;
     padding: .5em .5em;
+}
+
+.nav-link {
+    padding: .75rem 0;
+}
+
+.no-after:after {
+    content: none !important;
 }
 
 .navbar-brand span {
@@ -273,21 +283,157 @@ input::placeholder {
         --bs-table-accent-bg: var(--bs-table-accent-bg-override);
     }
 
-    #indexpage {
-    content: "";
-    position: absolute;
-    margin: 0;
-    padding: 0;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    height: auto;
+.accordion-item {
+    background-color: transparent !important;
+    border: none;
+}
+
+.accordion-button,
+.accordion-button:not(.collapsed) {
+    background-color: transparent !important;
+    box-shadow: none;
+    cursor: auto;
+}
+
+.accordion-button:focus {
+    border-color: transparent !important;
+    box-shadow: none ;
+}
+
+    .accordion-button::after {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23F3F7FD'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
+    }
+
+    .accordion-button:not(.collapsed)::after {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23F3CD52'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
+    }
+
+
+
+
+    /*.navbar {
+    background-color: var(--primary-background-color) !important;
+}*/
+    /*main.page {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+div.main-content {
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 100%;
+}
+
+    div.main-content > *:nth-child(1) {
+        flex: 1 1 25%;
+        min-width: 30ch;
+    }
+
+    div.main-content > *:nth-child(2) {
+        flex: 1 1 75%;
+        min-width: 15ch;
+    }
+
+    div.main-content .sidebar {
+        background-color: var(--primary-background-color);
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+        div.main-content .sidebar .menu-categories span {
+            max-width: 175px;
+        }
+
+        div.main-content .sidebar .menu-categories a {
+            font-size: 1em !important;
+        }
+
+            div.main-content .sidebar .menu-categories a:hover,
+            div.main-content .sidebar .menu-categories a.active {
+                color: #A98EDA !important;
+            }
+
+        div.main-content .sidebar .tools a {
+            position: relative;
+            font-family: var(--ff-small-text);
+            font-size: 1.25em !important;
+            text-decoration: none;
+        }
+
+            div.main-content .sidebar .tools a:hover {
+                color: var(--clr-after) !important;
+            }
+
+            div.main-content .sidebar .tools a::before {
+                content: "" !important;
+                position: absolute !important;
+                width: 50% !important;
+                height: 2px !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                background-color: var(--clr-after) !important;
+                visibility: hidden !important;
+                transform: scaleX(0) !important;
+                transition: all 0.3s ease-in-out 0s !important;
+            }
+
+            div.main-content .sidebar .tools a:hover::before {
+                visibility: visible !important;
+                transform: scaleX(1) !important;
+            }
+
+            div.main-content .sidebar .tools a.active::before {
+                content: "" !important;
+                position: absolute !important;
+                width: 100% !important;
+                height: 2px !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                background-color: var(--clr-after) !important;
+                visibility: visible !important;
+                transform: scaleX(1) !important;
+                transition: all 0.3s ease-in-out 0s !important;
+            }
+
+            div.main-content .sidebar .tools a.active {
+                color: var(--clr-after) !important;
+            }
+
+
+    div.main-content .content {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+
+img.cover-center {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    width: -moz-fit-content;
+    width: fit-content;
     width: 100%;
-    background-image: url('/assets/images/rocket.svg'), url('/assets/images/cloud_left_right.svg'), linear-gradient(hsl(247, 61%, 27%), hsl(247, 67%, 24%), hsl(248, 75%, 20%));
-    background-size: 10%, 20%, 20%, 100%;
-    background-repeat: no-repeat, no-repeat, repeat-x;
-    background-position: bottom center, bottom right, center;
-} #indextext {
+    height: auto;
+    max-height: 100%;
+}
+*/
+    #indexpage {
+        content: "";
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        height: auto;
+        width: 100%;
+        background-image: url('/assets/images/rocket.svg'), url('/assets/images/cloud_left_right.svg'), linear-gradient(hsl(247, 61%, 27%), hsl(247, 67%, 24%), hsl(248, 75%, 20%));
+        background-size: 10%, 20%, 20%, 100%;
+        background-repeat: no-repeat, no-repeat, repeat-x;
+        background-position: bottom center, bottom right, center;
+    } #indextext {
     position: absolute;
     text-align: left;
     left: 30%;
