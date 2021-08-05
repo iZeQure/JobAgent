@@ -55,6 +55,7 @@ namespace BlazorServerWebsite
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IJobAdvertRepository, JobAdvertRepository>();
+            services.AddScoped<IJobPageRepository, JobPageRepository>();
             services.AddScoped<IVacantJobRepository, VacantJobRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<ISpecializationRepository, SpecializationRepository>();
@@ -74,6 +75,7 @@ namespace BlazorServerWebsite
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IJobAdvertService, JobAdvertService>();
             services.AddScoped<IVacantJobService, VacantJobService>();
+            services.AddScoped<IJobPageService, JobPageService>();
 
             services.AddScoped<IMessageClearProvider, MessageClearProvider>();
             services.AddScoped<FileAccessProvider>();
