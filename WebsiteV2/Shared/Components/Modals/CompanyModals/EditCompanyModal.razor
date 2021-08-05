@@ -2,11 +2,10 @@
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
 
-            @if (CompanyModelContext != null)
+            @if (CompanyModel != null)
             {
-                @if (CompanyModelContext.Model is CompanyModel model)
-                {
-                    <EditForm EditContext="CompanyModelContext" OnValidSubmit="OnValidSubmit_UpdateCompany">
+               
+                    <EditForm Model="CompanyModel" OnValidSubmit="OnValidSubmit_UpdateCompany">
 
                         <div class="modal-header">
                             <h5 class="modal-title" id="EditCompanyModalTitel">Virksommhedens Information :</h5>
@@ -25,7 +24,7 @@
                             <div class="row">
                                 <div class="col">
                                     <label for="inputCompanyIdentity" class="admin-label col-form-label col-form-label-sm">Virksomhedens CVR : <span class="font-italic small" style="color: lightcoral;">*Ændring af CVR kan muligvis skabe problemer.</span></label>
-                                    <input id="inputCompanyIdentity" type="text" class="form-control form-control-sm" placeholder="Indtast CVR nr." @bind-value="model.CVR" />
+                                    <input id="inputCompanyIdentity" type="text" class="form-control form-control-sm" placeholder="Indtast CVR nr.." @bind-value="CompanyModel.CVR" />
                                 </div>
                             </div>
 
@@ -34,7 +33,7 @@
                             <div class="row">
                                 <div class="col">
                                     <label for="inputName" class="admin-label col-form-label col-form-label-sm">Virksomhedens Navn :</label>
-                                    <input id="inputName" type="text" class="form-control form-control-sm" placeholder="Indtast virksomhedens navn.." @bind="model.Name" />
+                                    <input id="inputName" type="text" class="form-control form-control-sm" placeholder="Indtast virksomhedens navn.." @bind="CompanyModel.Name" />
                                 </div>
                             </div>
 
@@ -42,10 +41,11 @@
 
                             <div class="row">
                                 <div class="col">
-                                    <label for="inputCompanyUrl" class="admin-label col-form-label col-form-label-sm">Link til Virksomhedens hjemmeside :</label>
-                                    @*<input id="inputCompanyUrl" type="text" class="form-control form-control-sm" placeholder="Indtast link til virksomhedens hjemmeside.." @bind-value="model." />*@
+                                    <label for="InputContactPerson" class="admin-label col-form-label col-form-label-sm">Kontakt Person :</label>
+                                    <input id="InputContactPerson" type="text" class="form-control form-control-sm" placeholder="Indtast Kontakperson fra virksomheden.." @bind-value="CompanyModel.ContactPerson" />
                                 </div>
                             </div>
+
                         </div>
 
                         <div class="modal-footer">
@@ -53,7 +53,6 @@
                             <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_isProcessing">Gem ændringer</button>
                         </div>
                     </EditForm>
-                }
             }
 
         </div>

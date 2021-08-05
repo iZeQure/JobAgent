@@ -20,7 +20,6 @@ namespace BlazorServerWebsite.Pages.Admin.Administrate
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
 
         private readonly CancellationTokenSource _tokenSource = new();
-        private EditContext _companyEditContext;
         private CompanyModel _companyModel = new();
         private IEnumerable<Company> _companies = new List<Company>();
 
@@ -31,7 +30,6 @@ namespace BlazorServerWebsite.Pages.Admin.Administrate
         protected override async Task OnInitializedAsync()
         {
             RefreshProvider.RefreshRequest += UpdateContentAsync;
-            _companyEditContext = new(_companyModel);
 
             _companies = await CompanyService.GetAllAsync(_tokenSource.Token);
 
@@ -50,15 +48,27 @@ namespace BlazorServerWebsite.Pages.Admin.Administrate
 
         private async void OnClick_OpenEditModal(int id)
         {
-            var company = await CompanyService.GetByIdAsync(id, _tokenSource.Token);
-
-            _companyModel = new CompanyModel()
+            try
             {
-                CompanyId = company.Id,
-                CVR = company.CVR,
-                Name = company.Name,
-                ContactPerson = company.ContactPerson
-            };
+                var company = await CompanyService.GetByIdAsync(id, _tokenSource.Token);
+
+                _companyModel = new CompanyModel()
+                {
+                    CompanyId = company.Id,
+                    CVR = company.CVR,
+                    Name = company.Name,
+                    ContactPerson = company.ContactPerson
+                };
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Open EditModal error: {ex.Message}");
+            }
+            finally 
+            {
+                StateHasChanged();
+            }
         }
 
         private void OnClick_RemoveCompanyModal(int id)

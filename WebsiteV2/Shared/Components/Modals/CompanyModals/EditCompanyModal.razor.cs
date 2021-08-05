@@ -16,7 +16,7 @@ namespace BlazorServerWebsite.Shared.Components.Modals.CompanyModals
 {
     public partial class EditCompanyModal : ComponentBase
     {
-        [Parameter] public EditContext CompanyModelContext { get; set; }
+        [Parameter] public CompanyModel CompanyModel { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
@@ -28,24 +28,28 @@ namespace BlazorServerWebsite.Shared.Components.Modals.CompanyModals
 
         private async Task OnValidSubmit_UpdateCompany()
         {
-            _isProcessing = true;
-
-            if (CompanyModelContext.Model is CompanyModel model)
+            try
             {
+                _isProcessing = true;
+
                 Company company = new(
-                    model.CompanyId,
-                    model.CVR,
-                    model.Name,
-                    model.ContactPerson);
+                    CompanyModel.CompanyId,
+                    CompanyModel.CVR,
+                    CompanyModel.Name,
+                    CompanyModel.ContactPerson);
 
                 await CompanyService.UpdateAsync(company, tokenSource.Token);
-
-                _isProcessing = false;
 
                 RefreshProvider.CallRefreshRequest();
 
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditCompany");
-                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{model.CompanyId}");
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{CompanyModel.CompanyId}");
+
+            }
+            finally
+            {
+                _isProcessing = false;
+                StateHasChanged();
             }
         }
     }
