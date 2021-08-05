@@ -60,10 +60,10 @@
                                 else
                                 {
                                     <select id="regInputCompany" class="form-control form-control-sm" @bind="_jobAdvertModel.Id">
-                                        <option value="0" selected>---Vælg en virksomhed fra listen---</option>
+                                        <option value="0" selected>---Vælg en job side fra listen som tilhører stillingsopslaget---</option>
                                         @foreach (var vacantJob in _vacantJobs)
                                         {
-                                            <option value="@vacantJob.Id">@vacantJob.Company.Name</option>
+                                        <option value="@vacantJob.Id">@vacantJob.Company.Name - @vacantJob.URL</option>
                                         }
                                     </select>
                                 }
@@ -83,10 +83,16 @@
                                 else
                                 {
                                     <select id="regInputCategory" class="form-control form-control-sm" @onchange="OnChange_GetSpecializationByCategoryId">
-                                        <option value="0" selected>---Vælg en kateori fra listen---</option>
                                         @foreach (var category in _categories)
                                         {
-                                            <option value="@category.Id">@category.Name</option>
+                                            if (_categories.FirstOrDefault().Id == category.Id)
+                                            {
+                                                <option value="@category.Id" selected>@category.Name</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@category.Id">@category.Name</option>
+                                            }
                                         }
                                     </select>
                                 }

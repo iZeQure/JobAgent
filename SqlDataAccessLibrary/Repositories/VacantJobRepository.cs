@@ -89,14 +89,11 @@ namespace SqlDataAccessLibrary.Repositories
 
                     while (await reader.ReadAsync(cancellation))
                     {
-                        vacantJobs.Add(new VacantJob(
-                            reader.GetInt32(0),
-                            new Company(
-                                reader.GetInt32(2),
-                                0,
-                                string.Empty,
-                                string.Empty),
-                            reader.GetString(1)));
+                        var job = new VacantJob(
+                            reader.GetInt32(0), url: reader.GetString(1),
+                            company: new Company(reader.GetInt32(2), reader.GetInt32(3), reader.GetString(4), reader.GetString(5)));
+
+                        vacantJobs.Add(job);
                     }
 
                     return await Task.FromResult(vacantJobs);
@@ -135,9 +132,8 @@ namespace SqlDataAccessLibrary.Repositories
                     while (await reader.ReadAsync(cancellation))
                     {
                         job = new VacantJob(
-                            reader.GetInt32(0),
-                            new Company(reader.GetInt32(2), 0, string.Empty, string.Empty),
-                            reader.GetString(1));
+                            reader.GetInt32(0), url: reader.GetString(1),
+                            company: new Company(reader.GetInt32(2), reader.GetInt32(3), reader.GetString(4), reader.GetString(5)));
                     }
                     return job;
                 }

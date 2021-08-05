@@ -33,7 +33,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "[JA.spCreateJobAdvert]";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@id", createEntity.Id),
+                    new SqlParameter("@vacantJobId", createEntity.Id),
                     new SqlParameter("@categoryId", createEntity.Category.Id),
                     new SqlParameter("@specializationid", createEntity.Specialization.Id),
                     new SqlParameter("@jobAdvertTitle", createEntity.Title),
@@ -62,7 +62,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "[JA.spDeleteJobAdvert]";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@id", deleteEntity.Id)
+                    new SqlParameter("@vacantJobId", deleteEntity.Id)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -136,7 +136,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "[JA.spGetJobAdvertById]";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@id", id)
+                    new SqlParameter("@vacantJobId", id)
                 };
 
                 using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
