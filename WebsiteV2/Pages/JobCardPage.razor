@@ -2,43 +2,59 @@
 @page "/job/{CategoryId:int}"
 @page "/job/{CategoryId:int}/{SpecializationId:int}"
 
-@if (_isLoadingData)
-{
-    <MessageAlert Message="Indlæser Stillingsopslag..." IsLoading="_isLoadingData" Alert="MessageAlert.AlertType.Info" />
-}
+<div class="container-fluid my-3">
+    @if (_isLoadingData)
+    {
+        <MessageAlert Message="Indlæser Stillingsopslag..." IsLoading="_isLoadingData" Alert="MessageAlert.AlertType.Info" />
+    }
 
-@if (_loadFailed)
-{
-    <MessageAlert Message="Fejl ved indlæsning af stillingsopslag..." Alert="MessageAlert.AlertType.Error" />
-}
+    @if (_loadFailed)
+    {
+        <MessageAlert Message="Fejl ved indlæsning af stillingsopslag..." Alert="MessageAlert.AlertType.Error" />
+    }
 
-@if (_jobAdverts == null || _jobAdverts.Count() == 0)
-{
-    <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="Beklager, kunne ikke indlæse indholdet begrundet af en fejl." />
-}
-else
-{
-    <div id="job-wrapper">
-        <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 g-4 px-3 py-3">
-            @foreach (var jobAdvert in _jobAdverts)
+    @if (_jobAdverts == null || _jobAdverts.Count() == 0)
+    {
+        if (CategoryId == 0 && SpecializationId == 0)
+        {
+            <MessageAlert Alert="MessageAlert.AlertType.Info" FullWidth="false" Message="Fandt ikke nogen ikke kategoriseret stillingsopslag!" />
+        }
+        else
+        {
+            if (SpecializationId == 0)
             {
-                <div class="col">
-                    <div class="card" style="max-width: 540px;">
-                        <div class="row g-0">
-                            <div class="col-md-12">
-                                <div class="card-body">
-                                    <h5 class="card-title">@jobAdvert.Title</h5>
-                                    <p class="card-subtitle"><small>@jobAdvert.VacantJob.Company.Name</small></p>
-                                    <p class="card-text card-content">@jobAdvert.Summary</p>
-                                    <p class="card-subtitle"><small>Oprettet: @jobAdvert.RegistrationDateTime.ToString("dddd, d MMM yyyy", CultureInfo.CreateSpecificCulture("da-DK"))</small></p>
-                                    <a href="@jobAdvert.VacantJob.URL" class="btn btn-outline-light">Se Stilling</a>
+                <MessageAlert Alert="MessageAlert.AlertType.Info" FullWidth="false" Message="Fandt ikke nogen stillingsopslag i denne uddannelsesgren!" />
+            }
+            else
+            {
+                <MessageAlert Alert="MessageAlert.AlertType.Info" FullWidth="false" Message="Fandt ikke nogen stillingsopslag fra dette speciale, i denne uddannelsesgren!" />
+            }
+        }
+    }
+    else
+    {
+        <div id="job-wrapper">
+            <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 g-4 px-3 py-3">
+                @foreach (var jobAdvert in _jobAdverts)
+                {
+                    <div class="col">
+                        <div class="card" style="max-width: 540px;">
+                            <div class="row g-0">
+                                <div class="col-md-12">
+                                    <div class="card-body">
+                                        <h5 class="card-title">@jobAdvert.Title</h5>
+                                        <p class="card-subtitle"><small>@jobAdvert.VacantJob.Company.Name</small></p>
+                                        <p class="card-text card-content">@jobAdvert.Summary</p>
+                                        <p class="card-subtitle"><small>Oprettet: @jobAdvert.RegistrationDateTime.ToString("dddd, d MMM yyyy", CultureInfo.CreateSpecificCulture("da-DK"))</small></p>
+                                        <a href="@jobAdvert.VacantJob.URL" class="btn btn-outline-light">Se Stilling</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            }
+                }
+            </div>
         </div>
-    </div>
-}
+    }
+</div>
 

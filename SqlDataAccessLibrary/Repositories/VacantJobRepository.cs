@@ -92,11 +92,11 @@ namespace SqlDataAccessLibrary.Repositories
                         vacantJobs.Add(new VacantJob(
                             reader.GetInt32(0),
                             new Company(
-                                reader.GetInt32(1),
+                                reader.GetInt32(2),
                                 0,
                                 string.Empty,
                                 string.Empty),
-                            reader.GetString(2)));
+                            reader.GetString(1)));
                     }
 
                     return await Task.FromResult(vacantJobs);
@@ -136,8 +136,8 @@ namespace SqlDataAccessLibrary.Repositories
                     {
                         job = new VacantJob(
                             reader.GetInt32(0),
-                            new Company(reader.GetInt32(1), 0, string.Empty, string.Empty),
-                            reader.GetString(2));
+                            new Company(reader.GetInt32(2), 0, string.Empty, string.Empty),
+                            reader.GetString(1));
                     }
                     return job;
                 }

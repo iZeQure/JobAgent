@@ -126,7 +126,10 @@ namespace BlazorServerWebsite.Shared.Components.Modals.JobAdvertModals
 
                     for (int i = 0; i < _specializations.Count(); i++)
                     {
-                        tempList.Add(_specializations.ElementAt(i));
+                        if (_specializations.ElementAt(i).Category.Id.Equals(categoryId))
+                        {
+                            tempList.Add(_specializations.ElementAt(i));
+                        }
                     }
 
                     _sortedSpecializations = tempList;

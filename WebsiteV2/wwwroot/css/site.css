@@ -95,6 +95,7 @@ a {
     a.nav-link,
     button .nav-link {
         font-size: 1.25rem;
+        padding: 0, 0, .75rem, 1.5rem;
     }
 
         a.nav-link:hover,
@@ -155,10 +156,6 @@ input::placeholder {
     font-size: .85rem;
     color: #a98eda !important;
     padding: .5em .5em;
-}
-
-.nav-link {
-    padding: .75rem 0;
 }
 
 .no-after:after {
@@ -286,6 +283,28 @@ input::placeholder {
 .accordion-item {
     background-color: transparent !important;
     border: none;
+}
+
+    .accordion-item a.nav-link,
+    .accordion-item button.nav-link {
+        padding: 0 0 .25rem 0 !important;
+    }
+
+    .accordion-item a.nav-link span {
+        padding: .5rem 0 !important;
+    }
+
+    .accordion-item .accordion-body {
+        background-color: var(--clr-white);
+        border-radius: .25rem;        
+    }
+
+    .accordion-item .accordion-body a {
+        color: var(--clr-neutral-900) !important;
+    }
+
+.accordion-button {
+    padding: .5rem 1.25rem;
 }
 
 .accordion-button,
