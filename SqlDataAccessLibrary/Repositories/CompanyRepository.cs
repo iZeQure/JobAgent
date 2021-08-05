@@ -123,7 +123,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "[JA.spGetCompanyById]";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@id", id)
+                    new SqlParameter("@companyId", id)
                 };
 
                 using var reader = await _sqlDatabase.ExecuteReaderAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
@@ -135,10 +135,10 @@ namespace SqlDataAccessLibrary.Repositories
                     while (await reader.ReadAsync(cancellation))
                     {
                         company = new Company(
+                            id,
                             reader.GetInt32(0),
-                            reader.GetInt32(1),
-                            reader.GetString(2),
-                            reader.GetString(3));
+                            reader.GetString(1),
+                            reader.GetString(2));
                     }
 
                     return await Task.FromResult(company);
