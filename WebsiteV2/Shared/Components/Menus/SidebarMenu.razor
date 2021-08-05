@@ -136,6 +136,9 @@ AdminContext.User.IsInRole("Udvikler"))
                             Bruger Rettigheder
                         </NavLink>
                     </li>
+                }
+                @if (AdminContext.User.IsInRole("Udvikler"))
+                {
 
                     <li class="nav-item">
                         <NavLink class="nav-link" href="/admin/system/settings/view-log">
@@ -143,10 +146,7 @@ AdminContext.User.IsInRole("Udvikler"))
                             Log
                         </NavLink>
                     </li>
-                }
 
-                @if (AdminContext.User.IsInRole("Udvikler"))
-                {
                     <li class="nav-item">
                         <NavLink class="nav-link" href="/admin/system/settings/versioning">
                             <span><i class="fas fa-user-cog"></i></span>
@@ -184,43 +184,43 @@ AdminContext.User.IsInRole("Udvikler"))
 
 
         @*@foreach (var category in _menu)
-        {
-
-            if (category.Specializations.Count() == 0)
             {
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="@category.Id">
-                        <span class="me-auto">@category.Name</span>
-                        <span class="badge bg-purple-300">@category.Specializations.Count()</span>
-                    </NavLink>
-                </li>
-            }
 
-            @if (category.Specializations.Count() != 0)
-            {
-                <li class="nav-item btn-group dropend">
-                        <NavLink type="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                if (category.Specializations.Count() == 0)
+                {
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="@category.Id">
                             <span class="me-auto">@category.Name</span>
                             <span class="badge bg-purple-300">@category.Specializations.Count()</span>
                         </NavLink>
-                        <ul class="dropdown-menu">
-                            @foreach (var specialization in category.Specializations)
-                            {
-                                <NavLink class="dropdown-item text-left text-truncate w-auto" href="/job/{category.Id}/{specialization.Id}">
-                                    <span class="badge badge-info">@specialization.Name</span>
-                                    <span class="ml-2">@category.Name</span>
-                                </NavLink>
-                            }
-                        </ul>
                     </li>
+                }
+
+                @if (category.Specializations.Count() != 0)
+                {
+                    <li class="nav-item btn-group dropend">
+                            <NavLink type="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="me-auto">@category.Name</span>
+                                <span class="badge bg-purple-300">@category.Specializations.Count()</span>
+                            </NavLink>
+                            <ul class="dropdown-menu">
+                                @foreach (var specialization in category.Specializations)
+                                {
+                                    <NavLink class="dropdown-item text-left text-truncate w-auto" href="/job/{category.Id}/{specialization.Id}">
+                                        <span class="badge badge-info">@specialization.Name</span>
+                                        <span class="ml-2">@category.Name</span>
+                                    </NavLink>
+                                }
+                            </ul>
+                        </li>
 
 
 
 
-            }
+                }
 
 
-        }*@
+            }*@
 
     </NotAuthorized>
 </AuthorizeView>
