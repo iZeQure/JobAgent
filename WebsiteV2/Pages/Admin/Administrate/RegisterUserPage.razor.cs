@@ -5,21 +5,23 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using ObjectLibrary.Common;
 using System;
+using SecurityLibrary.Cryptography.Extentions;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using SecurityLibrary.Interfaces;
 
 namespace BlazorServerWebsite.Pages.Admin.Administrate
 {
     public partial class RegisterUserPage : ComponentBase
     {
         [Inject] private IUserService UserService { get; set; }
-        [Inject] private IAreaService AreaService { get; set; }
+        [Inject] private IRoleService RoleService { get; set; }
         [Inject] private ILocationService LocationService { get; set; }
+        [Inject] private IAuthenticationAccess AuthenticationAccess { get; set; }
 
         private RegisterUserModel _regAccModel;
-        private User User;
-        private IEnumerable<Area> _areas;
+        private IEnumerable<Role> _roles;
         private IEnumerable<Location> _locations;
         private CancellationTokenSource _tokenSource = new();
 
@@ -32,7 +34,7 @@ namespace BlazorServerWebsite.Pages.Admin.Administrate
 
         protected override async Task OnInitializedAsync()
         {
-            _areas = new List<Area>();
+            _roles = new List<Role>();
             _locations = new List<Location>();
             _regAccModel = new();
 
@@ -46,7 +48,7 @@ namespace BlazorServerWebsite.Pages.Admin.Administrate
 
             try
             {
-                _areas = await AreaService.GetAllAsync(_tokenSource.Token);
+                _roles = await RoleService.GetAllAsync(_tokenSource.Token);
                 _locations = await LocationService.GetAllAsync(_tokenSource.Token);
             }
             catch (Exception)
@@ -76,15 +78,49 @@ namespace BlazorServerWebsite.Pages.Admin.Administrate
                     return;
                 }
 
-                var userService = (UserService)UserService;
+                IUser tempUser = new User(
+                    0,
+                    new Role(_regAccModel.RoleId, ""),
+                    new Location(_regAccModel.LocationId, ""),
+                    null,
+                    _regAccModel.FirstName,
+                    _regAccModel.LastName,
+                    _regAccModel.Email,
+                    _regAccModel.Password
+                    );
+                tempUser.GenerateSalt();
+                tempUser.HashPassword();
 
-                var userResult = await userService.CreateAsync(User, _tokenSource.Token);
-                await userService.GrantUserAreaAsync(User, _regAccModel.ConsultantAreaId, _tokenSource.Token);
+                string accToken = AuthenticationAccess.GenerateAccessToken(tempUser);
+
+                IUser user = new User(
+                    tempUser.Id,
+                   tempUser.GetRole,
+                    tempUser.GetLocation,
+                    null,
+                    tempUser.GetFirstName,
+                    tempUser.GetLastName,
+                    tempUser.GetEmail,
+                    tempUser.GetPassword,
+                    tempUser.GetSalt,
+                    accToken
+                    );
+                
+
+                var userResult = await UserService.CreateAsync(user, _tokenSource.Token);
+
+                if(userResult == 0)
+                {
+                    errorMessage = "Brugeren blev ikke oprettet, der skete en fejl. Prøv igen senere.";
+                    return;
+                }
+
 
                 infoMessage = "Praktikkonsulent blev oprettet succesfuldt";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 errorOcurred = true;
                 errorMessage = "Ukendt Fejl.";
             }

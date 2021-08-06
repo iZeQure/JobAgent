@@ -48,11 +48,12 @@ namespace BlazorServerWebsite.Shared.Components.Modals.JobAdvertModals
                 }
 
                 RefreshProvider.CallRefreshRequest();
-                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalRemoveJobVacancy");
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalRemoveJobAdvert");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 _errorMessage = "Kunne ikke fjerne stillingsopslag grundet ukendt fejl.";
+                Console.WriteLine(ex.Message);
             }
             finally
             {

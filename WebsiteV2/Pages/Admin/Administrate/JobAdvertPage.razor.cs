@@ -102,6 +102,7 @@ namespace BlazorServerWebsite.Pages.Admin.Administrate
                 Id = details.Id,
                 Title = details.Title,
                 RegistrationDateTime = details.RegistrationDateTime,
+                Summary = details.Summary,
                 CategoryId = details.Category.Id,
                 SpecializationId = details.Specialization.Id
             };

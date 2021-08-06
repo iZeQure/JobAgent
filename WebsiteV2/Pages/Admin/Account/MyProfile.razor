@@ -1,5 +1,5 @@
 ﻿@page "/admin/account/my-profile"
-@attribute [Authorize]
+@attribute [Authorize(Roles = "System Administrator, Udvikler")]
 
 <PageDocumentTitle DocumentTitle="Bruger Indstillinger - Min Profil" />
 
@@ -94,16 +94,24 @@
                     <button type="button" class="btn btn-outline-primary mt-2" @onclick="async () => await OnButtonClick_AssignUserConsultantArea(_accountProfileDiverseModel.ConsultantAreaIdToBeAssigned)" disabled="@_isProcessingUpdateConsultantAreaRequest">Tilføj Konsulentområde</button>
                 </div>
                 <div class="col">
-                    <label for="activeConsultantAreas">Tildelte Konsulentområder:</label>
-                    <InputSelect id="activeConsultantAreas" @bind-Value="@_accountProfileDiverseModel.ConsultantAreaIdToBeRemoved" class="form-control form-control-sm" @onselectionchange="@(() => ShouldRender())">
-                        <option selected value="0">Vælg et område for at fjerne det</option>
-                        @foreach (var area in _assignedConsultantAreas)
-                            {
-                                var areaId = _areas.FirstOrDefault(x => x.Name.Equals(area.Name)).Id;
-                            <option value="@(areaId)">@area.Name</option>
-                            }
-                    </InputSelect>
-                    <button type="button" class="btn btn-outline-primary mt-2" @onclick="async () => await OnButtonClick_RemoveUserConsultantArea(_accountProfileDiverseModel.ConsultantAreaIdToBeRemoved)" disabled="@_isProcessingUpdateConsultantAreaRequest">Fjern Konsulentområde</button>
+                    @if (_assignedConsultantAreas == null || !_assignedConsultantAreas.Any())
+                    {
+                        <label>Fejl</label>
+                    }
+                    else
+                    {
+
+                        <label for="activeConsultantAreas">Tildelte Konsulentområder:</label>
+                        <InputSelect id="activeConsultantAreas" @bind-Value="@_accountProfileDiverseModel.ConsultantAreaIdToBeRemoved" class="form-control form-control-sm" @onselectionchange="@(() => ShouldRender())">
+                            <option selected value="0">Vælg et område for at fjerne det</option>
+                            @foreach (var area in _assignedConsultantAreas)
+                                    {
+                                        var areaId = _areas.FirstOrDefault(x => x.Name.Equals(area.Name)).Id;
+                                <option value="@(areaId)">@area.Name</option>
+                                    }
+                        </InputSelect>
+                        <button type="button" class="btn btn-outline-primary mt-2" @onclick="async () => await OnButtonClick_RemoveUserConsultantArea(_accountProfileDiverseModel.ConsultantAreaIdToBeRemoved)" disabled="@_isProcessingUpdateConsultantAreaRequest">Fjern Konsulentområde</button>
+                    }
                 </div>
             </div>
         </EditForm>

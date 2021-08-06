@@ -6,6 +6,7 @@ namespace BlazorServerWebsite.Data.FormModels
 {
     public class RegisterUserModel
     {
+
         [Required(AllowEmptyStrings = false, ErrorMessage = "Udfyld venligst fornavn.")]
         [StringLength(maximumLength: 128, MinimumLength = 1)]
         public string FirstName { get; set; }
@@ -31,8 +32,8 @@ namespace BlazorServerWebsite.Data.FormModels
         public string ConfirmPassword { get; set; }
 
         [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "Vælg venligst et konsulent område.")]
-        public int ConsultantAreaId { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "Vælg venligst en Rolle.")]
+        public int RoleId { get; set; }
 
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "Vælg venligst en lokation.")]

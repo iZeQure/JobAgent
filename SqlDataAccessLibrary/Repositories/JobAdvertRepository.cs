@@ -59,7 +59,7 @@ namespace SqlDataAccessLibrary.Repositories
         {
             try
             {
-                string cmdText = "[JA.spDeleteJobAdvert]";
+                string cmdText = "[JA.spRemoveJobAdvert]";
                 SqlParameter[] parameters = new[]
                 {
                     new SqlParameter("@vacantJobId", deleteEntity.Id)
@@ -275,7 +275,7 @@ namespace SqlDataAccessLibrary.Repositories
                 string cmdText = "[JA.spUpdateJobAdvert]";
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@id", updateEntity.Id),
+                    new SqlParameter("@vacantJobId", updateEntity.Id),
                     new SqlParameter("@categoryId", updateEntity.Category.Id),
                     new SqlParameter("@specializationid", updateEntity.Specialization.Id),
                     new SqlParameter("@jobAdvertTitle", updateEntity.Title),

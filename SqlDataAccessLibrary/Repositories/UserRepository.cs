@@ -107,15 +107,14 @@ namespace SqlDataAccessLibrary.Repositories
 
                 SqlParameter[] parameters = new[]
                 {
-                    new SqlParameter("@id", createEntity.Id),
                     new SqlParameter("@roleId", createEntity.GetRole.Id),
                     new SqlParameter("@locationId", createEntity.GetLocation.Id),
-                    new SqlParameter("@firstName", createEntity.GetFirstName),
-                    new SqlParameter("@lastName", createEntity.GetLastName),
-                    new SqlParameter("@email", createEntity.GetEmail),
-                    new SqlParameter("@password", createEntity.GetPassword),
-                    new SqlParameter("@salt", createEntity.GetSalt),
-                    new SqlParameter("@accessToken", createEntity.GetAccessToken)
+                    new SqlParameter("@userFirstName", createEntity.GetFirstName),
+                    new SqlParameter("@userLastName", createEntity.GetLastName),
+                    new SqlParameter("@userEmail", createEntity.GetEmail),
+                    new SqlParameter("@userPass", createEntity.GetPassword),
+                    new SqlParameter("@userSalt", createEntity.GetSalt),
+                    new SqlParameter("@userAccessToken", createEntity.GetAccessToken)
                 };
 
                 return await _sqlDatabase.ExecuteNonQueryAsync(cmdText, CommandType.StoredProcedure, cancellation, parameters);
