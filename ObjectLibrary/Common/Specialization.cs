@@ -9,7 +9,7 @@ namespace ObjectLibrary.Common
     /// <summary>
     /// Handles the information of Specialization.
     /// </summary>
-    public class Specialization : BaseEntity
+    public class Specialization : BaseEntity<int>
     {
         private Category _category;
         private string _name;

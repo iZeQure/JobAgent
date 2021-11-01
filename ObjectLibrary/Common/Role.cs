@@ -9,7 +9,7 @@ namespace ObjectLibrary.Common
     /// <summary>
     /// Handles the information of a role.
     /// </summary>
-    public class Role : BaseEntity
+    public class Role : BaseEntity<int>
     {
         private string _name;
         private string _description;

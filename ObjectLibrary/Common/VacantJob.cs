@@ -9,7 +9,7 @@ namespace ObjectLibrary.Common
     /// <summary>
     /// Handles the information about the Vacant Jobs.
     /// </summary>
-    public class VacantJob : BaseEntity
+    public class VacantJob : BaseEntity<int>
     {
         private Company _company;
         private string _url;

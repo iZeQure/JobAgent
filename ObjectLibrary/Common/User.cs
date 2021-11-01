@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ObjectLibrary.Common.Abstractions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ObjectLibrary.Common
 {
-    public class User : BaseEntity, IUser
+    public class User : IUser
     {
         private readonly Role _userRole;
         private readonly Location _userLocation;
@@ -84,6 +85,8 @@ namespace ObjectLibrary.Common
         /// Get the email for the user.
         /// </summary>
         public string GetEmail { get { return _email; } }
+
+        public int Id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public void SetPassword(string password)
         {

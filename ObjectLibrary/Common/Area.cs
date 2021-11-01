@@ -9,7 +9,7 @@ namespace ObjectLibrary.Common
     /// <summary>
     /// Handles the information of an Area entity.
     /// </summary>
-    public class Area : BaseEntity
+    public class Area : BaseEntity<int>
     {
         private string _name;
 

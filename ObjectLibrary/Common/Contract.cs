@@ -9,7 +9,7 @@ namespace ObjectLibrary.Common
     /// <summary>
     /// Handles the information of the contract.
     /// </summary>
-    public class Contract : BaseEntity
+    public class Contract : BaseEntity<int>
     {
         private Company _company;
         private IUser _user;

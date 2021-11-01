@@ -9,7 +9,7 @@ namespace ObjectLibrary.Common
     /// <summary>
     /// Handles the information about the Job Pages.
     /// </summary>
-    public class JobPage : BaseEntity
+    public class JobPage : BaseEntity<int>
     {
         private Company _company;
         private string _url;

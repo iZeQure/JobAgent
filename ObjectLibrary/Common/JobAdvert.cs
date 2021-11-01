@@ -9,7 +9,7 @@ namespace ObjectLibrary.Common
     /// <summary>
     /// Handles the information about job advert.
     /// </summary>
-    public class JobAdvert : BaseEntity
+    public class JobAdvert : BaseEntity<int>
     {
         private readonly VacantJob _vacantJob;
         private Category _category;

@@ -9,7 +9,7 @@ namespace ObjectLibrary.Common
     /// <summary>
     /// Handles the information of the company.
     /// </summary>
-    public class Company : BaseEntity
+    public class Company : BaseEntity<int>
     {
         private int _cvr;
         private string _name;

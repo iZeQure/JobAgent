@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace ObjectLibrary.Common
+namespace ObjectLibrary.Common.Abstractions
 {
     /// <summary>
     /// Encapsulates the <see cref="User"/> properties for security purposes.
     /// </summary>
-    public interface IUser : IBaseEntity
+    public interface IUser : IBaseEntity<int>
     {
         /// <summary>
         /// Get the user id

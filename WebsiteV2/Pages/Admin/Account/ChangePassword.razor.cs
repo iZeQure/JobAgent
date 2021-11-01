@@ -75,12 +75,6 @@ namespace BlazorServerWebsite.Pages.Admin.Account
 
                 IUser user = await UserService.GetUserByEmailAsync(_sessionUserEmail, _tokenSource.Token);
 
-                //Role role = null;
-                //Location location = null;
-                //List<Area> areaList = new List<Area>();
-
-                //User user = new(0, role, location, areaList, string.Empty, string.Empty, changePasswordModel.Email, changePasswordModel.Password);
-
                 user.SetPassword(changePasswordModel.Password);
 
                 user.GenerateSalt();

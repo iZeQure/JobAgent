@@ -9,11 +9,11 @@ namespace ObjectLibrary.Common
     /// <summary>
     /// Describes the base of an object entity.
     /// </summary>
-    public abstract class BaseEntity : IBaseEntity
+    public abstract class BaseEntity<EntityType> : IBaseEntity<EntityType>
     {
-        private int _id;
+        private EntityType _id;
 
-        protected BaseEntity(int id)
+        protected BaseEntity(EntityType id)
         {
             _id = id;
         }
@@ -21,6 +21,6 @@ namespace ObjectLibrary.Common
         /// <summary>
         /// Get the unique id associated with this entity.
         /// </summary>
-        public int Id { get { return _id; } set { _id = value; } }
+        public EntityType Id { get { return _id; } set { _id = value; } }
     }
 }

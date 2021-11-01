@@ -13,7 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ObjectLibrary\ObjectLibrary.csproj" />
     <ProjectReference Include="..\SecurityLibrary\SecurityLibrary.csproj" />
-    <ProjectReference Include="..\SqlDataAccessLibrary\SqlDataAccessLibrary.csproj" />
+    <ProjectReference Include="..\SqlDataAccessLibrary\DataAccessLibrary.csproj" />
   </ItemGroup>
 
 </Project>

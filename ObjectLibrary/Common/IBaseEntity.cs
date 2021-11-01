@@ -1,7 +1,7 @@
 ﻿namespace ObjectLibrary.Common
 {
-    public interface IBaseEntity
+    public interface IBaseEntity<EntityType>
     {
-        int Id { get; set; }
+        EntityType Id { get; set; }
     }
 }

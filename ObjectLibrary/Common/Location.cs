@@ -9,7 +9,7 @@ namespace ObjectLibrary.Common
     /// <summary>
     /// Handles the information of Location.
     /// </summary>
-    public class Location : BaseEntity
+    public class Location : BaseEntity<int>
     {
         private string _name;
 

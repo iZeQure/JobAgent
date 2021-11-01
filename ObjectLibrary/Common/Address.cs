@@ -9,7 +9,7 @@ namespace ObjectLibrary.Common
     /// <summary>
     /// Handles the information of an address.
     /// </summary>
-    public class Address : BaseEntity
+    public class Address : BaseEntity<int>
     {
         private string _streetAddress;
         private string _city;
