@@ -23,5 +23,20 @@ namespace JobAgentClassLibrary.Common.Areas
         {
             return await _repository.GetAllAsync();
         }
+
+        public async Task<IArea> GetByIdAsync(int id)
+        {
+            return await _repository.GetByIdAsync(id);
+        }
+
+        public async Task<bool> RemoveAsync(IArea entity)
+        {
+            return await _repository.RemoveAsync(entity);
+        }
+
+        public async Task<IArea> UpdateAsync(IArea entity)
+        {
+            return await _repository.UpdateAsync(entity);
+        }
     }
 }
