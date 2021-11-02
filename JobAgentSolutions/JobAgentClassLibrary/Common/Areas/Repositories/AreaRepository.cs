@@ -61,7 +61,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
         {
             List<IArea> categories = new();
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
                 using (var cmd = conn.CreateCommand())
                 {
@@ -101,7 +101,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
         public async Task<IArea> GetByIdAsync(int id)
         {
             Area area = new Area();
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
                 var values = new SqlParameter[]
                 {
@@ -146,7 +146,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
             {
                 var values = new SqlParameter[]
                 {
@@ -186,7 +186,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
 
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
             {
                 var values = new SqlParameter[]
                 {
