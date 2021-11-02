@@ -11,9 +11,9 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
 {
     public class CompanyRepository : ICompanyRepository
     {
-        private readonly SqlDbManager _sqlDbManager;
+        private readonly ISqlDbManager _sqlDbManager;
 
-        public CompanyRepository(SqlDbManager sqlDbManager)
+        public CompanyRepository(ISqlDbManager sqlDbManager)
         {
             _sqlDbManager = sqlDbManager;
         }
@@ -62,7 +62,7 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
         {
             List<ICompany> categories = new();
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
                 using (var cmd = conn.CreateCommand())
                 {
@@ -102,7 +102,7 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
         public async Task<ICompany> GetByIdAsync(int id)
         {
             Company company = new Company();
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
                 var values = new SqlParameter[]
                 {
@@ -145,7 +145,7 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
             {
                 var values = new SqlParameter[]
                 {
@@ -183,7 +183,7 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
             {
                 var values = new SqlParameter[]
                 {
