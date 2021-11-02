@@ -60,7 +60,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
         {
             List<ICategory> categories = new();
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
                 using (var cmd = conn.CreateCommand())
                 {
@@ -99,7 +99,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
         {
             ICategory category = null;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
                 using (var cmd = conn.CreateCommand())
                 {
@@ -139,7 +139,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
         {
             bool isDeleted = false;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
             {
                 var values = new SqlParameter[]
                 {
@@ -172,7 +172,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
             {
                 var values = new SqlParameter[]
                 {

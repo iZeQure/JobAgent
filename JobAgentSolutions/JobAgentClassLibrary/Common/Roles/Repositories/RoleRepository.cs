@@ -1,35 +1,214 @@
 ﻿using JobAgentClassLibrary.Common.Roles.Entities;
+using JobAgentClassLibrary.Core.Database.Managers;
+using JobAgentClassLibrary.Core.Entities;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.Roles.Repositories
 {
     public class RoleRepository : IRoleRepository
     {
-        public Task<IRole> CreateAsync(IRole entity)
+        private readonly ISqlDbManager _sqlDbManager;
+
+        public RoleRepository(ISqlDbManager sqlDbManager)
         {
-            throw new NotImplementedException();
+            _sqlDbManager = sqlDbManager;
         }
 
-        public Task<List<IRole>> GetAllAsync(IRole entity)
+        public async Task<IRole> CreateAsync(IRole entity)
         {
-            throw new NotImplementedException();
+            int entityId = 0;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            {
+                var values = new SqlParameter[]
+                {
+                    new SqlParameter("@id", entity.Id),
+                    new SqlParameter("@roleName", entity.Name),
+                    new SqlParameter("@roleDescription", entity.Description)
+                };
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spCreateRole]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddRange(values);
+
+                    try
+                    {
+                        await conn.OpenAsync();
+
+                        entityId = (int)await cmd.ExecuteScalarAsync();
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            if (entityId != 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
+
+            return null;
         }
 
-        public Task<IRole> GetByIdAsync(int id)
+        public async Task<List<IRole>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            List<IRole> roles = new();
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spGetRoles]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    try
+                    {
+                        using (var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            if (!reader.HasRows) return null;
+
+                            while (await reader.ReadAsync())
+                            {
+                                var role = new Role
+                                {
+                                    Id = reader.GetInt32(0),
+                                    Name = reader.GetString(1),
+                                    Description = reader.GetString(2)
+                                };
+
+                                roles.Add(role);
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return roles;
         }
 
-        public Task<bool> RemoveAsync(IRole entity)
+        public async Task<IRole> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            IRole role = null;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spGetRoleById]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    try
+                    {
+                        using (var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            if (!reader.HasRows) return null;
+
+                            while (await reader.ReadAsync())
+                            {
+                                role = new Role
+                                {
+                                    Id = reader.GetInt32(0),
+                                    Name = reader.GetString(1)
+                                };
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+
+            }
+
+            return role;
         }
 
-        public Task<IRole> UpdateAsync(IRole entity)
+        public async Task<bool> RemoveAsync(IRole entity)
         {
-            throw new NotImplementedException();
+            bool isDeleted = false;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
+            {
+                var values = new SqlParameter[]
+                {
+                    new SqlParameter("@id", entity.Id)
+                };
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spDeleteRole]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddRange(values);
+
+                    try
+                    {
+                        await conn.OpenAsync();
+
+                        isDeleted = (await cmd.ExecuteNonQueryAsync()) == 1;
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return isDeleted;
+        }
+
+        public async Task<IRole> UpdateAsync(IRole entity)
+        {
+            int entityId = 0;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
+            {
+                var values = new SqlParameter[]
+                {
+                    new SqlParameter("@id", entity.Id),
+                    new SqlParameter("@roleName", entity.Name),
+                    new SqlParameter("@roleDescription", entity.Description)
+                };
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spUpdateRole]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddRange(values);
+
+                    try
+                    {
+                        await conn.OpenAsync();
+
+                        entityId = (int)await cmd.ExecuteScalarAsync();
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            if (entityId != 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
+
+            return null;
         }
     }
 }
