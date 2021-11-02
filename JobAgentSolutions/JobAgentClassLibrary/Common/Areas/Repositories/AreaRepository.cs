@@ -57,7 +57,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
         }
 
 
-        public async Task<List<IArea>> GetAllAsync(IArea entity)
+        public async Task<List<IArea>> GetAllAsync()
         {
             List<IArea> categories = new();
 

@@ -17,7 +17,7 @@ namespace JobAgentClassLibrary.Core.Repositories
         Task<TAggregateType> UpdateAsync(TAggregateType entity);
         Task<bool> RemoveAsync(TAggregateType entity);
         Task<TAggregateType> GetByIdAsync(KCriteria id);
-        Task<List<TAggregateType>> GetAllAsync(TAggregateType entity);
+        Task<List<TAggregateType>> GetAllAsync();
 
     }
 }
