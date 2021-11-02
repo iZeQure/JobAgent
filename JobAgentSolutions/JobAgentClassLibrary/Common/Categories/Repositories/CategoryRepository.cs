@@ -1,35 +1,210 @@
 ﻿using JobAgentClassLibrary.Common.Categories.Entities;
+using JobAgentClassLibrary.Core.Database.Managers;
+using JobAgentClassLibrary.Core.Entities;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.Categories.Repositories
 {
     public class CategoryRepository : ICategoryRepository
     {
-        public Task<ICategory> CreateAsync(ICategory entity)
+        private readonly ISqlDbManager _sqlDbManager;
+
+        public CategoryRepository(ISqlDbManager sqlDbManager)
         {
-            throw new NotImplementedException();
+            _sqlDbManager = sqlDbManager;
         }
 
-        public Task<List<ICategory>> GetAllAsync(ICategory entity)
+        public async Task<ICategory> CreateAsync(ICategory entity)
         {
-            throw new NotImplementedException();
+            int entityId = 0;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            {
+                var values = new SqlParameter[]
+                {
+                    new SqlParameter("@name", entity.Name)
+                };
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spCreateCategory]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddRange(values);
+
+                    try
+                    {
+                        await conn.OpenAsync();
+
+                        entityId = (int)await cmd.ExecuteScalarAsync();
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            if (entityId != 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
+
+            return null;
         }
 
-        public Task<ICategory> GetByIdAsync(int id)
+        public async Task<List<ICategory>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            List<ICategory> categories = new();
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spGetCategories]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    try
+                    {
+                        using (var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            if (!reader.HasRows) return null;
+
+                            while (await reader.ReadAsync())
+                            {
+                                var category = new Category
+                                {
+                                    Id = reader.GetInt32(0),
+                                    Name = reader.GetString(1)
+                                };
+
+                                categories.Add(category);
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return categories;
         }
 
-        public Task<bool> RemoveAsync(ICategory entity)
+        public async Task<ICategory> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            ICategory category = null;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spGetCategoryById]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    try
+                    {
+                        using (var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            if (!reader.HasRows) return null;
+
+                            while (await reader.ReadAsync())
+                            {
+                                category = new Category
+                                {
+                                    Id = reader.GetInt32(0),
+                                    Name = reader.GetString(1)
+                                };
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+
+            }
+
+            return category;
         }
 
-        public Task<ICategory> UpdateAsync(ICategory entity)
+        public async Task<bool> RemoveAsync(ICategory entity)
         {
-            throw new NotImplementedException();
+            bool isDeleted = false;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            {
+                var values = new SqlParameter[]
+                {
+                    new SqlParameter("@id", entity.Id)
+                };
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spDeleteCategory]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddRange(values);
+
+                    try
+                    {
+                        await conn.OpenAsync();
+
+                        isDeleted = (await cmd.ExecuteNonQueryAsync()) == 1;
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return isDeleted;
+        }
+
+        public async Task<ICategory> UpdateAsync(ICategory entity)
+        {
+            int entityId = 0;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            {
+                var values = new SqlParameter[]
+                {
+                    new SqlParameter("@id", entity.Id),
+                    new SqlParameter("@name", entity.Name)
+                };
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spUpdateCategory]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddRange(values);
+
+                    try
+                    {
+                        await conn.OpenAsync();
+
+                        entityId = (int)await cmd.ExecuteScalarAsync();
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            if (entityId != 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
+
+            return null;
         }
     }
 }
