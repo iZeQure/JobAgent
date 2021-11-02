@@ -4,19 +4,4 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Common\JobPages\Entities\" />
-    <Folder Include="Common\JobPages\Repositories\" />
-    <Folder Include="Common\JobAdverts\Entities\" />
-    <Folder Include="Common\JobAdverts\Repositories\" />
-    <Folder Include="Common\VacantJobs\Entities\" />
-    <Folder Include="Common\VacantJobs\Repositories\" />
-    <Folder Include="Common\Companies\Entities\" />
-    <Folder Include="Common\Companies\Repositories\" />
-    <Folder Include="Common\Categories\Entities\" />
-    <Folder Include="Common\Categories\Repositories\" />
-    <Folder Include="Common\Areas\Entities\" />
-    <Folder Include="Common\Areas\Repositories\" />
-  </ItemGroup>
-
 </Project>

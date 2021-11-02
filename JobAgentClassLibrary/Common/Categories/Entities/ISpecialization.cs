@@ -1,9 +1,9 @@
 ﻿using JobAgentClassLibrary.Core.Entities;
 using JobAgentClassLibrary.Core.Repositories;
 
-namespace JobAgentClassLibrary.Common.Locations.Entities
+namespace JobAgentClassLibrary.Common.Categories.Entities
 {
-    public interface ILocation : IAggregateRoot, IEntity<int>
+    public interface ISpecialization : IAggregateRoot, IEntity<int>
     {
         public string Name { get; }
     }
