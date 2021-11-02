@@ -2,7 +2,7 @@
 using System.Data.SqlClient;
 using System.Text;
 
-namespace DataAccessLibrary.Factories
+namespace JobAgentClassLibrary.Core.Database.Factories
 {
     public class SqlDbFactory : ISqlDbFactory
     {

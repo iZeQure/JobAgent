@@ -1,6 +1,6 @@
 ﻿using System.Data.SqlClient;
 
-namespace DataAccessLibrary.Factories
+namespace JobAgentClassLibrary.Core.Database.Factories
 {
     public interface ISqlDbFactory
     {

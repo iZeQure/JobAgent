@@ -1,8 +1,8 @@
-﻿using DataAccessLibrary.Factories;
+﻿using JobAgentClassLibrary.Core.Database.Factories;
 using JobAgentClassLibrary.Core.Entities;
 using System.Data.SqlClient;
 
-namespace DataAccessLibrary.Managers
+namespace JobAgentClassLibrary.Core.Database.Managers
 {
     public class SqlDbManager : ISqlDbManager
     {
