@@ -1,6 +1,10 @@
-﻿using JobAgentClassLibrary.Loggings.Entities;
+﻿using JobAgentClassLibrary.Core.Database.Managers;
+using JobAgentClassLibrary.Core.Entities;
+using JobAgentClassLibrary.Loggings.Entities;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,29 +13,225 @@ namespace JobAgentClassLibrary.Loggings.Repositories
 {
     public class LogRepository : ILoggingRepository
     {
-        public Task<ILog> CreateAsync(ILog entity)
+        private readonly ISqlDbManager _sqlDbManager;
+
+        public LogRepository(ISqlDbManager sqlDbManager)
         {
-            throw new NotImplementedException();
+            _sqlDbManager = sqlDbManager;
         }
 
-        public Task<List<ILog>> GetAllAsync(ILog entity)
+
+        public async Task<ILog> CreateAsync(ILog entity)
         {
-            throw new NotImplementedException();
+            int entityId = 0;
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            {
+                var values = new SqlParameter[]
+                {
+                    new SqlParameter("@id", entity.Id),
+                    new SqlParameter("@logSeverityId", entity.LogSeverity),
+                    new SqlParameter("@createdDateTime", entity.CreatedDateTime),
+                    new SqlParameter("@createdBy", entity.CreatedBy),
+                    new SqlParameter("@action", entity.Action),
+                    new SqlParameter("@message", entity.Message)
+                };
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spCreateLog]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddRange(values);
+
+                    try
+                    {
+                        await conn.OpenAsync();
+
+                        entityId = (int)await cmd.ExecuteScalarAsync();
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            if (entityId != 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
+
+            return null;
         }
 
-        public Task<ILog> GetByIdAsync(int id)
+        public async Task<List<ILog>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            List<ILog> logs = new();
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spGetLogs]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    try
+                    {
+                        using (var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            if (!reader.HasRows) return null;
+
+                            while (await reader.ReadAsync())
+                            {
+                                var log = new DbLog
+                                {
+                                    Id = reader.GetInt32(0),
+                                    LogSeverity = (LogSeverity)reader.GetInt32(1),
+                                    CreatedDateTime = reader.GetDateTime(2),
+                                    CreatedBy = reader.GetString(3),
+                                    Action = reader.GetString(4),
+                                    Message = reader.GetString(5)
+
+                                };
+                                logs.Add(log);
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return logs;
         }
 
-        public Task<bool> RemoveAsync(ILog entity)
+        public async Task<ILog> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            ILog log = null;
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            {
+                var values = new SqlParameter[]
+                {
+                        new SqlParameter("@id", id)
+                };
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spGetLogById]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddRange(values);
+
+                    try
+                    {
+                        using (var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            if (!reader.HasRows) return null;
+
+                            while (await reader.ReadAsync())
+                            {
+                                log = new DbLog()
+                                {
+                                    Id = reader.GetInt32(0),
+                                    LogSeverity = (LogSeverity)reader.GetInt32(1),
+                                    CreatedDateTime = reader.GetDateTime(2),
+                                    CreatedBy = reader.GetString(3),
+                                    Action = reader.GetString(4),
+                                    Message = reader.GetString(5)
+                                };
+
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return log;
         }
 
-        public Task<ILog> UpdateAsync(ILog entity)
+        public async Task<bool> RemoveAsync(ILog entity)
         {
-            throw new NotImplementedException();
+            int entityId = 0;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
+            {
+                var values = new SqlParameter[]
+                {
+                        new SqlParameter("@id", entity.Id)
+                };
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spDeleteLog]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddRange(values);
+
+                    try
+                    {
+                        await conn.OpenAsync();
+
+                        entityId = (int)await cmd.ExecuteScalarAsync();
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            if (entityId != 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<ILog> UpdateAsync(ILog entity)
+        {
+            int entityId = 0;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
+            {
+                var values = new SqlParameter[]
+                {
+                   new SqlParameter("@id", entity.Id),
+                    new SqlParameter("@logSeverityId", entity.LogSeverity),
+                    new SqlParameter("@createdDateTime", entity.CreatedDateTime),
+                    new SqlParameter("@createdBy", entity.CreatedBy),
+                    new SqlParameter("@action", entity.Action),
+                    new SqlParameter("@message", entity.Message)
+                };
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spUpdateLog]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddRange(values);
+
+                    try
+                    {
+                        await conn.OpenAsync();
+
+                        entityId = (int)await cmd.ExecuteScalarAsync();
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            if (entityId != 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
+
+            return null;
         }
     }
 }
