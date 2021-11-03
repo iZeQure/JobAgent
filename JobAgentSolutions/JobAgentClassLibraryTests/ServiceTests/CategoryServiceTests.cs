@@ -17,7 +17,7 @@ namespace JobAgentClassLibraryTests.ServiceTests
         }
 
         [Test]
-        public async Task GetAllAsync_GetData_ShouldProvideWithPopulatedCollection()
+        public async Task GetAllAsync_GetData_ShouldReturnPopulatedCollection()
         {
             // Arrange
             int collectionCount = 0;
