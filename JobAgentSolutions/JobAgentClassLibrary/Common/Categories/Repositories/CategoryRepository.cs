@@ -39,7 +39,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
                     {
                         await conn.OpenAsync();
 
-                        entityId = (int)await cmd.ExecuteScalarAsync();
+                        entityId = int.Parse((await cmd.ExecuteScalarAsync()).ToString());
                     }
                     catch (Exception)
                     {
@@ -69,6 +69,8 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
 
                     try
                     {
+                        await conn.OpenAsync();
+
                         using (var reader = await cmd.ExecuteReaderAsync())
                         {
                             if (!reader.HasRows) return null;
@@ -110,6 +112,8 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
 
                     try
                     {
+                        await conn.OpenAsync();
+
                         using (var reader = await cmd.ExecuteReaderAsync())
                         {
                             if (!reader.HasRows) return null;
@@ -190,7 +194,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
                     {
                         await conn.OpenAsync();
 
-                        entityId = (int)await cmd.ExecuteScalarAsync();
+                        entityId = int.Parse((await cmd.ExecuteScalarAsync()).ToString());
                     }
                     catch (Exception)
                     {

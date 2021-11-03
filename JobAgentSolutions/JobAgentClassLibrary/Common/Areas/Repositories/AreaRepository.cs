@@ -1,4 +1,5 @@
-﻿using JobAgentClassLibrary.Common.Areas.Entities;
+﻿using Dapper;
+using JobAgentClassLibrary.Common.Areas.Entities;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
 using System;
@@ -24,28 +25,30 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
             int entityId = 0;
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
             {
+                string proc = "[JA.spCreateArea]";
                 var values = new SqlParameter[]
                 {
                     new SqlParameter("@name", entity.Name)
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spCreateArea]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
+                //using (var cmd = conn.CreateCommand())
+                //{
+                //    cmd.CommandText = 
+                //    cmd.CommandType = CommandType.StoredProcedure;
+                //    cmd.Parameters.AddRange(values);
 
-                    try
-                    {
-                        await conn.OpenAsync();
+                //    try
+                //    {
+                //        await conn.OpenAsync();
 
-                        entityId = (int)await cmd.ExecuteScalarAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                //        entityId = (int)await cmd.ExecuteScalarAsync();
+                //    }
+                //    catch (Exception)
+                //    {
+                //        throw;
+                //    }
+                //}
             }
 
             if (entityId != 0)

@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using Dapper;
+using Dapper.Contrib.Extensions;
 
 namespace JobAgentClassLibrary.Common.Categories.Repositories
 {
@@ -24,6 +26,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
             {
+                string proc = "[JA.spCreateSpecialization]";
                 var values = new SqlParameter[]
                 {
                     new SqlParameter("@id", entity.Id),
@@ -31,26 +34,31 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
                     new SqlParameter("@SpecializationName", entity.Name)
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spCreateSpecialization]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
+                await conn.OpenAsync();
 
-                    try
-                    {
-                        await conn.OpenAsync();
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
 
-                        entityId = (int)await cmd.ExecuteScalarAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                //using (var cmd = conn.CreateCommand())
+                //{
+                //    cmd.CommandText = "[JA.spCreateSpecialization]";
+                //    cmd.CommandType = CommandType.StoredProcedure;
+                //    cmd.Parameters.AddRange(values);
+
+                //    try
+                //    {
+                //        await conn.OpenAsync();
+
+                //        entityId = await conn.Ex.ExecuteScalarAsync<int>();
+                //        entityId = (int)await cmd.ExecuteScalarAsync();
+                //    }
+                //    catch (Exception)
+                //    {
+                //        throw;
+                //    }
+                //}
             }
 
-            if (entityId != 0)
+            if (entityId > 0)
             {
                 return await GetByIdAsync(entityId);
             }
@@ -71,6 +79,8 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
 
                     try
                     {
+                        await conn.OpenAsync();
+
                         using (var reader = await cmd.ExecuteReaderAsync())
                         {
                             if (!reader.HasRows) return null;
@@ -113,6 +123,8 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
 
                     try
                     {
+                        await conn.OpenAsync();
+
                         using (var reader = await cmd.ExecuteReaderAsync())
                         {
                             if (!reader.HasRows) return null;
