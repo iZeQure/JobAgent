@@ -1,35 +1,223 @@
 ﻿using JobAgentClassLibrary.Common.VacantJobs.Entities;
+using JobAgentClassLibrary.Core.Database.Managers;
+using JobAgentClassLibrary.Core.Entities;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
 {
     public class VacantJobRepository : IVacantJobRepository
     {
-        public Task<IVacantJob> CreateAsync(IVacantJob entity)
+        private readonly ISqlDbManager _sqlDbManager;
+
+        public VacantJobRepository(ISqlDbManager sqlDbManager)
         {
-            throw new NotImplementedException();
+            _sqlDbManager = sqlDbManager;
         }
 
-        public Task<List<IVacantJob>> GetAllAsync(IVacantJob entity)
+
+        public async Task<IVacantJob> CreateAsync(IVacantJob entity)
         {
-            throw new NotImplementedException();
+            int entityId = 0;
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            {
+                var values = new SqlParameter[]
+                {
+                    new SqlParameter("@id", entity.Id),
+                    new SqlParameter("@companyId", entity.CompanyId),
+                    new SqlParameter("@vacantJobUrl", entity.URL)
+                };
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spCreateVacantJob]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddRange(values);
+
+                    try
+                    {
+                        await conn.OpenAsync();
+
+                        entityId = (int)await cmd.ExecuteScalarAsync();
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            if (entityId != 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
+
+            return null;
         }
 
-        public Task<IVacantJob> GetByIdAsync(int id)
+        public async Task<List<IVacantJob>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            List<IVacantJob> vacantJobs = new();
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spGetVacantJobs]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    try
+                    {
+                        using (var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            if (!reader.HasRows) return null;
+
+                            while (await reader.ReadAsync())
+                            {
+                                var vacantJob = new VacantJob
+                                {
+                                    Id = reader.GetInt32(0),
+                                    URL = reader.GetString(1),
+                                    CompanyId = reader.GetInt32(2)
+                                };
+
+                                vacantJobs.Add(vacantJob);
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return vacantJobs;
         }
 
-        public Task<bool> RemoveAsync(IVacantJob entity)
+        public async Task<IVacantJob> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            IVacantJob vacantJob = null;
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            {
+                var values = new SqlParameter[]
+                {
+                        new SqlParameter("@id", id)
+                };
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spGetVacantJobById]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddRange(values);
+
+                    try
+                    {
+                        using (var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            if (!reader.HasRows) return null;
+
+                            while (await reader.ReadAsync())
+                            {
+                                vacantJob = new VacantJob()
+                                {
+                                    Id = reader.GetInt32(0),
+                                    URL = reader.GetString(1),
+                                    CompanyId = reader.GetInt32(2)
+                                };
+
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return vacantJob;
         }
 
-        public Task<IVacantJob> UpdateAsync(IVacantJob entity)
+        public async Task<bool> RemoveAsync(IVacantJob entity)
         {
-            throw new NotImplementedException();
+            int entityId = 0;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
+            {
+                var values = new SqlParameter[]
+                {
+                        new SqlParameter("@id", entity.Id)
+                };
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spDeleteVacantJob]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddRange(values);
+
+                    try
+                    {
+                        await conn.OpenAsync();
+
+                        entityId = (int)await cmd.ExecuteScalarAsync();
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            if (entityId != 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<IVacantJob> UpdateAsync(IVacantJob entity)
+        {
+            int entityId = 0;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
+            {
+                var values = new SqlParameter[]
+                {
+                    new SqlParameter("@id", entity.Id),
+                    new SqlParameter("@companyId", entity.CompanyId),
+                    new SqlParameter("@vacantJobUrl", entity.URL)
+                };
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spUpdateVacantJob]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddRange(values);
+
+                    try
+                    {
+                        await conn.OpenAsync();
+
+                        entityId = (int)await cmd.ExecuteScalarAsync();
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            if (entityId != 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
+
+            return null;
         }
     }
 }
