@@ -1,6 +1,6 @@
 ﻿namespace JobAgentClassLibrary.Common.Filters.Entities
 {
-    public class DynamicSeachFilter : IDynamicSearchFilter
+    public class DynamicSearchFilter : IDynamicSearchFilter
     {
         public int CategoryId { get; set; }
 
