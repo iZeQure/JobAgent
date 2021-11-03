@@ -9,7 +9,7 @@ namespace JobAgentClassLibrary.Common.Areas
     {
         private readonly IAreaRepository _repository;
 
-        public AreaService(IAreaRepository repository = null)
+        public AreaService(IAreaRepository repository)
         {
             _repository = repository;
         }
