@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Dapper.Contrib.Extensions;
 using JobAgentClassLibrary.Common.Areas.Entities;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.Areas.Repositories
@@ -32,23 +34,6 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
                 };
 
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
-                //using (var cmd = conn.CreateCommand())
-                //{
-                //    cmd.CommandText = 
-                //    cmd.CommandType = CommandType.StoredProcedure;
-                //    cmd.Parameters.AddRange(values);
-
-                //    try
-                //    {
-                //        await conn.OpenAsync();
-
-                //        entityId = (int)await cmd.ExecuteScalarAsync();
-                //    }
-                //    catch (Exception)
-                //    {
-                //        throw;
-                //    }
-                //}
             }
 
             if (entityId != 0)
@@ -66,37 +51,41 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
+                string proc = "[JA.spGetAreas]";
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spGetAreas]";
-                    cmd.CommandType = CommandType.StoredProcedure;
+                var queryResult = await conn.QueryAsync<Area>(proc, commandType: CommandType.StoredProcedure);
 
-                    try
-                    {
-                        await conn.OpenAsync();
+                areas = queryResult.Cast<IArea>().ToList();
+                //using (var cmd = conn.CreateCommand())
+                //{
+                //    cmd.CommandText = "[JA.spGetAreas]";
+                //    cmd.CommandType = CommandType.StoredProcedure;
 
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
+                //    try
+                //    {
+                //        await conn.OpenAsync();
 
-                            while (await reader.ReadAsync())
-                            {
-                                var area = new Area
-                                {
-                                    Id = reader.GetInt32(0),
-                                    Name = reader.GetString(1)
-                                };
+                //        using (var reader = await cmd.ExecuteReaderAsync())
+                //        {
+                //            if (!reader.HasRows) return null;
 
-                                areas.Add(area);
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                //            while (await reader.ReadAsync())
+                //            {
+                //                var area = new Area
+                //                {
+                //                    Id = reader.GetInt32(0),
+                //                    Name = reader.GetString(1)
+                //                };
+
+                //                areas.Add(area);
+                //            }
+                //        }
+                //    }
+                //    catch (Exception)
+                //    {
+                //        throw;
+                //    }
+                //}
 
             }
 
