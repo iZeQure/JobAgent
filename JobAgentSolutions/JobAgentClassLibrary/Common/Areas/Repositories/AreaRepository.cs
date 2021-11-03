@@ -59,7 +59,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
 
         public async Task<List<IArea>> GetAllAsync()
         {
-            List<IArea> categories = new();
+            List<IArea> areas = new();
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
@@ -76,13 +76,13 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
 
                             while (await reader.ReadAsync())
                             {
-                                var category = new Area
+                                var area = new Area
                                 {
                                     Id = reader.GetInt32(0),
                                     Name = reader.GetString(1)
                                 };
 
-                                categories.Add(category);
+                                areas.Add(area);
                             }
                         }
                     }
@@ -94,13 +94,13 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
 
             }
 
-            return categories;
+            return areas;
         }
 
 
         public async Task<IArea> GetByIdAsync(int id)
         {
-            Area area = new Area();
+            IArea area = null;
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
                 var values = new SqlParameter[]
@@ -122,7 +122,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
 
                             while (await reader.ReadAsync())
                             {
-                                area = new()
+                                area = new Area()
                                 {
                                     Id = reader.GetInt32(0),
                                     Name = reader.GetString(1)
