@@ -1,35 +1,211 @@
 ﻿using JobAgentClassLibrary.Common.Locations.Entities;
+using JobAgentClassLibrary.Core.Database.Managers;
+using JobAgentClassLibrary.Core.Entities;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.Locations.Repositories
 {
     public class LocationRepository : ILocationRepository
     {
-        public Task<ILocation> CreateAsync(ILocation entity)
+        private readonly ISqlDbManager _sqlDbManager;
+
+        public LocationRepository(ISqlDbManager sqlDbManager)
         {
-            throw new NotImplementedException();
+            _sqlDbManager = sqlDbManager;
         }
 
-        public Task<List<ILocation>> GetAllAsync(ILocation entity)
+        public async Task<ILocation> CreateAsync(ILocation entity)
         {
-            throw new NotImplementedException();
+            int entityId = 0;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            {
+                var values = new SqlParameter[]
+                {
+                    new SqlParameter("@id", entity.Id),
+                    new SqlParameter("@locationName", entity.Name)
+                };
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spCreateLocation]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddRange(values);
+
+                    try
+                    {
+                        await conn.OpenAsync();
+
+                        entityId = (int)await cmd.ExecuteScalarAsync();
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            if (entityId != 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
+
+            return null;
         }
 
-        public Task<ILocation> GetByIdAsync(int id)
+        public async Task<List<ILocation>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            List<ILocation> locations = new();
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spGetLocations]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    try
+                    {
+                        using (var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            if (!reader.HasRows) return null;
+
+                            while (await reader.ReadAsync())
+                            {
+                                var location = new Location
+                                {
+                                    Id = reader.GetInt32(0),
+                                    Name = reader.GetString(1)
+                                };
+
+                                locations.Add(location);
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return locations;
         }
 
-        public Task<bool> RemoveAsync(ILocation entity)
+        public async Task<ILocation> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            ILocation location = null;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spGetLocationById]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    try
+                    {
+                        using (var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            if (!reader.HasRows) return null;
+
+                            while (await reader.ReadAsync())
+                            {
+                                location = new Location
+                                {
+                                    Id = reader.GetInt32(0),
+                                    Name = reader.GetString(1)
+                                };
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+
+            }
+
+            return location;
         }
 
-        public Task<ILocation> UpdateAsync(ILocation entity)
+        public async Task<bool> RemoveAsync(ILocation entity)
         {
-            throw new NotImplementedException();
+            bool isDeleted = false;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
+            {
+                var values = new SqlParameter[]
+                {
+                    new SqlParameter("@id", entity.Id)
+                };
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spRemoveLocation]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddRange(values);
+
+                    try
+                    {
+                        await conn.OpenAsync();
+
+                        isDeleted = (await cmd.ExecuteNonQueryAsync()) == 1;
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return isDeleted;
+        }
+
+        public async Task<ILocation> UpdateAsync(ILocation entity)
+        {
+            int entityId = 0;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
+            {
+                var values = new SqlParameter[]
+                {
+                    new SqlParameter("@id", entity.Id),
+                    new SqlParameter("@locationName", entity.Name)
+                };
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "[JA.spUpdateLocation]";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddRange(values);
+
+                    try
+                    {
+                        await conn.OpenAsync();
+
+                        entityId = (int)await cmd.ExecuteScalarAsync();
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            if (entityId != 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
+
+            return null;
         }
     }
 }
