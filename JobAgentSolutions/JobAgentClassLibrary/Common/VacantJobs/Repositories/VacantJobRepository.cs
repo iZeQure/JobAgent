@@ -41,7 +41,8 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
                     {
                         await conn.OpenAsync();
 
-                        entityId = (int)await cmd.ExecuteScalarAsync();
+                        var execResult = (await cmd.ExecuteScalarAsync()).ToString();
+                        entityId = int.Parse(execResult);
                     }
                     catch (Exception)
                     {
@@ -71,6 +72,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
 
                     try
                     {
+                        await conn.OpenAsync();
                         using (var reader = await cmd.ExecuteReaderAsync())
                         {
                             if (!reader.HasRows) return null;
@@ -116,6 +118,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
 
                     try
                     {
+                        await conn.OpenAsync();
                         using (var reader = await cmd.ExecuteReaderAsync())
                         {
                             if (!reader.HasRows) return null;
@@ -163,7 +166,8 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
                     {
                         await conn.OpenAsync();
 
-                        entityId = (int)await cmd.ExecuteScalarAsync();
+                        var execResult = (await cmd.ExecuteScalarAsync()).ToString();
+                        entityId = int.Parse(execResult);
                     }
                     catch (Exception)
                     {
@@ -203,7 +207,8 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
                     {
                         await conn.OpenAsync();
 
-                        entityId = (int)await cmd.ExecuteScalarAsync();
+                        var procResult = (await cmd.ExecuteScalarAsync()).ToString();
+                        entityId = int.Parse(procResult);
                     }
                     catch (Exception)
                     {
@@ -212,7 +217,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
                 }
             }
 
-            if (entityId != 0)
+            if (entityId >= 0)
             {
                 return await GetByIdAsync(entityId);
             }
