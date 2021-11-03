@@ -35,8 +35,9 @@ namespace JobAgentClassLibraryTests.RepositoryTests
 
             List<IArea> areaList = await areaRepository.GetAllAsync();
 
-            if (areaList.Count() != 0 && areaList != null)
+            if (areaList is not null && areaList!.Any())
             {
+                IArea lol = areaList.FirstOrDefault();
                 actual = true;
             }
 

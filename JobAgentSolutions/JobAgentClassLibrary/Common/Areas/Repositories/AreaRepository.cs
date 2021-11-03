@@ -53,7 +53,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
             {
                 string proc = "[JA.spGetAreas]";
 
-                var queryResult = await conn.QueryAsync<Area>(proc, commandType: CommandType.StoredProcedure);
+                var queryResult = await conn.QueryAsync<AreaInformation>(proc, commandType: CommandType.StoredProcedure);
 
                 areas = queryResult.Cast<IArea>().ToList();
                 //using (var cmd = conn.CreateCommand())
