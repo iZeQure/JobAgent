@@ -115,7 +115,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
 
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "[JA.spGetStaticSearchFilterById]";
+                    cmd.CommandText = "[JA.spGetDynamicSearchFilterById]";
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddRange(values);
 
