@@ -40,8 +40,8 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
                         await conn.OpenAsync();
 
                         //entityId = (int)await cmd.ExecuteScalarAsync();
-                        var test = (await cmd.ExecuteScalarAsync()).ToString();
-                        entityId = int.Parse(test);
+                        var execResult = (await cmd.ExecuteScalarAsync()).ToString();
+                        entityId = int.Parse(execResult);
                     }
                     catch (Exception)
                     {
@@ -169,8 +169,8 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
                     {
                         await conn.OpenAsync();
 
-                        var procResult = (await cmd.ExecuteScalarAsync()).ToString();
-                        entityId = int.Parse(procResult);
+                        var execResult = (await cmd.ExecuteScalarAsync()).ToString();
+                        entityId = int.Parse(execResult);
                     }
                     catch (Exception)
                     {
