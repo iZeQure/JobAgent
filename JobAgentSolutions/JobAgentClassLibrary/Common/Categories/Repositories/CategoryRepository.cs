@@ -69,6 +69,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
 
                     try
                     {
+                        await conn.OpenAsync();
                         using (var reader = await cmd.ExecuteReaderAsync())
                         {
                             if (!reader.HasRows) return null;

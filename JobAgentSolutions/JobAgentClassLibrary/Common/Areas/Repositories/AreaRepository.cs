@@ -26,7 +26,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
             {
                 var values = new SqlParameter[]
                 {
-                    new SqlParameter("@name", entity.Name)
+                    new SqlParameter("@areaName", entity.Name)
                 };
 
                 using (var cmd = conn.CreateCommand())
@@ -39,7 +39,9 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
                     {
                         await conn.OpenAsync();
 
-                        entityId = (int)await cmd.ExecuteScalarAsync();
+                        //entityId = (int)await cmd.ExecuteScalarAsync();
+                        var test = (await cmd.ExecuteScalarAsync()).ToString();
+                        entityId = int.Parse(test);
                     }
                     catch (Exception)
                     {
@@ -63,6 +65,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
+
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = "[JA.spGetAreas]";
@@ -70,6 +73,8 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
 
                     try
                     {
+                        await conn.OpenAsync();
+
                         using (var reader = await cmd.ExecuteReaderAsync())
                         {
                             if (!reader.HasRows) return null;
@@ -105,7 +110,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
             {
                 var values = new SqlParameter[]
                 {
-                        new SqlParameter("@id", id)
+                        new SqlParameter("@areaId", id)
                 };
 
                 using (var cmd = conn.CreateCommand())
@@ -116,6 +121,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
 
                     try
                     {
+                        await conn.OpenAsync();
                         using (var reader = await cmd.ExecuteReaderAsync())
                         {
                             if (!reader.HasRows) return null;
@@ -150,12 +156,12 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
             {
                 var values = new SqlParameter[]
                 {
-                        new SqlParameter("@id", entity.Id)
+                        new SqlParameter("@areaId", entity.Id)
                 };
 
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "[JA.spDeleteArea]";
+                    cmd.CommandText = "[JA.spRemoveArea]";
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddRange(values);
 
@@ -163,7 +169,8 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
                     {
                         await conn.OpenAsync();
 
-                        entityId = (int)await cmd.ExecuteScalarAsync();
+                        var procResult = (await cmd.ExecuteScalarAsync()).ToString();
+                        entityId = int.Parse(procResult);
                     }
                     catch (Exception)
                     {
@@ -183,15 +190,14 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
 
         public async Task<IArea> UpdateAsync(IArea entity)
         {
-
             int entityId = 0;
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
             {
                 var values = new SqlParameter[]
                 {
-                        new SqlParameter("@id", entity.Id),
-                        new SqlParameter("@name", entity.Name)
+                        new SqlParameter("@areaId", entity.Id),
+                        new SqlParameter("@areaName", entity.Name)
                 };
 
                 using (var cmd = conn.CreateCommand())
@@ -204,7 +210,9 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
                     {
                         await conn.OpenAsync();
 
-                        entityId = (int)await cmd.ExecuteScalarAsync();
+                        var procResult = (await cmd.ExecuteScalarAsync()).ToString();
+                        entityId = int.Parse(procResult);
+
                     }
                     catch (Exception)
                     {
@@ -213,7 +221,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
                 }
             }
 
-            if (entityId != 0)
+            if (entityId >= 0)
             {
                 return await GetByIdAsync(entityId);
             }
