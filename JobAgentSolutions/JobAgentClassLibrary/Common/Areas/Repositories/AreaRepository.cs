@@ -26,10 +26,11 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
             {
                 string proc = "[JA.spCreateArea]";
-                var values = new SqlParameter[]
+                var values = new
                 {
-                    new SqlParameter("@areaName", entity.Name)
+                    @areaName = entity.Name
                 };
+
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
                 //using (var cmd = conn.CreateCommand())
                 //{
