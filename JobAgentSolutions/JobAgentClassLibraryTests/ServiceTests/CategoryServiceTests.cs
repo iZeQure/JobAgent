@@ -17,11 +17,21 @@ namespace JobAgentClassLibraryTests.ServiceTests
         }
 
         [Test]
-        public async Task TestMoq()
+        public async Task GetAllAsync_GetData_ShouldProvideWithPopulatedCollection()
         {
-            var categories = await _moqRepository.GetAllAsync();
+            // Arrange
+            int collectionCount = 0;
 
+            // Act
+            var categories = await _moqRepository.GetAllAsync();
+            AsyncTestDelegate getAllAction = async () 
+                => await _moqRepository.GetAllAsync();
+
+            // Assert
             Assert.IsNotNull(categories);
+            Assert.IsNotEmpty(categories);
+            Assert.Greater(collectionCount, categories.Count);
+            Assert.DoesNotThrowAsync(getAllAction);
         }
     }
 }
