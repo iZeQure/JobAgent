@@ -101,7 +101,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
 
         public async Task<IStaticSearchFilter> GetByIdAsync(int id)
         {
-            StaticSearchFilter staticSearchFilter = new();
+            StaticSearchFilter staticSearchFilter = null;
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
                 var values = new SqlParameter[]

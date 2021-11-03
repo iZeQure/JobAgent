@@ -105,7 +105,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
 
         public async Task<IDynamicSearchFilter> GetByIdAsync(int id)
         {
-            DynamicSearchFilter dynamincSearchFilter = new();
+            DynamicSearchFilter dynamincSearchFilter = null;
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
                 var values = new SqlParameter[]
