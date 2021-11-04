@@ -63,12 +63,14 @@ namespace JobAgentClassLibraryTests.RepositoryTests
 
             //Act
             actual = await _areaRepository.CreateAsync(expected);
+            bool cleanUpAreaTest = await _areaRepository.RemoveAsync(actual);
 
             //Assert
             Assert.IsNotNull(actual);
             Assert.IsNotEmpty(actual.Name);
             Assert.AreNotEqual(expected.Id, actual.Id);
             Assert.AreEqual(expected.Name, actual.Name);
+            Assert.IsTrue(cleanUpAreaTest);
         }
 
 
