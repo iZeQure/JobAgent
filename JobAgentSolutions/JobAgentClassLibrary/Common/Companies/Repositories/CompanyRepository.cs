@@ -1,4 +1,5 @@
-﻿using JobAgentClassLibrary.Common.Companies.Entities;
+﻿using Dapper;
+using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
 using System;
@@ -24,30 +25,16 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
             int entityId = 0;
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
             {
-                var values = new SqlParameter[]
+                string proc = "[JA.spCreateCompany]";
+
+                var values = new
                 {
-                    new SqlParameter("@companyCVR", entity.CVR),
-                    new SqlParameter("@companyName", entity.Name),
-                    new SqlParameter("@contactPerson", entity.ContactPerson)
+                    @companyCVR = entity.Id,
+                    @companyName = entity.Name,
+                    @contactPerson = entity.ContactPerson
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spCreateCompany]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = (int)await cmd.ExecuteScalarAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
             if (entityId != 0)

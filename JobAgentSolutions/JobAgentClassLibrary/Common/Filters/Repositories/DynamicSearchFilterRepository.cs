@@ -1,4 +1,5 @@
-﻿using JobAgentClassLibrary.Common.Filters.Entities;
+﻿using Dapper;
+using JobAgentClassLibrary.Common.Filters.Entities;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
 using System;
@@ -24,31 +25,17 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
             int entityId = 0;
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
             {
-                var values = new SqlParameter[]
+                string proc = "[JA.spCreateDynamicSearchFilter]";
+
+                var values = new
                 {
-                    new SqlParameter("@id", entity.Id),
-                    new SqlParameter("@categoryId", entity.CategoryId),
-                    new SqlParameter("@specializationId", entity.SpecializationId),
-                    new SqlParameter("@key", entity.Key)
+                    @id = entity.Id,
+                    @categoryId = entity.CategoryId,
+                    @specializationId = entity.SpecializationId,
+                    @key = entity.Key
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spCreateDynamicSearchFilter]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = (int)await cmd.ExecuteScalarAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
             if (entityId != 0)

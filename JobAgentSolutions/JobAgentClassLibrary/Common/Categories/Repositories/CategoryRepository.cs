@@ -202,7 +202,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
                 }
             }
 
-            if (entityId != 0)
+            if (entityId >= 0)
             {
                 return await GetByIdAsync(entityId);
             }

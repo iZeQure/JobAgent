@@ -207,7 +207,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
                     {
                         await conn.OpenAsync();
 
-                        entityId = (int)await cmd.ExecuteScalarAsync();
+                        entityId = int.Parse((await cmd.ExecuteScalarAsync()).ToString());
                     }
                     catch (Exception)
                     {
@@ -216,7 +216,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
                 }
             }
 
-            if (entityId != 0)
+            if (entityId >= 0)
             {
                 return await GetByIdAsync(entityId);
             }

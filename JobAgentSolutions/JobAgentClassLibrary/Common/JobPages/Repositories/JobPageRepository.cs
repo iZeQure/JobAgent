@@ -1,4 +1,5 @@
-﻿using JobAgentClassLibrary.Common.JobPages.Entities;
+﻿using Dapper;
+using JobAgentClassLibrary.Common.JobPages.Entities;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
 using System;
@@ -21,33 +22,18 @@ namespace JobAgentClassLibrary.Common.JobPages.Repositories
         public async Task<IJobPage> CreateAsync(IJobPage entity)
         {
             int entityId = 0;
-
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
             {
-                var values = new SqlParameter[]
+                string proc = "[JA.spCreateJobPage]";
+                
+                var values = new
                 {
-                    new SqlParameter("@jobPageId", entity.Id),
-                    new SqlParameter("@companyId", entity.CompanyId),
-                    new SqlParameter("@jobPageUrl", entity.URL)
+                    @jobPageId = entity.Id,
+                    @companyId = entity.CompanyId,
+                    @jobPageUrl = entity.URL
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spCreateJobPage]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = (int)await cmd.ExecuteScalarAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
             if (entityId != 0)
@@ -194,7 +180,7 @@ namespace JobAgentClassLibrary.Common.JobPages.Repositories
                     {
                         await conn.OpenAsync();
 
-                        entityId = (int)await cmd.ExecuteScalarAsync();
+                        entityId = int.Parse((await cmd.ExecuteScalarAsync()).ToString());
                     }
                     catch (Exception)
                     {
@@ -203,7 +189,7 @@ namespace JobAgentClassLibrary.Common.JobPages.Repositories
                 }
             }
 
-            if (entityId != 0)
+            if (entityId >= 0)
             {
                 return await GetByIdAsync(entityId);
             }

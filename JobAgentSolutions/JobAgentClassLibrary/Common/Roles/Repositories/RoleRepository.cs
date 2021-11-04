@@ -1,4 +1,5 @@
-﻿using JobAgentClassLibrary.Common.Roles.Entities;
+﻿using Dapper;
+using JobAgentClassLibrary.Common.Roles.Entities;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
 using System;
@@ -21,33 +22,18 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
         public async Task<IRole> CreateAsync(IRole entity)
         {
             int entityId = 0;
-
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
             {
-                var values = new SqlParameter[]
+                string proc = "[JA.spCreateRole]";
+
+                var values = new
                 {
-                    new SqlParameter("@id", entity.Id),
-                    new SqlParameter("@roleName", entity.Name),
-                    new SqlParameter("@roleDescription", entity.Description)
+                    @roleId = entity.Id,
+                    @roleName = entity.Name,
+                    @roleDescription = entity.Description
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spCreateRole]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = (int)await cmd.ExecuteScalarAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
             if (entityId != 0)
@@ -194,7 +180,7 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
                     {
                         await conn.OpenAsync();
 
-                        entityId = (int)await cmd.ExecuteScalarAsync();
+                        entityId = int.Parse((await cmd.ExecuteScalarAsync()).ToString());
                     }
                     catch (Exception)
                     {
@@ -203,7 +189,7 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
                 }
             }
 
-            if (entityId != 0)
+            if (entityId >= 0)
             {
                 return await GetByIdAsync(entityId);
             }

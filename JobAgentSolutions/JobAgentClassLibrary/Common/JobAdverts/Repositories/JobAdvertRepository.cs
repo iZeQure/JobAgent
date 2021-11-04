@@ -1,4 +1,5 @@
-﻿using JobAgentClassLibrary.Common.JobAdverts.Entities;
+﻿using Dapper;
+using JobAgentClassLibrary.Common.JobAdverts.Entities;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
 using System;
@@ -24,33 +25,19 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
             int entityId = 0;
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
             {
-                var values = new SqlParameter[]
+                string proc = "[JA.spCreateJobAdvert]";
+
+                var values = new
                 {
-                    new SqlParameter("@vacantJobId", entity.Id),
-                    new SqlParameter("@categoryId", entity.CategoryId),
-                    new SqlParameter("@specializationid", entity.SpecializationId),
-                    new SqlParameter("@jobAdvertTitle", entity.Title),
-                    new SqlParameter("@jobAdvertSummary", entity.Summary),
-                    new SqlParameter("@jobAdvertRegistrationDateTime", entity.RegistrationDateTime),
+                    @vacantJobId = entity.Id,
+                    @categoryId = entity.CategoryId,
+                    @specializationId = entity.SpecializationId,
+                    @jobAdvertTitlte = entity.Title,
+                    @jobAdvertSummary = entity.Summary,
+                    @jobAdvertRegistrationDateTime = entity.RegistrationDateTime
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spCreateJobAdvert]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = (int)await cmd.ExecuteScalarAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
             if (entityId != 0)

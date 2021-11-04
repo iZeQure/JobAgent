@@ -1,4 +1,5 @@
-﻿using JobAgentClassLibrary.Common.VacantJobs.Entities;
+﻿using Dapper;
+using JobAgentClassLibrary.Common.VacantJobs.Entities;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
 using System;
@@ -24,31 +25,16 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
             int entityId = 0;
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
             {
-                var values = new SqlParameter[]
+                string proc = "[JA.spCreateVacantJob]";
+
+                var values = new
                 {
-                    new SqlParameter("@id", entity.Id),
-                    new SqlParameter("@companyId", entity.CompanyId),
-                    new SqlParameter("@vacantJobUrl", entity.URL)
+                    @id = entity.Id,
+                    @companyId = entity.CompanyId,
+                    @vacantJobUrl = entity.URL
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spCreateVacantJob]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        var execResult = (await cmd.ExecuteScalarAsync()).ToString();
-                        entityId = int.Parse(execResult);
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
             if (entityId != 0)
@@ -166,8 +152,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
                     {
                         await conn.OpenAsync();
 
-                        var execResult = (await cmd.ExecuteScalarAsync()).ToString();
-                        entityId = int.Parse(execResult);
+                        entityId = int.Parse((await cmd.ExecuteScalarAsync()).ToString());
                     }
                     catch (Exception)
                     {
@@ -207,8 +192,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
                     {
                         await conn.OpenAsync();
 
-                        var procResult = (await cmd.ExecuteScalarAsync()).ToString();
-                        entityId = int.Parse(procResult);
+                        entityId = int.Parse((await cmd.ExecuteScalarAsync()).ToString());
                     }
                     catch (Exception)
                     {

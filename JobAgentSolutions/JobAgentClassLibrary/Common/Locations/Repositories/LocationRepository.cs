@@ -1,4 +1,5 @@
-﻿using JobAgentClassLibrary.Common.Locations.Entities;
+﻿using Dapper;
+using JobAgentClassLibrary.Common.Locations.Entities;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
 using System;
@@ -21,32 +22,17 @@ namespace JobAgentClassLibrary.Common.Locations.Repositories
         public async Task<ILocation> CreateAsync(ILocation entity)
         {
             int entityId = 0;
-
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
             {
-                var values = new SqlParameter[]
+                string proc = "[JA.spCreateLocation]";
+
+                var values = new
                 {
-                    new SqlParameter("@id", entity.Id),
-                    new SqlParameter("@locationName", entity.Name)
+                    @LocationId = entity.Id,
+                    @LocationName = entity.Name
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spCreateLocation]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = (int)await cmd.ExecuteScalarAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
             if (entityId != 0)
@@ -191,7 +177,7 @@ namespace JobAgentClassLibrary.Common.Locations.Repositories
                     {
                         await conn.OpenAsync();
 
-                        entityId = (int)await cmd.ExecuteScalarAsync();
+                        entityId = int.Parse((await cmd.ExecuteScalarAsync()).ToString());
                     }
                     catch (Exception)
                     {
@@ -200,7 +186,7 @@ namespace JobAgentClassLibrary.Common.Locations.Repositories
                 }
             }
 
-            if (entityId != 0)
+            if (entityId >= 0)
             {
                 return await GetByIdAsync(entityId);
             }
