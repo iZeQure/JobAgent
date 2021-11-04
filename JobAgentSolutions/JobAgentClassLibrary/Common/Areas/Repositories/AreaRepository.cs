@@ -109,13 +109,12 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
             {
                 var proc = "[JA.spRemoveArea]";
-                var values = new AreaInformation
+                var values = new
                 {
-                    AreaId = entity.Id,
-                    AreaName = entity.Name
+                    @areaId = entity.Id
                 };
 
-                isDeleted = await conn.DeleteAsync(values);
+                isDeleted = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure) >= 1);
             }
 
             return isDeleted;
