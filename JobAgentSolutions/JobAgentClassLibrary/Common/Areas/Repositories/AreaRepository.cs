@@ -1,13 +1,10 @@
 ﻿using Dapper;
-using Dapper.Contrib.Extensions;
 using JobAgentClassLibrary.Common.Areas.Entities;
 using JobAgentClassLibrary.Common.Areas.Entities.EntityMaps;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
-using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
