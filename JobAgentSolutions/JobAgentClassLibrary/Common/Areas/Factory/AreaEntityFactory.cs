@@ -1,4 +1,5 @@
-﻿using JobAgentClassLibrary.Common.Areas.Entities.EntityMaps;
+﻿using JobAgentClassLibrary.Common.Areas.Entities;
+using JobAgentClassLibrary.Common.Areas.Entities.EntityMaps;
 using JobAgentClassLibrary.Core.Factories;
 using JobAgentClassLibrary.Core.Repositories;
 using System;
