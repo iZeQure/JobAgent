@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using JobAgentClassLibrary.Common.Areas.Entities;
 using JobAgentClassLibrary.Common.Areas.Entities.EntityMaps;
+using JobAgentClassLibrary.Common.Areas.Factory;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
 using System.Collections.Generic;
@@ -13,10 +14,12 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
     public class AreaRepository : IAreaRepository
     {
         private readonly ISqlDbManager _sqlDbManager;
+        private readonly AreaEntityFactory _factory;
 
         public AreaRepository(ISqlDbManager sqlDbManager)
         {
             _sqlDbManager = sqlDbManager;
+            _factory = new AreaEntityFactory();
         }
 
 
@@ -25,7 +28,6 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
             int entityId = 0;
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
             {
-                await conn.OpenAsync();
                 string proc = "[JA.spCreateArea]";
                 var values = new
                 {
@@ -51,7 +53,6 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
                 string proc = "[JA.spGetAreas]";
-                //string cmdTxt = "SELECT * FROM [AreaInformation]";
 
                 var queryResult = await conn.QueryAsync<AreaInformation>(proc, commandType: CommandType.StoredProcedure);
 
@@ -59,11 +60,11 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
                 {
                     foreach (var result in queryResult)
                     {
-                        areas.Add(new Area
-                        {
-                            Id = result.Id,
-                            Name = result.Name
-                        });
+                        IArea area = (IArea)_factory.CreateEntity(
+                                nameof(Area),
+                                result.Id, result.Name);
+
+                        areas.Add(area);
                     }
                 }
             }
@@ -87,11 +88,9 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
 
                 if (queryResult is not null)
                 {
-                    area = new Area
-                    {
-                        Id = queryResult.Id,
-                        Name = queryResult.Name
-                    };
+                    area = (IArea)_factory.CreateEntity(
+                                nameof(Area),
+                                queryResult.Id, queryResult.Name);
                 }
             }
 
@@ -141,6 +140,5 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
 
             return null;
         }
-
     }
 }
