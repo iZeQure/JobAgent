@@ -114,7 +114,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
                     @areaId = entity.Id
                 };
 
-                isDeleted = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure) >= 1);
+                isDeleted = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
             }
 
             return isDeleted;
