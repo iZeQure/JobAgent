@@ -1,6 +1,6 @@
 ﻿using Dapper.Contrib.Extensions;
 
-namespace JobAgentClassLibrary.Common.Areas.Entities
+namespace JobAgentClassLibrary.Common.Areas.Entities.EntityMaps
 {
     [Table("AreaInformation")]
     public class AreaInformation : IArea
@@ -10,7 +10,7 @@ namespace JobAgentClassLibrary.Common.Areas.Entities
         public int Id => AreaId;
 
         [Key]
-        private int AreaId { get; set; }
-        private string AreaName { get; set; }
+        public int AreaId { get; set; }
+        public string AreaName { get; set; }
     }
 }

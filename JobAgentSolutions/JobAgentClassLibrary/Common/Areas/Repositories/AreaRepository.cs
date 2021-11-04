@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Dapper.Contrib.Extensions;
 using JobAgentClassLibrary.Common.Areas.Entities;
+using JobAgentClassLibrary.Common.Areas.Entities.EntityMaps;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
 using System;
@@ -27,6 +28,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
             int entityId = 0;
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
             {
+                await conn.OpenAsync();
                 string proc = "[JA.spCreateArea]";
                 var values = new
                 {
@@ -78,39 +80,21 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
             IArea area = null;
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spGetAreaById]";
+                var values = new
                 {
-                        new SqlParameter("@areaId", id)
+                    @areaId = id
                 };
 
-                using (var cmd = conn.CreateCommand())
+                var queryResult = await conn.QuerySingleOrDefaultAsync<AreaInformation>(proc, values, commandType: CommandType.StoredProcedure);
+
+                if (queryResult is not null)
                 {
-                    cmd.CommandText = "[JA.spGetAreaById]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
+                    area = new Area
                     {
-                        await conn.OpenAsync();
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
-
-                            while (await reader.ReadAsync())
-                            {
-                                area = new Area()
-                                {
-                                    Id = reader.GetInt32(0),
-                                    Name = reader.GetString(1)
-                                };
-
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                        Id = queryResult.Id,
+                        Name = queryResult.Name
+                    };
                 }
             }
 
@@ -120,41 +104,21 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
 
         public async Task<bool> RemoveAsync(IArea entity)
         {
-            int entityId = 0;
+            bool isDeleted = false;
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spRemoveArea]";
+                var values = new AreaInformation
                 {
-                        new SqlParameter("@areaId", entity.Id)
+                    AreaId = entity.Id,
+                    AreaName = entity.Name
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spRemoveArea]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        var execResult = (await cmd.ExecuteScalarAsync()).ToString();
-                        entityId = int.Parse(execResult);
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                isDeleted = await conn.DeleteAsync(values);
             }
 
-            if (entityId != 0)
-            {
-                return true;
-            }
-
-            return false;
+            return isDeleted;
         }
 
 
