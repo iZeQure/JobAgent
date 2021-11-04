@@ -53,13 +53,7 @@ namespace JobAgentClassLibraryTests.RepositoryTests
             IArea expected;
             IArea actual;
 
-            var rnd = new Random(DateTime.Now.GetHashCode());
-            string testAreaName = $"UnitTest{rnd.Next(3424, 458729)}";
-            expected = new Area
-            {
-                Id = 0,
-                Name = testAreaName
-            };
+            expected = CreateTestAreaObject();
 
             //Act
             actual = await _areaRepository.CreateAsync(expected);
@@ -73,22 +67,41 @@ namespace JobAgentClassLibraryTests.RepositoryTests
             Assert.IsTrue(cleanUpAreaTest);
         }
 
+        private static IArea CreateTestAreaObject()
+        {
+            IArea expected;
+            var rnd = new Random(DateTime.Now.GetHashCode());
+            string testAreaName = $"UnitTest{rnd.Next(3424, 458729)}";
+            expected = new Area
+            {
+                Id = 0,
+                Name = testAreaName
+            };
+            return expected;
+        }
 
         [Test]
         [Order(2)]
         public async Task GetByIdAsync_ReturnsAValidObject_IfArgumentIsValid()
         {
             //Arrange
+            IArea testArea;
             IArea requestedArea;
 
+            testArea = await _areaRepository.CreateAsync(CreateTestAreaObject());
+            
             //Act
             requestedArea = await _areaRepository.GetByIdAsync(testArea.Id);
+
+            //cleanup
+            bool cleanUpAreaTest = await _areaRepository.RemoveAsync(requestedArea);
 
             //Assert
             Assert.IsNotNull(requestedArea);
             Assert.IsNotNull(requestedArea.Id);
             Assert.AreNotEqual(0, requestedArea.Id);
-            Assert.AreEqual("Alabama", requestedArea.Name);
+            Assert.AreEqual(testArea.Name, requestedArea.Name);
+            Assert.IsTrue(cleanUpAreaTest);
         }
 
 
@@ -97,20 +110,29 @@ namespace JobAgentClassLibraryTests.RepositoryTests
         public async Task UpdateAsync_UpdatesExistingObject_IfArgumentsIsValid()
         {
             //Arrange
-            IArea updateArea;
-            string newName = "Texas";
+            IArea testArea;
+            IArea newArea;
+            IArea updatedArea;
 
-            IArea tempArea = new Area
+            testArea = await _areaRepository.CreateAsync(CreateTestAreaObject());
+
+            //Act
+            newArea = new Area
             {
                 Id = testArea.Id,
-                Name = newName
-            }; 
+                Name = CreateTestAreaObject().Name
+            };
             
-            updateArea = await _areaRepository.UpdateAsync(tempArea);
+            updatedArea = await _areaRepository.UpdateAsync(newArea);
+
+            //Cleanup
+            bool cleanUpAreaTest = await _areaRepository.RemoveAsync(updatedArea);
 
             //Assert
-            Assert.IsNotNull(updateArea);
-            Assert.AreEqual(newName, updateArea.Name);
+            Assert.IsNotNull(updatedArea);
+            Assert.IsNotNull(updatedArea.Name);
+            Assert.AreEqual(newArea.Name, updatedArea.Name);
+            Assert.IsTrue(cleanUpAreaTest);
         }
 
 
@@ -119,6 +141,8 @@ namespace JobAgentClassLibraryTests.RepositoryTests
         public async Task RemoveArea_ShouldRemoveArea()
         {
             //Arrange
+            IArea testArea;
+            testArea = await _areaRepository.CreateAsync(CreateTestAreaObject());
 
             //Act
             bool cleanupSuccess = await _areaRepository.RemoveAsync(testArea);
