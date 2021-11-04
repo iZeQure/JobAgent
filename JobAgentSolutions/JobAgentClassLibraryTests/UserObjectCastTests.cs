@@ -3,7 +3,7 @@ using JobAgentClassLibrary.Common.Roles.Entities;
 using JobAgentClassLibrary.Common.Users.Entities;
 using NUnit.Framework;
 
-namespace JobAgentClassLibraryTests.RepositoryTests
+namespace JobAgentClassLibraryTests
 {
     public class UserObjectCastTests
     {
