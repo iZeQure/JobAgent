@@ -1,10 +1,12 @@
-﻿using JobAgentClassLibrary.Common.Categories.Entities;
+﻿using Dapper;
+using JobAgentClassLibrary.Common.Categories.Entities;
+using JobAgentClassLibrary.Common.Categories.Entities.EntityMaps;
+using JobAgentClassLibrary.Common.Categories.Factory;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
-using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.Categories.Repositories
@@ -12,10 +14,12 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
     public class CategoryRepository : ICategoryRepository
     {
         private readonly ISqlDbManager _sqlDbManager;
+        private readonly CategoryEntityFactory _factory;
 
-        public CategoryRepository(ISqlDbManager sqlDbManager)
+        public CategoryRepository(ISqlDbManager sqlDbManager, CategoryEntityFactory factory)
         {
             _sqlDbManager = sqlDbManager;
+            _factory = factory;
         }
 
         public async Task<ICategory> CreateAsync(ICategory entity)
@@ -24,28 +28,13 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spCreateCategory]";
+                var values = new
                 {
-                    new SqlParameter("@name", entity.Name)
+                    @name = entity.Name
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spCreateCategory]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = int.Parse((await cmd.ExecuteScalarAsync()).ToString());
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
             if (entityId != 0)
@@ -62,33 +51,17 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                using (var cmd = conn.CreateCommand())
+                var proc = "[JA.spGetCategories]";
+
+                var queryResult = await conn.QueryAsync<CategoryInformation>(proc, commandType: CommandType.StoredProcedure);
+
+                if (queryResult is not null && queryResult.Any())
                 {
-                    cmd.CommandText = "[JA.spGetCategories]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    try
+                    foreach (var result in queryResult)
                     {
-                        await conn.OpenAsync();
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
+                        ICategory category = (ICategory)_factory.CreateEntity(nameof(Category), result.Id, result.Name);
 
-                            while (await reader.ReadAsync())
-                            {
-                                var category = new Category
-                                {
-                                    Id = reader.GetInt32(0),
-                                    Name = reader.GetString(1)
-                                };
-
-                                categories.Add(category);
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
+                        categories.Add(category);
                     }
                 }
             }
@@ -99,40 +72,22 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
         public async Task<ICategory> GetByIdAsync(int id)
         {
             ICategory category = null;
-
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                using (var cmd = conn.CreateCommand())
+                var proc = "[JA.spGetCategoryById]";
+                var values = new
                 {
-                    cmd.CommandText = "[JA.spGetCategoryById]";
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    @categoryId = id
+                };
 
-                    cmd.Parameters.AddWithValue("@id", id);
+                var queryResult = await conn.QuerySingleOrDefaultAsync<CategoryInformation>(proc, values, commandType: CommandType.StoredProcedure);
 
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
-
-                            while (await reader.ReadAsync())
-                            {
-                                category = new Category
-                                {
-                                    Id = reader.GetInt32(0),
-                                    Name = reader.GetString(1)
-                                };
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                if (queryResult is not null)
+                {
+                    category = (ICategory)_factory.CreateEntity(
+                                nameof(Category),
+                                queryResult.Id, queryResult.Name);
                 }
-
             }
 
             return category;
@@ -144,28 +99,13 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spRemoveCategory]";
+                var values = new
                 {
-                    new SqlParameter("@id", entity.Id)
+                    @categoryId = entity.Id
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spDeleteCategory]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        isDeleted = (await cmd.ExecuteNonQueryAsync()) == 1;
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                isDeleted = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
             }
 
             return isDeleted;
@@ -177,29 +117,14 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spUpdateCategory]";
+                var values = new
                 {
-                    new SqlParameter("@id", entity.Id),
-                    new SqlParameter("@name", entity.Name)
+                    @categoryId = entity.Id,
+                    @categoryName = entity.Name
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spUpdateCategory]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = int.Parse((await cmd.ExecuteScalarAsync()).ToString());
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
             if (entityId >= 0)

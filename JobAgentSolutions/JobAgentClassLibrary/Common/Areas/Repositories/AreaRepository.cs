@@ -16,10 +16,10 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
         private readonly ISqlDbManager _sqlDbManager;
         private readonly AreaEntityFactory _factory;
 
-        public AreaRepository(ISqlDbManager sqlDbManager)
+        public AreaRepository(ISqlDbManager sqlDbManager, AreaEntityFactory factory)
         {
             _sqlDbManager = sqlDbManager;
-            _factory = new AreaEntityFactory();
+            _factory = factory;
         }
 
 
