@@ -1,5 +1,8 @@
 ﻿namespace JobAgentClassLibrary.Common.Filters.Entities
 {
+    /// <summary>
+    /// Handles the data of a dynamic search filter.
+    /// </summary>
     public class DynamicSearchFilter : IDynamicSearchFilter
     {
         public int CategoryId { get; set; }
