@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Loggings.Repositories
 {
-    public class LogRepository : ILoggingRepository
+    public class DbLogRepository : ILoggingRepository
     {
         private readonly ISqlDbManager _sqlDbManager;
 
-        public LogRepository(ISqlDbManager sqlDbManager)
+        public DbLogRepository(ISqlDbManager sqlDbManager)
         {
             _sqlDbManager = sqlDbManager;
         }
