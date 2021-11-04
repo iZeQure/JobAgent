@@ -11,7 +11,7 @@ namespace JobAgentClassLibraryTests.RepositoryTests
     public class AreaRepositoryTests
     {
         IAreaRepository areaRepository;
-        IArea createdArea;
+        IArea testArea;
 
         [SetUp]
         public void Setup()
@@ -50,17 +50,17 @@ namespace JobAgentClassLibraryTests.RepositoryTests
         public async Task CreateAsync_ShouldCreateNewArea()
         {
             //Arrange
-            IArea testArea = new Area
+            testArea = new Area
             {
                 Name = "Alabama"
             };
 
             //Act
-            createdArea = await areaRepository.CreateAsync(testArea);
+            testArea = await areaRepository.CreateAsync(testArea);
 
             //Assert
-            Assert.IsNotNull(createdArea);
-            Assert.AreEqual("Alabama", createdArea.Name);
+            Assert.IsNotNull(testArea);
+            Assert.AreEqual("Alabama", testArea.Name);
             
         }
 
@@ -73,7 +73,7 @@ namespace JobAgentClassLibraryTests.RepositoryTests
             IArea requestedArea;
 
             //Act
-            requestedArea = await areaRepository.GetByIdAsync(createdArea.Id);
+            requestedArea = await areaRepository.GetByIdAsync(testArea.Id);
 
             //Assert
             Assert.IsNotNull(requestedArea);
@@ -91,13 +91,13 @@ namespace JobAgentClassLibraryTests.RepositoryTests
             IArea updateArea;
             string newName = "Texas";
 
-            IArea testArea = new Area
+            IArea tempArea = new Area
             {
-                Id = createdArea.Id,
+                Id = testArea.Id,
                 Name = newName
             }; 
             
-            updateArea = await areaRepository.UpdateAsync(testArea);
+            updateArea = await areaRepository.UpdateAsync(tempArea);
 
             //Assert
             Assert.IsNotNull(updateArea);
@@ -112,7 +112,7 @@ namespace JobAgentClassLibraryTests.RepositoryTests
             //Arrange
 
             //Act
-            bool cleanupSuccess = await areaRepository.RemoveAsync(createdArea);
+            bool cleanupSuccess = await areaRepository.RemoveAsync(testArea);
             
             //Assert
             Assert.IsTrue(cleanupSuccess);
