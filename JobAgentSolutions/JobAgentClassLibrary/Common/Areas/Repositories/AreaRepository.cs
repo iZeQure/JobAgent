@@ -127,31 +127,14 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spUpdateArea]";
+                var values = new
                 {
-                        new SqlParameter("@areaId", entity.Id),
-                        new SqlParameter("@areaName", entity.Name)
+                    @areaId = entity.Id,
+                    @areaName = entity.Name
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spUpdateArea]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        var procResult = (await cmd.ExecuteScalarAsync()).ToString();
-                        entityId = int.Parse(procResult);
-
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
             if (entityId >= 0)
