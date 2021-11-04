@@ -15,13 +15,15 @@ namespace JobAgentClassLibrary.Core.Database.Managers
 
         public SqlConnection GetSqlConnection(DbConnectionType connectionType) => connectionType switch
         {
-            DbConnectionType.Basic => GetSqlConnectionBasicReader(),
-            DbConnectionType.Complex => GetSqlConnectionComplexSelect(),
-            DbConnectionType.Create => GetSqlConnectionCreatePermission(),
-            DbConnectionType.Update => GetSqlConnectionUpdatePermission(),
-            DbConnectionType.Delete => GetSqlConnectionDeletePermission(),
+            DbConnectionType.Basic => GetTestSqlConnection(),
+            DbConnectionType.Complex => GetTestSqlConnection(),
+            DbConnectionType.Create => GetTestSqlConnection(),
+            DbConnectionType.Update => GetTestSqlConnection(),
+            DbConnectionType.Delete => GetTestSqlConnection(),
             _ => throw new System.ArgumentException("No Connection Type found with used type.", nameof(connectionType))
         };
+
+        private SqlConnection GetTestSqlConnection() => _factory.CreateConnection("sa", "1234");
 
         private SqlConnection GetSqlConnectionBasicReader() => _factory.CreateConnection("BasicUserReader", "Pa$$w0rd");
 

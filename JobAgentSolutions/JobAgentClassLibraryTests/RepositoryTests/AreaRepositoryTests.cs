@@ -2,78 +2,85 @@
 using JobAgentClassLibrary.Common.Areas.Repositories;
 using JobAgentClassLibraryTests.Setup;
 using NUnit.Framework;
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibraryTests.RepositoryTests
 {
+    /// <summary>
+    /// Represents a test class for <see cref="IAreaRepository"/>.
+    /// Handles the tests of all scenarios that could happen in the repository.
+    /// </summary>
     public class AreaRepositoryTests
     {
-        IAreaRepository areaRepository;
-        IArea testArea;
+        private IAreaRepository _areaRepository;
 
         [SetUp]
         public void Setup()
         {
             var manager = SqlConfigurationSetup.SetupSqlDbManager();
-            areaRepository = new AreaRepository(manager);
+            _areaRepository = new AreaRepository(manager);
         }
 
 
         [Test]
         [Order(0)]
-        public async Task GetAllAsync_ShouldReturnAll()
+        public async Task GetAllAsync_HasData_IfCollectionIsNotNull()
         {
-            //Arrange
-            bool expected = true;
+            // Arrange
+            IArea firstArea;
 
-            //Act
-            bool actual = false;
+            // Act
+            var areas = await _areaRepository.GetAllAsync();
+            firstArea = areas.First();
 
-            //Assert
-
-            List<IArea> areaList = await areaRepository.GetAllAsync();
-
-            if (areaList is not null && areaList!.Any())
-            {
-                IArea lol = areaList.FirstOrDefault();
-                actual = true;
-            }
-
-            Assert.AreEqual(expected, actual);
+            // Assert
+            Assert.IsNotNull(areas);
+            Assert.IsNotEmpty(areas);
+            Assert.IsNotNull(firstArea);
+            Assert.AreNotEqual(0, firstArea.Id);
+            Assert.IsNotNull(firstArea.Name);
+            Assert.IsNotEmpty(firstArea.Name);
         }
 
 
         [Test]
         [Order(1)]
-        public async Task CreateAsync_ShouldCreateNewArea()
+        public async Task CreateAsync_CreatesAnArea_IfArgumentsAreValid()
         {
             //Arrange
-            testArea = new Area
+            IArea expected;
+            IArea actual;
+
+            var rnd = new Random(DateTime.Now.GetHashCode());
+            string testAreaName = $"UnitTest{rnd.Next(3424, 458729)}";
+            expected = new Area
             {
-                Name = "Alabama"
+                Id = 0,
+                Name = testAreaName
             };
 
             //Act
-            testArea = await areaRepository.CreateAsync(testArea);
+            actual = await _areaRepository.CreateAsync(expected);
 
             //Assert
-            Assert.IsNotNull(testArea);
-            Assert.AreEqual("Alabama", testArea.Name);
-            
+            Assert.IsNotNull(actual);
+            Assert.IsNotEmpty(actual.Name);
+            Assert.AreNotEqual(expected.Id, actual.Id);
+            Assert.AreEqual(expected.Name, actual.Name);
         }
 
 
         [Test]
         [Order(2)]
-        public async Task GetByIdAsync_ShouldReturnArea()
+        public async Task GetByIdAsync_ReturnsAValidObject_IfArgumentIsValid()
         {
             //Arrange
             IArea requestedArea;
 
             //Act
-            requestedArea = await areaRepository.GetByIdAsync(testArea.Id);
+            requestedArea = await _areaRepository.GetByIdAsync(testArea.Id);
 
             //Assert
             Assert.IsNotNull(requestedArea);
@@ -85,7 +92,7 @@ namespace JobAgentClassLibraryTests.RepositoryTests
 
         [Test]
         [Order(3)]
-        public async Task UpdateAsync_ShouldUpdateArea()
+        public async Task UpdateAsync_UpdatesExistingObject_IfArgumentsIsValid()
         {
             //Arrange
             IArea updateArea;
@@ -97,7 +104,7 @@ namespace JobAgentClassLibraryTests.RepositoryTests
                 Name = newName
             }; 
             
-            updateArea = await areaRepository.UpdateAsync(tempArea);
+            updateArea = await _areaRepository.UpdateAsync(tempArea);
 
             //Assert
             Assert.IsNotNull(updateArea);
@@ -112,7 +119,7 @@ namespace JobAgentClassLibraryTests.RepositoryTests
             //Arrange
 
             //Act
-            bool cleanupSuccess = await areaRepository.RemoveAsync(testArea);
+            bool cleanupSuccess = await _areaRepository.RemoveAsync(testArea);
             
             //Assert
             Assert.IsTrue(cleanupSuccess);

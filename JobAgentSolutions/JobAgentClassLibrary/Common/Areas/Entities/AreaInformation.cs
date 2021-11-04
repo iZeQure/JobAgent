@@ -1,14 +1,16 @@
-﻿namespace JobAgentClassLibrary.Common.Areas.Entities
+﻿using Dapper.Contrib.Extensions;
+
+namespace JobAgentClassLibrary.Common.Areas.Entities
 {
+    [Table("AreaInformation")]
     public class AreaInformation : IArea
     {
-        public int AreaId { get; set; }
+        public string Name => AreaName;
 
-        public string AreaName { get; set; }
+        public int Id => AreaId;
 
-        public int Id { get { return AreaId; } }
-
-        public string Name { get { return AreaName; } }
-
+        [Key]
+        private int AreaId { get; set; }
+        private string AreaName { get; set; }
     }
 }

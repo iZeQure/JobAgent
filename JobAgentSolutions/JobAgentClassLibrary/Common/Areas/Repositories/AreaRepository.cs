@@ -52,41 +52,21 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
                 string proc = "[JA.spGetAreas]";
+                //string cmdTxt = "SELECT * FROM [AreaInformation]";
 
                 var queryResult = await conn.QueryAsync<AreaInformation>(proc, commandType: CommandType.StoredProcedure);
 
-                areas = queryResult.Cast<IArea>().ToList();
-                //using (var cmd = conn.CreateCommand())
-                //{
-                //    cmd.CommandText = "[JA.spGetAreas]";
-                //    cmd.CommandType = CommandType.StoredProcedure;
-
-                //    try
-                //    {
-                //        await conn.OpenAsync();
-
-                //        using (var reader = await cmd.ExecuteReaderAsync())
-                //        {
-                //            if (!reader.HasRows) return null;
-
-                //            while (await reader.ReadAsync())
-                //            {
-                //                var area = new Area
-                //                {
-                //                    Id = reader.GetInt32(0),
-                //                    Name = reader.GetString(1)
-                //                };
-
-                //                areas.Add(area);
-                //            }
-                //        }
-                //    }
-                //    catch (Exception)
-                //    {
-                //        throw;
-                //    }
-                //}
-
+                if (queryResult is not null && queryResult.Any())
+                {
+                    foreach (var result in queryResult)
+                    {
+                        areas.Add(new Area
+                        {
+                            Id = result.Id,
+                            Name = result.Name
+                        });
+                    }
+                }
             }
 
             return areas;
