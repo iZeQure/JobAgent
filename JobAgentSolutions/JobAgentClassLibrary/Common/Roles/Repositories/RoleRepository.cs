@@ -1,11 +1,14 @@
 ﻿using Dapper;
 using JobAgentClassLibrary.Common.Roles.Entities;
+using JobAgentClassLibrary.Common.Roles.Entities.EntityMaps;
+using JobAgentClassLibrary.Common.Roles.Factory;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.Roles.Repositories
@@ -13,10 +16,12 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
     public class RoleRepository : IRoleRepository
     {
         private readonly ISqlDbManager _sqlDbManager;
+        private readonly RoleEntityFactory _factory;
 
-        public RoleRepository(ISqlDbManager sqlDbManager)
+        public RoleRepository(ISqlDbManager sqlDbManager, RoleEntityFactory factory)
         {
             _sqlDbManager = sqlDbManager;
+            _factory = factory;
         }
 
         public async Task<IRole> CreateAsync(IRole entity)
@@ -50,33 +55,19 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                using (var cmd = conn.CreateCommand())
+                string proc = "[JA.spGetRoles]";
+
+                var queryResult = await conn.QueryAsync<RoleInformation>(proc, commandType: CommandType.StoredProcedure);
+
+                if (queryResult is not null && queryResult.Any())
                 {
-                    cmd.CommandText = "[JA.spGetRoles]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    try
+                    foreach (var result in queryResult)
                     {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
+                        IRole role = (IRole)_factory.CreateEntity(
+                                nameof(Role),
+                                result.Id, result.Name);
 
-                            while (await reader.ReadAsync())
-                            {
-                                var role = new Role
-                                {
-                                    Id = reader.GetInt32(0),
-                                    Name = reader.GetString(1),
-                                    Description = reader.GetString(2)
-                                };
-
-                                roles.Add(role);
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
+                        roles.Add(role);
                     }
                 }
             }
@@ -87,38 +78,22 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
         public async Task<IRole> GetByIdAsync(int id)
         {
             IRole role = null;
-
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                using (var cmd = conn.CreateCommand())
+                var proc = "[JA.spGetRoleById]";
+                var values = new
                 {
-                    cmd.CommandText = "[JA.spGetRoleById]";
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    @roleId = id
+                };
 
-                    cmd.Parameters.AddWithValue("@id", id);
+                var queryResult = await conn.QuerySingleOrDefaultAsync<RoleInformation>(proc, values, commandType: CommandType.StoredProcedure);
 
-                    try
-                    {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
-
-                            while (await reader.ReadAsync())
-                            {
-                                role = new Role
-                                {
-                                    Id = reader.GetInt32(0),
-                                    Name = reader.GetString(1)
-                                };
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                if (queryResult is not null)
+                {
+                    role = (IRole)_factory.CreateEntity(
+                                nameof(Role),
+                                queryResult.Id, queryResult.Name);
                 }
-
             }
 
             return role;
@@ -130,28 +105,13 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spDeleteRole]";
+                var values = new
                 {
-                    new SqlParameter("@id", entity.Id)
+                    @roleId = entity.Id
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spDeleteRole]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        isDeleted = (await cmd.ExecuteNonQueryAsync()) == 1;
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                isDeleted = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
             }
 
             return isDeleted;
@@ -163,30 +123,14 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spUpdateRole]";
+                var values = new
                 {
-                    new SqlParameter("@id", entity.Id),
-                    new SqlParameter("@roleName", entity.Name),
-                    new SqlParameter("@roleDescription", entity.Description)
+                    @roleId = entity.Id,
+                    @roleName = entity.Name
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spUpdateRole]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = int.Parse((await cmd.ExecuteScalarAsync()).ToString());
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
             if (entityId >= 0)
