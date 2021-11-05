@@ -21,7 +21,7 @@ namespace JobAgentClassLibrary.Common.Categories.Factory
                 CategoryId = ParseEntityValueToInt(entityValues[1]),
                 Name = ParseEntityValueToString(entityValues[2])
             },
-            _ => throw new ArgumentOutOfRangeException(nameof(paramName), paramName, "Coudln't create type. Out of range.")
+            _ => throw new ArgumentOutOfRangeException(nameof(paramName), paramName, "Couldn't create type. Out of range.")
         };
     }
 }

@@ -24,7 +24,7 @@ namespace JobAgentClassLibrary.Common.Filters.Factory
                 CategoryId = ParseValue<int>(entityValues[2]),
                 DynamicSearchFilterKey = ParseValue<string>(entityValues[3])
             },
-            _ => throw new ArgumentOutOfRangeException(nameof(paramName), paramName, "Coudln't create type. Out of range.")
+            _ => throw new ArgumentOutOfRangeException(nameof(paramName), paramName, "Couldn't create type. Out of range.")
 
         };
     }

@@ -20,7 +20,7 @@ namespace JobAgentClassLibrary.Common.Companies.Factory
                 CompanyId = ParseValue<int>(entityValues[0]),
                 CompanyName = ParseValue<string>(entityValues[1]),
             },
-            _ => throw new ArgumentOutOfRangeException(nameof(paramName), paramName, "Coudln't create type. Out of range.")
+            _ => throw new ArgumentOutOfRangeException(nameof(paramName), paramName, "Couldn't create type. Out of range.")
         };
     }
 }

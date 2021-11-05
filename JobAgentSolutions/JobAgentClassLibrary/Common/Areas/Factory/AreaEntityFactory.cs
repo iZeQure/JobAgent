@@ -23,7 +23,7 @@ namespace JobAgentClassLibrary.Common.Areas.Factory
                 AreaId = ParseValue<int>(entityValues[0]),
                 AreaName = ParseValue<string>(entityValues[1]),
             },
-            _ => throw new ArgumentOutOfRangeException(nameof(paramName), paramName, "Coudln't create type. Out of range.")
+            _ => throw new ArgumentOutOfRangeException(nameof(paramName), paramName, "Couldn't create type. Out of range.")
         };
     }
 }
