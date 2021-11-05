@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace JobAgentClassLibrary.Common.JobAdverts.Entities
 {
@@ -14,8 +15,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Entities
 
         public int SpecializationId { get; set; }
 
-        public int VacantJobId { get; set; }
-
+        [DisplayName("VacantJobId")]
         public int Id { get; set; }
     }
 }
