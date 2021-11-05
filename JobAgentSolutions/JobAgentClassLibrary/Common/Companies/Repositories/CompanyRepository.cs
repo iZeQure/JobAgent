@@ -50,7 +50,7 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
 
         public async Task<List<ICompany>> GetAllAsync()
         {
-            List<ICompany> areas = new();
+            List<ICompany> companies = new();
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
@@ -64,14 +64,14 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
                     {
                         ICompany area = (ICompany)_factory.CreateEntity(
                                 nameof(Company),
-                                result.Id, result.Name);
+                                result.CompanyId, result.CompanyName);
 
-                        areas.Add(area);
+                        companies.Add(area);
                     }
                 }
             }
 
-            return areas;
+            return companies;
         }
 
         public async Task<ICompany> GetByIdAsync(int id)
@@ -91,7 +91,7 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
                 {
                     company = (ICompany)_factory.CreateEntity(
                                 nameof(Company),
-                                queryResult.Id, queryResult.Name);
+                                queryResult.CompanyName, queryResult.CompanyName);
                 }
             }
 
