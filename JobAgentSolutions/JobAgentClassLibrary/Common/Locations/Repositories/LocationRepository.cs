@@ -62,11 +62,11 @@ namespace JobAgentClassLibrary.Common.Locations.Repositories
                 {
                     foreach (var result in queryResult)
                     {
-                        ILocation area = (ILocation)_factory.CreateEntity(
+                        ILocation location = (ILocation)_factory.CreateEntity(
                                 nameof(Location),
                                 result.LocationId, result.LocationName);
 
-                        locations.Add(area);
+                        locations.Add(location);
                     }
                 }
             }
@@ -76,7 +76,7 @@ namespace JobAgentClassLibrary.Common.Locations.Repositories
 
         public async Task<ILocation> GetByIdAsync(int id)
         {
-            ILocation area = null;
+            ILocation location = null;
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
                 var proc = "[JA.spGetLocationById]";
@@ -89,13 +89,13 @@ namespace JobAgentClassLibrary.Common.Locations.Repositories
 
                 if (queryResult is not null)
                 {
-                    area = (ILocation)_factory.CreateEntity(
+                    location = (ILocation)_factory.CreateEntity(
                                 nameof(Location),
                                 queryResult.Id, queryResult.Name);
                 }
             }
 
-            return area;
+            return location;
         }
 
         public async Task<bool> RemoveAsync(ILocation entity)
