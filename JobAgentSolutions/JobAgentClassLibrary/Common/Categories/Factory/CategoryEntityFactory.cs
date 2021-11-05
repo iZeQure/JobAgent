@@ -2,6 +2,7 @@
 using JobAgentClassLibrary.Core.Factories;
 using JobAgentClassLibrary.Core.Repositories;
 using System;
+using System.Collections.Generic;
 
 namespace JobAgentClassLibrary.Common.Categories.Factory
 {
@@ -11,15 +12,15 @@ namespace JobAgentClassLibrary.Common.Categories.Factory
         {
             nameof(Category) => new Category
             {
-                Id = ParseEntityValueToInt(entityValues[0]),
-                Name = ParseEntityValueToString(entityValues[1]),
-                Specializations = ParseEntityValueToList<ISpecialization>(entityValues[2]) ?? null
+                Id = ParseValue<int>(entityValues[0]),
+                Name = ParseValue<string>(entityValues[1]),
+                Specializations = ParseValue<List<ISpecialization>>(entityValues[2]) ?? null
             },
             nameof(Specialization) => new Specialization
             {
-                Id = ParseEntityValueToInt(entityValues[0]),
-                CategoryId = ParseEntityValueToInt(entityValues[1]),
-                Name = ParseEntityValueToString(entityValues[2])
+                Id = ParseValue<int>(entityValues[0]),
+                CategoryId = ParseValue<int>(entityValues[1]),
+                Name = ParseValue<string>(entityValues[2])
             },
             _ => throw new ArgumentOutOfRangeException(nameof(paramName), paramName, "Couldn't create type. Out of range.")
         };
