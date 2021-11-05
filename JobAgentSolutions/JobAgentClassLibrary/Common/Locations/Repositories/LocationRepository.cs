@@ -1,11 +1,14 @@
 ﻿using Dapper;
 using JobAgentClassLibrary.Common.Locations.Entities;
+using JobAgentClassLibrary.Common.Locations.Entities.EntityMaps;
+using JobAgentClassLibrary.Common.Locations.Factory;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.Locations.Repositories
@@ -13,10 +16,12 @@ namespace JobAgentClassLibrary.Common.Locations.Repositories
     public class LocationRepository : ILocationRepository
     {
         private readonly ISqlDbManager _sqlDbManager;
+        private readonly LocationEntityFactory _factory;
 
-        public LocationRepository(ISqlDbManager sqlDbManager)
+        public LocationRepository(ISqlDbManager sqlDbManager, LocationEntityFactory factory)
         {
             _sqlDbManager = sqlDbManager;
+            _factory = factory;
         }
 
         public async Task<ILocation> CreateAsync(ILocation entity)
@@ -49,32 +54,19 @@ namespace JobAgentClassLibrary.Common.Locations.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                using (var cmd = conn.CreateCommand())
+                string proc = "[JA.spGetLocations]";
+
+                var queryResult = await conn.QueryAsync<LocationInformation>(proc, commandType: CommandType.StoredProcedure);
+
+                if (queryResult is not null && queryResult.Any())
                 {
-                    cmd.CommandText = "[JA.spGetLocations]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    try
+                    foreach (var result in queryResult)
                     {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
+                        ILocation area = (ILocation)_factory.CreateEntity(
+                                nameof(Location),
+                                result.LocationId, result.LocationName);
 
-                            while (await reader.ReadAsync())
-                            {
-                                var location = new Location
-                                {
-                                    Id = reader.GetInt32(0),
-                                    Name = reader.GetString(1)
-                                };
-
-                                locations.Add(location);
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
+                        locations.Add(area);
                     }
                 }
             }
@@ -84,42 +76,26 @@ namespace JobAgentClassLibrary.Common.Locations.Repositories
 
         public async Task<ILocation> GetByIdAsync(int id)
         {
-            ILocation location = null;
-
+            ILocation area = null;
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                using (var cmd = conn.CreateCommand())
+                var proc = "[JA.spGetLocationById]";
+                var values = new
                 {
-                    cmd.CommandText = "[JA.spGetLocationById]";
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    @locationId = id
+                };
 
-                    cmd.Parameters.AddWithValue("@id", id);
+                var queryResult = await conn.QuerySingleOrDefaultAsync<LocationInformation>(proc, values, commandType: CommandType.StoredProcedure);
 
-                    try
-                    {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
-
-                            while (await reader.ReadAsync())
-                            {
-                                location = new Location
-                                {
-                                    Id = reader.GetInt32(0),
-                                    Name = reader.GetString(1)
-                                };
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                if (queryResult is not null)
+                {
+                    area = (ILocation)_factory.CreateEntity(
+                                nameof(Location),
+                                queryResult.Id, queryResult.Name);
                 }
-
             }
 
-            return location;
+            return area;
         }
 
         public async Task<bool> RemoveAsync(ILocation entity)
@@ -128,28 +104,13 @@ namespace JobAgentClassLibrary.Common.Locations.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spRemoveLocation]";
+                var values = new
                 {
-                    new SqlParameter("@id", entity.Id)
+                    @locationId = entity.Id
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spRemoveLocation]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        isDeleted = (await cmd.ExecuteNonQueryAsync()) == 1;
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                isDeleted = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
             }
 
             return isDeleted;
@@ -161,29 +122,14 @@ namespace JobAgentClassLibrary.Common.Locations.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spUpdateLocation]";
+                var values = new
                 {
-                    new SqlParameter("@id", entity.Id),
-                    new SqlParameter("@locationName", entity.Name)
+                    @locationId = entity.Id,
+                    @locationName = entity.Name
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spUpdateLocation]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = int.Parse((await cmd.ExecuteScalarAsync()).ToString());
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
             if (entityId >= 0)
