@@ -1,11 +1,14 @@
 ﻿using Dapper;
 using JobAgentClassLibrary.Common.Filters.Entities;
+using JobAgentClassLibrary.Common.Filters.Entities.EntityMaps;
+using JobAgentClassLibrary.Common.Filters.Factory;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.Filters.Repositories
@@ -13,10 +16,13 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
     public class DynamicSearchFilterRepository : IDynamicSearchFilterRepository
     {
         private readonly ISqlDbManager _sqlDbManager;
+        private readonly DynamicSearchFilterEntityFactory _factory;
 
-        public DynamicSearchFilterRepository(ISqlDbManager sqlDbManager)
+
+        public DynamicSearchFilterRepository(ISqlDbManager sqlDbManager, DynamicSearchFilterEntityFactory factory)
         {
             _sqlDbManager = sqlDbManager;
+            _factory = factory;
         }
 
 
@@ -49,128 +55,72 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
 
         public async Task<List<IDynamicSearchFilter>> GetAllAsync()
         {
-            List<IDynamicSearchFilter> dynamicSearchFilters = new();
+            List<IDynamicSearchFilter> DynamicSearchFilters = new();
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                using (var cmd = conn.CreateCommand())
+                string proc = "[JA.spGetDynamicSearchFilters]";
+
+                var queryResult = await conn.QueryAsync<DynamicSearchFilterInformation>(proc, commandType: CommandType.StoredProcedure);
+
+                if (queryResult is not null && queryResult.Any())
                 {
-                    cmd.CommandText = "[JA.spGetDynamicSearchFilters]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    try
+                    foreach (var result in queryResult)
                     {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
+                        IDynamicSearchFilter dynamicSearchFilter = (IDynamicSearchFilter)_factory.CreateEntity(
+                                nameof(DynamicSearchFilter),
+                                result.DynamicSearchFilterId, result.SpecializationId, result.CategoryId, result.DynamicSearchFilterKey);
 
-                            while (await reader.ReadAsync())
-                            {
-                                var company = new DynamicSearchFilter
-                                {
-                                    Id = reader.GetInt32(0),
-                                    CategoryId = reader.GetInt32(1),
-                                    SpecializationId = reader.GetInt32(2),
-                                    Key = reader.GetString(3)
-
-                                };
-
-                                dynamicSearchFilters.Add(company);
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
+                        DynamicSearchFilters.Add(dynamicSearchFilter);
                     }
                 }
             }
 
-            return dynamicSearchFilters;
+            return DynamicSearchFilters;
         }
 
 
         public async Task<IDynamicSearchFilter> GetByIdAsync(int id)
         {
-            DynamicSearchFilter dynamincSearchFilter = null;
+            IDynamicSearchFilter dynamicSearchFilter = null;
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spGetDynamicSearchFilterById]";
+                var values = new
                 {
-                        new SqlParameter("@id", id)
+                    @areaId = id
                 };
 
-                using (var cmd = conn.CreateCommand())
+                var queryResult = await conn.QuerySingleOrDefaultAsync<DynamicSearchFilterInformation>(proc, values, commandType: CommandType.StoredProcedure);
+
+                if (queryResult is not null)
                 {
-                    cmd.CommandText = "[JA.spGetDynamicSearchFilterById]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
-
-                            while (await reader.ReadAsync())
-                            {
-                                dynamincSearchFilter = new()
-                                {
-                                    Id = reader.GetInt32(0),
-                                    CategoryId = reader.GetInt32(1),
-                                    SpecializationId = reader.GetInt32(2),
-                                    Key = reader.GetString(3)
-                                };
-
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                    dynamicSearchFilter = (IDynamicSearchFilter)_factory.CreateEntity(
+                                nameof(DynamicSearchFilter),
+                                queryResult.DynamicSearchFilterId, queryResult.SpecializationId, queryResult.CategoryId, queryResult.DynamicSearchFilterKey);
                 }
             }
-            return dynamincSearchFilter;
+
+            return dynamicSearchFilter;
         }
 
 
         public async Task<bool> RemoveAsync(IDynamicSearchFilter entity)
         {
-            int entityId = 0;
+            bool isDeleted = false;
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spRemoveDynamicSearchFilter]";
+                var values = new
                 {
-                        new SqlParameter("@id", entity.Id)
+                    @id = entity.Id
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spRemoveDynamicSearchFilter]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = (int)await cmd.ExecuteScalarAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                isDeleted = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
             }
 
-            if (entityId != 0)
-            {
-                return true;
-            }
-
-            return false;
+            return isDeleted;
         }
 
 
@@ -180,34 +130,19 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spUpdateDynamicSearchFilter]";
+                var values = new
                 {
-                    new SqlParameter("@id", entity.Id),
-                    new SqlParameter("@categoryId", entity.CategoryId),
-                    new SqlParameter("@specializationId", entity.SpecializationId),
-                    new SqlParameter("@key", entity.Key)
+                    @id = entity.Id,
+                    @specializationId = entity.SpecializationId,
+                    @categoryId = entity.CategoryId,
+                    @key = entity.Key
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spUpdateDynamicSearchFilter]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = (int)await cmd.ExecuteScalarAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId != 0)
+            if (entityId >= 0)
             {
                 return await GetByIdAsync(entityId);
             }
