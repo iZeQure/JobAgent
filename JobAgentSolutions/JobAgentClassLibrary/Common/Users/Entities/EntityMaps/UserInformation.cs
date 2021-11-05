@@ -21,8 +21,7 @@ namespace JobAgentClassLibrary.Common.Users.Entities.EntityMaps
 
         public Role Role => new() { Id = RoleId };
 
-        //Ikke sikker på hvad vi skal gøre her
-        public List<Area> ConsultantAreas => throw new NotImplementedException();
+        public List<Area> ConsultantAreas { get; set; }
 
 
         [Key]
