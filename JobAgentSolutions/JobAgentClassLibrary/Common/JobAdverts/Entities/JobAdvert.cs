@@ -15,7 +15,6 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Entities
 
         public int SpecializationId { get; set; }
 
-        [DisplayName("VacantJobId")]
         public int Id { get; set; }
     }
 }

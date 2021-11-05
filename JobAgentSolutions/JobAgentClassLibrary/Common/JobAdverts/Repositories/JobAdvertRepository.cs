@@ -71,7 +71,6 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
                                 var jobAdvert = new JobAdvert
                                 {
                                     Id = reader.GetInt32(0),
-                                    VacantJobId = reader.GetInt32(0),
                                     CategoryId = reader.GetInt32(6),
                                     SpecializationId = reader.GetInt32(8),
                                     Title = reader.GetString(11),
@@ -126,7 +125,6 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
                                 jobAdvert = new JobAdvert
                                 {
                                     Id = reader.GetInt32(0),
-                                    VacantJobId = reader.GetInt32(0),
                                     CategoryId = reader.GetInt32(6),
                                     SpecializationId = reader.GetInt32(8),
                                     Title = reader.GetString(11),
