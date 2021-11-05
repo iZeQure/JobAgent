@@ -1,11 +1,12 @@
 ﻿using Dapper;
 using JobAgentClassLibrary.Common.VacantJobs.Entities;
+using JobAgentClassLibrary.Common.VacantJobs.Entities.EntityMaps;
+using JobAgentClassLibrary.Common.VacantJobs.Factory;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
-using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
@@ -13,25 +14,25 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
     public class VacantJobRepository : IVacantJobRepository
     {
         private readonly ISqlDbManager _sqlDbManager;
+        private readonly VacantJobEntityFactory _factory;
 
-        public VacantJobRepository(ISqlDbManager sqlDbManager)
+        public VacantJobRepository(ISqlDbManager sqlDbManager, VacantJobEntityFactory factory)
         {
             _sqlDbManager = sqlDbManager;
+            _factory = factory;
         }
-
 
         public async Task<IVacantJob> CreateAsync(IVacantJob entity)
         {
             int entityId = 0;
+
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
             {
-                string proc = "[JA.spCreateVacantJob]";
-
+                var proc = "[JA.spCreateVacantJob]";
                 var values = new
                 {
-                    @id = entity.Id,
                     @companyId = entity.CompanyId,
-                    @vacantJobUrl = entity.URL
+                    @url = entity.URL
                 };
 
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
@@ -51,34 +52,17 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                using (var cmd = conn.CreateCommand())
+                var proc = "[JA.spGetCategories]";
+
+                var queryResult = await conn.QueryAsync<VacantJobInformation>(proc, commandType: CommandType.StoredProcedure);
+
+                if (queryResult is not null && queryResult.Any())
                 {
-                    cmd.CommandText = "[JA.spGetVacantJobs]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    try
+                    foreach (var result in queryResult)
                     {
-                        await conn.OpenAsync();
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
+                        IVacantJob vacantJob = (IVacantJob)_factory.CreateEntity(nameof(VacantJob), result.Id, result.CompanyId, result.URL);
 
-                            while (await reader.ReadAsync())
-                            {
-                                var vacantJob = new VacantJob
-                                {
-                                    Id = reader.GetInt32(0),
-                                    URL = reader.GetString(1),
-                                    CompanyId = reader.GetInt32(2)
-                                };
-
-                                vacantJobs.Add(vacantJob);
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
+                        vacantJobs.Add(vacantJob);
                     }
                 }
             }
@@ -91,40 +75,19 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
             IVacantJob vacantJob = null;
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spGetCategoryById]";
+                var values = new
                 {
-                        new SqlParameter("@id", id)
+                    @vacantJobId = id
                 };
 
-                using (var cmd = conn.CreateCommand())
+                var queryResult = await conn.QuerySingleOrDefaultAsync<VacantJobInformation>(proc, values, commandType: CommandType.StoredProcedure);
+
+                if (queryResult is not null)
                 {
-                    cmd.CommandText = "[JA.spGetVacantJobById]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
-
-                            while (await reader.ReadAsync())
-                            {
-                                vacantJob = new VacantJob()
-                                {
-                                    Id = reader.GetInt32(0),
-                                    URL = reader.GetString(1),
-                                    CompanyId = reader.GetInt32(2)
-                                };
-
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                    vacantJob = (IVacantJob)_factory.CreateEntity(
+                                nameof(VacantJob),
+                                queryResult.Id, queryResult.CompanyId, queryResult.URL);
                 }
             }
 
@@ -133,40 +96,20 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
 
         public async Task<bool> RemoveAsync(IVacantJob entity)
         {
-            int entityId = 0;
+            bool isDeleted = false;
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spRemoveVacantJob]";
+                var values = new
                 {
-                        new SqlParameter("@id", entity.Id)
+                    @vacantJobId = entity.Id
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spDeleteVacantJob]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = int.Parse((await cmd.ExecuteScalarAsync()).ToString());
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                isDeleted = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
             }
 
-            if (entityId != 0)
-            {
-                return true;
-            }
-
-            return false;
+            return isDeleted;
         }
 
         public async Task<IVacantJob> UpdateAsync(IVacantJob entity)
@@ -175,30 +118,15 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spUpdateVacantJob]";
+                var values = new
                 {
-                    new SqlParameter("@id", entity.Id),
-                    new SqlParameter("@companyId", entity.CompanyId),
-                    new SqlParameter("@vacantJobUrl", entity.URL)
+                    @vacantJobId = entity.Id,
+                    @companyId = entity.CompanyId,
+                    @url = entity.URL
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spUpdateVacantJob]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = int.Parse((await cmd.ExecuteScalarAsync()).ToString());
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
             if (entityId >= 0)
