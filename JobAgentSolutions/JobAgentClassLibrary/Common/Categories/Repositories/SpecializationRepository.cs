@@ -1,23 +1,24 @@
 ﻿using JobAgentClassLibrary.Common.Categories.Entities;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
-using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Dapper;
-using Dapper.Contrib.Extensions;
+using JobAgentClassLibrary.Common.Categories.Factory;
+using JobAgentClassLibrary.Common.Categories.Entities.EntityMaps;
 
 namespace JobAgentClassLibrary.Common.Categories.Repositories
 {
     public class SpecializationRepository : ISpecializationRepository
     {
         private readonly ISqlDbManager _sqlDbManager;
+        private readonly CategoryEntityFactory _factory;
 
-        public SpecializationRepository(ISqlDbManager sqlDbManager)
+        public SpecializationRepository(ISqlDbManager sqlDbManager, CategoryEntityFactory factory)
         {
             _sqlDbManager = sqlDbManager;
+            _factory = factory;
         }
 
         public async Task<ISpecialization> CreateAsync(ISpecialization entity)
@@ -27,35 +28,13 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
             {
                 string proc = "[JA.spCreateSpecialization]";
-                var values = new SqlParameter[]
+                var values = new
                 {
-                    new SqlParameter("@id", entity.Id),
-                    new SqlParameter("@categoryId", entity.CategoryId),
-                    new SqlParameter("@SpecializationName", entity.Name)
+                    @specializationName = entity.Name,
+                    @categoryId = entity.CategoryId
                 };
 
-                await conn.OpenAsync();
-
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
-
-                //using (var cmd = conn.CreateCommand())
-                //{
-                //    cmd.CommandText = "[JA.spCreateSpecialization]";
-                //    cmd.CommandType = CommandType.StoredProcedure;
-                //    cmd.Parameters.AddRange(values);
-
-                //    try
-                //    {
-                //        await conn.OpenAsync();
-
-                //        entityId = await conn.Ex.ExecuteScalarAsync<int>();
-                //        entityId = (int)await cmd.ExecuteScalarAsync();
-                //    }
-                //    catch (Exception)
-                //    {
-                //        throw;
-                //    }
-                //}
             }
 
             if (entityId > 0)
@@ -72,35 +51,17 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                using (var cmd = conn.CreateCommand())
+                var proc = "[JA.spGetSpecializations]";
+
+                var queryResults = await conn.QueryAsync<SpecializationInformation>(proc, commandType: CommandType.StoredProcedure);
+
+                if (queryResults is not null)
                 {
-                    cmd.CommandText = "[JA.spGetSpecializations]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    try
+                    foreach (var result in queryResults)
                     {
-                        await conn.OpenAsync();
+                        ISpecialization specialization = (ISpecialization)_factory.CreateEntity(nameof(Specialization), result.Id, result.CategoryId, result.Name);
 
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
-
-                            while (await reader.ReadAsync())
-                            {
-                                var specialization = new Specialization
-                                {
-                                    Id = reader.GetInt32(0),
-                                    Name = reader.GetString(1),
-                                    CategoryId = reader.GetInt32(2)
-                                };
-
-                                specializations.Add(specialization);
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
+                        specializations.Add(specialization);
                     }
                 }
             }
@@ -114,38 +75,18 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                using (var cmd = conn.CreateCommand())
+                var proc = "[JA.spGetSpecializationById]";
+                var values = new
                 {
-                    cmd.CommandText = "[JA.spGetSpecializationById]";
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    @specializationId = id
+                };
 
-                    cmd.Parameters.AddWithValue("@id", id);
+                var queryResult = await conn.QuerySingleOrDefaultAsync<SpecializationInformation>(proc, values, commandType: CommandType.StoredProcedure);
 
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
-
-                            while (await reader.ReadAsync())
-                            {
-                                specialization = new Specialization
-                                {
-                                    Id = reader.GetInt32(0),
-                                    Name = reader.GetString(1),
-                                    CategoryId = reader.GetInt32(2)
-                                };
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                if (queryResult is not null)
+                {
+                    specialization = (ISpecialization)_factory.CreateEntity(nameof(Specialization), queryResult.Id, queryResult.CategoryId, queryResult.Name);
                 }
-
             }
 
             return specialization;
@@ -157,28 +98,13 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spRemoveSpecialization]";
+                var values = new
                 {
-                    new SqlParameter("@id", entity.Id)
+                    @specializationId = entity.Id
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spRemoveSpecialization]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        isDeleted = (await cmd.ExecuteNonQueryAsync()) == 1;
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                isDeleted = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
             }
 
             return isDeleted;
@@ -190,30 +116,15 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spUpdateSpecialization]";
+                var values = new
                 {
-                    new SqlParameter("@id", entity.Id),
-                    new SqlParameter("@specializationName", entity.Name),
-                    new SqlParameter("@categoryId", entity.CategoryId)
+                    @specializationId = entity.Id,
+                    @specializationName = entity.Name,
+                    @categoryId = entity.CategoryId
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spUpdateSpecialization]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = int.Parse((await cmd.ExecuteScalarAsync()).ToString());
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
             if (entityId >= 0)

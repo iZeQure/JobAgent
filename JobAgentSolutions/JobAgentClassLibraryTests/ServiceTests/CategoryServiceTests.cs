@@ -13,7 +13,7 @@ namespace JobAgentClassLibraryTests.ServiceTests
         public void SetUp()
         {
             var manager = SqlConfigurationSetup.SetupSqlDbManager();
-            _moqRepository = new CategoryRepository(manager);
+            _moqRepository = new CategoryRepository(manager, new JobAgentClassLibrary.Common.Categories.Factory.CategoryEntityFactory());
         }
 
         [Test]
