@@ -31,7 +31,6 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
                 {
                     @companyCVR = entity.Id,
                     @companyName = entity.Name,
-                    @contactPerson = entity.ContactPerson
                 };
 
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
@@ -67,9 +66,7 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
                                 var company = new Company
                                 {
                                     Id = reader.GetInt32(0),
-                                    CVR = reader.GetInt32(1),
                                     Name = reader.GetString(2),
-                                    ContactPerson = reader.GetString(3)
                                 };
 
                                 categories.Add(company);
@@ -175,9 +172,7 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
                 var values = new SqlParameter[]
                 {
                         new SqlParameter("@id", entity.Id),
-                        new SqlParameter("@companyCVR", entity.CVR),
                         new SqlParameter("@companyName", entity.Name),
-                        new SqlParameter("@contactPerson", entity.ContactPerson)
                 };
 
                 using (var cmd = conn.CreateCommand())
