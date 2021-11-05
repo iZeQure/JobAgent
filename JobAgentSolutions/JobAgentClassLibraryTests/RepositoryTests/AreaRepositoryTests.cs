@@ -1,4 +1,5 @@
 ﻿using JobAgentClassLibrary.Common.Areas.Entities;
+using JobAgentClassLibrary.Common.Areas.Factory;
 using JobAgentClassLibrary.Common.Areas.Repositories;
 using JobAgentClassLibraryTests.Setup;
 using NUnit.Framework;
@@ -20,7 +21,8 @@ namespace JobAgentClassLibraryTests.RepositoryTests
         public void Setup()
         {
             var manager = SqlConfigurationSetup.SetupSqlDbManager();
-            _areaRepository = new AreaRepository(manager);
+            var factory = new AreaEntityFactory();
+            _areaRepository = new AreaRepository(manager, factory);
         }
 
 
