@@ -11,7 +11,5 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Entities
         public DateTime RegistrationDateTime { get; }
         public int CategoryId { get; }
         public int SpecializationId { get; }
-        public int VacantJobId { get; }
-
     }
 }
