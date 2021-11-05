@@ -1,11 +1,12 @@
 ﻿using Dapper;
 using JobAgentClassLibrary.Common.JobAdverts.Entities;
+using JobAgentClassLibrary.Common.JobAdverts.Entities.EntityMaps;
+using JobAgentClassLibrary.Common.JobAdverts.Factory;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
@@ -13,12 +14,13 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
     public class JobAdvertRepository : IJobAdvertRepository
     {
         private readonly ISqlDbManager _sqlDbManager;
+        private readonly JobAdvertEntityFactory _factory;
 
-        public JobAdvertRepository(ISqlDbManager sqlDbManager)
+        public JobAdvertRepository(ISqlDbManager sqlDbManager, JobAdvertEntityFactory factory)
         {
             _sqlDbManager = sqlDbManager;
+            _factory = factory;
         }
-
 
         public async Task<IJobAdvert> CreateAsync(IJobAdvert entity)
         {
@@ -55,37 +57,23 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                using (var cmd = conn.CreateCommand())
+                var proc = "[JA.spGetJobAdverts]";
+
+                var queryResults = await conn.QueryAsync<JobAdvertInformation>(proc, commandType: CommandType.StoredProcedure);
+
+                if (queryResults is not null)
                 {
-                    cmd.CommandText = "[JA.spGetJobAdverts]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    try
+                    foreach (var result in queryResults)
                     {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
+                        IJobAdvert jobAdvert = (IJobAdvert)_factory.CreateEntity(nameof(JobAdvert),
+                            result.Id,
+                            result.CategoryId,
+                            result.SpecializationId,
+                            result.Title,
+                            result.Summary,
+                            result.RegistrationDateTime);
 
-                            while (await reader.ReadAsync())
-                            {
-                                var jobAdvert = new JobAdvert
-                                {
-                                    Id = reader.GetInt32(0),
-                                    CategoryId = reader.GetInt32(6),
-                                    SpecializationId = reader.GetInt32(8),
-                                    Title = reader.GetString(11),
-                                    Summary = reader.GetString(12),
-                                    RegistrationDateTime = reader.GetDateTime(13)
-
-                                };
-
-                                jobAdverts.Add(jobAdvert);
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
+                        jobAdverts.Add(jobAdvert);
                     }
                 }
             }
@@ -103,42 +91,23 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
             IJobAdvert jobAdvert = null;
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spGetJobAdvertById]";
+                var values = new
                 {
-                        new SqlParameter("@id", id)
+                    @vacantJobId = id
                 };
 
-                using (var cmd = conn.CreateCommand())
+                var queryResult = await conn.QuerySingleOrDefaultAsync<JobAdvertInformation>(proc, values, commandType: CommandType.StoredProcedure);
+
+                if (queryResult is not null)
                 {
-                    cmd.CommandText = "[JA.spGetJobAdvertById]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
-
-                            while (await reader.ReadAsync())
-                            {
-                                jobAdvert = new JobAdvert
-                                {
-                                    Id = reader.GetInt32(0),
-                                    CategoryId = reader.GetInt32(6),
-                                    SpecializationId = reader.GetInt32(8),
-                                    Title = reader.GetString(11),
-                                    Summary = reader.GetString(12),
-                                    RegistrationDateTime = reader.GetDateTime(13)
-                                };
-
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                    jobAdvert = (IJobAdvert)_factory.CreateEntity(nameof(JobAdvert),
+                        queryResult.Id,
+                        queryResult.CategoryId,
+                        queryResult.SpecializationId,
+                        queryResult.Title,
+                        queryResult.Summary,
+                        queryResult.RegistrationDateTime);
                 }
             }
             return jobAdvert;
@@ -147,135 +116,82 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
 
         public async Task<int> GetJobAdvertCountByCategoryId(int id)
         {
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            int count = 0;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Complex))
             {
+                var proc = "[JA.spGetTotalJobAdvertCountByCategoryId]";
+                var dynamicValues = new DynamicParameters();
 
-                SqlParameter outputParameter = new() { Direction = ParameterDirection.Output, ParameterName = "@countByCategory", SqlDbType = SqlDbType.Int };
+                dynamicValues.Add("@categoryId", id);
+                dynamicValues.Add("@countByCategory", SqlDbType.Int, direction: ParameterDirection.Output);
 
-                SqlParameter[] values = new[]
-                {
-                    new SqlParameter("@categoryId", id),
-                    outputParameter
-                };
+                await conn.QueryAsync(proc, dynamicValues, commandType: CommandType.StoredProcedure);
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spGetTotalJobAdvertCountByCategoryId]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-                    await cmd.ExecuteNonQueryAsync();
-                }
-
-                bool parsedOutput = int.TryParse(values[1].Value.ToString(), out int count);
-                if (parsedOutput)
-                {
-                    return count;
-                }
-
-                return 0;
+                count = dynamicValues.Get<int>("@countByCategory");
             }
+
+            return count;
         }
 
 
         public async Task<int> GetJobAdvertCountBySpecializationId(int id)
         {
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            int count = 0;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Complex))
             {
+                var proc = "[JA.spGetTotalJobAdvertCountBySpecializationId]";
+                var dynamicValues = new DynamicParameters();
 
-                SqlParameter outputParameter = new() { Direction = ParameterDirection.Output, ParameterName = "@countByCategory", SqlDbType = SqlDbType.Int };
+                dynamicValues.Add("@specializationId", id);
+                dynamicValues.Add("@countByCategory", SqlDbType.Int, direction: ParameterDirection.Output);
 
-                SqlParameter[] values = new[]
-                {
-                    new SqlParameter("@specializationId", id),
-                    outputParameter
-                };
+                await conn.QueryAsync(proc, dynamicValues, commandType: CommandType.StoredProcedure);
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spGetTotalJobAdvertCountBySpecializationId]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-                    await cmd.ExecuteNonQueryAsync();
-                }
-
-                bool parsedOutput = int.TryParse(values[1].Value.ToString(), out int count);
-                if (parsedOutput)
-                {
-                    return count;
-                }
-
-                return 0;
+                count = dynamicValues.Get<int>("@countByCategory");
             }
+
+            return count;
         }
 
 
         public async Task<int> GetJobAdvertCountByUncategorized()
         {
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            int count = 0;
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Complex))
             {
+                var proc = "[JA.spGetTotalJobAdvertCountByNonCategorized]";
+                var dynamicValues = new DynamicParameters();
 
-                SqlParameter outputParameter = new() { Direction = ParameterDirection.Output, ParameterName = "@countByCategory", SqlDbType = SqlDbType.Int };
+                dynamicValues.Add("@countByCategory", SqlDbType.Int, direction: ParameterDirection.Output);
 
-                SqlParameter[] values = new[]
-                {
-                    outputParameter
-                };
+                await conn.QueryAsync(proc, dynamicValues, commandType: CommandType.StoredProcedure);
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spGetTotalJobAdvertCountByNonCategorized]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-                    await cmd.ExecuteNonQueryAsync();
-                }
-
-                bool parsedOutput = int.TryParse(values[1].Value.ToString(), out int count);
-                if (parsedOutput)
-                {
-                    return count;
-                }
-
-                return 0;
+                count = dynamicValues.Get<int>("@countByCategory");
             }
+
+            return count;
         }
 
 
         public async Task<bool> RemoveAsync(IJobAdvert entity)
         {
-            int entityId = 0;
+            bool isDeleted = false;
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spRemoveJobAdvert]";
+                var values = new
                 {
-                        new SqlParameter("@id", entity.Id)
+                    @vacantJobId = entity.Id
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spRemoveJobAdvert]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = (int)await cmd.ExecuteScalarAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                isDeleted = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
             }
 
-            if (entityId != 0)
-            {
-                return true;
-            }
-
-            return false;
+            return isDeleted;
         }
 
 
@@ -285,36 +201,21 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spUpdateJobAdvert]";
+                var values = new
                 {
-                    new SqlParameter("@vacantJobId", entity.Id),
-                    new SqlParameter("@categoryId", entity.CategoryId),
-                    new SqlParameter("@specializationid", entity.SpecializationId),
-                    new SqlParameter("@jobAdvertTitle", entity.Title),
-                    new SqlParameter("@jobAdvertSummary", entity.Summary),
-                    new SqlParameter("@jobAdvertRegistrationDateTime", entity.RegistrationDateTime)
+                    @vacantJobId = entity.Id,
+                    @specializationId = entity.SpecializationId,
+                    @categoryId = entity.CategoryId,
+                    @jobAdvertTitle = entity.Title,
+                    @jobAdvertSummary = entity.Summary,
+                    @jobAdvertRegistrationDateTime = entity.RegistrationDateTime
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spUpdateJobAdvert]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = (int)await cmd.ExecuteScalarAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId != 0)
+            if (entityId >= 0)
             {
                 return await GetByIdAsync(entityId);
             }
