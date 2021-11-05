@@ -15,13 +15,13 @@ namespace JobAgentClassLibrary.Common.Areas.Factory
         {
             nameof(Area) => new Area
             {
-                Id = ParseEntityValueToInt(entityValues[0]),
-                Name = ParseEntityValueToString(entityValues[1])
+                Id = ParseValue<int>(entityValues[0]),
+                Name = ParseValue<string>(entityValues[1])
             },
             nameof(AreaInformation) => new AreaInformation
             {
-                AreaId = ParseEntityValueToInt(entityValues[0]),
-                AreaName = ParseEntityValueToString(entityValues[1]),
+                AreaId = ParseValue<int>(entityValues[0]),
+                AreaName = ParseValue<string>(entityValues[1]),
             },
             _ => throw new ArgumentOutOfRangeException(nameof(paramName), paramName, "Coudln't create type. Out of range.")
         };

@@ -12,15 +12,15 @@ namespace JobAgentClassLibrary.Common.Filters.Factory
         {
             nameof(StaticSearchFilter) => new StaticSearchFilter
             {
-                Id = ParseEntityValueToInt(entityValues[0]),
-                FilterType = new() { Id = ParseEntityValueToInt(entityValues[1]) },
-                Key = ParseEntityValueToString(entityValues[2])
+                Id = ParseValue<int>(entityValues[0]),
+                FilterType = new() { Id = ParseValue<int>(entityValues[1]) },
+                Key = ParseValue<string>(entityValues[2])
             },
             nameof(StaticSearchFilterInformation) => new StaticSearchFilterInformation
             {
-                StaticSearchFilterId = ParseEntityValueToInt(entityValues[0]),
-                FilterTypeId = ParseEntityValueToInt(entityValues[1]),
-                StaticSearchFilterKey = ParseEntityValueToString(entityValues[2])
+                StaticSearchFilterId = ParseValue<int>(entityValues[0]),
+                FilterTypeId = ParseValue<int>(entityValues[1]),
+                StaticSearchFilterKey = ParseValue<string>(entityValues[2])
             },
             _ => throw new ArgumentOutOfRangeException(nameof(paramName), paramName, "Coudln't create type. Out of range.")
         };

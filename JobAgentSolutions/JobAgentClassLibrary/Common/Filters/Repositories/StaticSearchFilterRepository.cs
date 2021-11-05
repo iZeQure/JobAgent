@@ -1,11 +1,14 @@
 ﻿using Dapper;
 using JobAgentClassLibrary.Common.Filters.Entities;
+using JobAgentClassLibrary.Common.Filters.Entities.EntityMaps;
+using JobAgentClassLibrary.Common.Filters.Factory;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.Filters.Repositories
@@ -13,10 +16,14 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
     public class StaticSearchFilterRepository : IStaticSearchFilterRepository
     {
         private readonly ISqlDbManager _sqlDbManager;
+        private readonly StaticSearchFilterEntityFactory _factory;
 
-        public StaticSearchFilterRepository(ISqlDbManager sqlDbManager)
+
+        public StaticSearchFilterRepository(ISqlDbManager sqlDbManager, StaticSearchFilterEntityFactory factory)
         {
             _sqlDbManager = sqlDbManager;
+            _factory = factory;
+
         }
 
 
@@ -51,34 +58,19 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                using (var cmd = conn.CreateCommand())
+                string proc = "[JA.spGetStaticSearchFilters]";
+
+                var queryResult = await conn.QueryAsync<StaticSearchFilterInformation>(proc, commandType: CommandType.StoredProcedure);
+
+                if (queryResult is not null && queryResult.Any())
                 {
-                    cmd.CommandText = "[JA.spGetStaticSearchFilters]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    try
+                    foreach (var result in queryResult)
                     {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
+                        IStaticSearchFilter dynamicSearchFilter = (IStaticSearchFilter)_factory.CreateEntity(
+                                nameof(StaticSearchFilter),
+                                result.StaticSearchFilterId, result.FilterTypeId, result.StaticSearchFilterKey);
 
-                            while (await reader.ReadAsync())
-                            {
-                                var staticSearchFilter = new StaticSearchFilter
-                                {
-                                    Id = reader.GetInt32(0),
-                                    FilterType = new() { Id = reader.GetInt32(1) },
-                                    Key = reader.GetString(2)
-
-                                };
-
-                                staticSearchFilters.Add(staticSearchFilter);
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
+                        staticSearchFilters.Add(dynamicSearchFilter);
                     }
                 }
             }
@@ -88,83 +80,44 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
 
         public async Task<IStaticSearchFilter> GetByIdAsync(int id)
         {
-            StaticSearchFilter staticSearchFilter = null;
+            IStaticSearchFilter staticSearchFilter = null;
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spGetStaticSearchFilterById]";
+                var values = new
                 {
-                        new SqlParameter("@id", id)
+                    @id = id
                 };
 
-                using (var cmd = conn.CreateCommand())
+                var queryResult = await conn.QuerySingleOrDefaultAsync<StaticSearchFilterInformation>(proc, values, commandType: CommandType.StoredProcedure);
+
+                if (queryResult is not null)
                 {
-                    cmd.CommandText = "[JA.spGetStaticSearchFilterById]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
-
-                            while (await reader.ReadAsync())
-                            {
-                                staticSearchFilter = new()
-                                {
-                                    Id = reader.GetInt32(0),
-                                    FilterType = new() { Id = reader.GetInt32(1) },
-                                    Key = reader.GetString(2)
-                                };
-
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                    staticSearchFilter = (IStaticSearchFilter)_factory.CreateEntity(
+                                nameof(StaticSearchFilter),
+                                queryResult.StaticSearchFilterId, queryResult.FilterTypeId, queryResult.StaticSearchFilterKey);
                 }
             }
+
             return staticSearchFilter;
         }
 
         public async Task<bool> RemoveAsync(IStaticSearchFilter entity)
         {
-            int entityId = 0;
+            bool isDeleted = false;
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spRemoveStaticSearchFilter]";
+                var values = new
                 {
-                        new SqlParameter("@id", entity.Id)
+                    @id = entity.Id
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spRemoveStaticSearchFilter]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = (int)await cmd.ExecuteScalarAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                isDeleted = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
             }
 
-            if (entityId != 0)
-            {
-                return true;
-            }
-
-            return false;
+            return isDeleted;
         }
 
         public async Task<IStaticSearchFilter> UpdateAsync(IStaticSearchFilter entity)
@@ -173,33 +126,18 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spUpdateStaticSearchFilter]";
+                var values = new
                 {
-                    new SqlParameter("@id", entity.Id),
-                    new SqlParameter("@categoryId", entity.FilterType.Id),
-                    new SqlParameter("@key", entity.Key)
+                    @id = entity.Id,
+                    @categoryId = entity.FilterType.Id,
+                    @key = entity.Key
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spUpdateStaticSearchFilter]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = (int)await cmd.ExecuteScalarAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId != 0)
+            if (entityId >= 0)
             {
                 return await GetByIdAsync(entityId);
             }
