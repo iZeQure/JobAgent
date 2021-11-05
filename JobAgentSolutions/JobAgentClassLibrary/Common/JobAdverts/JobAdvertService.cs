@@ -14,20 +14,14 @@ namespace JobAgentClassLibrary.Common.JobAdverts
             _repository = repository;
         }
 
-
         public async Task<IJobAdvert> CreateAsync(IJobAdvert entity)
         {
             return await _repository.CreateAsync(entity);
         }
 
-        public async Task<List<IJobAdvert>> GetAllAsync()
+        public async Task<List<IJobAdvert>> GetJobAdvertsAsync()
         {
             return await _repository.GetAllAsync();
-        }
-
-        public async Task<List<JobAdvert>> GetAllUncategorized()
-        {
-            return await _repository.GetAllUncategorized();
         }
 
         public async Task<IJobAdvert> GetByIdAsync(int id)
