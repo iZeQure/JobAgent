@@ -1,11 +1,12 @@
 ﻿using Dapper;
 using JobAgentClassLibrary.Common.Companies.Entities;
+using JobAgentClassLibrary.Common.Companies.Entities.EntityMaps;
+using JobAgentClassLibrary.Common.Companies.Factory;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
-using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.Companies.Repositories
@@ -13,10 +14,14 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
     public class CompanyRepository : ICompanyRepository
     {
         private readonly ISqlDbManager _sqlDbManager;
+        private readonly CompanyEntityFactory _factory;
 
-        public CompanyRepository(ISqlDbManager sqlDbManager)
+
+        public CompanyRepository(ISqlDbManager sqlDbManager, CompanyEntityFactory factory)
         {
             _sqlDbManager = sqlDbManager;
+            _factory = factory;
+
         }
 
 
@@ -46,121 +51,70 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
 
         public async Task<List<ICompany>> GetAllAsync()
         {
-            List<ICompany> categories = new();
+            List<ICompany> areas = new();
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                using (var cmd = conn.CreateCommand())
+                string proc = "[JA.spGetCompanies]";
+
+                var queryResult = await conn.QueryAsync<CompanyInformation>(proc, commandType: CommandType.StoredProcedure);
+
+                if (queryResult is not null && queryResult.Any())
                 {
-                    cmd.CommandText = "[JA.spGetCompanies]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    try
+                    foreach (var result in queryResult)
                     {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
+                        ICompany area = (ICompany)_factory.CreateEntity(
+                                nameof(Company),
+                                result.Id, result.Name);
 
-                            while (await reader.ReadAsync())
-                            {
-                                var company = new Company
-                                {
-                                    Id = reader.GetInt32(0),
-                                    Name = reader.GetString(2),
-                                };
-
-                                categories.Add(company);
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
+                        areas.Add(area);
                     }
                 }
             }
 
-            return categories;
+            return areas;
         }
 
         public async Task<ICompany> GetByIdAsync(int id)
         {
-            Company company = new Company();
+            ICompany company = null;
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spGetCompanyById]";
+                var values = new
                 {
-                        new SqlParameter("@companyId", id)
+                    @companyId = id
                 };
 
-                using (var cmd = conn.CreateCommand())
+                var queryResult = await conn.QuerySingleOrDefaultAsync<CompanyInformation>(proc, values, commandType: CommandType.StoredProcedure);
+
+                if (queryResult is not null)
                 {
-                    cmd.CommandText = "[JA.spGetCompanyById]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
-
-                            while (await reader.ReadAsync())
-                            {
-                                company = new()
-                                {
-                                    Id = reader.GetInt32(0),
-                                    Name = reader.GetString(1)
-                                };
-
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                    company = (ICompany)_factory.CreateEntity(
+                                nameof(Company),
+                                queryResult.Id, queryResult.Name);
                 }
             }
+
             return company;
         }
 
         public async Task<bool> RemoveAsync(ICompany entity)
         {
-            int entityId = 0;
+            bool isDeleted = false;
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spRemoveCompany]";
+                var values = new
                 {
-                        new SqlParameter("@companyId", entity.Id)
+                    @companyId = entity.Id
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spDeleteCompany]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = (int)await cmd.ExecuteScalarAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                isDeleted = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
             }
 
-            if (entityId != 0)
-            {
-                return true;
-            }
-
-            return false;
+            return isDeleted;
         }
 
         public async Task<ICompany> UpdateAsync(ICompany entity)
@@ -169,32 +123,17 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spUpdateCompany]";
+                var values = new
                 {
-                        new SqlParameter("@id", entity.Id),
-                        new SqlParameter("@companyName", entity.Name),
+                    @companyId = entity.Id,
+                    @companyName = entity.Name
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spUpdateCompany]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = (int)await cmd.ExecuteScalarAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId != 0)
+            if (entityId >= 0)
             {
                 return await GetByIdAsync(entityId);
             }
