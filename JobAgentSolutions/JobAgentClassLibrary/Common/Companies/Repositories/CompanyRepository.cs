@@ -34,7 +34,6 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
 
                 var values = new
                 {
-                    @companyCVR = entity.Id,
                     @companyName = entity.Name,
                 };
 
