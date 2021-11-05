@@ -12,17 +12,17 @@ namespace JobAgentClassLibrary.Common.Filters.Factory
         {
             nameof(DynamicSearchFilter) => new DynamicSearchFilter
             {
-                Id = ParseEntityValueToInt(entityValues[0]),
-                SpecializationId = ParseEntityValueToInt(entityValues[1]),
-                CategoryId = ParseEntityValueToInt(entityValues[2]),
-                Key = ParseEntityValueToString(entityValues[3])
+                Id = ParseValue<int>(entityValues[0]),
+                SpecializationId = ParseValue<int>(entityValues[1]),
+                CategoryId = ParseValue<int>(entityValues[2]),
+                Key = ParseValue<string>(entityValues[3])
             },
             nameof(DynamicSearchFilterInformation) => new DynamicSearchFilterInformation
             {
-                DynamicSearchFilterId = ParseEntityValueToInt(entityValues[0]),
-                SpecializationId = ParseEntityValueToInt(entityValues[1]),
-                CategoryId = ParseEntityValueToInt(entityValues[2]),
-                DynamicSearchFilterKey = ParseEntityValueToString(entityValues[3])
+                DynamicSearchFilterId = ParseValue<int>(entityValues[0]),
+                SpecializationId = ParseValue<int>(entityValues[1]),
+                CategoryId = ParseValue<int>(entityValues[2]),
+                DynamicSearchFilterKey = ParseValue<string>(entityValues[3])
             },
             _ => throw new ArgumentOutOfRangeException(nameof(paramName), paramName, "Coudln't create type. Out of range.")
 
