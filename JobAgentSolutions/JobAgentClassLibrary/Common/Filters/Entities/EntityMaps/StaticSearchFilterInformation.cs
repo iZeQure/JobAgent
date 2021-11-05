@@ -3,7 +3,7 @@
 namespace JobAgentClassLibrary.Common.Filters.Entities.EntityMaps
 {
     [Table("StaticSearchFilterInformation")]
-    public class StaticSearchFilter : IStaticSearchFilter
+    public class StaticSearchFilterInformation : IStaticSearchFilter
     {
         public int Id => StaticSearchFilterId;
 
