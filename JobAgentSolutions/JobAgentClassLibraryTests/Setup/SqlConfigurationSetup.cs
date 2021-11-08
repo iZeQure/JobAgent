@@ -12,7 +12,7 @@ namespace JobAgentClassLibraryTests.Setup
         {
             var inMemorySettings = new Dictionary<string, string>
             {
-                {"ServerHost", "IGEIRISS\\SQLDEV" },
+                {"ServerHost", "172.18.3.151" },
                 {"Database", "JobAgentDB_v2" }
             };
 

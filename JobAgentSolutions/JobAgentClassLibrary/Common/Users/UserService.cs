@@ -41,7 +41,7 @@ namespace JobAgentClassLibrary.Common.Users
 
         public async Task<string> GetSaltByEmailAddressAsync(string email)
         {
-            return await _userRepository.GetSaltByEmailAddressAsync(email);
+            return await _userRepository.GetSaltByEmailAsync(email);
         }
 
         public async Task<IUser> GetUserByAccessTokenAsync(string accessToken)

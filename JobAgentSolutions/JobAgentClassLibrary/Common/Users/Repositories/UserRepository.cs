@@ -1,7 +1,10 @@
-﻿using JobAgentClassLibrary.Common.Areas.Entities;
+﻿using Dapper;
+using JobAgentClassLibrary.Common.Areas.Entities;
 using JobAgentClassLibrary.Common.Locations.Entities;
 using JobAgentClassLibrary.Common.Roles.Entities;
 using JobAgentClassLibrary.Common.Users.Entities;
+using JobAgentClassLibrary.Common.Users.Entities.EntityMaps;
+using JobAgentClassLibrary.Common.Users.Factory;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
 using System;
@@ -15,10 +18,12 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
     public class UserRepository : IUserRepository
     {
         private readonly ISqlDbManager _sqlDbManager;
+        private readonly UserEntityFactory _factory;
 
-        public UserRepository(ISqlDbManager sqlDbManager)
+        public UserRepository(ISqlDbManager sqlDbManager, UserEntityFactory factory)
         {
             _sqlDbManager = sqlDbManager;
+            _factory = factory;
         }
 
         public async Task<bool> AuthenticateUserLoginAsync(IAuthUser user)
@@ -32,39 +37,16 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.ComplexUser))
             {
-                var outputParam = new SqlParameter
-                {
-                    Direction = ParameterDirection.Output,
-                    ParameterName = "@returnResult",
-                    SqlDbType = SqlDbType.Bit
-                };
+                var proc = "[JA.spValidateUserLogin]";
+                var dynamicValues = new DynamicParameters();
 
-                var values = new SqlParameter[]
-                {
-                    new SqlParameter("@userEmail", ((AuthUser)user).Email),
-                    new SqlParameter("@userPassword", user.Password),
-                    outputParam
-                };
+                dynamicValues.Add("@userEmail", ((AuthUser)user).Email);
+                dynamicValues.Add("@userPassword", user.Password);
+                dynamicValues.Add("@returnResult", SqlDbType.Bit, direction: ParameterDirection.Output);
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spValidateUserLogin]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
+                await conn.QueryAsync(proc, dynamicValues, commandType: CommandType.StoredProcedure);
 
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        await cmd.ExecuteNonQueryAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
-
-                isAuthenticated = Convert.ToBoolean(values[2].Value);
+                isAuthenticated = dynamicValues.Get<bool>("@returnResult");
             }
 
             return isAuthenticated;
@@ -76,38 +58,15 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.ComplexUser))
             {
-                var outputParam = new SqlParameter
-                {
-                    Direction = ParameterDirection.Output,
-                    ParameterName = "@returnResult",
-                    SqlDbType = SqlDbType.Bit
-                };
+                var proc = "[JA.spValidateUserLogin]";
+                var dynamicValues = new DynamicParameters();
 
-                var values = new SqlParameter[]
-                {
-                    new SqlParameter("@userEmail", user.Email),
-                    outputParam
-                };
+                dynamicValues.Add("@userEmail", user.Email);
+                dynamicValues.Add("@returnResult", SqlDbType.Bit, direction: ParameterDirection.Output);
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spValidateUserExists]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
+                await conn.QueryAsync(proc, dynamicValues, commandType: CommandType.StoredProcedure);
 
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        await cmd.ExecuteNonQueryAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
-
-                userExists = Convert.ToBoolean(values[2].Value);
+                userExists = dynamicValues.Get<bool>("@returnResult");
             }
 
             return userExists;
@@ -121,35 +80,20 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
             {
                 using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
                 {
-                    var values = new SqlParameter[]
+                    var proc = "[JA.spCreateUser]";
+                    var values = new
                     {
-                        new SqlParameter("@roleId", authUser.RoleId.Id),
-                        new SqlParameter("@locationId", authUser.LocationId.Id),
-                        new SqlParameter("@userFirstName", authUser.FirstName),
-                        new SqlParameter("@userLastName", authUser.LastName),
-                        new SqlParameter("@userEmail", authUser.Email),
-                        new SqlParameter("@userPass", authUser.Password),
-                        new SqlParameter("@userSalt", authUser.Salt),
-                        new SqlParameter("@userAccessToken", authUser.AccessToken)
+                        @roleId = authUser.RoleId,
+                        @locationId = authUser.LocationId,
+                        @userFirstName = authUser.FirstName,
+                        @userLastName = authUser.LastName,
+                        @userEmail = authUser.Email,
+                        @userPass = authUser.Password,
+                        @userSalt = authUser.Salt,
+                        @userAccessToken = authUser.AccessToken
                     };
 
-                    using (var cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = "[JA.spCreateUser]";
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.AddRange(values);
-
-                        try
-                        {
-                            await conn.OpenAsync();
-
-                            entityId = (int)await cmd.ExecuteScalarAsync();
-                        }
-                        catch (Exception)
-                        {
-                            throw;
-                        }
-                    }
+                    entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
                 }
 
                 if (entityId != 0)
@@ -167,28 +111,23 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
-                using (var cmd = conn.CreateCommand())
+                var proc = "[JA.spGetUsers]";
+
+                var queryResults = await conn.QueryAsync<UserInformation>(proc, commandType: CommandType.StoredProcedure);
+
+                if (queryResults is not null)
                 {
-                    cmd.CommandText = "[JA.spGetUsers]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    try
+                    foreach (var result in queryResults)
                     {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return users;
+                        IUser user = (IUser)_factory.CreateEntity(nameof(User),
+                            result.Id,
+                            result.RoleId,
+                            result.LocationId,
+                            result.FirstName,
+                            result.LastName,
+                            result.Email);
 
-                            while (await reader.ReadAsync())
-                            {
-                                var user = await MapUserDataFromSqlDataReader(reader);
-
-                                users.Add(user);
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
+                        users.Add(user);
                     }
                 }
             }
@@ -202,29 +141,23 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
-                using (var cmd = conn.CreateCommand())
+                var proc = "[JA.spGetUserByEmail]";
+                var values = new
                 {
-                    cmd.CommandText = "[JA.spGetUserByEmail]";
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    @email = email
+                };
 
-                    cmd.Parameters.AddWithValue("@email", email);
+                var result = await conn.QueryFirstOrDefaultAsync<UserInformation>(proc, values, commandType: CommandType.StoredProcedure);
 
-                    try
-                    {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
-
-                            while (await reader.ReadAsync())
-                            {
-                                user = await MapUserDataFromSqlDataReader(reader);
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                if (result is not null)
+                {
+                    user = (IUser)_factory.CreateEntity(nameof(User),
+                        result.Id,
+                        result.RoleId,
+                        result.LocationId,
+                        result.FirstName,
+                        result.LastName,
+                        result.Email);
                 }
             }
 
@@ -237,64 +170,46 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
-                using (var cmd = conn.CreateCommand())
+                var proc = "[JA.spGetUserById]";
+                var values = new
                 {
-                    cmd.CommandText = "[JA.spGetUserById]";
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    @userId = id
+                };
 
-                    cmd.Parameters.AddWithValue("@userId", id);
+                var result = await conn.QueryFirstOrDefaultAsync<UserInformation>(proc, values, commandType: CommandType.StoredProcedure);
 
-                    try
-                    {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
-
-                            while (await reader.ReadAsync())
-                            {
-                                user = await MapUserDataFromSqlDataReader(reader);
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                if (result is not null)
+                {
+                    user = (IUser)_factory.CreateEntity(nameof(User),
+                        result.Id,
+                        result.RoleId,
+                        result.LocationId,
+                        result.FirstName,
+                        result.LastName,
+                        result.Email);
                 }
             }
 
             return user;
         }
 
-        public async Task<string> GetSaltByEmailAddressAsync(string email)
+        public async Task<string> GetSaltByEmailAsync(string email)
         {
             string salt = string.Empty;
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
-                using (var cmd = conn.CreateCommand())
+                var proc = "[JA.spGetUserSaltByEmail]";
+                var values = new
                 {
-                    cmd.CommandText = "[JA.spGetUserSaltByEmail]";
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    @userEmail = email
+                };
 
-                    cmd.Parameters.AddWithValue("@userEmail ", email);
+                var result = await conn.QueryFirstOrDefaultAsync<string>(proc, values, commandType: CommandType.StoredProcedure);
 
-                    try
-                    {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
-
-                            while (await reader.ReadAsync())
-                            {
-                                salt = reader.GetString(0);
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                if (result is not null)
+                {
+                    salt = result;
                 }
             }
 
@@ -307,29 +222,24 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
-                using (var cmd = conn.CreateCommand())
+                var proc = "[JA.spGetUserByAccessToken]";
+                var values = new
                 {
-                    cmd.CommandText = "[JA.spGetUserByAccessToken]";
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    @userAccessToken = accessToken
+                };
 
-                    cmd.Parameters.AddWithValue("@userAccessToken ", accessToken);
+                var result = await conn.QueryFirstOrDefaultAsync<AuthUserView>(proc, values, commandType: CommandType.StoredProcedure);
 
-                    try
-                    {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
-
-                            while (await reader.ReadAsync())
-                            {
-                                user = await MapUserDataFromSqlDataReader(reader);
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                if (result is not null)
+                {
+                    user = (AuthUser)_factory.CreateEntity(nameof(AuthUser),
+                        result.Id,
+                        result.RoleId,
+                        result.LocationId,
+                        result.FirstName,
+                        result.LastName,
+                        result.Email,
+                        result.AccessToken);
                 }
             }
 

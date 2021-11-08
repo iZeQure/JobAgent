@@ -4,7 +4,6 @@ using JobAgentClassLibrary.Common.JobAdverts.Entities.EntityMaps;
 using JobAgentClassLibrary.Common.JobAdverts.Factory;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
@@ -50,7 +49,6 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
             return null;
         }
 
-
         public async Task<List<IJobAdvert>> GetAllAsync()
         {
             List<IJobAdvert> jobAdverts = new();
@@ -80,12 +78,6 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
             return jobAdverts;
         }
 
-        public Task<List<JobAdvert>> GetAllUncategorized()
-        {
-            throw new NotImplementedException();
-        }
-
-
         public async Task<IJobAdvert> GetByIdAsync(int id)
         {
             IJobAdvert jobAdvert = null;
@@ -113,7 +105,6 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
             return jobAdvert;
         }
 
-
         public async Task<int> GetJobAdvertCountByCategoryId(int id)
         {
             int count = 0;
@@ -133,7 +124,6 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
 
             return count;
         }
-
 
         public async Task<int> GetJobAdvertCountBySpecializationId(int id)
         {
@@ -155,7 +145,6 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
             return count;
         }
 
-
         public async Task<int> GetJobAdvertCountByUncategorized()
         {
             int count = 0;
@@ -175,7 +164,6 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
             return count;
         }
 
-
         public async Task<bool> RemoveAsync(IJobAdvert entity)
         {
             bool isDeleted = false;
@@ -193,7 +181,6 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
 
             return isDeleted;
         }
-
 
         public async Task<IJobAdvert> UpdateAsync(IJobAdvert entity)
         {

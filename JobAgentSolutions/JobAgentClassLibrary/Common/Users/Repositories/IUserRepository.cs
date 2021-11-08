@@ -20,6 +20,6 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
         Task<int> RevokeAreaFromUserAsync(IUser user, int areaId);
 
-        Task<string> GetSaltByEmailAddressAsync(string email);
+        Task<string> GetSaltByEmailAsync(string email);
     }
 }
