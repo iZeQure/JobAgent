@@ -30,7 +30,7 @@ namespace JobAgentClassLibraryTests.ServiceTests
             // Assert
             Assert.IsNotNull(categories);
             Assert.IsNotEmpty(categories);
-            Assert.Greater(collectionCount, categories.Count);
+            Assert.Greater(categories.Count, collectionCount);
             Assert.DoesNotThrowAsync(getAllAction);
         }
     }
