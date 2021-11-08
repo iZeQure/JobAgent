@@ -1,5 +1,6 @@
 ﻿using JobAgentClassLibrary.Core.Database.Factories;
 using JobAgentClassLibrary.Core.Entities;
+using System;
 using System.Data.SqlClient;
 
 namespace JobAgentClassLibrary.Core.Database.Managers
@@ -13,14 +14,14 @@ namespace JobAgentClassLibrary.Core.Database.Managers
             _factory = factory;
         }
 
-        public SqlConnection GetSqlConnection(DbConnectionType connectionType) => connectionType switch
+        public SqlConnection GetSqlConnection(DbCredentialType connectionType) => connectionType switch
         {
-            DbConnectionType.Basic => GetTestSqlConnection(),
-            DbConnectionType.Complex => GetTestSqlConnection(),
-            DbConnectionType.Create => GetTestSqlConnection(),
-            DbConnectionType.Update => GetTestSqlConnection(),
-            DbConnectionType.Delete => GetTestSqlConnection(),
-            _ => throw new System.ArgumentException("No Connection Type found with used type.", nameof(connectionType))
+            DbCredentialType.BasicUser => GetTestSqlConnection(),
+            DbCredentialType.ComplexUser => GetTestSqlConnection(),
+            DbCredentialType.CreateUser => GetTestSqlConnection(),
+            DbCredentialType.UpdateUser => GetTestSqlConnection(),
+            DbCredentialType.DeleteUser => GetTestSqlConnection(),
+            _ => throw new ArgumentException("No Connection Type found with used type.", nameof(connectionType))
         };
 
         private SqlConnection GetTestSqlConnection() => _factory.CreateConnection("sa", "1234");

@@ -26,7 +26,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
             {
                 var proc = "[JA.spCreateCategory]";
                 var values = new
@@ -49,7 +49,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
         {
             List<ICategory> categories = new();
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 var proc = "[JA.spGetCategories]";
 
@@ -72,7 +72,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
         public async Task<ICategory> GetByIdAsync(int id)
         {
             ICategory category = null;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 var proc = "[JA.spGetCategoryById]";
                 var values = new
@@ -97,7 +97,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
         {
             bool isDeleted = false;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.DeleteUser))
             {
                 var proc = "[JA.spRemoveCategory]";
                 var values = new
@@ -115,7 +115,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
             {
                 var proc = "[JA.spUpdateCategory]";
                 var values = new

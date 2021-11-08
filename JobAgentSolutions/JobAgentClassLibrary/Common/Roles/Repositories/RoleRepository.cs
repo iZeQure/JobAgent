@@ -25,7 +25,7 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
         public async Task<IRole> CreateAsync(IRole entity)
         {
             int entityId = 0;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
             {
                 string proc = "[JA.spCreateRole]";
 
@@ -51,7 +51,7 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
         {
             List<IRole> roles = new();
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 string proc = "[JA.spGetRoles]";
 
@@ -76,7 +76,7 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
         public async Task<IRole> GetByIdAsync(int id)
         {
             IRole role = null;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 var proc = "[JA.spGetRoleById]";
                 var values = new
@@ -101,7 +101,7 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
         {
             bool isDeleted = false;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.DeleteUser))
             {
                 var proc = "[JA.spDeleteRole]";
                 var values = new
@@ -119,7 +119,7 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
             {
                 var proc = "[JA.spUpdateRole]";
                 var values = new

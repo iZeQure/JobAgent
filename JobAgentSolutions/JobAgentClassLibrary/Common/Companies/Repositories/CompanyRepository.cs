@@ -28,7 +28,7 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
         public async Task<ICompany> CreateAsync(ICompany entity)
         {
             int entityId = 0;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
             {
                 string proc = "[JA.spCreateCompany]";
 
@@ -52,7 +52,7 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
         {
             List<ICompany> companies = new();
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 string proc = "[JA.spGetCompanies]";
 
@@ -77,7 +77,7 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
         public async Task<ICompany> GetByIdAsync(int id)
         {
             ICompany company = null;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 var proc = "[JA.spGetCompanyById]";
                 var values = new
@@ -102,7 +102,7 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
         {
             bool isDeleted = false;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.DeleteUser))
             {
                 var proc = "[JA.spRemoveCompany]";
                 var values = new
@@ -120,7 +120,7 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
             {
                 var proc = "[JA.spUpdateCompany]";
                 var values = new

@@ -25,7 +25,7 @@ namespace JobAgentClassLibrary.Common.Locations.Repositories
         public async Task<ILocation> CreateAsync(ILocation entity)
         {
             int entityId = 0;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
             {
                 string proc = "[JA.spCreateLocation]";
 
@@ -50,7 +50,7 @@ namespace JobAgentClassLibrary.Common.Locations.Repositories
         {
             List<ILocation> locations = new();
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 string proc = "[JA.spGetLocations]";
 
@@ -75,7 +75,7 @@ namespace JobAgentClassLibrary.Common.Locations.Repositories
         public async Task<ILocation> GetByIdAsync(int id)
         {
             ILocation location = null;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 var proc = "[JA.spGetLocationById]";
                 var values = new
@@ -100,7 +100,7 @@ namespace JobAgentClassLibrary.Common.Locations.Repositories
         {
             bool isDeleted = false;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.DeleteUser))
             {
                 var proc = "[JA.spRemoveLocation]";
                 var values = new
@@ -118,7 +118,7 @@ namespace JobAgentClassLibrary.Common.Locations.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
             {
                 var proc = "[JA.spUpdateLocation]";
                 var values = new

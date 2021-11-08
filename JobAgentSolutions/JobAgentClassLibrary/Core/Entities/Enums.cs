@@ -5,12 +5,12 @@
         Trace, Debug, Information, Warning, Error, Critical
     }
 
-    public enum DbConnectionType
+    public enum DbCredentialType
     {
-        Basic,
-        Complex,
-        Create,
-        Update,
-        Delete
+        BasicUser,
+        ComplexUser,
+        CreateUser,
+        UpdateUser,
+        DeleteUser
     }
 }

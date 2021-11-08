@@ -29,7 +29,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
         public async Task<IDynamicSearchFilter> CreateAsync(IDynamicSearchFilter entity)
         {
             int entityId = 0;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
             {
                 string proc = "[JA.spCreateDynamicSearchFilter]";
 
@@ -57,7 +57,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
         {
             List<IDynamicSearchFilter> DynamicSearchFilters = new();
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 string proc = "[JA.spGetDynamicSearchFilters]";
 
@@ -83,7 +83,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
         public async Task<IDynamicSearchFilter> GetByIdAsync(int id)
         {
             IDynamicSearchFilter dynamicSearchFilter = null;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 var proc = "[JA.spGetDynamicSearchFilterById]";
                 var values = new
@@ -109,7 +109,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
         {
             bool isDeleted = false;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.DeleteUser))
             {
                 var proc = "[JA.spRemoveDynamicSearchFilter]";
                 var values = new
@@ -128,7 +128,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
             {
                 var proc = "[JA.spUpdateDynamicSearchFilter]";
                 var values = new

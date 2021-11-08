@@ -27,7 +27,7 @@ namespace JobAgentClassLibrary.Common.JobPages.Repositories
         public async Task<IJobPage> CreateAsync(IJobPage entity)
         {
             int entityId = 0;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
             {
                 string proc = "[JA.spCreateJobPage]";
                 
@@ -53,7 +53,7 @@ namespace JobAgentClassLibrary.Common.JobPages.Repositories
         {
             List<IJobPage> jobPages = new();
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 var proc = "[JA.spGetJobPages]";
 
@@ -77,7 +77,7 @@ namespace JobAgentClassLibrary.Common.JobPages.Repositories
         {
             IJobPage jobPage = null;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 var proc = "[JA.spGetJobPageById]";
                 var values = new
@@ -102,7 +102,7 @@ namespace JobAgentClassLibrary.Common.JobPages.Repositories
         {
             bool isDeleted = false;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.DeleteUser))
             {
                 var proc = "[JA.spRemoveJobPage]";
                 var values = new
@@ -120,7 +120,7 @@ namespace JobAgentClassLibrary.Common.JobPages.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
             {
                 var proc = "[JA.spUpdateJobPage]";
                 var values = new

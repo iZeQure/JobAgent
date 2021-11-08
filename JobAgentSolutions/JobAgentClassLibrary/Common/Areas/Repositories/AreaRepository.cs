@@ -26,7 +26,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
         public async Task<IArea> CreateAsync(IArea entity)
         {
             int entityId = 0;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
             {
                 string proc = "[JA.spCreateArea]";
                 var values = new
@@ -50,7 +50,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
         {
             List<IArea> areas = new();
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 string proc = "[JA.spGetAreas]";
 
@@ -76,7 +76,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
         public async Task<IArea> GetByIdAsync(int id)
         {
             IArea area = null;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 var proc = "[JA.spGetAreaById]";
                 var values = new
@@ -102,7 +102,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
         {
             bool isDeleted = false;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.DeleteUser))
             {
                 var proc = "[JA.spRemoveArea]";
                 var values = new
@@ -121,7 +121,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
             {
                 var proc = "[JA.spUpdateArea]";
                 var values = new

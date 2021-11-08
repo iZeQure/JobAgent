@@ -25,7 +25,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
         public async Task<IJobAdvert> CreateAsync(IJobAdvert entity)
         {
             int entityId = 0;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
             {
                 string proc = "[JA.spCreateJobAdvert]";
 
@@ -55,7 +55,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
         {
             List<IJobAdvert> jobAdverts = new();
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 var proc = "[JA.spGetJobAdverts]";
 
@@ -89,7 +89,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
         public async Task<IJobAdvert> GetByIdAsync(int id)
         {
             IJobAdvert jobAdvert = null;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 var proc = "[JA.spGetJobAdvertById]";
                 var values = new
@@ -118,7 +118,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
         {
             int count = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Complex))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.ComplexUser))
             {
                 var proc = "[JA.spGetTotalJobAdvertCountByCategoryId]";
                 var dynamicValues = new DynamicParameters();
@@ -139,7 +139,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
         {
             int count = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Complex))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.ComplexUser))
             {
                 var proc = "[JA.spGetTotalJobAdvertCountBySpecializationId]";
                 var dynamicValues = new DynamicParameters();
@@ -160,7 +160,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
         {
             int count = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Complex))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.ComplexUser))
             {
                 var proc = "[JA.spGetTotalJobAdvertCountByNonCategorized]";
                 var dynamicValues = new DynamicParameters();
@@ -180,7 +180,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
         {
             bool isDeleted = false;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.DeleteUser))
             {
                 var proc = "[JA.spRemoveJobAdvert]";
                 var values = new
@@ -199,7 +199,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
             {
                 var proc = "[JA.spUpdateJobAdvert]";
                 var values = new

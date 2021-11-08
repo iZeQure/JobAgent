@@ -30,7 +30,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
         public async Task<IStaticSearchFilter> CreateAsync(IStaticSearchFilter entity)
         {
             int entityId = 0;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
             {
                 string proc = "[JA.spCreateStaticSearchFilter]";
 
@@ -56,7 +56,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
         {
             List<IStaticSearchFilter> staticSearchFilters = new();
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 string proc = "[JA.spGetStaticSearchFilters]";
 
@@ -81,7 +81,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
         public async Task<IStaticSearchFilter> GetByIdAsync(int id)
         {
             IStaticSearchFilter staticSearchFilter = null;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 var proc = "[JA.spGetStaticSearchFilterById]";
                 var values = new
@@ -106,7 +106,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
         {
             bool isDeleted = false;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.DeleteUser))
             {
                 var proc = "[JA.spRemoveStaticSearchFilter]";
                 var values = new
@@ -124,7 +124,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
             {
                 var proc = "[JA.spUpdateStaticSearchFilter]";
                 var values = new

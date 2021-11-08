@@ -30,7 +30,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
             bool isAuthenticated = false;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Complex))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.ComplexUser))
             {
                 var outputParam = new SqlParameter
                 {
@@ -74,7 +74,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
         {
             bool userExists = false;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Complex))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.ComplexUser))
             {
                 var outputParam = new SqlParameter
                 {
@@ -119,7 +119,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
             if (entity is AuthUser authUser)
             {
-                using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+                using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
                 {
                     var values = new SqlParameter[]
                     {
@@ -165,7 +165,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
         {
             List<IUser> users = new();
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 using (var cmd = conn.CreateCommand())
                 {
@@ -200,7 +200,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
         {
             IUser user = null;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 using (var cmd = conn.CreateCommand())
                 {
@@ -235,7 +235,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
         {
             IUser user = null;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 using (var cmd = conn.CreateCommand())
                 {
@@ -270,7 +270,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
         {
             string salt = string.Empty;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 using (var cmd = conn.CreateCommand())
                 {
@@ -305,7 +305,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
         {
             IUser user = null;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 using (var cmd = conn.CreateCommand())
                 {
@@ -340,7 +340,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
         {
             int affectedRows = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
             {
                 var values = new SqlParameter[]
                 {
@@ -374,7 +374,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
         {
             int affectedRows = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
             {
                 var values = new SqlParameter[]
                 {
@@ -408,7 +408,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
         {
             bool isDeleted = false;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.DeleteUser))
             {
                 var values = new SqlParameter[]
                 {
@@ -441,7 +441,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
             {
                 var values = new SqlParameter[]
                 {
@@ -486,7 +486,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
             if (user is AuthUser authUser)
             {
-                using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
+                using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
                 {
                     var values = new SqlParameter[]
                     {

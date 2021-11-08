@@ -24,7 +24,7 @@ namespace JobAgentClassLibrary.Loggings.Repositories
         public async Task<ILog> CreateAsync(ILog entity)
         {
             int entityId = 0;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
             {
                 var values = new SqlParameter[]
                 {
@@ -67,7 +67,7 @@ namespace JobAgentClassLibrary.Loggings.Repositories
         {
             List<ILog> logs = new();
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 using (var cmd = conn.CreateCommand())
                 {
@@ -109,7 +109,7 @@ namespace JobAgentClassLibrary.Loggings.Repositories
         public async Task<ILog> GetByIdAsync(int id)
         {
             ILog log = null;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 var values = new SqlParameter[]
                 {
@@ -157,7 +157,7 @@ namespace JobAgentClassLibrary.Loggings.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.DeleteUser))
             {
                 var values = new SqlParameter[]
                 {
@@ -195,7 +195,7 @@ namespace JobAgentClassLibrary.Loggings.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
             {
                 var values = new SqlParameter[]
                 {

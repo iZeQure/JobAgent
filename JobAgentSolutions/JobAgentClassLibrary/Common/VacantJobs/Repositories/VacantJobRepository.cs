@@ -26,7 +26,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
             {
                 var proc = "[JA.spCreateVacantJob]";
                 var values = new
@@ -50,7 +50,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
         {
             List<IVacantJob> vacantJobs = new();
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 var proc = "[JA.spGetCategories]";
 
@@ -73,7 +73,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
         public async Task<IVacantJob> GetByIdAsync(int id)
         {
             IVacantJob vacantJob = null;
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 var proc = "[JA.spGetCategoryById]";
                 var values = new
@@ -98,7 +98,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
         {
             bool isDeleted = false;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.DeleteUser))
             {
                 var proc = "[JA.spRemoveVacantJob]";
                 var values = new
@@ -116,7 +116,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
             {
                 var proc = "[JA.spUpdateVacantJob]";
                 var values = new

@@ -25,7 +25,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Create))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
             {
                 string proc = "[JA.spCreateSpecialization]";
                 var values = new
@@ -49,7 +49,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
         {
             List<ISpecialization> specializations = new();
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 var proc = "[JA.spGetSpecializations]";
 
@@ -73,7 +73,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
         {
             ISpecialization specialization = null;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Basic))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 var proc = "[JA.spGetSpecializationById]";
                 var values = new
@@ -96,7 +96,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
         {
             bool isDeleted = false;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Delete))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.DeleteUser))
             {
                 var proc = "[JA.spRemoveSpecialization]";
                 var values = new
@@ -114,7 +114,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
         {
             int entityId = 0;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbConnectionType.Update))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
             {
                 var proc = "[JA.spUpdateSpecialization]";
                 var values = new
