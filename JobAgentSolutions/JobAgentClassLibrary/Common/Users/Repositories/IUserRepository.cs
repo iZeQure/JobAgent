@@ -1,8 +1,6 @@
-﻿using JobAgentClassLibrary.Core.Repositories;
-using JobAgentClassLibrary.Common.Users.Entities;
+﻿using JobAgentClassLibrary.Common.Users.Entities;
+using JobAgentClassLibrary.Core.Repositories;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using JobAgentClassLibrary.Common.Areas.Entities;
 
 namespace JobAgentClassLibrary.Common.Users.Repositories
 {
@@ -23,5 +21,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
         Task<bool> GrantUserConsultantAreaAsync(IUser user, int areaId);
 
         Task<bool> RevokeUserConsultantAreaAsync(IUser user, int areaId);
+
+        Task<IUser> GetUserConsultantAreasAsync(IUser user);
     }
 }

@@ -1,4 +1,6 @@
 ﻿using Dapper;
+using JobAgentClassLibrary.Common.Areas.Entities;
+using JobAgentClassLibrary.Common.Areas.Entities.EntityMaps;
 using JobAgentClassLibrary.Common.Areas.Factory;
 using JobAgentClassLibrary.Common.Users.Entities;
 using JobAgentClassLibrary.Common.Users.Entities.EntityMaps;
@@ -8,6 +10,7 @@ using JobAgentClassLibrary.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.Users.Repositories
@@ -350,6 +353,29 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
             }
 
             return updatedPassword;
+        }
+
+        public async Task<IUser> GetUserConsultantAreasAsync(IUser user)
+        {
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
+            {
+                string proc = "[JA.spGetUserConsultantAreasByUserId]";
+
+                var queryResult = await conn.QueryAsync<AreaInformation>(proc, commandType: CommandType.StoredProcedure);
+
+                if (queryResult is not null && queryResult.Any())
+                {
+                    foreach (var result in queryResult)
+                    {
+                        IArea area = (IArea)_areaFactory.CreateEntity(
+                                nameof(Area),
+                                result.Id, result.Name);
+
+                        user.ConsultantAreas.Add(area);
+                    }
+                }
+            }
+            return user;
         }
     }
 }
