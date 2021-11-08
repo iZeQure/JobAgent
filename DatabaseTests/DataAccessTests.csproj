@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Database\DataAccess.csproj" />
+    <ProjectReference Include="..\SqlDataAccessLibrary\DataAccessLibrary.csproj" />
   </ItemGroup>
 
 </Project>

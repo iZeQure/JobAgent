@@ -1,0 +1,111 @@
+﻿<div class="modal fade" id="ModalEditContract" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+
+            <PageHeadingTitle DisplayTitle="Rediger Kontrakt" />
+
+            @if (ContractModelContext != null)
+            {
+                if (ContractModelContext.Model is ContractModel model)
+                {
+                    <EditForm EditContext="ContractModelContext" OnValidSubmit="OnValidSubmit_UpdateContract">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title">Kontrakt Information :</h5>
+                        </div>
+
+                        @if (_showError)
+                        {
+                            <MessageAlert Alert="MessageAlert.AlertType.Error" Message="@_errorMessage" />
+                        }
+
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="inputCompany" class="admin-label col-form-label col-form-label-sm">Kontrakt for :</label>
+                                    <select id="inputCompany" class="form-control form-control-sm" @bind="model.SignedWithCompany">
+                                        @if (_companies != null)
+                                        {
+                                            @foreach (var company in _companies)
+                                            {
+                                                if (company.Id == model.SignedWithCompany)
+                                                {
+                                                    <option value="@company.Id" selected>@company.Name</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@company.Id">@company.Name</option>
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <option value="0" selected>Kunne ikke hente virksomheder!</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <label for="inputSignedByUser" class="admin-label col-form-label col-form-label-sm">Underskrevet af :</label>
+                                    <select id="inputSignedByUser" class="form-control form-control-sm" @bind="model.SignedByUser">
+                                        @if (_users != null)
+                                        {
+                                            @foreach (var user in _users)
+                                            {
+                                                if (user.GetUserId == model.SignedByUser)
+                                                {
+                                                    <option value="@user.GetUserId" selected>@user.GetFullName</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@user.GetUserId">@user.GetFullName</option>
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <option value="0" selected>Kunne ikke hente brugere!</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <div class="row">
+                                <div class="col">
+                                    <label for="inputContactPerson" class="admin-label col-form-label col-form-label-sm">Virksomheds Kontakt Person :</label>
+                                    <input id="inputContactPerson" class="form-control form-control-sm" type="text" placeholder="Indtast en kontakt person.." @bind="model.ContactPerson" />
+                                </div>
+                                <div class="col">
+                                    <label for="inputContractName" class="admin-label col-form-label col-form-label-sm">Kontraktens Navn : <span class="font-italic small" style="color: red;">*Ikke ændre dette hvis navnet på kontrakten ikke bliver ændret.</span></label>
+                                    <input id="inputContractName" class="form-control form-control-sm" type="text" placeholder="Indtast kontraktens fil navn / lokation.." disabled @bind="model.ContractFileName" />
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <div class="row">
+                                <div class="col">
+                                    <label for="inputRegisteredDate" class="admin-label col-form-label col-form-label-sm">Kontrakt Registreret Dato :</label>
+                                    <InputDate @bind-Value="@model.RegistrationDate" TValue="DateTime" class="form-control form-control-sm"></InputDate>
+                                </div>
+                                <div class="col">
+                                    <label for="inputExpiryDate" class="admin-label col-form-label col-form-label-sm">Udløbsdato :</label>
+                                    <InputDate @bind-Value="@model.ExpiryDate" TValue="DateTime" class="form-control form-control-sm"></InputDate>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="CancelRequest" @onclick:preventDefault>Annuller</button>
+                            <button class="btn btn-info text-light cursor-pointer" type="submit">Gem ændringer</button>
+                        </div>
+
+                    </EditForm>
+                }
+            }
+
+        </div>
+    </div>
+</div>
