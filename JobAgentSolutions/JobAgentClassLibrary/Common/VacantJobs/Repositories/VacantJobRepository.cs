@@ -52,7 +52,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
-                var proc = "[JA.spGetCategories]";
+                var proc = "[JA.spGetVacantJobs]";
 
                 var queryResult = await conn.QueryAsync<VacantJobInformation>(proc, commandType: CommandType.StoredProcedure);
 
@@ -75,7 +75,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
             IVacantJob vacantJob = null;
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
-                var proc = "[JA.spGetCategoryById]";
+                var proc = "[JA.spGetVacantJobById]";
                 var values = new
                 {
                     @vacantJobId = id
