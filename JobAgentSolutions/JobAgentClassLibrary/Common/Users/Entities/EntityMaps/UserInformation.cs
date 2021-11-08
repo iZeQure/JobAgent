@@ -11,7 +11,7 @@ namespace JobAgentClassLibrary.Common.Users.Entities.EntityMaps
 
         public string FullName { get { return $"{FirstName} {LastName}"; } }
 
-        public List<Area> ConsultantAreas { get; set; }
+        public List<IArea> ConsultantAreas { get; set; }
 
         [Key]
         public int UserId { get; set; }
