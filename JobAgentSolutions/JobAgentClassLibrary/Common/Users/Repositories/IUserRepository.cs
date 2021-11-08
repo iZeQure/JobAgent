@@ -1,6 +1,8 @@
 ﻿using JobAgentClassLibrary.Core.Repositories;
 using JobAgentClassLibrary.Common.Users.Entities;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using JobAgentClassLibrary.Common.Areas.Entities;
 
 namespace JobAgentClassLibrary.Common.Users.Repositories
 {
@@ -21,5 +23,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
         Task<int> RevokeAreaFromUserAsync(IUser user, int areaId);
 
         Task<string> GetSaltByEmailAsync(string email);
+
+        Task<IUser> GetUserConsultantAreasAsync(IUser user);
     }
 }

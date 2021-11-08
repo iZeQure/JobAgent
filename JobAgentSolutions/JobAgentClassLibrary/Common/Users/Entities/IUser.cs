@@ -15,6 +15,6 @@ namespace JobAgentClassLibrary.Common.Users.Entities
         public string Email { get; }
         public int LocationId { get; }
         public int RoleId { get; }
-        public List<Area> ConsultantAreas { get; }
+        public List<IArea> ConsultantAreas { get; }
     }
 }

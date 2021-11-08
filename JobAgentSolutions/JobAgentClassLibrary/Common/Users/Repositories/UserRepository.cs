@@ -1,5 +1,7 @@
 ﻿using Dapper;
 using JobAgentClassLibrary.Common.Areas.Entities;
+using JobAgentClassLibrary.Common.Areas.Entities.EntityMaps;
+using JobAgentClassLibrary.Common.Areas.Factory;
 using JobAgentClassLibrary.Common.Locations.Entities;
 using JobAgentClassLibrary.Common.Roles.Entities;
 using JobAgentClassLibrary.Common.Users.Entities;
@@ -11,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.Users.Repositories
@@ -19,11 +22,13 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
     {
         private readonly ISqlDbManager _sqlDbManager;
         private readonly UserEntityFactory _factory;
+        private readonly AreaEntityFactory _areaFactory;
 
-        public UserRepository(ISqlDbManager sqlDbManager, UserEntityFactory factory)
+        public UserRepository(ISqlDbManager sqlDbManager, UserEntityFactory factory, AreaEntityFactory areaFactory)
         {
             _sqlDbManager = sqlDbManager;
             _factory = factory;
+            _areaFactory = areaFactory;
         }
 
         public async Task<bool> AuthenticateUserLoginAsync(IAuthUser user)
@@ -428,44 +433,28 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
             return affectedRows;
         }
 
-        private async Task<IUser> MapUserDataFromSqlDataReader(SqlDataReader reader)
+        public async Task<IUser> GetUserConsultantAreasAsync(IUser user)
         {
-            bool isConsultantAreasNull = await reader.IsDBNullAsync("Consultant Areas");
-            var delimiteredConsultantAreas = isConsultantAreasNull == true ? string.Empty : reader.GetString(10);
-            var splitConsultantAreas = delimiteredConsultantAreas.Split(";");
-            var consultantAreas = new List<Area>();
-
-            foreach (var area in splitConsultantAreas)
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
-                consultantAreas.Add(new Area
+                string proc = "[JA.spGetUserConsultantAreasByUserId]";
+
+                var queryResult = await conn.QueryAsync<AreaInformation>(proc, commandType: CommandType.StoredProcedure);
+
+                if (queryResult is not null && queryResult.Any())
                 {
-                    Id = 0,
-                    Name = area
-                });
+                    foreach (var result in queryResult)
+                    {
+                        IArea area = (IArea)_areaFactory.CreateEntity(
+                                nameof(Area),
+                                result.Id, result.Name);
+
+                        user.ConsultantAreas.Add(area);
+                    }
+                }
             }
-
-            IUser user = new AuthUser
-            {
-                Id = reader.GetInt32(0),
-                RoleId = new Role
-                {
-                    Id = reader.GetInt32(1),
-                    Name = reader.GetString(2),
-                    Description = reader.GetString(3)
-                },
-                LocationId = new Location
-                {
-                    Id = reader.GetInt32(4),
-                    Name = reader.GetString(5)
-                },
-                FirstName = reader.GetString(6),
-                LastName = reader.GetString(7),
-                Email = reader.GetString(8),
-                AccessToken = reader.GetString(9),
-                ConsultantAreas = consultantAreas
-            };
-
             return user;
         }
     }
+}
 }
