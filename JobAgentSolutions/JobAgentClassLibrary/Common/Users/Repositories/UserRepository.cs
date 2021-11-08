@@ -355,8 +355,9 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
             return updatedPassword;
         }
 
-        public async Task<IUser> GetUserConsultantAreasAsync(IUser user)
+        public async Task<List<IArea>> GetUserConsultantAreasAsync(IUser user)
         {
+            List<IArea> areas = new();
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 string proc = "[JA.spGetUserConsultantAreasByUserId]";
@@ -371,11 +372,11 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
                                 nameof(Area),
                                 result.Id, result.Name);
 
-                        user.ConsultantAreas.Add(area);
+                        areas.Add(area);
                     }
                 }
             }
-            return user;
+            return areas;
         }
     }
 }
