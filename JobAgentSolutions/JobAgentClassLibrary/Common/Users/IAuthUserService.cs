@@ -7,7 +7,7 @@ namespace JobAgentClassLibrary.Common.Users
     {
         Task<bool> AuthenticateUserLoginAsync(IAuthUser user);
 
-        Task<int> UpdateUserPasswordAsync(IAuthUser user);
+        Task<bool> UpdateUserPasswordAsync(IAuthUser user);
 
         Task<IUser> GetUserByAccessTokenAsync(string accessToken);
 

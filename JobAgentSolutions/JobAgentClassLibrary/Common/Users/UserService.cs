@@ -1,5 +1,6 @@
 ﻿using JobAgentClassLibrary.Common.Users.Entities;
 using JobAgentClassLibrary.Common.Users.Repositories;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -54,9 +55,34 @@ namespace JobAgentClassLibrary.Common.Users
             return await _userRepository.GetAllAsync();
         }
 
-        public async Task<int> GrantAreaToUserAsync(IUser user, int areaId)
+        public async Task<IUser> GrantAreaToUserAsync(IUser user, int areaId)
         {
-            return await _userRepository.GrantUserConsultantAreaAsync(user, areaId);
+            try
+            {
+                var isGranted = await _userRepository.GrantUserConsultantAreaAsync(user, areaId);
+
+                if (isGranted)
+                {
+                    var consultantAreas = await _userRepository.GetUserConsultantAreasAsync(user);
+
+                    if (consultantAreas is not null)
+                    {
+                        user.ConsultantAreas.Clear();
+                        user.ConsultantAreas.AddRange(consultantAreas);
+
+                        return user;
+                    }
+
+                    throw new Exception("Consultant area was granted. But user was not updated correctly.");
+                }
+
+                throw new Exception("Error occurred. Consultant area was NOT granted.");
+            }
+            catch (Exception)
+            {
+                // Any unhandled exceptions.
+                throw;
+            }
         }
 
         public async Task<bool> RemoveAsync(IUser entity)
@@ -64,9 +90,34 @@ namespace JobAgentClassLibrary.Common.Users
             return await _userRepository.RemoveAsync(entity);
         }
 
-        public async Task<int> RevokeAreaFromUserAsync(IUser user, int areaId)
+        public async Task<IUser> RevokeAreaFromUserAsync(IUser user, int areaId)
         {
-            return await _userRepository.RevokeUserConsultantAreaAsync(user, areaId);
+            try
+            {
+                var isRevoked = await _userRepository.RevokeUserConsultantAreaAsync(user, areaId);
+
+                if (isRevoked)
+                {
+                    var consultantAreas = await _userRepository.GetUserConsultantAreasAsync(user);
+
+                    if (consultantAreas is not null)
+                    {
+                        user.ConsultantAreas.Clear();
+                        user.ConsultantAreas.AddRange(consultantAreas);
+
+                        return user;
+                    }
+
+                    throw new Exception("Consultant area was revoked. But user was not updated correctly.");
+                }
+
+                throw new Exception("Error occurred. Consultant area was NOT revoked.");
+            }
+            catch (Exception)
+            {
+                // Any unhandled exceptions.
+                throw;
+            }
         }
 
         public async Task<IUser> UpdateAsync(IUser entity)
@@ -74,7 +125,7 @@ namespace JobAgentClassLibrary.Common.Users
             return await _userRepository.UpdateAsync(entity);
         }
 
-        public async Task<int> UpdateUserPasswordAsync(IAuthUser user)
+        public async Task<bool> UpdateUserPasswordAsync(IAuthUser user)
         {
             return await _userRepository.UpdateUserPasswordAsync(user);
         }

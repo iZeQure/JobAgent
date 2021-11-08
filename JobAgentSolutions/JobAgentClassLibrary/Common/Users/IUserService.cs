@@ -6,22 +6,22 @@ namespace JobAgentClassLibrary.Common.Users
 {
     public interface IUserService : IAuthUserService
     {
-        Task<IUser> CreateAsync(IUser entity);
-
         Task<List<IUser>> GetUsersAsync();
 
-        Task<IUser> GetUserByIdAsync(int id);
+        Task<IUser> CreateAsync(IUser entity);
 
-        Task<bool> RemoveAsync(IUser entity);
+        Task<IUser> GetUserByIdAsync(int id);
 
         Task<IUser> UpdateAsync(IUser entity);
 
         Task<IUser> GetByEmailAsync(string email);
 
+        Task<IUser> GrantAreaToUserAsync(IUser user, int areaId);
+
+        Task<IUser> RevokeAreaFromUserAsync(IUser user, int areaId);
+
+        Task<bool> RemoveAsync(IUser entity);
+
         Task<bool> CheckUserExistsAsync(IUser user);
-
-        Task<int> GrantAreaToUserAsync(IUser user, int areaId);
-
-        Task<int> RevokeAreaFromUserAsync(IUser user, int areaId);
     }
 }
