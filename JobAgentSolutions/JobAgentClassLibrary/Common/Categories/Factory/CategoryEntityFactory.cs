@@ -14,7 +14,6 @@ namespace JobAgentClassLibrary.Common.Categories.Factory
             {
                 Id = ParseValue<int>(entityValues[0]),
                 Name = ParseValue<string>(entityValues[1]),
-                Specializations = ParseValue<List<ISpecialization>>(entityValues[2]) ?? null
             },
             nameof(Specialization) => new Specialization
             {
