@@ -14,8 +14,8 @@ namespace JobAgentClassLibrary.Common.Users.Factory
             nameof(User) => new User
             {
                 Id = ParseValue<int>(entityValues[0]),
-                Role = new Role { Id = ParseValue<int>(entityValues[1]) },
-                Location = new Location { Id = ParseValue<int>(entityValues[2])},
+                RoleId = ParseValue<int>(entityValues[1]) ,
+                LocationId = ParseValue<int>(entityValues[2]),
                 FirstName = ParseValue<string>(entityValues[3]),
                 LastName = ParseValue<string>(entityValues[4]),
                 Email = ParseValue<string>(entityValues[5]),

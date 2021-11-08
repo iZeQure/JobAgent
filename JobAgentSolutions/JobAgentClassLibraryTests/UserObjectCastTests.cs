@@ -16,8 +16,8 @@ namespace JobAgentClassLibraryTests
                 FirstName = "Jens",
                 LastName = "Jensen",
                 Email = "JensJensen@gmail.com",
-                Location = new Location { Name = "ringsted" },
-                Role = new Role { Name = "Bruger" },
+                LocationId = 2,
+                RoleId = 2,
                 Password = "lololol123123"
             };
 

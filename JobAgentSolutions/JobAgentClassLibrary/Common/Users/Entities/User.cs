@@ -15,9 +15,9 @@ namespace JobAgentClassLibrary.Common.Users.Entities
 
         public string Email { get; set; }
 
-        public Location Location { get; set; }
+        public int LocationId { get; set; }
 
-        public Role Role { get; set; }
+        public int RoleId { get; set; }
 
         public int Id { get; set; }
 

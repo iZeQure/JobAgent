@@ -13,8 +13,8 @@ namespace JobAgentClassLibrary.Common.Users.Entities
         public string LastName { get; }
         public string FullName { get; }
         public string Email { get; }
-        public Location Location { get; }
-        public Role Role { get; }
+        public int LocationId { get; }
+        public int RoleId { get; }
         public List<Area> ConsultantAreas { get; }
     }
 }

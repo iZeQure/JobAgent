@@ -123,8 +123,8 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
                 {
                     var values = new SqlParameter[]
                     {
-                        new SqlParameter("@roleId", authUser.Role.Id),
-                        new SqlParameter("@locationId", authUser.Location.Id),
+                        new SqlParameter("@roleId", authUser.RoleId.Id),
+                        new SqlParameter("@locationId", authUser.LocationId.Id),
                         new SqlParameter("@userFirstName", authUser.FirstName),
                         new SqlParameter("@userLastName", authUser.LastName),
                         new SqlParameter("@userEmail", authUser.Email),
@@ -446,8 +446,8 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
                 var values = new SqlParameter[]
                 {
                     new SqlParameter("@userId", entity.Id),
-                    new SqlParameter("@roleId", entity.Role.Id),
-                    new SqlParameter("@locationId", entity.Location.Id),
+                    new SqlParameter("@roleId", entity.RoleId.Id),
+                    new SqlParameter("@locationId", entity.LocationId.Id),
                     new SqlParameter("@firstName", entity.FirstName),
                     new SqlParameter("@lastName", entity.LastName),
                     new SqlParameter("@email", entity.Email)
@@ -537,13 +537,13 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
             IUser user = new AuthUser
             {
                 Id = reader.GetInt32(0),
-                Role = new Role
+                RoleId = new Role
                 {
                     Id = reader.GetInt32(1),
                     Name = reader.GetString(2),
                     Description = reader.GetString(3)
                 },
-                Location = new Location
+                LocationId = new Location
                 {
                     Id = reader.GetInt32(4),
                     Name = reader.GetString(5)
