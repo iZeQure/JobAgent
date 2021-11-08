@@ -1,9 +1,5 @@
 ﻿using Dapper;
-using JobAgentClassLibrary.Common.Areas.Entities;
-using JobAgentClassLibrary.Common.Areas.Entities.EntityMaps;
 using JobAgentClassLibrary.Common.Areas.Factory;
-using JobAgentClassLibrary.Common.Locations.Entities;
-using JobAgentClassLibrary.Common.Roles.Entities;
 using JobAgentClassLibrary.Common.Users.Entities;
 using JobAgentClassLibrary.Common.Users.Entities.EntityMaps;
 using JobAgentClassLibrary.Common.Users.Factory;
@@ -12,8 +8,6 @@ using JobAgentClassLibrary.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.Users.Repositories
@@ -358,5 +352,4 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
             return updatedPassword;
         }
     }
-}
 }
