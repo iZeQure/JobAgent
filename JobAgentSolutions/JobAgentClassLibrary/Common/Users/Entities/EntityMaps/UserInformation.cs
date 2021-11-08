@@ -1,12 +1,6 @@
 ﻿using Dapper.Contrib.Extensions;
 using JobAgentClassLibrary.Common.Areas.Entities;
-using JobAgentClassLibrary.Common.Locations.Entities;
-using JobAgentClassLibrary.Common.Roles.Entities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.Users.Entities.EntityMaps
 {
