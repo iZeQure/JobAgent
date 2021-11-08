@@ -6,20 +6,20 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 {
     public interface IUserRepository : IRepository<IUser, int>
     {
-        Task<bool> AuthenticateUserLoginAsync(IAuthUser user);
-
         Task<IUser> GetUserByAccessTokenAsync(string accessToken);
 
         Task<IUser> GetByEmailAsync(string email);
 
+        Task<bool> AuthenticateUserLoginAsync(IAuthUser user);
+
         Task<bool> CheckUserExistsAsync(IUser user);
 
-        Task<int> UpdateUserPasswordAsync(IAuthUser user);
-
-        Task<int> GrantAreaToUserAsync(IUser user, int areaId);
-
-        Task<int> RevokeAreaFromUserAsync(IUser user, int areaId);
-
         Task<string> GetSaltByEmailAsync(string email);
+
+        Task<bool> UpdateUserPasswordAsync(IAuthUser user);
+
+        Task<bool> GrantUserConsultantAreaAsync(IUser user, int areaId);
+
+        Task<bool> RevokeUserConsultantAreaAsync(IUser user, int areaId);
     }
 }

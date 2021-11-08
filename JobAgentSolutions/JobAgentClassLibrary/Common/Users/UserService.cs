@@ -56,7 +56,7 @@ namespace JobAgentClassLibrary.Common.Users
 
         public async Task<int> GrantAreaToUserAsync(IUser user, int areaId)
         {
-            return await _userRepository.GrantAreaToUserAsync(user, areaId);
+            return await _userRepository.GrantUserConsultantAreaAsync(user, areaId);
         }
 
         public async Task<bool> RemoveAsync(IUser entity)
@@ -66,7 +66,7 @@ namespace JobAgentClassLibrary.Common.Users
 
         public async Task<int> RevokeAreaFromUserAsync(IUser user, int areaId)
         {
-            return await _userRepository.RevokeAreaFromUserAsync(user, areaId);
+            return await _userRepository.RevokeUserConsultantAreaAsync(user, areaId);
         }
 
         public async Task<IUser> UpdateAsync(IUser entity)

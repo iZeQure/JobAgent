@@ -246,72 +246,42 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
             return user;
         }
 
-        public async Task<int> GrantAreaToUserAsync(IUser user, int areaId)
+        public async Task<bool> GrantUserConsultantAreaAsync(IUser user, int areaId)
         {
-            int affectedRows = 0;
+            bool isGranted = false;
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spGrantUserArea]";
+                var values = new
                 {
-                    new SqlParameter("@userId", user.Id),
-                    new SqlParameter("@areaId", areaId)
+                    @userId = user.Id,
+                    @areaId = areaId
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spGrantUserArea]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        affectedRows = await cmd.ExecuteNonQueryAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                isGranted = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
             }
 
-            return affectedRows;
+            return isGranted;
         }
 
-        public async Task<int> RevokeAreaFromUserAsync(IUser user, int areaId)
+        public async Task<bool> RevokeUserConsultantAreaAsync(IUser user, int areaId)
         {
-            int affectedRows = 0;
+            bool isRevoked = false;
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spRemoveUserArea]";
+                var values = new
                 {
-                    new SqlParameter("@userId", user.Id),
-                    new SqlParameter("@areaId", areaId)
+                    @userId = user.Id,
+                    @areaId = areaId
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spRemoveUserArea]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        affectedRows = await cmd.ExecuteNonQueryAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                isRevoked = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
             }
 
-            return affectedRows;
+            return isRevoked;
         }
 
         public async Task<bool> RemoveAsync(IUser entity)
@@ -320,28 +290,13 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.DeleteUser))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spRemoveUser]";
+                var values = new
                 {
-                    new SqlParameter("@userId", entity.Id)
+                    @userId = entity.Id
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spRemoveUser]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        isDeleted = (await cmd.ExecuteNonQueryAsync()) == 1;
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                isDeleted = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
             }
 
             return isDeleted;
@@ -353,33 +308,18 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spUpdateUser]";
+                var values = new
                 {
-                    new SqlParameter("@userId", entity.Id),
-                    new SqlParameter("@roleId", entity.RoleId.Id),
-                    new SqlParameter("@locationId", entity.LocationId.Id),
-                    new SqlParameter("@firstName", entity.FirstName),
-                    new SqlParameter("@lastName", entity.LastName),
-                    new SqlParameter("@email", entity.Email)
+                    @userId = entity.Id,
+                    @roleID = entity.RoleId,
+                    @locationId = entity.LocationId,
+                    @userFirstName = entity.FirstName,
+                    @userLastName = entity.LastName,
+                    @userEmail = entity.Email
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spUpdateUser]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = (int)await cmd.ExecuteScalarAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
             if (entityId != 0)
@@ -390,82 +330,27 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
             return null;
         }
 
-        public async Task<int> UpdateUserPasswordAsync(IAuthUser user)
+        public async Task<bool> UpdateUserPasswordAsync(IAuthUser user)
         {
-            int affectedRows = 0;
+            bool updatedPassword = false;
 
             if (user is AuthUser authUser)
             {
                 using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
                 {
-                    var values = new SqlParameter[]
+                    var proc = "[JA.spValidateUserLogin]";
+                    var values = new
                     {
-                    new SqlParameter("@userId", authUser.Id),
-                    new SqlParameter("@userNewPassword", authUser.Password),
-                    new SqlParameter("@userNewSalt", authUser.Salt)
+                        @userId = authUser.Id,
+                        @userNewPassword = authUser.Password,
+                        @userNewSalt = authUser.Salt
                     };
 
-                    using (var cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = "[JA.spUpdateUser]";
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.AddRange(values);
-
-                        try
-                        {
-                            await conn.OpenAsync();
-
-                            affectedRows = await cmd.ExecuteNonQueryAsync();
-                        }
-                        catch (Exception)
-                        {
-                            throw;
-                        }
-                    }
+                    updatedPassword = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
                 }
             }
 
-            return affectedRows;
-        }
-
-        private async Task<IUser> MapUserDataFromSqlDataReader(SqlDataReader reader)
-        {
-            bool isConsultantAreasNull = await reader.IsDBNullAsync("Consultant Areas");
-            var delimiteredConsultantAreas = isConsultantAreasNull == true ? string.Empty : reader.GetString(10);
-            var splitConsultantAreas = delimiteredConsultantAreas.Split(";");
-            var consultantAreas = new List<Area>();
-
-            foreach (var area in splitConsultantAreas)
-            {
-                consultantAreas.Add(new Area
-                {
-                    Id = 0,
-                    Name = area
-                });
-            }
-
-            IUser user = new AuthUser
-            {
-                Id = reader.GetInt32(0),
-                RoleId = new Role
-                {
-                    Id = reader.GetInt32(1),
-                    Name = reader.GetString(2),
-                    Description = reader.GetString(3)
-                },
-                LocationId = new Location
-                {
-                    Id = reader.GetInt32(4),
-                    Name = reader.GetString(5)
-                },
-                FirstName = reader.GetString(6),
-                LastName = reader.GetString(7),
-                Email = reader.GetString(8),
-                AccessToken = reader.GetString(9),
-                ConsultantAreas = consultantAreas
-            };
-
-            return user;
+            return updatedPassword;
         }
     }
 }
