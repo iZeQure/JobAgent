@@ -415,12 +415,14 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
                 using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
                 {
                     var proc = "[JA.spValidateUserAccessToken]";
-                    var values = new
-                    {
-                        @accessToken = accessToken
-                    };
+                    var dynamicValues = new DynamicParameters();
 
-                    validatedToken = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
+                    dynamicValues.Add("@userAcessToken", accessToken);
+                    dynamicValues.Add("@returnResult", SqlDbType.Bit, direction: ParameterDirection.Output);
+
+                    await conn.QueryAsync(proc, dynamicValues, commandType: CommandType.StoredProcedure);
+
+                    validatedToken = dynamicValues.Get<bool>("@returnResult");
                 }
             }
 
