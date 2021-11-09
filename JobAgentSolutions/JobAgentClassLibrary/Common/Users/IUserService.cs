@@ -22,6 +22,6 @@ namespace JobAgentClassLibrary.Common.Users
 
         Task<bool> RemoveAsync(IUser entity);
 
-        Task<bool> CheckUserExistsAsync(IUser user);
+        Task<bool> CheckUserExistsAsync(string email);
     }
 }
