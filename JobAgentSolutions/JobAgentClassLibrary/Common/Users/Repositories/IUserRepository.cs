@@ -14,7 +14,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
         Task<bool> AuthenticateUserLoginAsync(IAuthUser user);
 
-        Task<bool> CheckUserExistsAsync(IUser user);
+        Task<bool> CheckUserExistsAsync(string email);
 
         Task<string> GetSaltByEmailAsync(string email);
 
