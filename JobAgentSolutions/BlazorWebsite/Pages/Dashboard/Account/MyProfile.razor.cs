@@ -113,11 +113,11 @@ namespace BlazorWebsite.Pages.Dashboard.Account
                     _assignedConsultantAreas = (IEnumerable<Area>)_userSession.ConsultantAreas;
                     _accountProfileModel = new()
                     {
-                        RoleId = _userSession.GetRole.Id,
-                        LocationId = _userSession.GetLocation.Id,
-                        FirstName = _userSession.GetFirstName,
-                        LastName = _userSession.GetLastName,
-                        Email = _userSession.GetEmail
+                        RoleId = _userSession.RoleId,
+                        LocationId = _userSession.LocationId,
+                        FirstName = _userSession.FirstName,
+                        LastName = _userSession.LastName,
+                        Email = _userSession.Email
                     };
                 }
                 catch (Exception ex)
