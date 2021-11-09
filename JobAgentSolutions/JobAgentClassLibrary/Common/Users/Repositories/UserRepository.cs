@@ -54,16 +54,16 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
             return isAuthenticated;
         }
 
-        public async Task<bool> CheckUserExistsAsync(IUser user)
+        public async Task<bool> CheckUserExistsAsync(string email)
         {
             bool userExists = false;
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.ComplexUser))
             {
-                var proc = "[JA.spValidateUserLogin]";
+                var proc = "[JA.spValidateUserExists]";
                 var dynamicValues = new DynamicParameters();
 
-                dynamicValues.Add("@userEmail", user.Email);
+                dynamicValues.Add("@userEmail", email);
                 dynamicValues.Add("@returnResult", SqlDbType.Bit, direction: ParameterDirection.Output);
 
                 await conn.QueryAsync(proc, dynamicValues, commandType: CommandType.StoredProcedure);
@@ -355,6 +355,29 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
             return updatedPassword;
         }
 
+        public async Task<bool> UpdateUserAccessTokenAsync(IAuthUser user) 
+        {
+            bool updatedToken = false;
+
+            if (user is AuthUser authUser)
+            {
+
+                using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
+                {
+                    var proc = "[JA.spUpdateUserAccessToken]";
+                    var values = new
+                    {
+                        @userEmail = authUser.Email,
+                        @userAccessToken = authUser.AccessToken,
+                    };
+
+                    updatedToken = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
+                }
+            }
+
+            return updatedToken;
+        }
+
         public async Task<List<IArea>> GetUserConsultantAreasAsync(IUser user)
         {
             List<IArea> areas = new();
@@ -381,6 +404,29 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
                 }
             }
             return areas;
+        }
+
+        public async Task<bool> ValidateUserAccessTokenAsync(string accessToken)
+        {
+            bool validatedToken = false;
+
+            if (accessToken != null && accessToken != string.Empty)
+            {
+                using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
+                {
+                    var proc = "[JA.spValidateUserAccessToken]";
+                    var dynamicValues = new DynamicParameters();
+
+                    dynamicValues.Add("@userAcessToken", accessToken);
+                    dynamicValues.Add("@returnResult", SqlDbType.Bit, direction: ParameterDirection.Output);
+
+                    await conn.QueryAsync(proc, dynamicValues, commandType: CommandType.StoredProcedure);
+
+                    validatedToken = dynamicValues.Get<bool>("@returnResult");
+                }
+            }
+
+            return validatedToken;
         }
     }
 }

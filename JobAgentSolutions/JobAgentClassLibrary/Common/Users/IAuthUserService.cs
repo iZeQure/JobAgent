@@ -12,5 +12,7 @@ namespace JobAgentClassLibrary.Common.Users
         Task<IAuthUser> GetUserByAccessTokenAsync(string accessToken);
 
         Task<string> GetSaltByEmailAddressAsync(string email);
+
+        Task<bool> ValidateUserAccessTokenAsync(string accessToken);
     }
 }
