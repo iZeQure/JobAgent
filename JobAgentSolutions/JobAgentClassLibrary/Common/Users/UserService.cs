@@ -1,4 +1,5 @@
 ﻿using JobAgentClassLibrary.Common.Users.Entities;
+using JobAgentClassLibrary.Common.Users.Factory;
 using JobAgentClassLibrary.Common.Users.Repositories;
 using System;
 using System.Collections.Generic;
@@ -10,14 +11,23 @@ namespace JobAgentClassLibrary.Common.Users
     {
         private readonly IUserRepository _userRepository;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, UserEntityFactory userFactory)
         {
             _userRepository = userRepository;
+            _userFactory = userFactory;
         }
 
-        public async Task<bool> AuthenticateUserLoginAsync(IAuthUser user)
+        public async Task<bool> AuthenticateUserLoginAsync(string email, string password)
         {
-            return await _userRepository.AuthenticateUserLoginAsync(user);
+            var authUser = new AuthUser
+            {
+                Email = email,
+                Password = password
+            };
+
+            var isAuthenticated = await _userRepository.AuthenticateUserLoginAsync(authUser);
+
+            return isAuthenticated;
         }
 
         public async Task<bool> CheckUserExistsAsync(IUser user)
@@ -27,17 +37,47 @@ namespace JobAgentClassLibrary.Common.Users
 
         public async Task<IUser> CreateAsync(IUser entity)
         {
-            return await _userRepository.CreateAsync(entity);
+            var user = await _userRepository.CreateAsync(entity);
+
+            if (user is not null)
+            {
+                var consultantAreas = await _userRepository.GetUserConsultantAreasAsync(user);
+
+                user.ConsultantAreas.Clear();
+                user.ConsultantAreas.AddRange(consultantAreas);
+            }
+
+            return user;
         }
 
         public async Task<IUser> GetByEmailAsync(string email)
         {
-            return await _userRepository.GetByEmailAsync(email);
+            var user = await _userRepository.GetByEmailAsync(email);
+
+            if (user is not null)
+            {
+                var consultantAreas = await _userRepository.GetUserConsultantAreasAsync(user);
+
+                user.ConsultantAreas.Clear();
+                user.ConsultantAreas.AddRange(consultantAreas);
+            }
+
+            return user;
         }
 
         public async Task<IUser> GetUserByIdAsync(int id)
         {
-            return await _userRepository.GetByIdAsync(id);
+            var user = await _userRepository.GetByIdAsync(id);
+
+            if (user is not null)
+            {
+                var consultantAreas = await _userRepository.GetUserConsultantAreasAsync(user);
+
+                user.ConsultantAreas.Clear();
+                user.ConsultantAreas.AddRange(consultantAreas);
+            }
+
+            return user;
         }
 
         public async Task<string> GetSaltByEmailAddressAsync(string email)
@@ -47,12 +87,38 @@ namespace JobAgentClassLibrary.Common.Users
 
         public async Task<IUser> GetUserByAccessTokenAsync(string accessToken)
         {
-            return await _userRepository.GetUserByAccessTokenAsync(accessToken);
+            var user = await _userRepository.GetUserByAccessTokenAsync(accessToken);
+
+            if (user is not null)
+            {
+                var consultantAreas = await _userRepository.GetUserConsultantAreasAsync(user);
+
+                user.ConsultantAreas.Clear();
+                user.ConsultantAreas.AddRange(consultantAreas);
+            }
+
+            return user;
         }
 
         public async Task<List<IUser>> GetUsersAsync()
         {
-            return await _userRepository.GetAllAsync();
+            var users = await _userRepository.GetAllAsync();
+
+            if (users is not null)
+            {
+                foreach (var user in users)
+                {
+                    var consultantAreas = await _userRepository.GetUserConsultantAreasAsync(user);
+
+                    if (consultantAreas is not null)
+                    {
+                        user.ConsultantAreas.Clear();
+                        user.ConsultantAreas.AddRange(consultantAreas);
+                    }
+                }
+            }
+
+            return users;
         }
 
         public async Task<IUser> GrantAreaToUserAsync(IUser user, int areaId)
@@ -122,7 +188,17 @@ namespace JobAgentClassLibrary.Common.Users
 
         public async Task<IUser> UpdateAsync(IUser entity)
         {
-            return await _userRepository.UpdateAsync(entity);
+            var user = await _userRepository.UpdateAsync(entity);
+
+            if (user is not null)
+            {
+                var consultantAreas = await _userRepository.GetUserConsultantAreasAsync(user);
+
+                user.ConsultantAreas.Clear();
+                user.ConsultantAreas.AddRange(consultantAreas);
+            }
+
+            return user;
         }
 
         public async Task<bool> UpdateUserPasswordAsync(IAuthUser user)
