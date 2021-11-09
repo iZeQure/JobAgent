@@ -1,0 +1,122 @@
+﻿@page "/dashboard/account/my-profile"
+@attribute [Authorize(Roles = "System Administrator, Udvikler")]
+@using BlazorWebsite.Shared.Components.Diverse;
+
+<PageDocumentTitle DocumentTitle="Bruger Indstillinger - Min Profil" />
+
+<div class="page-content p-4">
+
+    <PageHeadingTitle DisplayTitle="Min Profil" />
+
+    <MessageAlert Message="@_errorMessage" FullWidth="false" Alert="MessageAlert.AlertType.Error" />
+
+    <MessageAlert Message="@_successMessage" Alert="MessageAlert.AlertType.Success" />
+
+    @if (_isLoadingData)
+    {
+        <MessageAlert Message="Indlæser nødvendig data; vent venligst." Alert="MessageAlert.AlertType.Info" IsLoading="_isLoadingData" />
+    }
+
+    @if (!string.IsNullOrEmpty(_sessionUserEmail))
+    {
+        <EditForm Model="_accountProfileModel" OnValidSubmit="OnValidSubmit_ChangeUserInformation" class="mb-3">
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="inputEmail">Email Adresse:</label>
+                    @if (_userEmailAlreadyExists)
+                    {
+                        <span class="d-inline-flex ps-1"><small class="text-danger font-weight-bolder">* Email er allerede tilknyttet en Praktikkonsulent.</small></span>
+                    }
+                    <InputText @bind-Value="@_accountProfileModel.Email" id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" @onfocusout="OnFocusOut_CheckUserAlreadyExists" />
+                    <ValidationMessage For="@(() => _accountProfileModel.Email)" />
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="inputFirstName">Fornavn:</label>
+                    <InputText @bind-Value="@_accountProfileModel.FirstName" id="inputFirstName" type="text" class="form-control form-control-sm" placeholder="Fornavn" />
+                    <ValidationMessage For="@(() => _accountProfileModel.FirstName)" />
+                </div>
+
+                <div class="col">
+                    <label for="inputLastName">Efternavn:</label>
+                    <InputText @bind-Value="@_accountProfileModel.LastName" id="inputLastName" type="text" class="form-control form-control-sm" placeholder="Efternavn" />
+                    <ValidationMessage For="@(() => _accountProfileModel.LastName)" />
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="inputLocation">Lokation:</label>
+                    <InputSelect @bind-Value="@_accountProfileModel.LocationId" class="form-control form-control-sm">
+                        @foreach (var location in _locations)
+                            {
+                            @if (location.Id == _accountProfileModel.LocationId)
+                                {
+                                <option selected value="@location.Id">@location.Name</option>
+                                }
+                                else
+                                {
+                                <option value="@location.Id">@location.Name</option>
+                                }
+                            }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => _accountProfileModel.LocationId)" />
+                </div>
+
+                <div class="col">
+                    <label for="fakeInputRole">Rolle:</label>
+                    @if (_roles.FirstOrDefault() != null)
+                    {
+                        <span id="fakeInputRole" type="text" class="form-control form-control-sm" readonly>@(_roles.FirstOrDefault(r => r.Id == _accountProfileModel.RoleId).Name ?? "Kunne ikke finde rolle.")</span>
+                        <ValidationMessage For="@(() => _accountProfileModel.RoleId)" />
+                    }
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-sm-start justify-content-md-between justify-lg-content-between">
+                <button type="submit" class="btn btn-outline-primary me-md-2" disabled="@_isProcessingUpdateUserRequest">Gem bruger oplysninger</button>
+                <button class="btn btn-outline-warning" type="button">Slet bruger</button>
+            </div>
+        </EditForm>
+
+        <hr />
+
+        <EditForm Model="_accountProfileDiverseModel">
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="selectConsultantArea">Konsulentområder:</label>
+                    <InputSelect id="selectConsultantArea" @bind-Value="@_accountProfileDiverseModel.ConsultantAreaIdToBeAssigned" class="form-control form-control-sm">
+                        <option selected value="0">Vælg et område for at tilføje det</option>
+                        @foreach (var area in _areas)
+                            {
+                            <option value="@area.Id">@area.Name</option>
+                            }
+                    </InputSelect>
+                    <button type="button" class="btn btn-outline-primary mt-2" @onclick="async () => await OnButtonClick_AssignUserConsultantArea(_accountProfileDiverseModel.ConsultantAreaIdToBeAssigned)" disabled="@_isProcessingUpdateConsultantAreaRequest">Tilføj Konsulentområde</button>
+                </div>
+                <div class="col">
+                    @if (_assignedConsultantAreas == null || !_assignedConsultantAreas.Any())
+                    {
+                        <label>Fejl</label>
+                    }
+                    else
+                    {
+
+                        <label for="activeConsultantAreas">Tildelte Konsulentområder:</label>
+                        <InputSelect id="activeConsultantAreas" @bind-Value="@_accountProfileDiverseModel.ConsultantAreaIdToBeRemoved" class="form-control form-control-sm" @onselectionchange="@(() => ShouldRender())">
+                            <option selected value="0">Vælg et område for at fjerne det</option>
+                            @foreach (var area in _assignedConsultantAreas)
+                                    {
+                                        var areaId = _areas.FirstOrDefault(x => x.Name.Equals(area.Name)).Id;
+                                <option value="@(areaId)">@area.Name</option>
+                                    }
+                        </InputSelect>
+                        <button type="button" class="btn btn-outline-primary mt-2" @onclick="async () => await OnButtonClick_RemoveUserConsultantArea(_accountProfileDiverseModel.ConsultantAreaIdToBeRemoved)" disabled="@_isProcessingUpdateConsultantAreaRequest">Fjern Konsulentområde</button>
+                    }
+                </div>
+            </div>
+        </EditForm>
+    }
+
+    <div id="myprofilepic"></div>
+</div>

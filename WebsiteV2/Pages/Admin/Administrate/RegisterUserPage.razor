@@ -1,0 +1,119 @@
+﻿@page "/admin/settings/register-user"
+@attribute [Authorize(Roles = "System Administrator, Udvikler")];
+
+    <PageDocumentTitle DocumentTitle="Administrer - Opret Praktikkonsulent" />
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        @if (errorOcurred)
+        {
+            <MessageAlert Alert="MessageAlert.AlertType.Error" Message="@errorMessage" FullWidth="false" />
+        }
+        else
+        {
+            <MessageAlert Alert="MessageAlert.AlertType.Warning" Message="@errorMessage" FullWidth="false" />
+        }
+    }
+
+    @if (!string.IsNullOrEmpty(infoMessage))
+    {
+        <MessageAlert Alert="MessageAlert.AlertType.Success" Message="@infoMessage" FullWidth="false" />
+    }
+
+
+    <div class="page-content p-4">
+        <PageHeadingTitle DisplayTitle="Opret Praktik Konsulent" />
+        @if (dataIsLoading)
+        {
+            <MessageAlert Alert="MessageAlert.AlertType.Info" Message="Henter oplysninger.." IsLoading="@dataIsLoading" />
+        }
+        else
+        {
+            <EditForm Model="_regAccModel" OnValidSubmit="OnValidSubmit_RegisterAccountAsync" autocomplete="off">
+
+                <div class="row">
+                    <div class="col">
+                        <label for="inputEmail">Email Adresse :</label>
+                        <input id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" @bind-value="_regAccModel.Email" @onfocusout="OnEmailFocusOut_CheckForExistence" />
+                        <ValidationMessage For="@(() => _regAccModel.Email)" />
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col">
+                        <label for="inputFirstName">Fornavn :</label>
+                        <input id="inputFirstName" type="text" class="form-control form-control-sm" placeholder="Fornavn" @bind-value="_regAccModel.FirstName" />
+                        <ValidationMessage For="@(() => _regAccModel.FirstName)" />
+                    </div>
+
+                    <div class="col">
+                        <label for="inputLastName">Efternavn :</label>
+                        <input id="inputLastName" type="text" class="form-control form-control-sm" placeholder="Efternavn" @bind-value="_regAccModel.LastName" />
+                        <ValidationMessage For="@(() => _regAccModel.LastName)" />
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col">
+                        <label for="inputConsultantArea">Rolle :</label>
+                        <select class="form-control form-control-sm" @bind="_regAccModel.RoleId">
+                            @if (!_roles.Any())
+                            {
+                                <option value="0" selected>Fandt ikke nogen roller..</option>
+                            }
+                            else
+                            {
+                                <option value="0" selected>Vælg en rolle</option>
+
+                                @foreach (var c in _roles)
+                                {
+                                    <option value="@c.Id">@c.Name</option>
+                                }
+                            }
+                        </select>
+                        <ValidationMessage For="@(() => _regAccModel.RoleId)" />
+                    </div>
+
+                    <div class="col">
+                        <label for="inputLocation">Lokation :</label>
+                        <select class="form-control form-control-sm" @bind="_regAccModel.LocationId">
+                            @if (!_locations.Any())
+                            {
+                                <option value="0" selected>Fandt ikke nogen lokationer..</option>
+                            }
+                            else
+                            {
+                                <option value="0" selected>Vælg en lokation</option>
+
+                                @foreach (var l in _locations)
+                                {
+                                    <option value="@l.Id">@l.Name</option>
+                                }
+                            }
+                        </select>
+                        <ValidationMessage For="@(() => _regAccModel.LocationId)" />
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col">
+                        <label for="inputPassword">Adgangskode :</label>
+                        <input id="inputPassword" type="password" class="form-control form-control-sm" placeholder="Adgangskode" @bind="_regAccModel.Password" />
+                        <ValidationMessage For="@(() => _regAccModel.Password)" />
+                    </div>
+
+                    <div class="col">
+                        <label for="inputConfirmPassword">Bekræft Adgangskode :</label>
+                        <input id="inputConfirmPassword" type="password" class="form-control form-control-sm" placeholder="Bekræft adgangskode" @bind="_regAccModel.ConfirmPassword" />
+                        <ValidationMessage For="@(() => _regAccModel.Password)" />
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-outline-primary mt-2">
+                    <span>Opret Praktikkonsulent</span>
+                </button>
+
+                <div id="myprofilepic"></div>
+
+            </EditForm>
+        }
+    </div>

@@ -1,0 +1,28 @@
+﻿<div class="modal fade" id="ModalRemoveContract" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <PageHeadingTitle DisplayTitle="Fjern Kontrakt" />
+
+            @if (!string.IsNullOrEmpty(_exceptionMessage))
+            {
+                <MessageAlert Message="@_exceptionMessage" />
+            }
+
+            @if (ContractId != 0)
+            {
+                <div class="modal-header">
+                    <h5 class="modal-title">Er du sikker på du vil slette denne kontrakt?</h5>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-bs-dismiss="modal">Annuller</button>
+                    <button type="button" class="btn btn-danger" @onclick="@(() => OnClick_RemoveContract(ContractId))">Slet Kontrakt!</button>
+                </div>
+            }
+            else
+            {
+                <MessageAlert Alert="MessageAlert.AlertType.Error" Message="Noget gik galt, med at hente oplysninger." MessageOptional="Indlæs siden igen, eller prøv igen senere." />
+            }
+        </div>
+    </div>
+</div>
