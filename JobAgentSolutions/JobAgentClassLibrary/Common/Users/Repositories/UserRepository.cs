@@ -54,16 +54,16 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
             return isAuthenticated;
         }
 
-        public async Task<bool> CheckUserExistsAsync(IUser user)
+        public async Task<bool> CheckUserExistsAsync(string email)
         {
             bool userExists = false;
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.ComplexUser))
             {
-                var proc = "[JA.spValidateUserLogin]";
+                var proc = "[JA.spValidateUserExists]";
                 var dynamicValues = new DynamicParameters();
 
-                dynamicValues.Add("@userEmail", user.Email);
+                dynamicValues.Add("@userEmail", email);
                 dynamicValues.Add("@returnResult", SqlDbType.Bit, direction: ParameterDirection.Output);
 
                 await conn.QueryAsync(proc, dynamicValues, commandType: CommandType.StoredProcedure);
@@ -218,9 +218,9 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
             return salt;
         }
 
-        public async Task<IUser> GetUserByAccessTokenAsync(string accessToken)
+        public async Task<IAuthUser> GetUserByAccessTokenAsync(string accessToken)
         {
-            IUser user = null;
+            IAuthUser authUser = null;
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
@@ -234,7 +234,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
                 if (result is not null)
                 {
-                    user = (AuthUser)_factory.CreateEntity(nameof(AuthUser),
+                    authUser = (AuthUser)_factory.CreateEntity(nameof(AuthUser),
                         result.Id,
                         result.RoleId,
                         result.LocationId,
@@ -245,7 +245,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
                 }
             }
 
-            return user;
+            return authUser;
         }
 
         public async Task<bool> GrantUserConsultantAreaAsync(IUser user, int areaId)
@@ -361,6 +361,10 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
                 string proc = "[JA.spGetUserConsultantAreasByUserId]";
+                var values = new
+                {
+                    @userId = user.Id
+                };
 
                 var queryResult = await conn.QueryAsync<AreaInformation>(proc, commandType: CommandType.StoredProcedure);
 
