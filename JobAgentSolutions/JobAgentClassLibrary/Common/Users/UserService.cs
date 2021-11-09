@@ -11,10 +11,9 @@ namespace JobAgentClassLibrary.Common.Users
     {
         private readonly IUserRepository _userRepository;
 
-        public UserService(IUserRepository userRepository, UserEntityFactory userFactory)
+        public UserService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            _userFactory = userFactory;
         }
 
         public async Task<bool> AuthenticateUserLoginAsync(string email, string password)
@@ -85,16 +84,16 @@ namespace JobAgentClassLibrary.Common.Users
             return await _userRepository.GetSaltByEmailAsync(email);
         }
 
-        public async Task<IUser> GetUserByAccessTokenAsync(string accessToken)
+        public async Task<IAuthUser> GetUserByAccessTokenAsync(string accessToken)
         {
             var user = await _userRepository.GetUserByAccessTokenAsync(accessToken);
 
-            if (user is not null)
+            if (user is not null && user is AuthUser authUser)
             {
-                var consultantAreas = await _userRepository.GetUserConsultantAreasAsync(user);
+                var consultantAreas = await _userRepository.GetUserConsultantAreasAsync(authUser);
 
-                user.ConsultantAreas.Clear();
-                user.ConsultantAreas.AddRange(consultantAreas);
+                authUser.ConsultantAreas.Clear();
+                authUser.ConsultantAreas.AddRange(consultantAreas);
             }
 
             return user;
