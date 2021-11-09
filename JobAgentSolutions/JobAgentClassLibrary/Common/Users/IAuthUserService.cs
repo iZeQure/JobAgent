@@ -5,7 +5,7 @@ namespace JobAgentClassLibrary.Common.Users
 {
     public interface IAuthUserService
     {
-        Task<bool> AuthenticateUserLoginAsync(IAuthUser user);
+        Task<bool> AuthenticateUserLoginAsync(string email, string password);
 
         Task<bool> UpdateUserPasswordAsync(IAuthUser user);
 
