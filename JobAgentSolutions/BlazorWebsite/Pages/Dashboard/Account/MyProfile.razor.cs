@@ -17,7 +17,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace BlazorWebsite.Pages.Admin.Account
+namespace BlazorWebsite.Pages.Dashboard.Account
 {
     public partial class MyProfile : ComponentBase
     {
@@ -144,9 +144,15 @@ namespace BlazorWebsite.Pages.Admin.Account
                     Email = _accountProfileModel.Email
                 };
 
-                int result = await UserService.UpdateAsync(user);
+                bool result = false;
 
-                if (result == 1)
+                var updatedUser = await UserService.UpdateAsync(user);
+                if (updatedUser.FirstName == _accountProfileModel.FirstName && updatedUser.Email == _accountProfileModel.Email)
+                {
+                    result = true;
+                }
+
+                if (result)
                 {
                     _successMessage = "Din bruger blev opdateret!";
                     return;
@@ -177,7 +183,7 @@ namespace BlazorWebsite.Pages.Admin.Account
 
                     try
                     {
-                        _userEmailAlreadyExists = await service.ValidateUserExistsByEmail(_accountProfileModel.Email);
+                        _userEmailAlreadyExists = await service.CheckUserExistsAsync(_accountProfileModel.Email);
                     }
                     catch (Exception ex)
                     {
@@ -214,9 +220,18 @@ namespace BlazorWebsite.Pages.Admin.Account
                     var tempList = _assignedConsultantAreas.ToList();
                     var getAreaById = _areas.FirstOrDefault(x => x.Id == selectedAreaId);
 
-                    int result = await UserService.GrantAreaToUserAsync(_userSession, selectedAreaId);
+                    bool result = false;
+                    var updatedUser = await UserService.GrantAreaToUserAsync(_userSession, selectedAreaId);
+                    
+                    foreach(var item in updatedUser.ConsultantAreas)
+                    {
+                        if(item.Id == selectedAreaId)
+                        {
+                            result = true;
+                        }
+                    }
 
-                    if (result == 1)
+                    if (result)
                     {
                         tempList.Add(getAreaById);
                         _assignedConsultantAreas = tempList.OrderBy(x => x.Id);
@@ -261,9 +276,18 @@ namespace BlazorWebsite.Pages.Admin.Account
                 {
                     var areaToBeRemoved = _areas.FirstOrDefault(x => x.Id == selectedAreaId);
 
-                    int result = (await UserService.RevokeAreaFromUserAsync(_userSession, areaToBeRemoved.Id)).FirstName.Length >= 1;
+                    bool result = true;
+                    var updatedUser = await UserService.RevokeAreaFromUserAsync(_userSession, areaToBeRemoved.Id);
 
-                    if (result == 1)
+                    foreach(var item in updatedUser.ConsultantAreas)
+                    {
+                        if(item.Id == areaToBeRemoved.Id)
+                        {
+                            result = false;
+                        }
+                    }
+
+                    if (result)
                     {
                         var areas = _assignedConsultantAreas.ToList();
                         areas.RemoveAll(x => x.Name.Equals(areaToBeRemoved.Name));
