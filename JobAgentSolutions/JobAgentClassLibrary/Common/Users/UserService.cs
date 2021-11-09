@@ -1,6 +1,6 @@
 ﻿using JobAgentClassLibrary.Common.Users.Entities;
-using JobAgentClassLibrary.Common.Users.Factory;
 using JobAgentClassLibrary.Common.Users.Repositories;
+using JobAgentClassLibrary.Security.interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,10 +10,12 @@ namespace JobAgentClassLibrary.Common.Users
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IAuthenticationAccess _authAccess;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, IAuthenticationAccess authAccess)
         {
             _userRepository = userRepository;
+            _authAccess = authAccess;
         }
 
         public async Task<bool> AuthenticateUserLoginAsync(string email, string password)
@@ -25,6 +27,17 @@ namespace JobAgentClassLibrary.Common.Users
             };
 
             var isAuthenticated = await _userRepository.AuthenticateUserLoginAsync(authUser);
+
+            if (isAuthenticated)
+            {
+                authUser.AccessToken = await _authAccess.GenerateAccessTokenAsync(authUser);
+                var tokenUpdated = await _userRepository.UpdateUserAccessTokenAsync(authUser);
+
+                if (!tokenUpdated)
+                {
+                    throw new ArgumentException("Coudln't authenticate user, error while generating token.", nameof(email));
+                }
+            }
 
             return isAuthenticated;
         }
@@ -203,6 +216,13 @@ namespace JobAgentClassLibrary.Common.Users
         public async Task<bool> UpdateUserPasswordAsync(IAuthUser user)
         {
             return await _userRepository.UpdateUserPasswordAsync(user);
+        }
+
+        public async Task<bool> ValidateUserAccessTokenAsync(string accessToken)
+        {
+            var tokenIsValid = await _userRepository.ValidateUserAccessTokenAsync(accessToken);
+
+            return tokenIsValid;
         }
     }
 }
