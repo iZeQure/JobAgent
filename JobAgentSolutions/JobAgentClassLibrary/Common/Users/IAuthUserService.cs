@@ -9,7 +9,7 @@ namespace JobAgentClassLibrary.Common.Users
 
         Task<bool> UpdateUserPasswordAsync(IAuthUser user);
 
-        Task<IUser> GetUserByAccessTokenAsync(string accessToken);
+        Task<IAuthUser> GetUserByAccessTokenAsync(string accessToken);
 
         Task<string> GetSaltByEmailAddressAsync(string email);
     }
