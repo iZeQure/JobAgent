@@ -27,5 +27,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
         Task<List<IArea>> GetUserConsultantAreasAsync(IUser user);
 
         Task<bool> UpdateUserAccessTokenAsync(IAuthUser user);
+
+        Task<bool> ValidateUserAccessTokenAsync(string accessToken);
     }
 }
