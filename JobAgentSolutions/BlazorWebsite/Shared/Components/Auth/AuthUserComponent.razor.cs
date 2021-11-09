@@ -47,21 +47,11 @@ namespace BlazorWebsite.Shared.Components.Auth
                     return;
                 }
 
-                var isAuthValid = await UserService.AuthenticateUserLoginAsync(_authUserModel.Email, _authUserModel.Password);
+                var authUser = await UserService.AuthenticateUserLoginAsync(_authUserModel.Email, _authUserModel.Password);
 
-                if (isAuthValid)
+                if (authUser is not null)
                 {
-                    // Update Accecss Token
-
-                    // Get User By Email
-
-                    // Mark user as authenticated.
-
-                    // Redirect.
-
-                    _user = await UserService.GetByEmailAsync(_authUserModel.Email);
-
-                    await MyAuthStateProvider.MarkUserAsAuthenticated(_user);
+                    await MyAuthStateProvider.MarkUserAsAuthenticated(authUser);
 
                     NavigationManager.NavigateTo("/", true);
                     return;
