@@ -1,6 +1,6 @@
 ﻿using JobAgentClassLibrary.Common.Users.Entities;
-using JobAgentClassLibrary.Common.Users.Factory;
 using JobAgentClassLibrary.Common.Users.Repositories;
+using JobAgentClassLibrary.Security.interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,14 +10,15 @@ namespace JobAgentClassLibrary.Common.Users
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IAuthenticationAccess _authAccess;
 
-        public UserService(IUserRepository userRepository, UserEntityFactory userFactory)
+        public UserService(IUserRepository userRepository, IAuthenticationAccess authAccess)
         {
             _userRepository = userRepository;
-            _userFactory = userFactory;
+            _authAccess = authAccess;
         }
 
-        public async Task<bool> AuthenticateUserLoginAsync(string email, string password)
+        public async Task<IAuthUser> AuthenticateUserLoginAsync(string email, string password)
         {
             var authUser = new AuthUser
             {
@@ -27,12 +28,32 @@ namespace JobAgentClassLibrary.Common.Users
 
             var isAuthenticated = await _userRepository.AuthenticateUserLoginAsync(authUser);
 
-            return isAuthenticated;
+            if (isAuthenticated)
+            {
+                authUser.AccessToken = await _authAccess.GenerateAccessTokenAsync(authUser);
+                var tokenUpdated = await _userRepository.UpdateUserAccessTokenAsync(authUser);
+
+                if (!tokenUpdated)
+                {
+                    throw new ArgumentException("Coudln't authenticate user, error while generating token.", nameof(email));
+                }
+
+                var user = await _userRepository.GetByEmailAsync(email);
+
+                if (user is not null && user is AuthUser auth)
+                {
+                    auth.AccessToken = authUser.AccessToken;
+
+                    return auth;
+                }
+            }
+
+            return null;
         }
 
-        public async Task<bool> CheckUserExistsAsync(IUser user)
+        public async Task<bool> CheckUserExistsAsync(string email)
         {
-            return await _userRepository.CheckUserExistsAsync(user);
+            return await _userRepository.CheckUserExistsAsync(email);
         }
 
         public async Task<IUser> CreateAsync(IUser entity)
@@ -85,16 +106,16 @@ namespace JobAgentClassLibrary.Common.Users
             return await _userRepository.GetSaltByEmailAsync(email);
         }
 
-        public async Task<IUser> GetUserByAccessTokenAsync(string accessToken)
+        public async Task<IAuthUser> GetUserByAccessTokenAsync(string accessToken)
         {
             var user = await _userRepository.GetUserByAccessTokenAsync(accessToken);
 
-            if (user is not null)
+            if (user is not null && user is AuthUser authUser)
             {
-                var consultantAreas = await _userRepository.GetUserConsultantAreasAsync(user);
+                var consultantAreas = await _userRepository.GetUserConsultantAreasAsync(authUser);
 
-                user.ConsultantAreas.Clear();
-                user.ConsultantAreas.AddRange(consultantAreas);
+                authUser.ConsultantAreas.Clear();
+                authUser.ConsultantAreas.AddRange(consultantAreas);
             }
 
             return user;
@@ -204,6 +225,13 @@ namespace JobAgentClassLibrary.Common.Users
         public async Task<bool> UpdateUserPasswordAsync(IAuthUser user)
         {
             return await _userRepository.UpdateUserPasswordAsync(user);
+        }
+
+        public async Task<bool> ValidateUserAccessTokenAsync(string accessToken)
+        {
+            var tokenIsValid = await _userRepository.ValidateUserAccessTokenAsync(accessToken);
+
+            return tokenIsValid;
         }
     }
 }

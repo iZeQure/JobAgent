@@ -1,4 +1,5 @@
-﻿using JobAgentClassLibrary.Common.Users;
+﻿using BlazorWebsite.Data.Providers;
+using JobAgentClassLibrary.Common.Users;
 using JobAgentClassLibrary.Common.Users.Entities;
 using JobAgentClassLibrary.Common.Users.Factory;
 using Microsoft.AspNetCore.Components;
@@ -50,9 +51,17 @@ namespace BlazorWebsite.Shared.Components.Auth
 
                 if (isAuthValid)
                 {
+                    // Update Accecss Token
+
+                    // Get User By Email
+
+                    // Mark user as authenticated.
+
+                    // Redirect.
+
                     _user = await UserService.GetByEmailAsync(_authUserModel.Email);
 
-                    await MyAuthStateProvider.MarkuserAsAuthenticatedAsync(_user);
+                    await MyAuthStateProvider.MarkUserAsAuthenticated(_user);
 
                     NavigationManager.NavigateTo("/", true);
                     return;

@@ -11,29 +11,27 @@ namespace BlazorWebsite.Data.Providers
 {
     public class MyAuthStateProvider : AuthenticationStateProvider
     {
-        private readonly ILocalStorageService _localStorageService;
         private readonly IUserService _userService;
         private readonly IAuthenticationAccess _access;
+        private readonly ILocalStorageService _localStorageService;
 
         /// <summary>
         /// Access the value for the access token in the memory.
         /// </summary>
         private const string ACCESS_TOKEN = "AccessToken";
 
-        public static bool IsAuthenticated { get; set; }
-        public static bool IsAuthenticating { get; set; }
-
-        public MyAuthStateProvider(ILocalStorageService localStorageService, IUserService userService, IAuthenticationAccess userAccess)
+        public MyAuthStateProvider(IUserService userService, IAuthenticationAccess userAccess, ILocalStorageService localStorageService)
         {
-            _localStorageService = localStorageService;
             _userService = userService;
             _access = userAccess;
+            _localStorageService = localStorageService;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             // Declare a variable to store the identity.
             ClaimsIdentity identity;
+            ClaimsPrincipal principal;
 
             // Declare a varible to store the user.
             IAuthUser user;
@@ -43,43 +41,49 @@ namespace BlazorWebsite.Data.Providers
 
             if (!string.IsNullOrWhiteSpace(accessToken) && !string.IsNullOrEmpty(accessToken))
             {
-                // Get the user by access token.
-                user = await _userService.GetUserByAccessTokenAsync(accessToken);
+                // Validate Token.
+                var accessTokenIsValid = await _userService.ValidateUserAccessTokenAsync(accessToken);
 
-                // TODO : Call get claims identity, to store the user into.
-                // Get claims identity with the authenticated user.
-                identity = await _access.GetClaimsIdentityAsync(user);
+                if (accessTokenIsValid)
+                {
+                    // Get the user by access token.
+                    user = await _userService.GetUserByAccessTokenAsync(accessToken);
+
+                    // TODO : Call get claims identity, to store the user into.
+                    // Get claims identity with the authenticated user.
+                    identity = await _access.GetClaimsIdentityAsync(user);
+
+                    principal = new ClaimsPrincipal(identity);
+                    return new AuthenticationState(principal);
+                }
             }
-            else
-            {
-                identity = new ClaimsIdentity();
-            }
+            
+            identity = new ClaimsIdentity();
+            principal = new ClaimsPrincipal(identity);
 
-            ClaimsPrincipal principalUser = new ClaimsPrincipal(identity);
-
-            return await Task.FromResult(new AuthenticationState(principalUser));
+            return new AuthenticationState(principal);
         }
 
         /// <summary>
         /// Mark user as authenticated, if credentials is valid from server side.
         /// </summary>
-        /// <param name="user">Used to authenticate the current user.</param>
+        /// <param name="genericAuthUser">Used to authenticate the current user.</param>
         /// <returns>A authentication notification task changed.</returns>
-        public async Task MarkUserAsAuthenticated(IAuthUser user)
+        public async Task MarkUserAsAuthenticated(IAuthUser genericAuthUser)
         {
-            if (string.IsNullOrEmpty(user.AccessToken))
+            if (string.IsNullOrEmpty(genericAuthUser.AccessToken))
             {
                 throw new NullReferenceException("Couldn't authenticate user. Access token not found.");
             }
 
             // Set the access token in the local memory.
-            await _localStorageService.SetItemAsync(ACCESS_TOKEN, user.AccessToken);
+            await _localStorageService.SetItemAsync(ACCESS_TOKEN, genericAuthUser.AccessToken);
 
             // Get current identity for the user.
-            ClaimsIdentity identity = await _access.GetClaimsIdentityAsync(user);
+            ClaimsIdentity identity = await _access.GetClaimsIdentityAsync(genericAuthUser);
 
             // Associate the identity with a principal.
-            ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+            ClaimsPrincipal principal = new(identity);
 
             // Notify the authentication about changes.
             NotifyAuthenticationStateChanged(principal);
@@ -95,10 +99,10 @@ namespace BlazorWebsite.Data.Providers
             await _localStorageService.RemoveItemAsync(ACCESS_TOKEN);
 
             // Initialize new identity.
-            ClaimsIdentity identity = new ClaimsIdentity();
+            ClaimsIdentity identity = new();
 
             // Remove current associated data in the principal.
-            ClaimsPrincipal user = new ClaimsPrincipal(identity);
+            ClaimsPrincipal user = new(identity);
 
             // Notify the authentication state about changes.
             NotifyAuthenticationStateChanged(user);
