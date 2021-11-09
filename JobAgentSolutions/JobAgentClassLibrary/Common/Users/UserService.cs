@@ -29,9 +29,9 @@ namespace JobAgentClassLibrary.Common.Users
             return isAuthenticated;
         }
 
-        public async Task<bool> CheckUserExistsAsync(IUser user)
+        public async Task<bool> CheckUserExistsAsync(string email)
         {
-            return await _userRepository.CheckUserExistsAsync(user);
+            return await _userRepository.CheckUserExistsAsync(email);
         }
 
         public async Task<IUser> CreateAsync(IUser entity)
