@@ -31,6 +31,7 @@ namespace BlazorWebsite.Data.Providers
         {
             // Declare a variable to store the identity.
             ClaimsIdentity identity;
+            ClaimsPrincipal principal;
 
             // Declare a varible to store the user.
             IAuthUser user;
@@ -40,21 +41,27 @@ namespace BlazorWebsite.Data.Providers
 
             if (!string.IsNullOrWhiteSpace(accessToken) && !string.IsNullOrEmpty(accessToken))
             {
-                // Get the user by access token.
-                user = await _userService.GetUserByAccessTokenAsync(accessToken);
+                // Validate Token.
+                var accessTokenIsValid = await _userService.ValidateUserAccessTokenAsync(accessToken);
 
-                // TODO : Call get claims identity, to store the user into.
-                // Get claims identity with the authenticated user.
-                identity = await _access.GetClaimsIdentityAsync(user);
+                if (accessTokenIsValid)
+                {
+                    // Get the user by access token.
+                    user = await _userService.GetUserByAccessTokenAsync(accessToken);
+
+                    // TODO : Call get claims identity, to store the user into.
+                    // Get claims identity with the authenticated user.
+                    identity = await _access.GetClaimsIdentityAsync(user);
+
+                    principal = new ClaimsPrincipal(identity);
+                    return new AuthenticationState(principal);
+                }
             }
-            else
-            {
-                identity = new ClaimsIdentity();
-            }
 
-            ClaimsPrincipal principalUser = new(identity);
+            identity = new ClaimsIdentity();
+            principal = new ClaimsPrincipal(identity);
 
-            return await Task.FromResult(new AuthenticationState(principalUser));
+            return new AuthenticationState(principal);
         }
 
         /// <summary>
