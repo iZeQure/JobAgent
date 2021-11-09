@@ -1,11 +1,10 @@
-﻿using JobAgentClassLibrary.Common.Users;
+﻿using BlazorWebsite.Data.Providers;
+using JobAgentClassLibrary.Common.Users;
 using JobAgentClassLibrary.Common.Users.Entities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
