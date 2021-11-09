@@ -355,6 +355,29 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
             return updatedPassword;
         }
 
+        public async Task<bool> UpdateUserAccessTokenAsync(IAuthUser user) 
+        {
+            bool updatedToken = false;
+
+            if (user is AuthUser authUser)
+            {
+
+                using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
+                {
+                    var proc = "[JA.spUpdateUserAccessToken]";
+                    var values = new
+                    {
+                        @userEmail = authUser.Email,
+                        @userAccessToken = authUser.AccessToken,
+                    };
+
+                    updatedToken = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
+                }
+            }
+
+            return updatedToken;
+        }
+
         public async Task<List<IArea>> GetUserConsultantAreasAsync(IUser user)
         {
             List<IArea> areas = new();
