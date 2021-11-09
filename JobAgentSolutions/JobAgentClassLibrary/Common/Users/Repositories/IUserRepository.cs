@@ -8,7 +8,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 {
     public interface IUserRepository : IRepository<IUser, int>
     {
-        Task<IUser> GetUserByAccessTokenAsync(string accessToken);
+        Task<IAuthUser> GetUserByAccessTokenAsync(string accessToken);
 
         Task<IUser> GetByEmailAsync(string email);
 
