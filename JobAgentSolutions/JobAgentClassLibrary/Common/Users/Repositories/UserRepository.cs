@@ -54,16 +54,16 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
             return isAuthenticated;
         }
 
-        public async Task<bool> CheckUserExistsAsync(IUser user)
+        public async Task<bool> CheckUserExistsAsync(string email)
         {
             bool userExists = false;
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.ComplexUser))
             {
-                var proc = "[JA.spValidateUserLogin]";
+                var proc = "[JA.spValidateUserExists]";
                 var dynamicValues = new DynamicParameters();
 
-                dynamicValues.Add("@userEmail", user.Email);
+                dynamicValues.Add("@userEmail", email);
                 dynamicValues.Add("@returnResult", SqlDbType.Bit, direction: ParameterDirection.Output);
 
                 await conn.QueryAsync(proc, dynamicValues, commandType: CommandType.StoredProcedure);
