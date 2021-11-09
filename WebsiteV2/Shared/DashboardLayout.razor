@@ -1,0 +1,57 @@
+﻿@inherits LayoutComponentBase
+
+<header class="navbar navbar-dark sticky-top bg-purple flex-md-nowrap p-0 shadow">
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">
+        <svg class="d-none d-sm-none d-md-inline-block pe-2" role="img" aria-label="Logo:">
+            <use xlink:href="assets/images/sprites.svg#brand-logo" />
+        </svg>
+        <span class="align-middle">Din Job Agent</span>
+    </a>
+
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+
+    <div class="dropdown px-3 me-auto me-md-0 me-lg-0">
+        <a href="#user-dropdown" id="userDropdown" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+            <span class="menu-icons @_userProfileState" @onclick="UserProfileIcon_ChangeActiveState">
+                <i class="far fa-user-circle"></i>
+            </span>
+        </a>
+        <div class="bg-purple dropdown-menu dropdown-menu-start dropdown-menu-sm-start dropdown-menu-md-end dropdown-menu-lg-end ms-0 ms-sm-3 me-md-3 me-lg-3" aria-labelledby="userDropdown" style="min-width: 15rem;" @onfocusout="UserProfileIcon_ChangeActiveState">
+            <AuthorizeView Context="authorizeContext">
+                <Authorized>
+                    <UserProfileComponent />
+                </Authorized>
+                <NotAuthorized>
+                    <LoginComponent />
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+    </div>
+</header>
+
+<div class="container-fluid">
+    <div class="row">
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-purple sidebar collapse">
+            <div class="position-sticky pt-3">
+                <SidebarMenu />
+            </div>
+        </nav>
+
+        <main class="col-md-9 col-lg-10 ms-sm-auto p-0">
+            @Body
+        </main>
+    </div>
+</div>
+
+@code {
+    private string _userProfileState => isStateActive ? "active" : "";
+    private bool isStateActive = false;
+
+    private void UserProfileIcon_ChangeActiveState()
+    {
+        isStateActive = !isStateActive;
+    }
+}

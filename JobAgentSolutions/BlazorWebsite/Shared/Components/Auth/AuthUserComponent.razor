@@ -1,0 +1,37 @@
+﻿<EditForm class="px-1 px-sm-2 px-md-2 px-lg-4 py-3" EditContext="_formContext" OnValidSubmit="OnValidFormSubmit_LogInAsync">
+    @if (!string.IsNullOrEmpty(_message))
+    {
+        <div class="alert alert-warning d-flex align-items-center small" role="alert">
+            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="assets/images/sprites.svg#exclamation-triangle-fill" /></svg>
+            <div>
+                @_message
+            </div>
+        </div>
+    }
+
+    <div class="mb-3">
+        <label for="dropdownProfileEmail" class="form-label">Email address</label>
+        <InputText @bind-Value="@_authUserModel.Email" class="form-control" type="email" placeholder="email@example.com" />
+        <ValidationMessage For="@(() => _authUserModel.Email)" />
+    </div>
+    <div class="mb-3">
+        <label for="dropdownProfilePassword" class="form-label">Password</label>
+        <InputText @bind-Value="@_authUserModel.Password" class="form-control" type="password" placeholder="Password" />
+        <ValidationMessage For="@(() => _authUserModel.Password)" />
+    </div>
+    <button type="submit" class="btn btn-outline-light btn-sm" disabled="@_processignAuthRequest">
+
+        @if (_processignAuthRequest)
+        {
+            <div class="d-flex align-items-center">
+                <span>Logger ind...</span>
+                <div class="spinner-border spinner-border-sm text-warning m-2 me-auto"></div>
+            </div>
+        }
+        else
+        {
+            <span>Log ind</span>
+        }
+
+    </button>
+</EditForm>
