@@ -405,5 +405,26 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
             }
             return areas;
         }
+
+        public async Task<bool> ValidateUserAccessTokenAsync(string accessToken)
+        {
+            bool validatedToken = false;
+
+            if (accessToken != null && accessToken != string.Empty)
+            {
+                using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
+                {
+                    var proc = "[JA.spValidateUserAccessToken]";
+                    var values = new
+                    {
+                        @accessToken = accessToken
+                    };
+
+                    validatedToken = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
+                }
+            }
+
+            return validatedToken;
+        }
     }
 }
