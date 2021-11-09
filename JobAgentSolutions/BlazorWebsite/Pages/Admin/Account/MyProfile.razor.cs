@@ -1,4 +1,5 @@
-﻿using JobAgentClassLibrary.Common.Areas;
+﻿using BlazorWebsite.Data.Providers;
+using JobAgentClassLibrary.Common.Areas;
 using JobAgentClassLibrary.Common.Areas.Entities;
 using JobAgentClassLibrary.Common.Locations;
 using JobAgentClassLibrary.Common.Locations.Entities;
@@ -9,6 +10,7 @@ using JobAgentClassLibrary.Common.Users.Entities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -96,9 +98,9 @@ namespace BlazorWebsite.Pages.Admin.Account
                 {
                     await Task.WhenAll(userTask, locationsTask, areasTask, roleTask);
 
-                    _locations = locationsTask.Result;
-                    _areas = areasTask.Result;
-                    _roles = roleTask.Result;
+                    _locations = (IEnumerable<Location>)locationsTask.Result;
+                    _areas = (IEnumerable<Area>)areasTask.Result;
+                    _roles = (IEnumerable<Role>)roleTask.Result;
                     _userSession = userTask.Result;
 
                     if (_userSession == null)
@@ -107,7 +109,7 @@ namespace BlazorWebsite.Pages.Admin.Account
                         return;
                     }
 
-                    _assignedConsultantAreas = _userSession.GetConsultantAreas;
+                    _assignedConsultantAreas = (IEnumerable<Area>)_userSession.ConsultantAreas;
                     _accountProfileModel = new()
                     {
                         RoleId = _userSession.GetRole.Id,
@@ -132,16 +134,17 @@ namespace BlazorWebsite.Pages.Admin.Account
             {
                 _isProcessingUpdateUserRequest = true;
 
-                IUser user = new User(
-                    _userSession.Id,
-                    new Role(_accountProfileModel.RoleId, "", ""),
-                    new Location(_accountProfileModel.LocationId, ""),
-                    null,
-                    _accountProfileModel.FirstName,
-                    _accountProfileModel.LastName,
-                    _accountProfileModel.Email);
+                IUser user = new User()
+                {
+                    Id = _userSession.Id,
+                    RoleId = _accountProfileModel.RoleId,
+                    LocationId = _accountProfileModel.LocationId,
+                    FirstName = _accountProfileModel.FirstName,
+                    LastName = _accountProfileModel.LastName,
+                    Email = _accountProfileModel.Email
+                };
 
-                int result = await UserService.UpdateAsync(user, _tokenSource.Token);
+                int result = await UserService.UpdateAsync(user);
 
                 if (result == 1)
                 {
@@ -174,7 +177,7 @@ namespace BlazorWebsite.Pages.Admin.Account
 
                     try
                     {
-                        _userEmailAlreadyExists = await service.ValidateUserExistsByEmail(_accountProfileModel.Email, _tokenSource.Token);
+                        _userEmailAlreadyExists = await service.ValidateUserExistsByEmail(_accountProfileModel.Email);
                     }
                     catch (Exception ex)
                     {
@@ -211,7 +214,7 @@ namespace BlazorWebsite.Pages.Admin.Account
                     var tempList = _assignedConsultantAreas.ToList();
                     var getAreaById = _areas.FirstOrDefault(x => x.Id == selectedAreaId);
 
-                    int result = await UserService.GrantUserAreaAsync(_userSession, selectedAreaId, _tokenSource.Token);
+                    int result = await UserService.GrantAreaToUserAsync(_userSession, selectedAreaId);
 
                     if (result == 1)
                     {
@@ -258,7 +261,7 @@ namespace BlazorWebsite.Pages.Admin.Account
                 {
                     var areaToBeRemoved = _areas.FirstOrDefault(x => x.Id == selectedAreaId);
 
-                    int result = await UserService.RemoveUserAreaAsync(_userSession, areaToBeRemoved.Id, _tokenSource.Token);
+                    int result = (await UserService.RevokeAreaFromUserAsync(_userSession, areaToBeRemoved.Id)).FirstName.Length >= 1;
 
                     if (result == 1)
                     {
