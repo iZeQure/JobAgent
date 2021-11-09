@@ -57,7 +57,7 @@ namespace BlazorWebsite.Data.Providers
                     return new AuthenticationState(principal);
                 }
             }
-
+            
             identity = new ClaimsIdentity();
             principal = new ClaimsPrincipal(identity);
 
