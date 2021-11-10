@@ -1,11 +1,10 @@
-﻿using JobAgentClassLibrary.Common.Companies;
+﻿using BlazorWebsite.Data.Providers;
+using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.JobPages;
 using JobAgentClassLibrary.Common.JobPages.Entities;
 using Microsoft.AspNetCore.Components;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Administrate
@@ -74,8 +73,5 @@ namespace BlazorWebsite.Pages.Administrate
                 StateHasChanged();
             }
         }
-
-
-
     }
 }
