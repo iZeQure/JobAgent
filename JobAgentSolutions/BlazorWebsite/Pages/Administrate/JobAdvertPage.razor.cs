@@ -22,7 +22,6 @@ namespace BlazorWebsite.Pages.Administrate
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJobAdvertService JobAdvertService { get; set; }
         [Inject] protected ICategoryService CategoryService { get; set; }
-        [Inject] protected IVacantJobService VacantJobService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
         [Inject] protected NavigationManager NavigationManager { get; set; }
