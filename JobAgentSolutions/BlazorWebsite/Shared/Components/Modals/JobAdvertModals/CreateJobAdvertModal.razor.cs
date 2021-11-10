@@ -1,4 +1,5 @@
 ﻿using BlazorWebsite.Data.Providers;
+using BlazorWebsite.Pages.Administrate;
 using JobAgentClassLibrary.Common.Categories;
 using JobAgentClassLibrary.Common.Categories.Entities;
 using JobAgentClassLibrary.Common.JobAdverts;
@@ -49,8 +50,8 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
 
             try
             {
-                var vacantJobsTask = VacantJobService.GetAllAsync(_tokenSource.Token);
-                var categoriesTask = CategoryService.GetAllAsync(_tokenSource.Token);
+                var vacantJobsTask = VacantJobService.GetAllAsync();
+                var categoriesTask = CategoryService.GetCategoriesAsync();
                 var specializationsTask = CategoryService.GetSpecializationsAsync();
 
                 try
