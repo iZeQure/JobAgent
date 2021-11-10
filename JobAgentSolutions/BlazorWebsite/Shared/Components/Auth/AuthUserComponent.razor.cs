@@ -1,4 +1,5 @@
-﻿using JobAgentClassLibrary.Common.Users;
+﻿using BlazorWebsite.Data.Providers;
+using JobAgentClassLibrary.Common.Users;
 using JobAgentClassLibrary.Common.Users.Entities;
 using JobAgentClassLibrary.Common.Users.Factory;
 using Microsoft.AspNetCore.Components;
@@ -46,13 +47,11 @@ namespace BlazorWebsite.Shared.Components.Auth
                     return;
                 }
 
-                var isAuthValid = await UserService.AuthenticateUserLoginAsync(_authUserModel.Email, _authUserModel.Password);
+                var authUser = await UserService.AuthenticateUserLoginAsync(_authUserModel.Email, _authUserModel.Password);
 
-                if (isAuthValid)
+                if (authUser is not null)
                 {
-                    _user = await UserService.GetByEmailAsync(_authUserModel.Email);
-
-                    await MyAuthStateProvider.MarkuserAsAuthenticatedAsync(_user);
+                    await MyAuthStateProvider.MarkUserAsAuthenticated(authUser);
 
                     NavigationManager.NavigateTo("/", true);
                     return;
