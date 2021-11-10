@@ -14,7 +14,6 @@ namespace JobAgentClassLibrary.Common.Filters
             _repository = repository;
         }
 
-
         public async Task<IStaticSearchFilter> CreateAsync(IStaticSearchFilter entity)
         {
             return await _repository.CreateAsync(entity);
