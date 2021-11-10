@@ -6,9 +6,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
@@ -45,10 +42,17 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
                     Name = _companyModel.Name
                 };
 
+                bool isCreated = false;
                 var result = await CompanyService.CreateAsync(company);
+
+                if(result.Id == _companyModel.CompanyId && result.Name == _companyModel.Name)
+                {
+                    isCreated = true;
+                }
+
                 _isProcessing = false;
 
-                if (result == 1)
+                if (isCreated)
                 {
                     _companyModel = new CompanyModel();
                     RefreshProvider.CallRefreshRequest();
