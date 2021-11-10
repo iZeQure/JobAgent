@@ -1,5 +1,4 @@
 ﻿using JobAgentClassLibrary.Common.Users.Entities;
-using JobAgentClassLibrary.Common.Users.Factory;
 using JobAgentClassLibrary.Common.Users.Repositories;
 using System;
 using System.Collections.Generic;
