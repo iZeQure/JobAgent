@@ -17,7 +17,6 @@ namespace JobAgentClassLibrary.Common.VacantJobs
             _repository = repository;
         }
 
-
         public async Task<IVacantJob> CreateAsync(IVacantJob entity)
         {
             return await _repository.CreateAsync(entity);
