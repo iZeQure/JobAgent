@@ -1,12 +1,11 @@
-﻿using JobAgentClassLibrary.Common.Companies;
+﻿using BlazorWebsite.Data.Providers;
+using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Administrate
