@@ -1,4 +1,5 @@
 ﻿using BlazorWebsite.Data.Providers;
+using BlazorWebsite.Pages.Administrate;
 using JobAgentClassLibrary.Common.Categories;
 using JobAgentClassLibrary.Common.Categories.Entities;
 using JobAgentClassLibrary.Common.JobAdverts;
