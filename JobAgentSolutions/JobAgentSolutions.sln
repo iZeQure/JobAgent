@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JobAgentClassLibraryTests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWebsite", "BlazorWebsite\BlazorWebsite.csproj", "{78258704-60F1-4945-8665-5E2CC79EADDC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebCrawler", "WebCrawler\WebCrawler.csproj", "{3526452B-A844-4D1B-B2AB-E901222C299A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{78258704-60F1-4945-8665-5E2CC79EADDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78258704-60F1-4945-8665-5E2CC79EADDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78258704-60F1-4945-8665-5E2CC79EADDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3526452B-A844-4D1B-B2AB-E901222C299A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3526452B-A844-4D1B-B2AB-E901222C299A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3526452B-A844-4D1B-B2AB-E901222C299A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3526452B-A844-4D1B-B2AB-E901222C299A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
