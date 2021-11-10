@@ -7,6 +7,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using JobAgentClassLibrary.Security.Cryptography;
 
 namespace BlazorWebsite.Pages.Dashboard.Account
 {
@@ -75,7 +76,7 @@ namespace BlazorWebsite.Pages.Dashboard.Account
                     authUser.GenerateSalt();
                     authUser.HashPassword();
 
-                    await UserService.UpdateUserPasswordAsync(user);
+                    await UserService.UpdateUserPasswordAsync((IAuthUser)user);
 
                     _infoMessage = "Adgangskode blev ændret.";
                 }
