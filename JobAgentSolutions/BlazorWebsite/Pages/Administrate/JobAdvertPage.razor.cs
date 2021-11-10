@@ -48,7 +48,13 @@ namespace BlazorWebsite.Pages.Administrate
 
             try
             {
-                var paginationModel = await JobAdvertService.JobAdvertPagination();
+                var paginatedResults = await JobAdvertService.JobAdvertPagination();
+                var paginationModel = new JobAdvertPaginationModel()
+                {
+                    JobAdvertsPerPage = 25,
+                    JobAdverts = paginatedResults,
+                    CurrentPage = 1
+                };
                 var categories = await CategoryService.GetCategoriesAsync();
                 var companies = await CompanyService.GetAllAsync();
 
@@ -71,14 +77,24 @@ namespace BlazorWebsite.Pages.Administrate
 
         private async Task ReturnPage(int pageNumber)
         {
-            _paginationModel = await JobAdvertService.JobAdvertPagination(pageNumber);
+            _paginationModel = new JobAdvertPaginationModel
+            {
+                CurrentPage = pageNumber,
+                JobAdverts = await JobAdvertService.JobAdvertPagination(pageNumber),
+                JobAdvertsPerPage = 25
+            };
         }
 
         private async Task RefreshAsync()
         {
             try
             {
-                var pagination = await JobAdvertService.JobAdvertPagination();
+                var pagination = new JobAdvertPaginationModel
+                {
+                    JobAdverts = await JobAdvertService.JobAdvertPagination(),
+                    CurrentPage = 1,
+                    JobAdvertsPerPage = 25
+                };
 
                 if (pagination != null)
                 {
@@ -118,12 +134,22 @@ namespace BlazorWebsite.Pages.Administrate
         {
             if (_categoryId == 0)
             {
-                _paginationModel = await JobAdvertService.JobAdvertPagination(page);
+                _paginationModel = new JobAdvertPaginationModel
+                {
+                    JobAdverts = await JobAdvertService.JobAdvertPagination(page),
+                    CurrentPage = page,
+                    JobAdvertsPerPage = 25
+                };
             }
 
             if (_categoryId != 0)
             {
-                _paginationModel = await JobAdvertService.FilteredJobAdvertPagination(_categoryId, page);
+                _paginationModel = new JobAdvertPaginationModel
+                {
+                    JobAdverts = await JobAdvertService.FilteredJobAdvertPagination(_categoryId, page),
+                    CurrentPage = page,
+                    JobAdvertsPerPage = 25
+                };
 
                 _filteredContentFound = _paginationModel.JobAdverts.Count() == 0 ? false : true;
             }
@@ -132,7 +158,12 @@ namespace BlazorWebsite.Pages.Administrate
         public async Task ClearFilteredContent()
         {
             _categoryId = 0;
-            _paginationModel = await JobAdvertService.JobAdvertPagination();
+            _paginationModel = new JobAdvertPaginationModel
+            {
+                JobAdverts = await JobAdvertService.JobAdvertPagination(),
+                CurrentPage = 1,
+                JobAdvertsPerPage = 25
+            };
         }
     }
 
@@ -163,7 +194,7 @@ namespace BlazorWebsite.Pages.Administrate
 
     public class JobAdvertPaginationModel
     {
-        public IEnumerable<JobAdvert> JobAdverts { get; set; }
+        public List<IJobAdvert> JobAdverts { get; set; }
         public int JobAdvertsPerPage { get; set; }
         public int CurrentPage { get; set; } = 1;
 
@@ -172,7 +203,7 @@ namespace BlazorWebsite.Pages.Administrate
             return Convert.ToInt32(Math.Ceiling(JobAdverts.Count() / (double)JobAdvertsPerPage));
         }
 
-        public IEnumerable<JobAdvert> PaginatedJobAdverts()
+        public IEnumerable<IJobAdvert> PaginatedJobAdverts()
         {
             int start = (CurrentPage - 1) * JobAdvertsPerPage;
 
