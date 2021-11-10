@@ -38,9 +38,7 @@
                     <thead class="table-primary text-light">
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">CVR Nummer</th>
                             <th scope="col">Navn</th>
-                            <th scope="col">Kontaktperson</th>
                             <th scope="col"></th>
                             <th scope="col"></th>
                         </tr>
@@ -51,9 +49,7 @@
                         {
                             <tr id="@(company.Id)">
                                 <th scope="row">@(company.Id)</th>
-                                <td>@(company.CVR)</td>
                                 <td>@(company.Name)</td>
-                                <td>@(company.ContactPerson)</td>
                                 <td>
                                     <span @onclick="(OnClickEvent => OnClick_OpenEditModal(company.Id))" data-bs-toggle="modal" data-bs-target="#ModalEditCompany">
                                         <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne virksomehd." Color="Popover.PopoverType.Info" />
