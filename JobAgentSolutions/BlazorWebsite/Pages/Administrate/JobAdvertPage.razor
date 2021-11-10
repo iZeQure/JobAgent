@@ -1,7 +1,7 @@
 ﻿@page "/admin/settings/job-vacancies"
 @attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
 @using BlazorWebsite.Shared.Components.Diverse;
-@using BlazorWebsite.Shared.Components.Modals.JobAdvertModals; 
+@using BlazorWebsite.Shared.Components.Modals.JobAdvertModals;
 
 <PageDocumentTitle DocumentTitle="Administrer - Stillingsopslag" />
 
@@ -9,7 +9,7 @@
     <PageHeadingTitle DisplayTitle="Administrer Stillingsopslag" />
     <div class="d-inline-block">
 
-        @if (_isDisabled)
+        @if (_createJobAdvertBtnIsDisabled)
         {
             <a class="btn btn-sm btn-info cursor-pointer text-white disabled">
                 <span>Ikke Aktiveret</span>
@@ -32,7 +32,7 @@
 }
 else
 {
-    @if (_paginationModel == null)
+    @if (_paginationModel == null || _dataIsLoading)
     {
         <MessageAlert Alert="MessageAlert.AlertType.Warning"
                       Message="Indlæser data, vent venligst!" />
@@ -65,13 +65,13 @@ else
         <section id="filterControls" class="mb-3">
             <div class="d-flex flex-row-reverse">
                 <div class="action">
-                    <button class="btn btn-sm btn-outline-info" @onclick="@(() => FilterContent())">Filtrér</button>
+                    <button class="btn btn-sm btn-outline-info" @onclick="@(() => FilterJobAdverts())">Filtrér</button>
                     <button class="btn btn-sm btn-outline-dark" @onclick="@(() => ClearFilteredContent())">Ryd Filtrering</button>
                 </div>
             </div>
         </section>
 
-        @if (_paginationModel.PaginatedJobAdverts().Count() == 0)
+        @if (!_paginationModel.PaginatedJobAdverts.Any())
         {
             if (_filteredContentFound == false)
             {
@@ -102,27 +102,54 @@ else
                     </thead>
                     <tbody>
 
-                        @foreach (var jobAdvert in _paginationModel.PaginatedJobAdverts())
+                        @foreach (var jobAdvert in _paginationModel.PaginatedJobAdverts)
                         {
                             <tr id="@jobAdvert.Id">
                                 <th scope="row">@jobAdvert.Id</th>
                                 <td>@jobAdvert.Title</td>
-                                @*@if (string.IsNullOrEmpty(jobAdvert.Specialization.Name))
+
+                                @if (jobAdvert.SpecializationId is not 0)
                                 {
-                                    <td>@jobAdvert.Category.Name</td>
+                                    <td>
+                                        <SpecializationDetails @key="jobAdvert" Id="jobAdvert.SpecializationId" />
+                                        @*@(Task.Run<string>(async () =>
+                                        {
+                                            var specializationName = (await CategoryService.GetSpecializationByIdAsync(jobAdvert.SpecializationId)).Name ?? "Kunne ikke indlæse speciale.";
+                                            return specializationName;
+                                        }))*@
+                                    </td>
                                 }
                                 else
                                 {
-                                    <td>@jobAdvert.Specialization.Name</td>
+                                    <td>
+                                        <CategoryDetails @key="jobAdvert" Id="jobAdvert.CategoryId" />
+                                        @*@(Task.Run<string>(async () =>
+                                        {
+                                            var categoryName = (await CategoryService.GetCategoryByIdAsync(jobAdvert.CategoryId)).Name ?? "Kunne ikke indlæse kategori.";
+                                            return categoryName;
+                                        }))*@
+                                    </td>
                                 }
-                                <td>@jobAdvert.VacantJob.Company.Name</td>*@
                                 <td>
-                                    <span @onclick="(id => OnClickEdit_GetJobAdvertDetailsById(jobAdvert.Id))" data-bs-toggle="modal" data-bs-target="#ModalEditJobAdvert">
+                                    <CompanyDetails @key="jobAdvert" Id="jobAdvert.Id" />
+                                    @*@(Task.Run<string>(async () =>
+                                    {
+                                        var vacantJob = await VacantJobService.GetByIdAsync(jobAdvert.Id);
+
+                                        if (vacantJob is null) return "Kunne ikke indlæse ejer på stillingsopslaget.";
+
+                                        var companyName = (await CompanyService.GetByIdAsync(vacantJob.CompanyId)).Name ?? "Kunne ikke indlæse virksomhed.";
+
+                                        return companyName;
+                                    }))*@
+                                </td>
+                                <td>
+                                    <span @onclick="(id => OnButtonClick_EditJobAdvert_LoadJobAdvertDetails(jobAdvert.Id))" data-bs-toggle="modal" data-bs-target="#ModalEditJobAdvert">
                                         <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette opslag." Color="Popover.PopoverType.Info" />
                                     </span>
                                 </td>
                                 <td>
-                                    <span @onclick="@(id => OnClick_StoreId(jobAdvert.Id))" data-bs-toggle="modal" data-bs-target="#ModalRemoveJobAdvert">
+                                    <span @onclick="@(id => OnButtonClick_RemoveJobAdvert_StoreId(jobAdvert.Id))" data-bs-toggle="modal" data-bs-target="#ModalRemoveJobAdvert">
                                         <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
                                     </span>
                                 </td>
@@ -140,7 +167,7 @@ else
                         var pageNumber = i;
 
                         <li class="@(i == _paginationModel.CurrentPage ? "page-item active" : "page-item")">
-                            <a class="page-link" href="/admin/settings/job/vacancies" @onclick="@(() => FilterContent(pageNumber))">@(i)</a>
+                            <a class="page-link" href="/admin/settings/job/vacancies" @onclick="@(() => FilterJobAdverts(pageNumber))">@(i)</a>
                         </li>
                     }
                 </ul>

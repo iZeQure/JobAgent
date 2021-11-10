@@ -4,6 +4,7 @@ using JobAgentClassLibrary.Common.Categories.Entities;
 using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.JobAdverts;
 using JobAgentClassLibrary.Common.JobAdverts.Entities;
+using JobAgentClassLibrary.Common.VacantJobs;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
@@ -21,53 +22,42 @@ namespace BlazorWebsite.Pages.Administrate
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJobAdvertService JobAdvertService { get; set; }
         [Inject] protected ICategoryService CategoryService { get; set; }
+        [Inject] protected IVacantJobService VacantJobService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
         [Inject] protected NavigationManager NavigationManager { get; set; }
 
+        private JobAdvertPaginationModel _paginationModel = new();
         private JobAdvertModel _jobAdvertModel = new();
-        private JobAdvertPaginationModel _paginationModel;
-        private IEnumerable<ICategory> _categories;
+        private List<ICategory> _categories;
         private int _advertId = 0;
         private int _categoryId = 0;
-        private bool _isDisabled = false;
+        private bool _createJobAdvertBtnIsDisabled = false;
         private bool _filteredContentFound = false;
         private bool _dataIsLoading = false;
         private string _errorMessage = "";
 
         protected override async Task OnInitializedAsync()
         {
-            RefreshProvider.RefreshRequest += RefreshAsync;
-
-            await LoadData();
-        }
-
-        private async Task LoadData()
-        {
-            _dataIsLoading = true;
+            RefreshProvider.RefreshRequest += RefreshDataAsync;
 
             try
             {
-                var paginatedResults = await JobAdvertService.JobAdvertPagination();
-                var paginationModel = new JobAdvertPaginationModel()
-                {
-                    JobAdvertsPerPage = 25,
-                    JobAdverts = paginatedResults,
-                    CurrentPage = 1
-                };
-                var categories = await CategoryService.GetCategoriesAsync();
-                var companies = await CompanyService.GetAllAsync();
+                _dataIsLoading = true;
 
-                if (companies.Any() == false)
-                {
-                    _isDisabled = true;
-                }
+                _paginationModel.JobAdverts = await JobAdvertService.GetJobAdvertsAsync();
+                _categories = await CategoryService.GetCategoriesAsync();
 
-                if (paginationModel != null && categories != null)
+                var company = (await CompanyService.GetAllAsync()).FirstOrDefault();
+
+                if (company is null)
                 {
-                    _paginationModel = paginationModel;
-                    _categories = categories;
+                    _createJobAdvertBtnIsDisabled = true;
                 }
+            }
+            catch (Exception ex)
+            {
+                _errorMessage = ex.Message;
             }
             finally
             {
@@ -75,42 +65,20 @@ namespace BlazorWebsite.Pages.Administrate
             }
         }
 
-        private async Task ReturnPage(int pageNumber)
-        {
-            _paginationModel = new JobAdvertPaginationModel
-            {
-                CurrentPage = pageNumber,
-                JobAdverts = await JobAdvertService.JobAdvertPagination(pageNumber),
-                JobAdvertsPerPage = 25
-            };
-        }
-
-        private async Task RefreshAsync()
+        private async Task RefreshDataAsync()
         {
             try
             {
-                var pagination = new JobAdvertPaginationModel
-                {
-                    JobAdverts = await JobAdvertService.JobAdvertPagination(),
-                    CurrentPage = 1,
-                    JobAdvertsPerPage = 25
-                };
-
-                if (pagination != null)
-                {
-                    _paginationModel = pagination;
-                    return;
-                }
-
-                _paginationModel = null;
-
-                _errorMessage = "Kunne ikke indlæse stillingsopslag.";
+                _paginationModel.ResetToDefaultSettings();
+                _paginationModel.JobAdverts = (await JobAdvertService.GetJobAdvertsAsync())
+                    .OrderBy(j => j.RegistrationDateTime)
+                    .ToList();
             }
             catch (Exception) { _errorMessage = "Ukendt Fejl ved opdatering af stillingsopslag."; }
             finally { StateHasChanged(); }
         }
 
-        public async Task OnClickEdit_GetJobAdvertDetailsById(int id)
+        public async Task OnButtonClick_EditJobAdvert_LoadJobAdvertDetails(int id)
         {
             var details = await JobAdvertService.GetByIdAsync(id);
 
@@ -125,45 +93,37 @@ namespace BlazorWebsite.Pages.Administrate
             };
         }
 
-        public void OnClick_StoreId(int id)
+        public void OnButtonClick_RemoveJobAdvert_StoreId(int id)
         {
             _advertId = id;
         }
 
-        public async Task FilterContent(int page = 1)
+        public async Task FilterJobAdverts(int page = 1)
         {
-            if (_categoryId == 0)
+            if (_categoryId is 0)
             {
-                _paginationModel = new JobAdvertPaginationModel
-                {
-                    JobAdverts = await JobAdvertService.JobAdvertPagination(page),
-                    CurrentPage = page,
-                    JobAdvertsPerPage = 25
-                };
+                _paginationModel.CurrentPage = page;
+                _paginationModel.JobAdverts = (await JobAdvertService.GetJobAdvertsAsync())
+                    .OrderBy(j => j.RegistrationDateTime)
+                    .ToList();
             }
-
-            if (_categoryId != 0)
+            else
             {
-                _paginationModel = new JobAdvertPaginationModel
-                {
-                    JobAdverts = await JobAdvertService.FilteredJobAdvertPagination(_categoryId, page),
-                    CurrentPage = page,
-                    JobAdvertsPerPage = 25
-                };
+                _paginationModel.CurrentPage = page;
+                _paginationModel.JobAdverts = (await JobAdvertService.GetJobAdvertsAsync())
+                    .Where(j => j.CategoryId == _categoryId)
+                    .OrderBy(j => j.Id)
+                    .ToList();
 
-                _filteredContentFound = _paginationModel.JobAdverts.Count() == 0 ? false : true;
+                _filteredContentFound = _paginationModel.JobAdverts.Any();
             }
         }
 
         public async Task ClearFilteredContent()
         {
             _categoryId = 0;
-            _paginationModel = new JobAdvertPaginationModel
-            {
-                JobAdverts = await JobAdvertService.JobAdvertPagination(),
-                CurrentPage = 1,
-                JobAdvertsPerPage = 25
-            };
+            _paginationModel.ResetToDefaultSettings();
+            _paginationModel.JobAdverts = await JobAdvertService.GetJobAdvertsAsync();
         }
     }
 
@@ -192,23 +152,52 @@ namespace BlazorWebsite.Pages.Administrate
         public int SpecializationId { get; set; } = 0;
     }
 
+    /// <summary>
+    /// Represents a model which handles the pagination of the Job Advert page.
+    /// </summary>
     public class JobAdvertPaginationModel
     {
+        /// <summary>
+        /// Initializes the model with default values.
+        /// </summary>
+        public JobAdvertPaginationModel(int maxContentPerPage = 25, int currentPage = 1)
+        {
+            JobAdverts = new();
+            JobAdvertsPerPage = maxContentPerPage;
+            CurrentPage = currentPage;
+        }
+
         public List<IJobAdvert> JobAdverts { get; set; }
-        public int JobAdvertsPerPage { get; set; }
+        public int JobAdvertsPerPage { get; set; } = 25;
         public int CurrentPage { get; set; } = 1;
+        public IEnumerable<IJobAdvert> PaginatedJobAdverts
+        {
+            get
+            {
+                return CreatePagination();
+            }
+        }
 
         public int PageCount()
         {
-            return Convert.ToInt32(Math.Ceiling(JobAdverts.Count() / (double)JobAdvertsPerPage));
+            return Convert.ToInt32(Math.Ceiling(JobAdverts.Count / (double)JobAdvertsPerPage));
         }
 
-        public IEnumerable<IJobAdvert> PaginatedJobAdverts()
+        private IEnumerable<IJobAdvert> CreatePagination()
         {
             int start = (CurrentPage - 1) * JobAdvertsPerPage;
 
-            return JobAdverts.OrderBy(j => j.Id).Skip(start).Take(JobAdvertsPerPage);
+            return JobAdverts
+                .OrderBy(j => j.Id)
+                .Skip(start)
+                .Take(JobAdvertsPerPage);
+        }
+
+        public void ResetToDefaultSettings()
+        {
+            JobAdverts = new();
+            JobAdvertsPerPage = 25;
+            CurrentPage = 1;
         }
     }
-
 }
