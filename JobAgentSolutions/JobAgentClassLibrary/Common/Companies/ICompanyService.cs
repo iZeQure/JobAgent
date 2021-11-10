@@ -11,7 +11,5 @@ namespace JobAgentClassLibrary.Common.Companies
         Task<ICompany> GetByIdAsync(int id);
         Task<bool> RemoveAsync(ICompany entity);
         Task<ICompany> UpdateAsync(ICompany entity);
-
-
     }
 }
