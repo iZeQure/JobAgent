@@ -19,7 +19,7 @@ namespace BlazorWebsite.Pages.Administrate
         [Parameter] public int JobAdvertId { get; set; }
         [Parameter] public int SpecializationId { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
-        [Inject] protected IJobAdvertService JobService { get; set; }
+        [Inject] protected IJobAdvertService JobAdvertService { get; set; }
         [Inject] protected ICategoryService CategoryService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
@@ -48,7 +48,7 @@ namespace BlazorWebsite.Pages.Administrate
 
             try
             {
-                var paginationModel = await JobService.JobAdvertPagination();
+                var paginationModel = await JobAdvertService.JobAdvertPagination();
                 var categories = await CategoryService.GetCategoriesAsync();
                 var companies = await CompanyService.GetAllAsync();
 
@@ -71,14 +71,14 @@ namespace BlazorWebsite.Pages.Administrate
 
         private async Task ReturnPage(int pageNumber)
         {
-            _paginationModel = await JobService.JobAdvertPagination(pageNumber);
+            _paginationModel = await JobAdvertService.JobAdvertPagination(pageNumber);
         }
 
         private async Task RefreshAsync()
         {
             try
             {
-                var pagination = await JobService.JobAdvertPagination();
+                var pagination = await JobAdvertService.JobAdvertPagination();
 
                 if (pagination != null)
                 {
@@ -96,7 +96,7 @@ namespace BlazorWebsite.Pages.Administrate
 
         public async Task OnClickEdit_GetJobAdvertDetailsById(int id)
         {
-            var details = await JobService.GetByIdAsync(id);
+            var details = await JobAdvertService.GetByIdAsync(id);
 
             _jobAdvertModel = new JobAdvertModel()
             {
@@ -118,12 +118,12 @@ namespace BlazorWebsite.Pages.Administrate
         {
             if (_categoryId == 0)
             {
-                _paginationModel = await JobService.JobAdvertPagination(page);
+                _paginationModel = await JobAdvertService.JobAdvertPagination(page);
             }
 
             if (_categoryId != 0)
             {
-                _paginationModel = await JobService.FilteredJobAdvertPagination(_categoryId, page);
+                _paginationModel = await JobAdvertService.FilteredJobAdvertPagination(_categoryId, page);
 
                 _filteredContentFound = _paginationModel.JobAdverts.Count() == 0 ? false : true;
             }
@@ -132,7 +132,7 @@ namespace BlazorWebsite.Pages.Administrate
         public async Task ClearFilteredContent()
         {
             _categoryId = 0;
-            _paginationModel = await JobService.JobAdvertPagination();
+            _paginationModel = await JobAdvertService.JobAdvertPagination();
         }
     }
 
