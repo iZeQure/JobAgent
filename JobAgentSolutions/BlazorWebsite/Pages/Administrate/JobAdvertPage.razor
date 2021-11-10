@@ -107,7 +107,7 @@ else
                             <tr id="@jobAdvert.Id">
                                 <th scope="row">@jobAdvert.Id</th>
                                 <td>@jobAdvert.Title</td>
-                                @if (string.IsNullOrEmpty(jobAdvert.Specialization.Name))
+                                @*@if (string.IsNullOrEmpty(jobAdvert.Specialization.Name))
                                 {
                                     <td>@jobAdvert.Category.Name</td>
                                 }
@@ -115,7 +115,7 @@ else
                                 {
                                     <td>@jobAdvert.Specialization.Name</td>
                                 }
-                                <td>@jobAdvert.VacantJob.Company.Name</td>
+                                <td>@jobAdvert.VacantJob.Company.Name</td>*@
                                 <td>
                                     <span @onclick="(id => OnClickEdit_GetJobAdvertDetailsById(jobAdvert.Id))" data-bs-toggle="modal" data-bs-target="#ModalEditJobAdvert">
                                         <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette opslag." Color="Popover.PopoverType.Info" />

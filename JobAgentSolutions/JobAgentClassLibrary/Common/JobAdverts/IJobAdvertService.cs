@@ -14,5 +14,8 @@ namespace JobAgentClassLibrary.Common.JobAdverts
         Task<int> GetJobAdvertCountByUncategorized();
         Task<bool> RemoveAsync(IJobAdvert entity);
         Task<IJobAdvert> UpdateAsync(IJobAdvert entity);
+        Task<List<IJobAdvert>> JobAdvertPagination(int page = 1);
+        Task<List<IJobAdvert>> JobAdvertPagination(int resultsPerPage, int page = 1);
+        Task<List<IJobAdvert>> FilteredJobAdvertPagination(int sortByCategoryId, int page = 1);
     }
 }
