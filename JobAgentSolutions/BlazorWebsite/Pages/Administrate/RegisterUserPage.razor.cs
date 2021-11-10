@@ -113,7 +113,7 @@ namespace BlazorWebsite.Pages.Administrate
                 var userResult = await UserService.CreateAsync(user);
                 bool userIsRegistered = false;
 
-                if(userResult.FirstName == user.FirstName && userResult.Email == user.Email)
+                if (userResult.FirstName == user.FirstName && userResult.Email == user.Email)
                 {
                     userIsRegistered = true;
                 }
