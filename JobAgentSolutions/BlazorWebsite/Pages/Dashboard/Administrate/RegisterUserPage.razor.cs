@@ -1,27 +1,23 @@
-﻿using JobAgentClassLibrary.Common.Locations;
+﻿using BlazorWebsite.Data.FormModels;
+using JobAgentClassLibrary.Common.Locations;
 using JobAgentClassLibrary.Common.Locations.Entities;
 using JobAgentClassLibrary.Common.Roles;
 using JobAgentClassLibrary.Common.Roles.Entities;
 using JobAgentClassLibrary.Common.Users;
 using JobAgentClassLibrary.Common.Users.Entities;
-using JobAgentClassLibrary.Security.Cryptography;
-using JobAgentClassLibrary.Security.interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
-namespace BlazorWebsite.Pages.Administrate
+namespace BlazorWebsite.Pages.Dashboard.Administrate
 {
     public partial class RegisterUserPage : ComponentBase
     {
         [Inject] private IUserService UserService { get; set; }
         [Inject] private IRoleService RoleService { get; set; }
         [Inject] private ILocationService LocationService { get; set; }
-        [Inject] private IAuthenticationAccess AuthenticationAccess { get; set; }
 
         private RegisterUserModel _regAccModel;
         private IEnumerable<IRole> _roles;
@@ -169,41 +165,4 @@ namespace BlazorWebsite.Pages.Administrate
             errorMessage = string.Empty;
         }
     }
-
-    public class RegisterUserModel
-    {
-
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Udfyld venligst fornavn.")]
-        [StringLength(maximumLength: 128, MinimumLength = 1)]
-        public string FirstName { get; set; }
-
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Udfyld venligst efternavn.")]
-        [StringLength(maximumLength: 128, MinimumLength = 1)]
-        public string LastName { get; set; }
-
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Email adresse er påkrævet.")]
-        [StringLength(maximumLength: 255, MinimumLength = 1)]
-        [EmailAddress(ErrorMessage = "Indtast en gyldig email adresse.")]
-        public string Email { get; set; }
-
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Adgangskode er påkrævet.")]
-        [StringLength(255, ErrorMessage = "Adgangskode er for lang eller kort.", MinimumLength = 6)]
-        [PasswordPropertyText]
-        public string Password { get; set; }
-
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Genindtast din adgangskode.")]
-        [Compare(nameof(Password), ErrorMessage = "Adgangskode stemmer ikke overens.")]
-        [StringLength(255, ErrorMessage = "Adgangskode er for lang eller kort.", MinimumLength = 6)]
-        [PasswordPropertyText]
-        public string ConfirmPassword { get; set; }
-
-        [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "Vælg venligst en Rolle.")]
-        public int RoleId { get; set; }
-
-        [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "Vælg venligst en lokation.")]
-        public int LocationId { get; set; }
-    }
-
 }

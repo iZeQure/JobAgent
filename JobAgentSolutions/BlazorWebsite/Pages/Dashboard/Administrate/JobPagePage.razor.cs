@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace BlazorWebsite.Pages.Administrate
+namespace BlazorWebsite.Pages.Dashboard.Administrate
 {
     public partial class JobPagePage : ComponentBase
     {

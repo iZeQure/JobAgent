@@ -1,8 +1,6 @@
 ﻿@page "/admin/settings/companies"
 @attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
-@using BlazorWebsite.Shared.Components.Diverse;
 @using BlazorWebsite.Shared.Components.Modals.CompanyModals;
-
 
 <PageDocumentTitle DocumentTitle="Administrer - Virksomheds Indstillinger" />
 
@@ -71,7 +69,7 @@
 
         <CreateCompanyModal />
 
-        <EditCompanyModal CompanyModel="_companyModel" />
+        <EditCompanyModal  @="_companyModel" />
 
         <RemoveCompanyModal CompanyId="_companyId" />
     }

@@ -1,6 +1,4 @@
-﻿@using BlazorWebsite.Shared.Components.Diverse;
- 
-<div class="modal fade" id="ModalEditCompany" tabindex="-1" role="dialog" aria-labelledby="EditCompanyModalTitel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+﻿<div class="modal fade" id="ModalEditCompany" tabindex="-1" role="dialog" aria-labelledby="EditCompanyModalTitel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
 
@@ -25,26 +23,8 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="inputCompanyIdentity" class="admin-label col-form-label col-form-label-sm">Virksomhedens CVR : <span class="font-italic small" style="color: lightcoral;">*Ændring af CVR kan muligvis skabe problemer.</span></label>
-                                <input id="inputCompanyIdentity" type="text" class="form-control form-control-sm" placeholder="Indtast CVR nr.." @bind-value="_companyModel.CVR" />
-                            </div>
-                        </div>
-
-                        <hr />
-
-                        <div class="row">
-                            <div class="col">
                                 <label for="inputName" class="admin-label col-form-label col-form-label-sm">Virksomhedens Navn :</label>
                                 <input id="inputName" type="text" class="form-control form-control-sm" placeholder="Indtast virksomhedens navn.." @bind="_companyModel.Name" />
-                            </div>
-                        </div>
-
-                        <hr />
-
-                        <div class="row">
-                            <div class="col">
-                                <label for="InputContactPerson" class="admin-label col-form-label col-form-label-sm">Kontakt Person :</label>
-                                <input id="InputContactPerson" type="text" class="form-control form-control-sm" placeholder="Indtast Kontakperson fra virksomheden.." @bind-value="_companyModel.ContactPerson" />
                             </div>
                         </div>
 

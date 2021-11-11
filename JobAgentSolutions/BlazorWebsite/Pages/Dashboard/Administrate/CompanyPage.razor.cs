@@ -1,14 +1,14 @@
-﻿using BlazorWebsite.Data.Providers;
+﻿using BlazorWebsite.Data.FormModels;
+using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
-namespace BlazorWebsite.Pages.Administrate
+namespace BlazorWebsite.Pages.Dashboard.Administrate
 {
     public partial class CompanyPage : ComponentBase
     {
@@ -69,21 +69,5 @@ namespace BlazorWebsite.Pages.Administrate
         {
             _companyId = id;
         }
-    }
-    public class CompanyModel
-    {
-        [Required]
-        public int CompanyId { get; set; }
-
-        [Required]
-        [Range(10000000, 99999999, ErrorMessage = "Indtast et gyldigt CVR Nummer. (8 siffer)")]
-        public int CVR { get; set; }
-
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Indtast et gyldigt navn.")]
-        [StringLength(maximumLength: 255, MinimumLength = 1)]
-        public string Name { get; set; }
-
-        [Required(AllowEmptyStrings = false, ErrorMessage = "En Kontakt Person er påkrævet")]
-        public string ContactPerson { get; set; }
     }
 }

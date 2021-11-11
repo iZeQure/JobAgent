@@ -1,5 +1,5 @@
-﻿using BlazorWebsite.Data.Providers;
-using BlazorWebsite.Pages.Administrate;
+﻿using BlazorWebsite.Data.FormModels;
+using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using Microsoft.AspNetCore.Components;
