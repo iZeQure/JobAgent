@@ -231,7 +231,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
         {
             IAuthUser authUser = null;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.ComplexUser))
             {
                 var proc = "[JA.spGetUserByAccessToken]";
                 var values = new
@@ -250,7 +250,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
                         result.FirstName,
                         result.LastName,
                         result.Email,
-                        result.AccessToken);
+                        "");
                 }
             }
 
@@ -392,7 +392,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
         public async Task<List<IArea>> GetUserConsultantAreasAsync(IUser user)
         {
             List<IArea> areas = new();
-            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.ComplexUser))
             {
                 string proc = "[JA.spGetUserConsultantAreasByUserId]";
                 var values = new
@@ -400,7 +400,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
                     @userId = user.Id
                 };
 
-                var queryResult = await conn.QueryAsync<AreaInformation>(proc, commandType: CommandType.StoredProcedure);
+                var queryResult = await conn.QueryAsync<AreaInformation>(proc, values, commandType: CommandType.StoredProcedure);
 
                 if (queryResult is not null && queryResult.Any())
                 {
@@ -423,17 +423,22 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
             if (accessToken != null && accessToken != string.Empty)
             {
-                using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
+                using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.ComplexUser))
                 {
                     var proc = "[JA.spValidateUserAccessToken]";
                     var dynamicValues = new DynamicParameters();
 
-                    dynamicValues.Add("@userAcessToken", accessToken);
+                    dynamicValues.Add("@userAccessToken", accessToken);
                     dynamicValues.Add("@returnResult", SqlDbType.Bit, direction: ParameterDirection.Output);
 
                     await conn.QueryAsync(proc, dynamicValues, commandType: CommandType.StoredProcedure);
 
-                    validatedToken = dynamicValues.Get<bool>("@returnResult");
+                    var returnResult = dynamicValues.Get<int>("@returnResult");
+
+                    if (returnResult == 1)
+                    {
+                        validatedToken = true;
+                    }
                 }
             }
 

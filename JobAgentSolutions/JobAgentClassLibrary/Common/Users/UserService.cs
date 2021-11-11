@@ -114,7 +114,7 @@ namespace JobAgentClassLibrary.Common.Users
             {
                 var consultantAreas = await _userRepository.GetUserConsultantAreasAsync(authUser);
 
-                authUser.ConsultantAreas.Clear();
+                authUser.ConsultantAreas = new();
                 authUser.ConsultantAreas.AddRange(consultantAreas);
             }
 

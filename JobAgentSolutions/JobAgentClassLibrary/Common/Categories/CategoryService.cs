@@ -58,11 +58,13 @@ namespace JobAgentClassLibrary.Common.Categories
 
             foreach (ICategory c in categories)
             {
+                if (c.Id is 0) continue;
+
                 foreach (ISpecialization s in specializations)
                 {
                     if (c.Id == s.CategoryId)
                     {
-                        menu.Find(x => x.Id == c.Id).Specializations.Add(s);
+                        menu.Find(x => x.Id == s.CategoryId)?.Specializations.Add(s);
                     }
                 }
             }
