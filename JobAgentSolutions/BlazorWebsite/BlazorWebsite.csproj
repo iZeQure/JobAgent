@@ -16,7 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\" />
+    <Folder Include="Data\FormModels\" />
+    <Folder Include="Data\Providers\" />
+    <Folder Include="Pages\Dashboard\" />
+    <Folder Include="Shared\Components\" />
   </ItemGroup>
 
 </Project>
