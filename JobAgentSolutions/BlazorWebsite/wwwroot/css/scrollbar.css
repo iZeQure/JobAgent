@@ -1,0 +1,14 @@
+﻿::-webkit-scrollbar, ::-webkit-scrollbar:horizontal {
+    width: 10px !important;
+    height: 10px !important;
+}
+
+.card-body::-webkit-scrollbar {
+    width: 4px !important;
+}
+
+::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-thumb:horizontal {
+    background-color: var(--scrollbar-wheel-color) !important;
+    border-radius: 5px !important;
+}
