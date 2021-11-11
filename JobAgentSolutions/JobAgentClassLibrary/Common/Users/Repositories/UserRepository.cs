@@ -7,6 +7,7 @@ using JobAgentClassLibrary.Common.Users.Entities.EntityMaps;
 using JobAgentClassLibrary.Common.Users.Factory;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
+using JobAgentClassLibrary.Security.Cryptography;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -17,15 +18,17 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 {
     public class UserRepository : IUserRepository
     {
+        private readonly ICryptographyService _cryptographyService;
         private readonly ISqlDbManager _sqlDbManager;
         private readonly UserEntityFactory _factory;
         private readonly AreaEntityFactory _areaFactory;
 
-        public UserRepository(ISqlDbManager sqlDbManager, UserEntityFactory factory, AreaEntityFactory areaFactory)
+        public UserRepository(ISqlDbManager sqlDbManager, UserEntityFactory factory, AreaEntityFactory areaFactory, ICryptographyService cryptographyService)
         {
             _sqlDbManager = sqlDbManager;
             _factory = factory;
             _areaFactory = areaFactory;
+            _cryptographyService = cryptographyService;
         }
 
         public async Task<bool> AuthenticateUserLoginAsync(IAuthUser user)
@@ -35,7 +38,11 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
                 throw new ArgumentNullException(nameof(user), "User was null.");
             }
 
+            var userSalt = await GetSaltByEmailAsync(((AuthUser)user).Email);
+            if (string.IsNullOrEmpty(userSalt)) return false;
+
             bool isAuthenticated = false;
+            var hashedUserPassword = _cryptographyService.HashUserPasswordWithSalt(((AuthUser)user).Password, userSalt);
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.ComplexUser))
             {
@@ -43,7 +50,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
                 var dynamicValues = new DynamicParameters();
 
                 dynamicValues.Add("@userEmail", ((AuthUser)user).Email);
-                dynamicValues.Add("@userPassword", user.Password);
+                dynamicValues.Add("@userPassword", hashedUserPassword);
                 dynamicValues.Add("@returnResult", SqlDbType.Bit, direction: ParameterDirection.Output);
 
                 await conn.QueryAsync(proc, dynamicValues, commandType: CommandType.StoredProcedure);
@@ -80,6 +87,8 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
             if (entity is AuthUser authUser)
             {
+                IHashedUser hashedUser = _cryptographyService.CreateHashedUser(authUser.Password);
+
                 using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
                 {
                     var proc = "[JA.spCreateUser]";
@@ -90,8 +99,8 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
                         @userFirstName = authUser.FirstName,
                         @userLastName = authUser.LastName,
                         @userEmail = authUser.Email,
-                        @userPass = authUser.Password,
-                        @userSalt = authUser.Salt,
+                        @userPass = hashedUser.Password,
+                        @userSalt = hashedUser.Salt,
                         @userAccessToken = authUser.AccessToken
                     };
 
@@ -338,14 +347,16 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
             if (user is AuthUser authUser)
             {
+                IHashedUser hashedUser = _cryptographyService.CreateHashedUser(authUser.Password);
+
                 using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
                 {
                     var proc = "[JA.spValidateUserLogin]";
                     var values = new
                     {
                         @userId = authUser.Id,
-                        @userNewPassword = authUser.Password,
-                        @userNewSalt = authUser.Salt
+                        @userNewPassword = hashedUser.Password,
+                        @userNewSalt = hashedUser.Salt
                     };
 
                     updatedPassword = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
@@ -353,6 +364,29 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
             }
 
             return updatedPassword;
+        }
+
+        public async Task<bool> UpdateUserAccessTokenAsync(IAuthUser user) 
+        {
+            bool updatedToken = false;
+
+            if (user is AuthUser authUser)
+            {
+
+                using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
+                {
+                    var proc = "[JA.spUpdateUserAccessToken]";
+                    var values = new
+                    {
+                        @userEmail = authUser.Email,
+                        @userAccessToken = authUser.AccessToken,
+                    };
+
+                    updatedToken = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
+                }
+            }
+
+            return updatedToken;
         }
 
         public async Task<List<IArea>> GetUserConsultantAreasAsync(IUser user)
@@ -381,6 +415,29 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
                 }
             }
             return areas;
+        }
+
+        public async Task<bool> ValidateUserAccessTokenAsync(string accessToken)
+        {
+            bool validatedToken = false;
+
+            if (accessToken != null && accessToken != string.Empty)
+            {
+                using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
+                {
+                    var proc = "[JA.spValidateUserAccessToken]";
+                    var dynamicValues = new DynamicParameters();
+
+                    dynamicValues.Add("@userAcessToken", accessToken);
+                    dynamicValues.Add("@returnResult", SqlDbType.Bit, direction: ParameterDirection.Output);
+
+                    await conn.QueryAsync(proc, dynamicValues, commandType: CommandType.StoredProcedure);
+
+                    validatedToken = dynamicValues.Get<bool>("@returnResult");
+                }
+            }
+
+            return validatedToken;
         }
     }
 }
