@@ -54,20 +54,5 @@ namespace JobAgentClassLibrary.Common.JobAdverts
         {
             return await _repository.UpdateAsync(entity);
         }
-
-        public async Task<List<IJobAdvert>> JobAdvertPagination(int page = 1)
-        {
-           return (await _repository.GetAllAsync()).OrderBy(x => x.RegistrationDateTime).ToList();
-        }
-
-        public async Task<List<IJobAdvert>> JobAdvertPagination(int resultsPerPage, int page = 1)
-        {
-            return (await _repository.GetAllAsync()).OrderBy(x => x.RegistrationDateTime).ToList();
-        }
-
-        public async Task<List<IJobAdvert>> FilteredJobAdvertPagination(int sortByCategoryId, int page = 1)
-        {
-            return (await _repository.GetAllAsync()).Where(c => c.CategoryId == sortByCategoryId).OrderBy(x => x.Id).ToList();
-        }
     }
 }
