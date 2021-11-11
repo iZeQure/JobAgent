@@ -1,0 +1,97 @@
+﻿@page "/admin/settings/jobpages"
+@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
+@using BlazorWebsite.Shared.Components.Diverse;
+
+
+<PageDocumentTitle DocumentTitle="Administrer - Virksomheds Links" />
+
+<div class="d-flex">
+    <PageHeadingTitle DisplayTitle="Virksomheds JobOpslags sider" />
+    <div class="d-inline-block">
+
+        @if (_companies == null)
+        {
+            <a class="btn btn-sm btn-info cursor-pointer text-white no-gutters disabled">
+                <span class="d-inline-block">Ikke Aktiveret</span>
+            </a>
+            <span class="d-inline-block"><small class="text-danger font-weight-bolder">* Opret en Kontrakt for at benytte links.</small></span>
+        }
+        else
+        {
+            <a class="btn btn-sm btn-info cursor-pointer text-white" data-toggle="modal" data-target="#CreateLinkModal">
+                Opret nyt Link
+            </a>
+        }
+
+    </div>
+</div>
+
+@if (dataIsLoading)
+{
+    <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="dataIsLoading" Message="Indlæser robot links.." />
+}
+else
+{
+    @if (_jobPages == null)
+    {
+        <MessageAlert Alert="MessageAlert.AlertType.Info"
+                      Message="Indlæser robot links.." IsLoading="true" />
+    }
+    else
+    {
+        @if (!_jobPages.Any())
+        {
+            <MessageAlert Alert="MessageAlert.AlertType.Warning"
+                          Message="Der blev ikke fundet nogen links."
+                          MessageOptional="Opret links, ved at trykke på knappen : Opret nyt Link. - Hvis knappen ikke er aktiveret, er det fordi der ikke blev fundet nogen kontrakter." />
+        }
+        else
+        {
+            <div class="table-responsive table-responsive-sm table-responsive-md">
+                <table class="table table-striped table-hover">
+                    <caption>Liste over virksomheders kontrakter..</caption>
+                    <thead class="table-primary text-light">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Virksomhed</th>
+                            <th scope="col">Link</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var source in _jobPages.OrderBy(x => x.CompanyId))
+                        {
+                            <tr id="@(source.Id)">
+                                <th scope="row">@(source.Id)</th>
+                                @foreach (var company in _companies)
+                                {
+                                    if (source.CompanyId == company.Id)
+                                    {
+                                        <td>@(company.Name)</td>
+                                    }
+                                }
+                                <td>@(source.URL)</td>
+
+                                <td>
+                                    <span data-toggle="modal" data-target="#EditSourceLinkModal" @onclick="@(mouseEvent => OnClick_EditLink(source.Id))">
+                                        <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne kontrakt." Color="Popover.PopoverType.Info" />
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span data-toggle="modal" data-target="#RemoveConfirmationSourceLinkModal" @onclick="@(mouseEvent => ConfirmationWindow(source.Id))">
+                                        <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+}
+

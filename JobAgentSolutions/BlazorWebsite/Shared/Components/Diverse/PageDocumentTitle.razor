@@ -1,0 +1,11 @@
+﻿@inject IJSRuntime JSRunTime
+
+@code {
+    [Parameter] public string DocumentTitle { get; set; }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        JSRunTime.InvokeVoidAsync("setDocumentTitleOnAfterRender", $"{DocumentTitle} | Din Job Agent");
+        return base.OnAfterRenderAsync(firstRender);
+    }
+}

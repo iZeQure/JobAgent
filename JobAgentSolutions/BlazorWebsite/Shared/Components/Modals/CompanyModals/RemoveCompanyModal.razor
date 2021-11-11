@@ -1,0 +1,25 @@
+﻿@using BlazorWebsite.Shared.Components.Diverse;
+
+<div class="modal fade" id="ModalRemoveCompany" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <PageHeadingTitle DisplayTitle="Fjern Virksomhed" />
+
+            @if (CompanyId != 0)
+            {
+                <div class="modal-header">
+                    <h5 class="modal-title">Er du sikker på du vil slette denne virksomhed?</h5>
+                </div>
+
+                <div class="modal-body">
+                    <p><small>Ved sletning af en virksomhed, bliver alle andre referencer til virksomheden også slettet.</small></p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-bs-dismiss="modal" @onclick="CancelRequest">Annuller</button>
+                    <button type="button" class="btn btn-danger" @onclick="@(() => OnClick_RemoveCompany(CompanyId))" disabled="@_isProcessing">Slet Virksomhed</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
