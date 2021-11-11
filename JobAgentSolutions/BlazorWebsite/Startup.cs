@@ -43,8 +43,8 @@ namespace BlazorWebsite
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            var connectionSettings = Configuration.GetSection("JobAgent").Get<DbConnectionSettings>();
-            var securitySettings = Configuration.GetSection("JobAgent").Get<AppSecuritySettings>();
+            var connectionSettings = Configuration.GetSection("JobAgent:DB").Get<DbConnectionSettings>();
+            var securitySettings = Configuration.GetSection("JobAgent:App").Get<AppSecuritySettings>();
 
 
             services.AddRazorPages();
