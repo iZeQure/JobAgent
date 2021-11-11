@@ -1,7 +1,6 @@
 ﻿@page "/job/uncategorized"
 @page "/job/{CategoryId:int}"
 @page "/job/{CategoryId:int}/{SpecializationId:int}"
-@using BlazorWebsite.Shared.Components.Diverse;
 
 <div class="container-fluid my-3">
     @if (_isLoadingData)
@@ -14,7 +13,7 @@
         <MessageAlert Message="Fejl ved indlæsning af stillingsopslag..." Alert="MessageAlert.AlertType.Error" />
     }
 
-    @if (_jobAdverts == null || _jobAdverts.Count() == 0)
+    @if (_jobAdverts is null || _jobAdverts.Count() == 0)
     {
         if (CategoryId == 0 && SpecializationId == 0)
         {
@@ -39,20 +38,7 @@
                 @foreach (var jobAdvert in _jobAdverts)
                 {
                     <div class="col">
-                        <div class="card" style="max-width: 540px;">
-                            <div class="row g-0">
-                                <div class="col-md-12">
-                                    <div class="card-body">
-                                        <h5 class="card-title">@jobAdvert.Title</h5>
-                                        <!-></!->
-                                        <p class="card-subtitle"><small>@*@jobAdvert.VacantJob.Company.Name*@</small></p> 
-                                        <p class="card-text card-content">@jobAdvert.Summary</p>
-                                        <p class="card-subtitle"><small>Oprettet: @jobAdvert.RegistrationDateTime.ToString("dddd, d MMM yyyy", CultureInfo.CreateSpecificCulture("da-DK"))</small></p>
-                                        <a href="@*@jobAdvert.VacantJob.URL*@" class="btn btn-outline-light">Se Stilling</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <JobCardDetails @key="jobAdvert" JobAdvert="jobAdvert" />
                     </div>
                 }
             </div>
