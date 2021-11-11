@@ -39,7 +39,7 @@ namespace BlazorWebsite.Data.Providers
             // Get the access token, from current auth state.
             string accessToken = await _localStorageService.GetItemAsync<string>(ACCESS_TOKEN);
 
-            if (!string.IsNullOrWhiteSpace(accessToken) && !string.IsNullOrEmpty(accessToken))
+            if (!string.IsNullOrWhiteSpace(accessToken) || !string.IsNullOrEmpty(accessToken))
             {
                 // Validate Token.
                 var accessTokenIsValid = await _userService.ValidateUserAccessTokenAsync(accessToken);
