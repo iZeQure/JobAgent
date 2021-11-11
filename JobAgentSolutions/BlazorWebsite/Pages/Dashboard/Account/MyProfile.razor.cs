@@ -48,17 +48,15 @@ namespace BlazorWebsite.Pages.Dashboard.Account
         private bool _isProcessingUpdateUserRequest = false;
         private bool _isProcessingUpdateConsultantAreaRequest = false;
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
             _editContext = new EditContext(_accountProfileModel);
             _editContext.AddDataAnnotationsValidation();
-        }
 
-        protected override async Task OnInitializedAsync()
-        {
-            _isLoadingData = true;
             try
             {
+                _isLoadingData = true;
+
                 // Load Session Data.
                 var session = await AuthenticationState;
 
@@ -129,8 +127,6 @@ namespace BlazorWebsite.Pages.Dashboard.Account
 
         private async Task OnValidSubmit_ChangeUserInformation()
         {
-            Console.WriteLine($"Form Submitted");
-
             if (_hasValidSession)
             {
                 _isProcessingUpdateUserRequest = true;
@@ -311,11 +307,6 @@ namespace BlazorWebsite.Pages.Dashboard.Account
             {
                 _isProcessingUpdateConsultantAreaRequest = false;
             }
-        }
-
-        private void Test()
-        {
-            Console.WriteLine($"Form Invalid.");
         }
     }
 
