@@ -92,11 +92,6 @@ namespace BlazorWebsite.Pages.Administrate
 
                 };
 
-                tempUser.GenerateSalt();
-                tempUser.HashPassword();
-
-                string accToken = await AuthenticationAccess.GenerateAccessTokenAsync(tempUser);
-
                 IUser user = new AuthUser
                 {
                     Id = tempUser.Id,
@@ -106,14 +101,13 @@ namespace BlazorWebsite.Pages.Administrate
                     LastName = tempUser.LastName,
                     Email = tempUser.Email,
                     Password = tempUser.Password,
-                    Salt = tempUser.Salt,
-                    AccessToken = accToken
+                    Salt = tempUser.Salt
                 };
 
                 var userResult = await UserService.CreateAsync(user);
                 bool userIsRegistered = false;
 
-                if(userResult.FirstName == user.FirstName && userResult.Email == user.Email)
+                if (userResult.FirstName == user.FirstName && userResult.Email == user.Email)
                 {
                     userIsRegistered = true;
                 }
