@@ -1,0 +1,89 @@
+﻿@using System.Security.Claims
+@using Data.Providers
+@attribute [Authorize]
+
+<div id="userprofile-container" class="overflow-auto m-2" style="max-height: 200px; max-width: 350px;">
+    <div class="d-flex flex-column align-items-start mb-3 me-2">
+        <label>Navn:</label>
+        <p>@_authState.User.Identity.Name</p>
+    </div>
+
+    <div class="d-flex flex-column align-items-start mb-3 me-2">
+        <label>Afdeling:</label>
+        <p>@GetLocationInformationOrDefault())</p>
+    </div>
+
+    <div class="d-flex flex-column align-items-start mb-3 me-2">
+        <label>Rolle:</label>
+        <p>@(GetRoleInformationOrDefault())</p>
+    </div>
+
+    <div class="d-flex flex-column align-items-start mb-3 me-2">
+        <label>Konsulentområder:</label>
+        @foreach (var claim in GetConsultantAreasOrDefault())
+        {
+            <p class="flex-fill">@claim.Value</p>
+        }
+    </div>
+</div>
+
+<div class="float-end ms-auto mx-1">
+    <button type="submit" class="btn btn-outline-light btn-sm" @onclick="(async () => await LogOutAsync())">Log ud</button>
+</div>
+
+@code {
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthenticationState { get; set; }
+    [Inject]
+    protected MyAuthStateProvider AuthStateProvider { get; set; }
+    [Inject]
+    protected NavigationManager NavigationManager { get; set; }
+
+    private AuthenticationState _authState;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _authState = await AuthenticationState;
+
+        AuthStateProvider.AuthenticationStateChanged += async (authState) =>
+        {
+            _authState = await AuthStateProvider.GetAuthenticationStateAsync();
+
+            StateHasChanged();
+        };
+    }
+
+    private async Task LogOutAsync()
+    {
+        await AuthStateProvider.MarkUserAsLoggedOut();
+
+        NavigationManager.NavigateTo("/", true);
+    }
+
+    private string GetRoleInformationOrDefault()
+    {
+        var roleClaim = _authState
+            .User
+            .Claims
+            .FirstOrDefault(x => x.Type.Equals(ClaimTypes.Role));
+
+        return roleClaim is not null ? roleClaim.Value : "Ikke indlæst";
+    }
+
+    private string GetLocationInformationOrDefault()
+    {
+        var locationClaim = _authState
+            .User
+            .Claims
+            .FirstOrDefault(x => x.Type.Equals("Location"));
+
+        return locationClaim is not null ? locationClaim.Value : "Ikke indlæst";
+    }
+
+    private List<Claim> GetConsultantAreasOrDefault()
+    {
+        var areas = _authState.User.Claims.Where(c => c.Type.Equals("ConsultantArea"));
+
+        return areas.ToList();
+    }
+}
