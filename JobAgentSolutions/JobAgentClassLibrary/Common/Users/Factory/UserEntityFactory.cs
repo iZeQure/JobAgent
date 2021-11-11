@@ -2,7 +2,6 @@
 using JobAgentClassLibrary.Core.Factories;
 using JobAgentClassLibrary.Core.Repositories;
 using System;
-using System.Linq;
 
 namespace JobAgentClassLibrary.Common.Users.Factory
 {
@@ -28,8 +27,11 @@ namespace JobAgentClassLibrary.Common.Users.Factory
                 LastName = ParseValue<string>(entityValues[4]),
                 Email = ParseValue<string>(entityValues[5]),
                 AccessToken = ParseValue<string>(6)
-                //Salt = ParseValue<string>(entityValues.ElementAtOrDefault(7) ?? string.Empty)
-                //Password = ParseValue<string>(entityValues.ElementAtOrDefault(8) ?? string.Empty)
+            },
+            nameof(HashedUser) => new AuthUser
+            {
+                Password = ParseValue<string>(entityValues[0]),
+                Salt = ParseValue<string>(entityValues[1])
             },
             _ => throw new ArgumentOutOfRangeException(nameof(paramName), paramName, "Coudln't create type. Out of range.")
         };
