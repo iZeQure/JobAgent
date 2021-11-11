@@ -1,25 +1,39 @@
 using Blazored.LocalStorage;
 using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Areas;
+using JobAgentClassLibrary.Common.Areas.Factory;
 using JobAgentClassLibrary.Common.Areas.Repositories;
 using JobAgentClassLibrary.Common.Categories;
+using JobAgentClassLibrary.Common.Categories.Factory;
 using JobAgentClassLibrary.Common.Categories.Repositories;
 using JobAgentClassLibrary.Common.Companies;
+using JobAgentClassLibrary.Common.Companies.Factory;
 using JobAgentClassLibrary.Common.Companies.Repositories;
+using JobAgentClassLibrary.Common.Filters.Factory;
 using JobAgentClassLibrary.Common.JobAdverts;
+using JobAgentClassLibrary.Common.JobAdverts.Factory;
 using JobAgentClassLibrary.Common.JobAdverts.Repositories;
 using JobAgentClassLibrary.Common.JobPages;
+using JobAgentClassLibrary.Common.JobPages.Factory;
 using JobAgentClassLibrary.Common.JobPages.Repositories;
 using JobAgentClassLibrary.Common.Locations;
+using JobAgentClassLibrary.Common.Locations.Factory;
 using JobAgentClassLibrary.Common.Locations.Repositories;
 using JobAgentClassLibrary.Common.Roles;
+using JobAgentClassLibrary.Common.Roles.Factory;
 using JobAgentClassLibrary.Common.Roles.Repositories;
 using JobAgentClassLibrary.Common.Users;
+using JobAgentClassLibrary.Common.Users.Factory;
 using JobAgentClassLibrary.Common.Users.Repositories;
 using JobAgentClassLibrary.Common.VacantJobs;
+using JobAgentClassLibrary.Common.VacantJobs.Factory;
 using JobAgentClassLibrary.Common.VacantJobs.Repositories;
+using JobAgentClassLibrary.Core.Database.Factories;
+using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Settings;
 using JobAgentClassLibrary.Security.Access;
+using JobAgentClassLibrary.Security.Cryptography;
+using JobAgentClassLibrary.Security.Cryptography.Hashing;
 using JobAgentClassLibrary.Security.interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -56,6 +70,26 @@ namespace BlazorWebsite
             services.AddSingleton<IConnectionSettings>(connectionSettings);
             services.AddSingleton<ISecuritySettings>(securitySettings);
 
+            /* Factory Injections */
+            services.AddSingleton<ISqlDbFactory, SqlDbFactory>();
+            services.AddSingleton<AreaEntityFactory>();
+            services.AddSingleton<CategoryEntityFactory>();
+            services.AddSingleton<CompanyEntityFactory>();
+            services.AddSingleton<DynamicSearchFilterEntityFactory>();
+            services.AddSingleton<FilterTypeEntityFactory>();
+            services.AddSingleton<StaticSearchFilterEntityFactory>();
+            services.AddSingleton<JobAdvertEntityFactory>();
+            services.AddSingleton<JobPageEntityFactory>();
+            services.AddSingleton<LocationEntityFactory>();
+            services.AddSingleton<RoleEntityFactory>();
+            services.AddSingleton<UserEntityFactory>();
+            services.AddSingleton<VacantJobEntityFactory>();
+
+
+            /* Manager Injections */
+            services.AddSingleton<ISqlDbManager, SqlDbManager>();
+            services.AddTransient<ICryptographyService, HashingService>();
+          
 
             /* Repository Injections */
             services.AddScoped<IUserRepository, UserRepository>();
@@ -67,6 +101,7 @@ namespace BlazorWebsite
             services.AddScoped<IJobPageRepository, JobPageRepository>();
             services.AddScoped<IVacantJobRepository, VacantJobRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<ISpecializationRepository, SpecializationRepository>();
 
 
             /* Access Injections */
