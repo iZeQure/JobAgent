@@ -45,10 +45,10 @@
                                     <div class="card-body">
                                         <h5 class="card-title">@jobAdvert.Title</h5>
                                         <!-></!->
-                                        <p class="card-subtitle"><small>@jobAdvert.VacantJob.Company.Name</small></p> 
+                                        <p class="card-subtitle"><small>@*@jobAdvert.VacantJob.Company.Name*@</small></p> 
                                         <p class="card-text card-content">@jobAdvert.Summary</p>
                                         <p class="card-subtitle"><small>Oprettet: @jobAdvert.RegistrationDateTime.ToString("dddd, d MMM yyyy", CultureInfo.CreateSpecificCulture("da-DK"))</small></p>
-                                        <a href="@jobAdvert.VacantJob.URL" class="btn btn-outline-light">Se Stilling</a>
+                                        <a href="@*@jobAdvert.VacantJob.URL*@" class="btn btn-outline-light">Se Stilling</a>
                                     </div>
                                 </div>
                             </div>
