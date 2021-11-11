@@ -1,4 +1,6 @@
-﻿using JobAgentClassLibrary.Common.Categories.Entities;
+﻿using BlazorWebsite.Data.Providers;
+using JobAgentClassLibrary.Common.Categories;
+using JobAgentClassLibrary.Common.Categories.Entities;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -10,7 +12,7 @@ namespace BlazorWebsite.Shared.Components.Menus
     public partial class SidebarMenu : ComponentBase
     {
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
-        [Inject] protected IMenuService MenuService { get; set; }
+        [Inject] protected ICategoryService CategoryService { get; set; }
 
 
         private const string NAVLINK_JOB_PREFIX = "/job/";
@@ -36,7 +38,7 @@ namespace BlazorWebsite.Shared.Components.Menus
             {
                 _isLoadingData = true;
 
-                _menu = await MenuService.InitializeMenu();
+                _menu = await CategoryService.GetMenuAsync();
 
                 _isLoadingData = false;
             }
@@ -58,7 +60,7 @@ namespace BlazorWebsite.Shared.Components.Menus
                 return;
             }
 
-            _menu = (await MenuService.InitializeMenu()).Where(x => x.Name.ToLower().Contains(getValue));
+            _menu = (await CategoryService.GetMenuAsync()).Where(x => x.Name.ToLower().Contains(getValue));
             StateHasChanged();
         }
 
@@ -70,7 +72,7 @@ namespace BlazorWebsite.Shared.Components.Menus
                 return;
             }
 
-            _menu = (await MenuService.InitializeMenu()).Where(x => x.Name.ToLower().Contains(_searchForEducation));
+            _menu = (await CategoryService.GetMenuAsync()).Where(x => x.Name.ToLower().Contains(_searchForEducation));
             StateHasChanged();
         }
 
