@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.VacantJobs
 {
-    public class VacantJobService
+    public class VacantJobService : IVacantJobService
     {
         private readonly IVacantJobRepository _repository;
 
@@ -16,7 +16,6 @@ namespace JobAgentClassLibrary.Common.VacantJobs
         {
             _repository = repository;
         }
-
 
         public async Task<IVacantJob> CreateAsync(IVacantJob entity)
         {
