@@ -73,9 +73,6 @@ namespace BlazorWebsite.Pages.Dashboard.Account
                 {
                     authUser.Password = changePasswordModel.Password;
 
-                    authUser.GenerateSalt();
-                    authUser.HashPassword();
-
                     await UserService.UpdateUserPasswordAsync((IAuthUser)user);
 
                     _infoMessage = "Adgangskode blev ændret.";
