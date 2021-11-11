@@ -1,0 +1,51 @@
+﻿@switch (Color)
+{
+    case PopoverType.Danger:
+        <a class="popover-danger btn btn-outline-warning" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus">
+            <i class="fas fa-trash-alt"></i>
+        </a>
+        break;
+    case PopoverType.Info:
+        <a class="popover-info btn btn-outline-primary" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus">
+            <i class="far fa-edit"></i>
+        </a>
+        break;
+}
+
+@code {
+    public enum PopoverType { Danger = 0, Info = 1 }
+
+    [Parameter] public string Title { get; set; }
+    [Parameter] public string Body { get; set; }
+    [Parameter] public PopoverType Color { get; set; }
+    [Inject] public IJSRuntime JSRunTime { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SetPopover();
+    }
+
+    protected async override Task OnParametersSetAsync()
+    {
+        await SetPopover();
+    }
+
+    private async Task SetPopover()
+    {
+        try
+        {
+            await JSRunTime.InvokeVoidAsync("tooltipInformation", $"{Title}", $"{Body}", $"{Color}");
+            await InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
+
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Popover Error: " + ex.Message);
+            throw;
+        }
+    }
+}
