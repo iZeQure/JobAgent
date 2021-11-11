@@ -18,7 +18,7 @@ namespace JobAgentClassLibrary.Common.Users
             _authAccess = authAccess;
         }
 
-        public async Task<bool> AuthenticateUserLoginAsync(string email, string password)
+        public async Task<IAuthUser> AuthenticateUserLoginAsync(string email, string password)
         {
             var authUser = new AuthUser
             {
@@ -37,9 +37,18 @@ namespace JobAgentClassLibrary.Common.Users
                 {
                     throw new ArgumentException("Coudln't authenticate user, error while generating token.", nameof(email));
                 }
+
+                var user = await _userRepository.GetByEmailAsync(email);
+
+                if (user is not null && user is AuthUser auth)
+                {
+                    auth.AccessToken = authUser.AccessToken;
+
+                    return auth;
+                }
             }
 
-            return isAuthenticated;
+            return null;
         }
 
         public async Task<bool> CheckUserExistsAsync(string email)

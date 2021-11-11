@@ -1,4 +1,4 @@
-﻿<EditForm class="px-1 px-sm-2 px-md-2 px-lg-4 py-3" EditContext="_editContext" OnValidSubmit="OnValidSubmit_LogInAsync">
+﻿<EditForm class="px-1 px-sm-2 px-md-2 px-lg-4 py-3" EditContext="_formContext" OnValidSubmit="OnValidFormSubmit_LogInAsync">
     @if (!string.IsNullOrEmpty(_message))
     {
         <div class="alert alert-warning d-flex align-items-center small" role="alert">
@@ -11,17 +11,17 @@
 
     <div class="mb-3">
         <label for="dropdownProfileEmail" class="form-label">Email address</label>
-        <InputText @bind-Value="@_authenticationModel.Email" class="form-control" type="email" placeholder="email@example.com" />
-        <ValidationMessage For="@(() => _authenticationModel.Email)" />
+        <InputText @bind-Value="@_authUserModel.Email" class="form-control" type="email" placeholder="email@example.com" />
+        <ValidationMessage For="@(() => _authUserModel.Email)" />
     </div>
     <div class="mb-3">
         <label for="dropdownProfilePassword" class="form-label">Password</label>
-        <InputText @bind-Value="@_authenticationModel.Password" class="form-control" type="password" placeholder="Password" />
-        <ValidationMessage For="@(() => _authenticationModel.Password)" />
+        <InputText @bind-Value="@_authUserModel.Password" class="form-control" type="password" placeholder="Password" />
+        <ValidationMessage For="@(() => _authUserModel.Password)" />
     </div>
-    <button type="submit" class="btn btn-outline-light btn-sm" disabled="@_processingRequest">
+    <button type="submit" class="btn btn-outline-light btn-sm" disabled="@_processignAuthRequest">
 
-        @if (_processingRequest)
+        @if (_processignAuthRequest)
         {
             <div class="d-flex align-items-center">
                 <span>Logger ind...</span>
