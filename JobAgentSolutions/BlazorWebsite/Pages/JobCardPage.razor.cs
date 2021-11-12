@@ -58,7 +58,7 @@ namespace BlazorWebsite.Pages
                 }
                 else if (SpecializationId != 0)
                 {
-                    jobAdverts = (List<IJobAdvert>)jobAdverts.Where(x => x.CategoryId == SpecializationId);
+                    _jobAdverts = jobAdverts.Where(x => x.CategoryId == SpecializationId);
                 }
             }
             catch (Exception ex)
