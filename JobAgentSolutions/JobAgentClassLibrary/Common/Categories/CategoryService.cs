@@ -2,6 +2,7 @@
 using JobAgentClassLibrary.Common.Categories.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.Categories
@@ -54,22 +55,18 @@ namespace JobAgentClassLibrary.Common.Categories
             var categories = categoriesTask.Result;
             var specializations = specializationsTask.Result;
 
-            var menu = new List<ICategory>();
-
-            foreach (ICategory c in categories)
+            foreach (var c in categories)
             {
                 if (c.Id is 0) continue;
 
-                foreach (ISpecialization s in specializations)
-                {
-                    if (c.Id == s.CategoryId)
-                    {
-                        menu.Find(x => x.Id == s.CategoryId)?.Specializations.Add(s);
-                    }
-                }
+                var matches = specializations.Where(s => s.CategoryId == c.Id);
+
+                if (!matches.Any()) continue;
+
+                c.AddRange(matches);
             }
 
-            return menu;
+            return categories;
         }
 
         public async Task<ISpecialization> GetSpecializationByIdAsync(int id)

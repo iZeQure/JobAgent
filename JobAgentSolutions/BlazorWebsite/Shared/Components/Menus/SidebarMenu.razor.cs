@@ -17,7 +17,7 @@ namespace BlazorWebsite.Shared.Components.Menus
 
         private const string NAVLINK_JOB_PREFIX = "/job/";
 
-        private IEnumerable<ICategory> _menu = new List<Category>();
+        private IEnumerable<ICategory> _menu;
         private string _errorMessage = string.Empty;
         private bool _isLoadingData;
 
@@ -37,6 +37,7 @@ namespace BlazorWebsite.Shared.Components.Menus
             finally
             {
                 _isLoadingData = false;
+                StateHasChanged();
             }
         }
 
