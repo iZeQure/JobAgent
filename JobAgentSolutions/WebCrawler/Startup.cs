@@ -21,7 +21,7 @@ namespace WebCrawler
 
         public void StartCrawler()
         {
-            crawler.GetVacantJobs();   
+            crawler.GetDataVacantJobs();   
         }
     }
 }
