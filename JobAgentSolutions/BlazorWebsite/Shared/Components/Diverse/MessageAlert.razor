@@ -3,7 +3,7 @@
     <div class="@(Container)">
         @switch (Alert)
         {
-            case AlertType.Info:
+            case Alert.Info:
                 <div class="alert alert-primary d-flex align-items-center" role="alert">
                     <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="assets/images/sprites.svg#info-fill" /></svg>
                     <div class="d-flex align-items-center">
@@ -16,7 +16,7 @@
                     </div>
                 </div>
                 break;
-            case AlertType.Success:
+            case Alert.Success:
                 <div class="alert alert-success d-flex align-items-center" role="alert">
                     <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="assets/images/sprites.svg#check-circle-fill" /></svg>
                     <div class="d-flex align-items-center">
@@ -29,7 +29,7 @@
                     </div>
                 </div>
                 break;
-            case AlertType.Error:
+            case Alert.Error:
                 <div class="alert alert-danger d-flex align-items-center" role="alert">
                     <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="assets/images/sprites.svg#exclamation-triangle-fill" /></svg>
                     <div class="d-flex align-items-center">
@@ -42,7 +42,7 @@
                     </div>
                 </div>
                 break;
-            case AlertType.Warning:
+            case Alert.Warning:
                 <div class="alert alert-warning d-flex align-items-center" role="alert">
                     <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="assets/images/sprites.svg#exclamation-triangle-fill" /></svg>
                     <div class="d-flex align-items-center">
