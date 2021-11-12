@@ -18,18 +18,26 @@ namespace BlazorWebsite.Shared.Components.Menus
         private const string NAVLINK_JOB_PREFIX = "/job/";
 
         private IEnumerable<ICategory> _menu = new List<Category>();
-        private string _searchForEducation = "";
-        private Task<int> _countByUncategorized = null;
-        private int _categoryId = 0;
         private string _errorMessage = string.Empty;
-        private bool _isDisabled = false;
-        private bool _isLoadingData = false;
+        private bool _isLoadingData;
 
         protected async override Task OnInitializedAsync()
         {
             RefreshProvider.RefreshRequest += UpdateContentAsync;
 
-            await UpdateContentAsync();
+            try
+            {
+                _isLoadingData = true;
+                _menu = await CategoryService.GetMenuAsync();
+            }
+            catch (Exception)
+            {
+                _errorMessage = "Fejl ved indløsning af menue.";
+            }
+            finally
+            {
+                _isLoadingData = false;
+            }
         }
 
         private async Task UpdateContentAsync()
@@ -37,17 +45,18 @@ namespace BlazorWebsite.Shared.Components.Menus
             try
             {
                 _isLoadingData = true;
-
                 _menu = await CategoryService.GetMenuAsync();
-
-                _isLoadingData = false;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed to load Job Categories and Specializations : {ex.Message}");
                 _errorMessage = "Ukendt Fejl ved opdatering af kategorier.";
             }
-            finally { StateHasChanged(); }
+            finally
+            {
+                _isLoadingData = false;
+                StateHasChanged();
+            }
         }
 
         private async Task OnInputChange_ApplySearchFilter(ChangeEventArgs e)
@@ -61,18 +70,6 @@ namespace BlazorWebsite.Shared.Components.Menus
             }
 
             _menu = (await CategoryService.GetMenuAsync()).Where(x => x.Name.ToLower().Contains(getValue));
-            StateHasChanged();
-        }
-
-        private async Task OnClick_SearchForEducation()
-        {
-            if (string.IsNullOrEmpty(_searchForEducation))
-            {
-                await UpdateContentAsync();
-                return;
-            }
-
-            _menu = (await CategoryService.GetMenuAsync()).Where(x => x.Name.ToLower().Contains(_searchForEducation));
             StateHasChanged();
         }
 
