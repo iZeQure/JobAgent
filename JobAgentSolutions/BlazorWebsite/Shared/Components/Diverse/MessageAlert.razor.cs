@@ -2,12 +2,11 @@
 
 namespace BlazorWebsite.Shared.Components.Diverse
 {
-    public enum Alert { Info, Warning, Error, Success }
     public partial class MessageAlert : ComponentBase
     {
         [Parameter] public string Message { get; set; } = string.Empty;
         [Parameter] public string MessageOptional { get; set; } = string.Empty;
-        [Parameter] public Alert Alert { get; set; }
+        [Parameter] public AlertType Alert { get; set; }
         [Parameter] public bool IsLoading { get; set; } = false;
         [Parameter] public bool FullWidth { get; set; } = true;
 
@@ -27,5 +26,6 @@ namespace BlazorWebsite.Shared.Components.Diverse
             StateHasChanged();
         }
 
+        public enum AlertType { Info, Warning, Error, Success }
     }
 }
