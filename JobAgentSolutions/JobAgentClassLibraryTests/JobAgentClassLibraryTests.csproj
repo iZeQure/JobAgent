@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\JobAgentClassLibrary\JobAgentClassLibrary.csproj" />
+    <ProjectReference Include="..\WebCrawler\WebCrawler.csproj" />
   </ItemGroup>
 
 </Project>
