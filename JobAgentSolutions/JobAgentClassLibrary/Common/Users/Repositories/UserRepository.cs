@@ -246,7 +246,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
                 if (result is not null)
                 {
                     authUser = (AuthUser)_factory.CreateEntity(nameof(AuthUser),
-                        result.Id,
+                        result.UserId,
                         result.RoleId,
                         result.LocationId,
                         result.FirstName,

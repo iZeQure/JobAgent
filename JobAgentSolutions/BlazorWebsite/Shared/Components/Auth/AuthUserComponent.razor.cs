@@ -1,6 +1,5 @@
 ﻿using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Users;
-using JobAgentClassLibrary.Common.Users.Entities;
 using JobAgentClassLibrary.Common.Users.Factory;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -19,7 +18,6 @@ namespace BlazorWebsite.Shared.Components.Auth
 
         private EditContext _formContext;
         private AuthUserModel _authUserModel = new();
-        private IUser _user;
         private bool _processignAuthRequest = false;
         private string _message = "";
 
@@ -53,7 +51,7 @@ namespace BlazorWebsite.Shared.Components.Auth
                 {
                     await MyAuthStateProvider.MarkUserAsAuthenticated(authUser);
 
-                    NavigationManager.NavigateTo("/", true);
+                    NavigationManager.NavigateTo("/admin", true);
                     return;
                 }
 
