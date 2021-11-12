@@ -104,10 +104,6 @@ namespace BlazorWebsite
             services.AddScoped<ISpecializationRepository, SpecializationRepository>();
 
 
-            /* Access Injections */
-            services.AddScoped<IAuthenticationAccess, UserAccess>();
-
-
             /* Service Injections */
             services.AddScoped<IAreaService, AreaService>();
             services.AddScoped<IRoleService, RoleService>();
@@ -118,6 +114,9 @@ namespace BlazorWebsite
             services.AddScoped<IJobAdvertService, JobAdvertService>();
             services.AddScoped<IVacantJobService, VacantJobService>();
             services.AddScoped<IJobPageService, JobPageService>();
+
+            /* Access Injections */
+            services.AddScoped<IAuthenticationAccess, UserAccess>();
 
 
             /* Provider Injections */

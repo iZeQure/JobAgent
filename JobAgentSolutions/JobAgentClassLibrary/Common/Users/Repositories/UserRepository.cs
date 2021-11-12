@@ -53,11 +53,13 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
                 dynamicValues.Add("@userPassword", hashedUserPassword);
                 dynamicValues.Add("@returnResult", SqlDbType.Bit, direction: ParameterDirection.Output);
 
-                await conn.QueryAsync(proc, dynamicValues, commandType: CommandType.StoredProcedure);
+                //await conn.QueryAsync(proc, dynamicValues, commandType: CommandType.StoredProcedure);
 
-                isAuthenticated = dynamicValues.Get<bool>("@returnResult");
+                isAuthenticated = await conn.QueryFirstOrDefaultAsync<bool>(proc, dynamicValues, commandType: CommandType.StoredProcedure);
+
+                //isAuthenticated = dynamicValues.Get<bool>("@returnResult");
             }
-
+            
             return isAuthenticated;
         }
 
@@ -150,7 +152,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
         {
             IUser user = null;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.ComplexUser))
             {
                 var proc = "[JA.spGetUserByEmail]";
                 var values = new
@@ -208,7 +210,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
         {
             string salt = string.Empty;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.ComplexUser))
             {
                 var proc = "[JA.spGetUserSaltByEmail]";
                 var values = new

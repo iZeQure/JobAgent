@@ -90,7 +90,7 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
                 {
                     role = (IRole)_factory.CreateEntity(
                                 nameof(Role),
-                                queryResult.Id, queryResult.Name);
+                                queryResult.Id, queryResult.Name, queryResult.Description);
                 }
             }
 
