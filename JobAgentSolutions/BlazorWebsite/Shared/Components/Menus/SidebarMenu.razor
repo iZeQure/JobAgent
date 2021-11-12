@@ -172,6 +172,14 @@ AdminContext.User.IsInRole("Udvikler"))
 
         @*<ul class="nav flex-column">*@
         <div class="accordion px-1" id="menuAccordionPanel">
+
+            <MessageAlert Message="@(_errorMessage)" Alert="MessageAlert.AlertType.Error" />
+
+            @if (_isLoadingData)
+            {
+                <MessageAlert Message="Indlæser kategorier . . ." Alert="MessageAlert.AlertType.Info" IsLoading="_isLoadingData" />
+            }
+
             @*<div class="accordion-item">
                     <h2 class="accordion-header">
                         <NavLink class="accordion-button" Match="NavLinkMatch.All" href="@(GenerateNavLinkLocation())">
