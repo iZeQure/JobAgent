@@ -5,6 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SkpJobCrawler.Crawler;
+using JobAgentClassLibrary.Common.VacantJobs.Entities;
+using JobAgentClassLibrary.Common.JobPages;
+using JobAgentClassLibrary.Common.VacantJobs;
 
 namespace WebCrawler
 {
@@ -41,6 +44,8 @@ namespace WebCrawler
         private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
             services.AddSingleton<ICrawler, JobCrawler>();
+            services.AddSingleton<IJobPageService, JobPageService>();
+            services.AddSingleton<IVacantJobService, VacantJobService>();
         }
     }
 }

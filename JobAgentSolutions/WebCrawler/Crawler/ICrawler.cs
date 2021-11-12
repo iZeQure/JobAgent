@@ -8,7 +8,6 @@ namespace SkpJobCrawler.Crawler
 {
     public interface ICrawler
     {
-        public void GetVacantJobsData();
-        public void GetVacantJobs();
+        void GetDataVacantJobs();
     }
 }

@@ -11,4 +11,14 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\JobAgentClassLibrary\JobAgentClassLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -1,90 +1,46 @@
 ﻿using HtmlAgilityPack;
-using JobAgentClassLibrary.Common.JobAdverts.Entities;
+using JobAgentClassLibrary.Common.JobPages.Entities;
+using JobAgentClassLibrary.Common.VacantJobs.Entities;
 using Microsoft.Extensions.Configuration;
-using SkpJobCrawler.Models;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
 using System.Net.Http;
+using WebCrawler.Crawler;
 
 namespace SkpJobCrawler.Crawler
 {
     public class JobCrawler : ICrawler
     {
-        private readonly IConfiguration configuration;
-        private List<JobAdvert> VacantJobs = new List<VancantJob>();
-        private List<VancantJob> JobPages = new List<VancantJob>();
-
-        public JobCrawler(IConfiguration configuration)
+        private readonly LinkProvider linkProvider;
+        internal protected List<HtmlDocument> htmlDocumentsVacantJobs = new List<HtmlDocument>();
+        internal protected List<HtmlDocument> htmlDocumentsJobPages = new List<HtmlDocument>();
+        public JobCrawler(LinkProvider linkProvider)
         {
-            this.configuration = configuration;
+            this.linkProvider = linkProvider;
         }
 
-        /// <summary>
-        /// Get the vacant jobs from db
-        /// </summary>
-        public void GetVacantJobsData()
+        public void GetDataVacantJobs()
         {
-            SqlConnection connection = new SqlConnection(configuration.GetConnectionString("Default"));
-            SqlCommand sqlCommand = new SqlCommand("[dbo].[JA.spGetJobAdverts]", connection);
-            connection.Open();
-            SqlDataReader reader = sqlCommand.ExecuteReader();
-            while (reader.Read())
+            foreach (var item in linkProvider.vacantJobs)
             {
-                int vacantJob_id = (int)reader["VacantJobId"];
-                int Company_Id = (int)reader["CompanyId"];
-                string JobPageUrl = (string)reader["JobPageUrl"];
-
-                VancantJob vancantJob = new VancantJob() { Company_Id = Company_Id, Id = vacantJob_id, Url = JobPageUrl };
-                VacantJobs.Add(vancantJob);
-            }
-            Console.WriteLine("Done");
-            connection.Close();
+                HttpClient client = new HttpClient();
+                HtmlDocument htmlDocument = new HtmlDocument();
+                var data = client.GetStringAsync(item.URL).Result;
+                htmlDocument.LoadHtml(data);
+                htmlDocumentsVacantJobs.Add(htmlDocument);
+            }   
         }
 
-        /// <summary>
-        /// Gets the job pages from db
-        /// </summary>
-        public void GetJobPages()
+        public void GetDataJobPages()
         {
-            SqlConnection connection = new SqlConnection(configuration.GetConnectionString("Default"));
-            SqlCommand sqlCommand = new SqlCommand("[dbo].[JA.spGetJobPages]", connection);
-            connection.Open();
-            SqlDataReader reader = sqlCommand.ExecuteReader();
-
-            while (reader.Read())
+            foreach (var item in linkProvider.jobPages)
             {
-                int vacantJob_id = (int)reader["VacantJobId"];
-                int Company_Id = (int)reader["CompanyId"];
-                string JobPageUrl = (string)reader["VacantJobUrl"];
-
-                VancantJob jobPage = new VancantJob() { Company_Id = Company_Id, Id = vacantJob_id, Url = JobPageUrl };
-                JobPages.Add(jobPage);
+                HttpClient client = new HttpClient();
+                HtmlDocument htmlDocument = new HtmlDocument();
+                var data = client.GetStringAsync(item.URL).Result;
+                htmlDocument.LoadHtml(data);
+                htmlDocumentsJobPages.Add(htmlDocument);
             }
-
-            Console.WriteLine("Done");
-            connection.Close();
-        }
-
-        public void GetVacantJobs()
-        {
-            string url = "https://www.dr.dk/tjenester/job-widget/";
-            HttpClient client = new HttpClient();
-            HtmlDocument htmlDocument = new HtmlDocument();
-            var data = client.GetStringAsync(url).Result;
-            htmlDocument.LoadHtml(data);
-            var nodes = htmlDocument.DocumentNode.SelectNodes("//span[contains(@class, 'dre-teaser-title__text')]");
-            //IEnumerable<HtmlNode> nodes = htmlDocument.DocumentNode.Descendants(0).Where(n => n.HasClass("dre-teaser-title"));
-
-
-            Console.WriteLine(htmlDocument.DocumentNode.InnerHtml);
-
-            //foreach (var item in nodes)
-            //{
-            //    Console.WriteLine(item.InnerText);
-            //}
-
         }
     }
 }
