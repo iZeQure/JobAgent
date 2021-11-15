@@ -34,10 +34,10 @@ namespace BlazorWebsite.Pages.Dashboard.Account
         private EditContext _editContext;
         private AccountProfileModel _accountProfileModel = new();
 
-        private IEnumerable<Location> _locations = new List<Location>();
-        private IEnumerable<Area> _areas = new List<Area>();
-        private IEnumerable<Role> _roles = new List<Role>();
-        private IEnumerable<Area> _assignedConsultantAreas = new List<Area>();
+        private IEnumerable<ILocation> _locations = new List<Location>();
+        private IEnumerable<IArea> _areas = new List<Area>();
+        private IEnumerable<IRole> _roles = new List<Role>();
+        private IEnumerable<IArea> _assignedConsultantAreas = new List<Area>();
 
         private string _successMessage = string.Empty;
         private string _errorMessage = string.Empty;
@@ -99,9 +99,9 @@ namespace BlazorWebsite.Pages.Dashboard.Account
                 {
                     await Task.WhenAll(userTask, locationsTask, areasTask, roleTask);
 
-                    _locations = (IEnumerable<Location>)locationsTask.Result;
-                    _areas = (IEnumerable<Area>)areasTask.Result;
-                    _roles = (IEnumerable<Role>)roleTask.Result;
+                    _locations = locationsTask.Result;
+                    _areas = areasTask.Result;
+                    _roles = roleTask.Result;
                     _userSession = userTask.Result;
 
                     if (_userSession == null)
@@ -110,7 +110,7 @@ namespace BlazorWebsite.Pages.Dashboard.Account
                         return;
                     }
 
-                    _assignedConsultantAreas = (IEnumerable<Area>)_userSession.ConsultantAreas;
+                    _assignedConsultantAreas = _userSession.ConsultantAreas;
                     _accountProfileModel = new()
                     {
                         RoleId = _userSession.RoleId,
