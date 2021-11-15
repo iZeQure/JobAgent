@@ -77,7 +77,12 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
                 await conn.QueryAsync(proc, dynamicValues, commandType: CommandType.StoredProcedure);
 
-                userExists = dynamicValues.Get<bool>("@returnResult");
+                var returnResult = dynamicValues.Get<int>("@returnResult");
+
+                if(returnResult == 1)
+                {
+                    userExists = true;
+                }
             }
 
             return userExists;

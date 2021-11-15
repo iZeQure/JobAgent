@@ -5,6 +5,8 @@ using JobAgentClassLibrary.Common.Roles;
 using JobAgentClassLibrary.Common.Roles.Entities;
 using JobAgentClassLibrary.Common.Users;
 using JobAgentClassLibrary.Common.Users.Entities;
+using JobAgentClassLibrary.Core.Settings;
+using JobAgentClassLibrary.Security.Access;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System;
@@ -18,6 +20,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
         [Inject] private IUserService UserService { get; set; }
         [Inject] private IRoleService RoleService { get; set; }
         [Inject] private ILocationService LocationService { get; set; }
+        [Inject] private ISecuritySettings SecuritySettings { get; set; }
 
         private RegisterUserModel _regAccModel;
         private IEnumerable<IRole> _roles;
@@ -67,6 +70,8 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             errorOcurred = false;
             isProcessingRequest = true;
 
+            UserAccess userAccess = new UserAccess(SecuritySettings, LocationService, RoleService);
+
             try
             {
                 if (emailExists)
@@ -84,9 +89,11 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
                     FirstName = _regAccModel.FirstName,
                     LastName = _regAccModel.LastName,
                     Email = _regAccModel.Email,
-                    Password = _regAccModel.Password
+                    Password = _regAccModel.Password,
 
                 };
+
+                tempUser.AccessToken = await userAccess.GenerateAccessTokenAsync(tempUser);
 
                 IUser user = new AuthUser
                 {
@@ -97,7 +104,8 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
                     LastName = tempUser.LastName,
                     Email = tempUser.Email,
                     Password = tempUser.Password,
-                    Salt = tempUser.Salt
+                    Salt = tempUser.Salt,
+                    AccessToken = tempUser.AccessToken
                 };
 
                 var userResult = await UserService.CreateAsync(user);
@@ -108,7 +116,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
                     userIsRegistered = true;
                 }
 
-                if (userIsRegistered)
+                if (!userIsRegistered)
                 {
                     errorMessage = "Brugeren blev ikke oprettet, der skete en fejl. Prøv igen senere.";
                     return;
@@ -134,6 +142,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
         {
             try
             {
+                ClearMessages();
                 var userService = (UserService)UserService;
 
                 if (userService != null)
@@ -145,6 +154,11 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
                     }
 
                     emailExists = await userService.CheckUserExistsAsync(_regAccModel.Email);
+
+                    if (emailExists)
+                    {
+                        errorMessage = "Denne mail er allerede i systemet.";
+                    }
                 }
             }
             catch (Exception)
