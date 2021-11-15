@@ -48,7 +48,7 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
         }
 
         public async Task<List<IRole>> GetAllAsync()
-        {
+       {
             List<IRole> roles = new();
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
@@ -63,7 +63,7 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
                     {
                         IRole role = (IRole)_factory.CreateEntity(
                                 nameof(Role),
-                                result.Id, result.Name);
+                                result.Id, result.Name, result.Description);
 
                         roles.Add(role);
                     }
