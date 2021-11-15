@@ -2,6 +2,8 @@
 using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Categories;
 using JobAgentClassLibrary.Common.Categories.Entities;
+using JobAgentClassLibrary.Common.Companies;
+using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.JobAdverts;
 using JobAgentClassLibrary.Common.JobAdverts.Entities;
 using JobAgentClassLibrary.Common.VacantJobs;
@@ -24,14 +26,17 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
         [Inject] protected IJobAdvertService JobAdvertService { get; set; }
         [Inject] protected IVacantJobService VacantJobService { get; set; }
         [Inject] protected ICategoryService CategoryService { get; set; }
+        [Inject] protected ICompanyService CompanyService { get; set; }
 
         private JobAdvertModel _jobAdvertModel = new();
         private IEnumerable<IVacantJob> _vacantJobs;
         private IEnumerable<ICategory> _categories;
+        private IEnumerable<ICompany> _companies;
         private IEnumerable<ISpecialization> _specializations;
         private IEnumerable<ISpecialization> _sortedSpecializations;
         private EditContext _editContext;
 
+        private string companyName;
         private string _errorMessage = "";
         private bool _isLoading = false;
         private bool _isProcessing = false;
@@ -50,6 +55,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
 
             try
             {
+                var companyTask = CompanyService.GetAllAsync();
                 var vacantJobsTask = VacantJobService.GetAllAsync();
                 var categoriesTask = CategoryService.GetCategoriesAsync();
                 var specializationsTask = CategoryService.GetSpecializationsAsync();
@@ -63,6 +69,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
                     Console.WriteLine($"Error: {ex.Message}");
                 }
 
+                _companies = companyTask.Result;
                 _vacantJobs = vacantJobsTask.Result;
                 _categories = categoriesTask.Result;
                 _specializations = specializationsTask.Result;

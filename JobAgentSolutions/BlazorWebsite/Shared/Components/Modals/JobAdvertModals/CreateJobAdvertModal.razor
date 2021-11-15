@@ -63,7 +63,14 @@
                                         <option value="0" selected>---Vælg en job side fra listen som tilhører stillingsopslaget---</option>
                                         @foreach (var vacantJob in _vacantJobs)
                                         {
-                                            @*<option value="@vacantJob.Id">@vacantJob.Company.Name - @vacantJob.URL</option>*@
+                                            @foreach(var item in _companies)
+                                            {
+                                                if(vacantJob.CompanyId == item.Id)
+                                                {
+                                                    companyName = item.Name;
+                                                }
+                                            }
+                                            <option value="@vacantJob.Id">@companyName - @vacantJob.URL</option>
                                         }
                                     </select>
                                 }
