@@ -10,7 +10,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
 {
     public partial class EditCompanyModal : ComponentBase
     {
-        [Parameter] public CompanyModel _companyModel { get; set; }
+        [Parameter] public CompanyModel Model { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
@@ -27,8 +27,8 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
 
                 Company company = new()
                 {
-                    Id = _companyModel.CompanyId,
-                    Name = _companyModel.Name
+                    Id = Model.CompanyId,
+                    Name = Model.Name
                 };
 
                 await CompanyService.UpdateAsync(company);
@@ -36,7 +36,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
                 RefreshProvider.CallRefreshRequest();
 
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditCompany");
-                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{_companyModel.CompanyId}");
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.CompanyId}");
 
             }
             finally
