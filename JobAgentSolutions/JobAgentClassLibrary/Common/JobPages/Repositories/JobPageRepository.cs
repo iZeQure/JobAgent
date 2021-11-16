@@ -33,7 +33,6 @@ namespace JobAgentClassLibrary.Common.JobPages.Repositories
                 
                 var values = new
                 {
-                    @jobPageId = entity.Id,
                     @companyId = entity.CompanyId,
                     @jobPageUrl = entity.URL
                 };

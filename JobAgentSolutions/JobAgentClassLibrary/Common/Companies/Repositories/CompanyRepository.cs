@@ -91,7 +91,7 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
                 {
                     company = (ICompany)_factory.CreateEntity(
                                 nameof(Company),
-                                queryResult.CompanyName, queryResult.CompanyName);
+                                queryResult.CompanyId, queryResult.CompanyName);
                 }
             }
 
