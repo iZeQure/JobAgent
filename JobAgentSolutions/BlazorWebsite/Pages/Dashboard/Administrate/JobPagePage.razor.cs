@@ -1,4 +1,5 @@
-﻿using BlazorWebsite.Data.Providers;
+﻿using BlazorWebsite.Data.FormModels;
+using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.JobPages;
@@ -11,15 +12,17 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
 {
     public partial class JobPagePage : ComponentBase
     {
+        [Parameter] public int JobPageId { get; set; }
         [Inject] private IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJobPageService JobPageService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
 
+        private JobPageModel _jobPageModel = new();
         private IEnumerable<IJobPage> _jobPages;
         private IEnumerable<ICompany> _companies;
         private IJobPage _jobPage;
 
-        private int jobPageId = 0;
+        private int _jobPageId = 0;
         private bool disabled = false;
         private bool dataIsLoading = true;
 
@@ -35,8 +38,13 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             dataIsLoading = true;
             try
             {
-                _jobPages = await JobPageService.GetJobPagesAsync();
-                _companies = await CompanyService.GetAllAsync();
+                var jobPageTask = JobPageService.GetJobPagesAsync();
+                var companyTask = CompanyService.GetAllAsync();
+
+                await Task.WhenAll(jobPageTask, companyTask);
+
+                _jobPages = jobPageTask.Result;
+                _companies = companyTask.Result;
             }
             finally
             {
@@ -47,7 +55,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
 
         private void ConfirmationWindow(int id)
         {
-            jobPageId = id;
+            _jobPageId = id;
         }
 
         private async Task OnClick_EditLink(int id)

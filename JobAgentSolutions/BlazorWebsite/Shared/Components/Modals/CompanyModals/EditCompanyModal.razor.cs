@@ -31,12 +31,21 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
                     Name = Model.Name
                 };
 
-                await CompanyService.UpdateAsync(company);
+                bool isUpdated = false;
+                var result = await CompanyService.UpdateAsync(company);
 
-                RefreshProvider.CallRefreshRequest();
+                if(result.Id == company.Id && result.Name == company.Name)
+                {
+                    isUpdated = true;
+                }
 
-                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditCompany");
-                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.CompanyId}");
+                if (!isUpdated)
+                {
+                    _errorMessage = "Kunne ikke opdatere virksomhed grundet ukendt fejl.";
+                }
+                    RefreshProvider.CallRefreshRequest();
+                    await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditCompany");
+                    await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.CompanyId}"); 
 
             }
             finally

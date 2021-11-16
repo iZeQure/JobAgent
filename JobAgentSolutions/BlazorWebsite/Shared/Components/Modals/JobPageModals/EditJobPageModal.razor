@@ -1,0 +1,61 @@
+﻿@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
+
+<div class="modal fade" id="ModalEditJobPage" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+
+            @if (_isLoading)
+            {
+                <MessageAlert IsLoading="_isLoading" Message="Indlæser data. Vent venligst.." Alert="MessageAlert.AlertType.Info" />
+
+            }
+            <MessageAlert Message="@(_errorMessage)" Alert="MessageAlert.AlertType.Error" />
+
+            @if (Model == null)
+            {
+                <MessageAlert Alert="MessageAlert.AlertType.Warning" FullWidth="true" Message="Vent venligst, henter detailjer på stillingsopslag!" />
+            }
+            else
+            {
+                <EditForm Model="Model" OnValidSubmit="OnValidSubmit_EditJobVacancy">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Rediger Stillingsopslag :</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col">
+                                <label for="inputTitle" class="admin-label col-form-label col-form-label-sm">Link:</label>
+                                <input id="inputTitle" type="text" class="form-control form-control-sm" placeholder="@_jobPageModel.URL" @bind-value="_jobPageModel.URL" />
+                                <ValidationMessage For="@(() => _jobPageModel.URL)" />
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="row">
+                            <div class="col">
+                                <label for="inputCompany" class="admin-label col-form-label col-form-label-sm">Virksomhed :</label>
+                                <select class="form-control form-control-sm" @bind="_jobPageModel.CompanyId">
+
+                                    @foreach (var company in _companies)
+                                    {
+                                        companyName = company.Name;
+                                        <option value="@company.Id">@companyName</option>
+                                    }
+
+                                </select>
+                                <ValidationMessage For="@(() => _jobPageModel.Id)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="OnClick_CancelRequest" @onclick:preventDefault>Annuller</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@(_isProcessing)">Gem ændringer</button>
+                    </div>
+                </EditForm>
+            }
+        </div>
+    </div>
+</div>

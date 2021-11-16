@@ -1,7 +1,8 @@
 ﻿<div class="modal fade" id="ModalRemoveCompany" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <PageHeadingTitle DisplayTitle="Fjern Virksomhed" />
+
+            <MessageAlert Message="@(_errorMessage)" Alert="MessageAlert.AlertType.Error" />
 
             @if (CompanyId != 0)
             {

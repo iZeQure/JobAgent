@@ -30,10 +30,9 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
                     RegistrationDateTime = DateTime.Now
                 };
 
-
                 var result = await JobAdvertService.RemoveAsync(jobAdvert);
 
-                if (result)
+                if (!result)
                 {
                     _errorMessage = "Kunne ikke fjerne stillingsopslag, stillingen er muligvis allerede slettet.";
 

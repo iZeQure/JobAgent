@@ -51,11 +51,22 @@
                                     {
                                         @if (vacantJob.Id == Model.Id)
                                         {
-                                            @*<option value="@vacantJob.Id" selected>@vacantJob.Company.Name</option>*@
+                                            @foreach (var company in _companies)
+                                            {
+                                                if (vacantJob.CompanyId == company.Id)
+                                                {
+                                                    companyName = company.Name;
+                                                    <option value="@company.Id" selected>@companyName</option>
+                                                }
+                                            }
                                         }
                                         else
                                         {
-                                            @*<option value="@vacantJob.Id">@vacantJob.Company.Name</option>*@
+                                            @foreach (var company in _companies)
+                                            {
+                                                companyName = company.Name;
+                                                <option value="@company.Id">@companyName</option>
+                                            }
                                         }
                                     }
                                 </select>

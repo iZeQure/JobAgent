@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using System;
 using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
@@ -32,39 +33,53 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
 
         private async Task OnValidSubmit_CreateCompany()
         {
-            if (_companyModel != null)
+            try
             {
-                _isProcessing = true;
-
-                Company company = new()
+                if (_companyModel != null)
                 {
-                    Id = _companyModel.CompanyId,
-                    Name = _companyModel.Name
-                };
+                    _isProcessing = true;
 
-                bool isCreated = false;
-                var result = await CompanyService.CreateAsync(company);
+                    Company company = new()
+                    {
+                        Id = _companyModel.CompanyId,
+                        Name = _companyModel.Name
+                    };
 
-                if(result.Id == _companyModel.CompanyId && result.Name == _companyModel.Name)
-                {
-                    isCreated = true;
-                }
+                    bool isCreated = false;
+                    var result = await CompanyService.CreateAsync(company);
 
-                _isProcessing = false;
+                    if (result.Id == _companyModel.CompanyId && result.Name == _companyModel.Name)
+                    {
+                        isCreated = true;
+                    }
 
-                if (isCreated)
-                {
-                    _companyModel = new CompanyModel();
+                    if (!isCreated)
+                    {
+                        _errorMessage = "Kunne ikke oprette virksomheden grundet ukendt fejl.";
+                    }
+
                     RefreshProvider.CallRefreshRequest();
                     await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateCompany");
-                    await Task.CompletedTask;
+                    await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{_companyModel.CompanyId}");
+
                 }
+            }
+            catch (Exception ex)
+            {
+                _errorMessage = ex.Message;
+            }
+            finally
+            {
+                _isProcessing = false;
+
             }
         }
 
         private void CancelRequest(MouseEventArgs e)
         {
-            _companyModel = new CompanyModel();
+            _isProcessing = false;
+            _companyModel = new();
+            StateHasChanged();
         }
     }
 }
