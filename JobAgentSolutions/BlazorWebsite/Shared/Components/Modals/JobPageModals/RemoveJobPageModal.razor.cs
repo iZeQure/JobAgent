@@ -39,7 +39,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
                 }
 
                 RefreshProvider.CallRefreshRequest();
-                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalRemoveJobAdvert");
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalRemoveJobPage");
             }
             catch (Exception ex)
             {
