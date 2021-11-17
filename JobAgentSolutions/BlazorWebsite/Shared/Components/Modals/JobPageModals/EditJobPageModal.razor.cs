@@ -5,7 +5,6 @@ using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.JobPages;
 using JobAgentClassLibrary.Common.JobPages.Entities;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
@@ -22,8 +21,6 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
         [Inject] protected ICompanyService CompanyService { get; set; }
 
         private IEnumerable<ICompany> _companies = new List<Company>();
-        private EditContext _editContext;
-        private string companyName = string.Empty;
 
         private string _errorMessage = "";
         private bool _isProcessing = false;
@@ -101,8 +98,6 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
         private void OnClick_CancelRequest()
         {
             Model = new JobPageModel();
-            Model = new();
-            _editContext = new(Model);
             StateHasChanged();
         }
     }

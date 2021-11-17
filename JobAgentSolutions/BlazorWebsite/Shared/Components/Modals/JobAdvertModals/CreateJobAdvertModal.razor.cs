@@ -36,7 +36,6 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
         private IEnumerable<ISpecialization> _sortedSpecializations;
         private EditContext _editContext;
 
-        private string companyName;
         private string _errorMessage = "";
         private bool _isLoading = false;
         private bool _isProcessing = false;
@@ -87,6 +86,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
 
         private async Task OnValidSubmit_CreateJobAdvertAsync()
         {
+            _isProcessing = true;
             try
             {
                 JobAdvert jobAdvert = new()
@@ -119,6 +119,10 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
             catch (Exception ex)
             {
                 _errorMessage = ex.Message;
+            }
+            finally
+            {
+                _isProcessing = false;
             }
         }
 

@@ -9,7 +9,6 @@ using JobAgentClassLibrary.Common.JobAdverts.Entities;
 using JobAgentClassLibrary.Common.VacantJobs;
 using JobAgentClassLibrary.Common.VacantJobs.Entities;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
@@ -33,8 +32,6 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
         private IEnumerable<ICompany> _companies = new List<Company>();
         private IEnumerable<ISpecialization> _specializations = new List<Specialization>();
         private List<ISpecialization> _sortedSpecializations = new List<ISpecialization>();
-        private EditContext _editContext;
-        private string companyName = string.Empty;
 
         private string _errorMessage = "";
         private bool _isProcessing = false;
@@ -145,7 +142,6 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
         {
             _sortedSpecializations.Clear();
             Model = new JobAdvertModel();
-            _editContext = new(Model);
             StateHasChanged();
         }
     }

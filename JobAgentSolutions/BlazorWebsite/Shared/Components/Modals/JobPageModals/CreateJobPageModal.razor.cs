@@ -73,6 +73,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
 
         private async Task OnValidSubmit_CreateJobAdvertAsync()
         {
+            _isProcessing = true;
             try
             {
                 JobPage jobPage = new()
@@ -103,6 +104,10 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
             catch (Exception ex)
             {
                 _errorMessage = ex.Message;
+            }
+            finally
+            {
+                _isProcessing = false;
             }
         }
 
