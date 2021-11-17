@@ -60,17 +60,16 @@
                                 else
                                 {
                                     <select id="regInputCompany" class="form-control form-control-sm" @bind="_jobAdvertModel.Id">
-                                        <option value="0" selected>---Vælg en job side fra listen som tilhører stillingsopslaget---</option>
+                                        <option value="0" selected>---Vælg den job side som stillingsOpslaget tilhører---</option>
                                         @foreach (var vacantJob in _vacantJobs)
                                         {
-                                            @foreach(var item in _companies)
+                                            @foreach (var company in _companies)
                                             {
-                                                if(vacantJob.CompanyId == item.Id)
+                                                if (vacantJob.CompanyId == company.Id)
                                                 {
-                                                    companyName = item.Name;
+                                                    <option value="@vacantJob.Id">@company.Name - @vacantJob.URL</option>
                                                 }
                                             }
-                                            <option value="@vacantJob.Id">@companyName - @vacantJob.URL</option>
                                         }
                                     </select>
                                 }
