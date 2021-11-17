@@ -21,14 +21,12 @@ namespace BlazorWebsite.Pages
         [Inject] protected IVacantJobService VacantJobService { get; set; }
         [Inject] protected IJobAdvertService JobAdvertService { get; set; }
 
+        private CultureInfo cultureInfo = CultureInfo.CreateSpecificCulture("da-DK");
         private IEnumerable<IJobAdvert> _jobAdverts = new List<JobAdvert>();
         private IEnumerable<IVacantJob> _vacantJobs = new List<VacantJob>();
         private IEnumerable<ICompany> _companies = new List<Company>();
-        private IJobAdvert _jobAdvertDetails;
-        private CultureInfo cultureInfo = CultureInfo.CreateSpecificCulture("da-DK");
 
-        private int _chosenCategoryId;
-        private bool _isLoadingData = false;
+        private bool _isLoadingData;
         private bool _loadFailed;
 
         protected override async Task OnInitializedAsync()
@@ -41,18 +39,9 @@ namespace BlazorWebsite.Pages
             await LoadData();
         }
 
-        private async Task GetJobAdvertDetails(int advertId)
-        {
-            if (advertId == 0)
-            {
-                await Task.CompletedTask;
-            }
-
-            _jobAdvertDetails = await JobAdvertService.GetByIdAsync(advertId);
-        }
-
         private async Task LoadData()
         {
+            _isLoadingData = true;
             try
             {
                 _loadFailed = false;
@@ -78,6 +67,10 @@ namespace BlazorWebsite.Pages
             {
                 _loadFailed = true;
                 Console.WriteLine($"Failed to load Job Adverts : {ex.Message}");
+            }
+            finally
+            {
+                _isLoadingData = false;
             }
         }
     }
