@@ -60,27 +60,27 @@ else
                     </thead>
                     <tbody>
 
-                        @foreach (var source in _jobPages.OrderBy(x => x.CompanyId))
+                        @foreach (var jobPage in _jobPages.OrderBy(x => x.CompanyId))
                         {
-                            <tr id="@(source.Id)">
-                                <th scope="row">@(source.Id)</th>
+                            <tr id="@(jobPage.Id)">
+                                <th scope="row">@(jobPage.Id)</th>
                                 @foreach (var company in _companies)
                                 {
-                                    if (source.CompanyId == company.Id)
+                                    if (jobPage.CompanyId == company.Id)
                                     {
                                         <td>@(company.Name)</td>
                                     }
                                 }
-                                <td>@(source.URL)</td>
+                                <td>@(jobPage.URL)</td>
 
                                 <td>
-                                    <span data-bs-toggle="modal" data-bs-target="#ModalEditJobPage" @onclick="@(mouseEvent => OnClick_EditLink(source.Id))">
+                                    <span data-bs-toggle="modal" data-bs-target="#ModalEditJobPage" @onclick="@(mouseEvent => OnClick_EditLink(jobPage.Id))">
                                         <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne jobside." Color="Popover.PopoverType.Info" />
                                     </span>
                                 </td>
 
                                 <td>
-                                    <span data-bs-toggle="modal" data-bs-target="#ModalRemoveJobPage" @onclick="@(mouseEvent => ConfirmationWindow(source.Id))">
+                                    <span data-bs-toggle="modal" data-bs-target="#ModalRemoveJobPage" @onclick="@(mouseEvent => ConfirmationWindow(jobPage.Id))">
                                         <Popover Title="Forsigtig!" Body="Denne knap sletter den valgte jobside, forevigt!" Color="Popover.PopoverType.Danger" />
                                     </span>
                                 </td>

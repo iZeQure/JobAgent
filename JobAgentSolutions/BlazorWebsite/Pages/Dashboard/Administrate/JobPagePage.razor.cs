@@ -5,6 +5,7 @@ using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.JobPages;
 using JobAgentClassLibrary.Common.JobPages.Entities;
 using Microsoft.AspNetCore.Components;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -58,7 +59,25 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
 
         private async Task OnClick_EditLink(int id)
         {
-            _jobPage = await JobPageService.GetByIdAsync(id);
+            try
+            {
+                _jobPage = await JobPageService.GetByIdAsync(id);
+
+                _jobPageModel = new JobPageModel
+                {
+                    Id = _jobPage.Id,
+                    CompanyId = _jobPage.CompanyId,
+                    URL = _jobPage.URL
+                };
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Open EditModal error: {ex.Message}");
+            }
+            finally
+            {
+                StateHasChanged();
+            }
         }
 
         private async Task RefreshContent()
@@ -73,7 +92,6 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
                 }
 
                 _jobPages = links;
-                _jobPageModel = new();
             }
             finally
             {
