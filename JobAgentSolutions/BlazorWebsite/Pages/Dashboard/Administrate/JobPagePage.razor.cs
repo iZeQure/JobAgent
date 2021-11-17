@@ -12,7 +12,6 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
 {
     public partial class JobPagePage : ComponentBase
     {
-        [Parameter] public int JobPageId { get; set; }
         [Inject] private IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJobPageService JobPageService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
@@ -23,7 +22,6 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
         private IJobPage _jobPage;
 
         private int _jobPageId = 0;
-        private bool disabled = false;
         private bool dataIsLoading = true;
 
         protected override async Task OnInitializedAsync()
@@ -75,6 +73,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
                 }
 
                 _jobPages = links;
+                _jobPageModel = new();
             }
             finally
             {

@@ -22,7 +22,6 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
         [Inject] protected ICompanyService CompanyService { get; set; }
 
         private IEnumerable<ICompany> _companies = new List<Company>();
-        private JobPageModel _jobPageModel;
         private EditContext _editContext;
         private string companyName = string.Empty;
 
@@ -46,8 +45,6 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
                 await Task.WhenAll(companyTask);
 
                 _companies = companyTask.Result;
-
-                _jobPageModel = Model;
             }
             catch (Exception ex)
             {
@@ -104,7 +101,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
         private void OnClick_CancelRequest()
         {
             Model = new JobPageModel();
-            _jobPageModel = new();
+            Model = new();
             _editContext = new(Model);
             StateHasChanged();
         }
