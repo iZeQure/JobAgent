@@ -1,13 +1,9 @@
 ﻿
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using SkpJobCrawler.Crawler;
-using JobAgentClassLibrary.Common.VacantJobs.Entities;
 using JobAgentClassLibrary.Common.JobPages;
 using JobAgentClassLibrary.Common.VacantJobs;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace WebCrawler
 {
@@ -20,7 +16,6 @@ namespace WebCrawler
             var startupService = ActivatorUtilities.GetServiceOrCreateInstance<Startup>(host.Services);
 
             startupService.StartCrawler();
-
         }
 
         private static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -43,9 +38,9 @@ namespace WebCrawler
 
         private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddSingleton<ICrawler, JobCrawler>();
             services.AddSingleton<IJobPageService, JobPageService>();
             services.AddSingleton<IVacantJobService, VacantJobService>();
+
         }
     }
 }
