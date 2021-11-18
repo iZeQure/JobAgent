@@ -55,7 +55,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
-                string proc = "[JA.spGetStaticSearchFilters]";
+                string proc = "[JA.spGetStaticFilterKeys]";
 
                 var queryResult = await conn.QueryAsync<StaticSearchFilterInformation>(proc, commandType: CommandType.StoredProcedure);
 
@@ -80,7 +80,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
             IStaticSearchFilter staticSearchFilter = null;
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
-                var proc = "[JA.spGetStaticSearchFilterById]";
+                var proc = "[JA.spGetStaticSearchFilterKeysById]";
                 var values = new
                 {
                     @id = id
