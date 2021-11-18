@@ -57,7 +57,7 @@ h4 {
     }
 
 h5 {
-    color: var(--clr-white) !important;
+    color: var(--bs-table-bg-override) !important;
     position: relative;
     font-family: var(--ff-h5);
     font-size: .75rem;
@@ -326,116 +326,6 @@ input::placeholder {
         }
 
 
-
-
-/*.navbar {
-    background-color: var(--primary-background-color) !important;
-}*/
-/*main.page {
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-}
-
-div.main-content {
-    display: flex;
-    flex-wrap: wrap;
-    min-height: 100%;
-}
-
-    div.main-content > *:nth-child(1) {
-        flex: 1 1 25%;
-        min-width: 30ch;
-    }
-
-    div.main-content > *:nth-child(2) {
-        flex: 1 1 75%;
-        min-width: 15ch;
-    }
-
-    div.main-content .sidebar {
-        background-color: var(--primary-background-color);
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-
-        div.main-content .sidebar .menu-categories span {
-            max-width: 175px;
-        }
-
-        div.main-content .sidebar .menu-categories a {
-            font-size: 1em !important;
-        }
-
-            div.main-content .sidebar .menu-categories a:hover,
-            div.main-content .sidebar .menu-categories a.active {
-                color: #A98EDA !important;
-            }
-
-        div.main-content .sidebar .tools a {
-            position: relative;
-            font-family: var(--ff-small-text);
-            font-size: 1.25em !important;
-            text-decoration: none;
-        }
-
-            div.main-content .sidebar .tools a:hover {
-                color: var(--clr-after) !important;
-            }
-
-            div.main-content .sidebar .tools a::before {
-                content: "" !important;
-                position: absolute !important;
-                width: 50% !important;
-                height: 2px !important;
-                bottom: 0 !important;
-                left: 0 !important;
-                background-color: var(--clr-after) !important;
-                visibility: hidden !important;
-                transform: scaleX(0) !important;
-                transition: all 0.3s ease-in-out 0s !important;
-            }
-
-            div.main-content .sidebar .tools a:hover::before {
-                visibility: visible !important;
-                transform: scaleX(1) !important;
-            }
-
-            div.main-content .sidebar .tools a.active::before {
-                content: "" !important;
-                position: absolute !important;
-                width: 100% !important;
-                height: 2px !important;
-                bottom: 0 !important;
-                left: 0 !important;
-                background-color: var(--clr-after) !important;
-                visibility: visible !important;
-                transform: scaleX(1) !important;
-                transition: all 0.3s ease-in-out 0s !important;
-            }
-
-            div.main-content .sidebar .tools a.active {
-                color: var(--clr-after) !important;
-            }
-
-
-    div.main-content .content {
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-
-
-img.cover-center {
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    width: -moz-fit-content;
-    width: fit-content;
-    width: 100%;
-    height: auto;
-    max-height: 100%;
-}
-*/
 #indexpage {
     content: "";
     position: absolute;
@@ -508,32 +398,7 @@ img.cover-center {
     background-position: bottom right;
     z-index: -1;
 }
-/*#userProfileDropdown {
-    width: 300px;
-}
 
-    #userProfileDropdown.dropdown-menu {
-        background-color: var(--primary-background-color) !important;
-        border-radius: var(--border-radius);
-        min-height: 350px;
-        max-height: 350px;
-    }
-
-    #userProfileDropdown label {
-        font-size: .65em;
-        text-transform: uppercase;
-        color: var(--primary-color);
-    }
-
-    #userProfileDropdown input {
-        border-radius: var(--border-radius);
-    }
-
-    #userProfileDropdown button {
-        position: absolute;
-        right: 1em;
-        bottom: 1em;
-    }*/
 .valid.modified:not([type=checkbox]) {
     outline: 1px solid #26b050;
 }
