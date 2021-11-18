@@ -79,10 +79,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
                 var returnResult = dynamicValues.Get<int>("@returnResult");
 
-                if (returnResult == 1)
-                {
-                    userExists = true;
-                }
+                if (returnResult == 1) userExists = true;
             }
 
             return userExists;
@@ -114,10 +111,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
                     entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
                 }
 
-                if (entityId != 0)
-                {
-                    return await GetByIdAsync(entityId);
-                }
+                if (entityId != 0) return await GetByIdAsync(entityId);
             }
 
             return null;
@@ -225,10 +219,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
                 var result = await conn.QueryFirstOrDefaultAsync<string>(proc, values, commandType: CommandType.StoredProcedure);
 
-                if (result is not null)
-                {
-                    salt = result;
-                }
+                if (result is not null) salt = result;
             }
 
             return salt;
@@ -340,10 +331,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId != 0)
-            {
-                return await GetByIdAsync(entityId);
-            }
+            if (entityId != 0) return await GetByIdAsync(entityId);
 
             return null;
         }
@@ -441,10 +429,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
                     var returnResult = dynamicValues.Get<int>("@returnResult");
 
-                    if (returnResult == 1)
-                    {
-                        validatedToken = true;
-                    }
+                    if (returnResult == 1) validatedToken = true;
                 }
             }
 

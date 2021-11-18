@@ -40,10 +40,7 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId != 0)
-            {
-                return await GetByIdAsync(entityId);
-            }
+            if (entityId != 0) return await GetByIdAsync(entityId);
 
             return null;
         }
@@ -132,13 +129,10 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId >= 0)
-            {
-                return await GetByIdAsync(entityId);
-            }
+            if (entityId >= 0) return await GetByIdAsync(entityId);
 
             return null;
         }
-    
+
     }
 }
