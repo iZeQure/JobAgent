@@ -1,9 +1,10 @@
-﻿*,
+﻿@import "_custom-root.css";
+
+*,
 *::before,
 *::after {
     box-sizing: border-box;
 }
-
 
 #job-wrapper {
     max-height: 90vh;
@@ -26,6 +27,7 @@
     }
 
 .card-title {
+    color: var(--clr-white) !important;
     margin: 0 0 0.5em 0;
     position: relative;
     word-wrap: break-word;
