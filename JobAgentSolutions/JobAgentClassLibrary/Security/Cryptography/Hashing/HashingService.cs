@@ -24,13 +24,13 @@ namespace JobAgentClassLibrary.Security.Cryptography.Hashing
         /// <returns>A <see cref="IHashedUser"/> with the hashed password and generated salt.</returns>
         public IHashedUser CreateHashedUser(string password)
         {
-            byte[] salt = SaltGeneratorFactory.GetSaltGenerator().GenerateSalt();
+            string salt = Convert.ToBase64String(SaltGeneratorFactory.GetSaltGenerator().GenerateSalt());
 
             byte[] encodedBytes = Encoding.UTF8.GetBytes(password + salt);
             byte[] computedHashCode = new SHA384Managed().ComputeHash(encodedBytes);
 
             password = Convert.ToBase64String(computedHashCode);
-            IHashedUser hashedUser = (IHashedUser)_userFactory.CreateEntity(nameof(HashedUser), password, Convert.ToBase64String(salt));
+            IHashedUser hashedUser = (IHashedUser)_userFactory.CreateEntity(nameof(HashedUser), password, salt);
 
             return hashedUser;
         }
