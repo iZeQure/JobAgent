@@ -26,7 +26,6 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
         private IEnumerable<ICompany> _companies;
         private EditContext _editContext;
 
-        private string companyName;
         private string _errorMessage = "";
         private bool _isLoading = false;
         private bool _isProcessing = false;
@@ -92,10 +91,11 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
                     isCreated = true;
                 }
 
-                if (isCreated)
+                if (!isCreated)
                 {
                     _errorMessage = "Kunne ikke oprette stilingsopslag grundet ukendt fejl";
                 }
+
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateJobPage");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{_jobPageModel.Id}");

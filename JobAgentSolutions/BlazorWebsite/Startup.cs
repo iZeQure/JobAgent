@@ -9,7 +9,9 @@ using JobAgentClassLibrary.Common.Categories.Repositories;
 using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Factory;
 using JobAgentClassLibrary.Common.Companies.Repositories;
+using JobAgentClassLibrary.Common.Filters;
 using JobAgentClassLibrary.Common.Filters.Factory;
+using JobAgentClassLibrary.Common.Filters.Repositories;
 using JobAgentClassLibrary.Common.JobAdverts;
 using JobAgentClassLibrary.Common.JobAdverts.Factory;
 using JobAgentClassLibrary.Common.JobAdverts.Repositories;
@@ -31,6 +33,9 @@ using JobAgentClassLibrary.Common.VacantJobs.Repositories;
 using JobAgentClassLibrary.Core.Database.Factories;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Settings;
+using JobAgentClassLibrary.Loggings;
+using JobAgentClassLibrary.Loggings.Factory;
+using JobAgentClassLibrary.Loggings.Repositories;
 using JobAgentClassLibrary.Security.Access;
 using JobAgentClassLibrary.Security.Cryptography;
 using JobAgentClassLibrary.Security.Cryptography.Hashing;
@@ -70,6 +75,7 @@ namespace BlazorWebsite
             services.AddSingleton<IConnectionSettings>(connectionSettings);
             services.AddSingleton<ISecuritySettings>(securitySettings);
 
+
             /* Factory Injections */
             services.AddSingleton<ISqlDbFactory, SqlDbFactory>();
             services.AddSingleton<AreaEntityFactory>();
@@ -84,6 +90,7 @@ namespace BlazorWebsite
             services.AddSingleton<RoleEntityFactory>();
             services.AddSingleton<UserEntityFactory>();
             services.AddSingleton<VacantJobEntityFactory>();
+            services.AddSingleton<LogEntityFactory>();
 
 
             /* Manager Injections */
@@ -101,7 +108,10 @@ namespace BlazorWebsite
             services.AddScoped<IJobPageRepository, JobPageRepository>();
             services.AddScoped<IVacantJobRepository, VacantJobRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IDynamicSearchFilterRepository, DynamicSearchFilterRepository>();
+            services.AddScoped<IStaticSearchFilterRepository, StaticSearchFilterRepository>();
             services.AddScoped<ISpecializationRepository, SpecializationRepository>();
+            services.AddScoped<ILoggingRepository, DbLogRepository>();
 
 
             /* Service Injections */
@@ -110,10 +120,14 @@ namespace BlazorWebsite
             services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IDynamicSearchFilterService, DynamicSearchFilterService>();
+            services.AddScoped<IStaticSearchFilterService, StaticSearchFilterService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IJobAdvertService, JobAdvertService>();
             services.AddScoped<IVacantJobService, VacantJobService>();
             services.AddScoped<IJobPageService, JobPageService>();
+            services.AddScoped<ILogService, DbLogService>();
+
 
             /* Access Injections */
             services.AddScoped<IAuthenticationAccess, UserAccess>();

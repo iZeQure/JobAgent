@@ -4,10 +4,8 @@ using JobAgentClassLibrary.Common.Filters.Entities.EntityMaps;
 using JobAgentClassLibrary.Common.Filters.Factory;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
-using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -35,7 +33,6 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
 
                 var values = new
                 {
-                    @id = entity.Id,
                     @categoryId = entity.CategoryId,
                     @specializationId = entity.SpecializationId,
                     @key = entity.Key
@@ -56,7 +53,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
-                string proc = "[JA.spGetDynamicSearchFilters]";
+                string proc = "[JA.spGetDynamicFilterKeys]";
 
                 var queryResult = await conn.QueryAsync<DynamicSearchFilterInformation>(proc, commandType: CommandType.StoredProcedure);
 
@@ -85,7 +82,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
                 var proc = "[JA.spGetDynamicSearchFilterById]";
                 var values = new
                 {
-                    @areaId = id
+                    @id = id
                 };
 
                 var queryResult = await conn.QuerySingleOrDefaultAsync<DynamicSearchFilterInformation>(proc, values, commandType: CommandType.StoredProcedure);

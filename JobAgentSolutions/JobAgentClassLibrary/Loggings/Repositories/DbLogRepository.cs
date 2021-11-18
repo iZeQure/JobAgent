@@ -1,12 +1,14 @@
-﻿using JobAgentClassLibrary.Core.Database.Managers;
+﻿using Dapper;
+using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
 using JobAgentClassLibrary.Loggings.Entities;
+using JobAgentClassLibrary.Loggings.Entities.EntityMaps;
+using JobAgentClassLibrary.Loggings.Factory;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Loggings.Repositories
@@ -14,96 +16,68 @@ namespace JobAgentClassLibrary.Loggings.Repositories
     public class DbLogRepository : ILoggingRepository
     {
         private readonly ISqlDbManager _sqlDbManager;
+        private readonly LogEntityFactory _factory;
 
-        public DbLogRepository(ISqlDbManager sqlDbManager)
+        public DbLogRepository(ISqlDbManager sqlDbManager, LogEntityFactory factory)
         {
             _sqlDbManager = sqlDbManager;
+            _factory = factory;
         }
 
 
         public async Task<ILog> CreateAsync(ILog entity)
         {
             int entityId = 0;
+
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spCreateLog]";
+                var values = new
                 {
-                    new SqlParameter("@id", entity.Id),
-                    new SqlParameter("@logSeverityId", entity.LogSeverity),
-                    new SqlParameter("@createdDateTime", entity.CreatedDateTime),
-                    new SqlParameter("@createdBy", entity.CreatedBy),
-                    new SqlParameter("@action", entity.Action),
-                    new SqlParameter("@message", entity.Message)
+                    @severrityId = entity.LogSeverity,
+                    @currentTime = entity.CreatedDateTime,
+                    @createdBy = entity.CreatedBy,
+                    @action = entity.Action,
+                    @message = entity.Message
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spCreateLog]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = (int)await cmd.ExecuteScalarAsync();
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId != 0)
-            {
-                return await GetByIdAsync(entityId);
-            }
+            if (entityId != 0) return await GetByIdAsync(entityId);
 
             return null;
         }
 
         public async Task<List<ILog>> GetAllAsync()
         {
-            List<ILog> logs = new();
+            List<ILog> vacantJobs = new();
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
-                using (var cmd = conn.CreateCommand())
+                var proc = "[JA.spGetLogs]";
+
+                var queryResult = await conn.QueryAsync<LogInformation>(proc, commandType: CommandType.StoredProcedure);
+
+                if (queryResult is not null && queryResult.Any())
                 {
-                    cmd.CommandText = "[JA.spGetLogs]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    try
+                    foreach (var result in queryResult)
                     {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
+                        ILog log = (ILog)_factory.CreateEntity(
+                            nameof(DbLog),
+                            result.LogId,
+                            result.LogSeverity,
+                            result.LogMessage,
+                            result.LogAction,
+                            result.LogCreatedBy,
+                            result.LogCreatedDateTime);
 
-                            while (await reader.ReadAsync())
-                            {
-                                var log = new DbLog
-                                {
-                                    Id = reader.GetInt32(0),
-                                    LogSeverity = (LogSeverity)reader.GetInt32(1),
-                                    CreatedDateTime = reader.GetDateTime(2),
-                                    CreatedBy = reader.GetString(3),
-                                    Action = reader.GetString(4),
-                                    Message = reader.GetString(5)
-
-                                };
-                                logs.Add(log);
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
+                        vacantJobs.Add(log);
                     }
                 }
             }
 
-            return logs;
+            return vacantJobs;
         }
 
         public async Task<ILog> GetByIdAsync(int id)
@@ -111,43 +85,26 @@ namespace JobAgentClassLibrary.Loggings.Repositories
             ILog log = null;
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spGetLogId]";
+                var values = new
                 {
-                        new SqlParameter("@id", id)
+                    @vacantJobId = id
                 };
 
-                using (var cmd = conn.CreateCommand())
+                var queryResult = await conn.QuerySingleOrDefaultAsync<LogInformation>(proc, values, commandType: CommandType.StoredProcedure);
+
+                if (queryResult is not null)
                 {
-                    cmd.CommandText = "[JA.spGetLogById]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (!reader.HasRows) return null;
-
-                            while (await reader.ReadAsync())
-                            {
-                                log = new DbLog()
-                                {
-                                    Id = reader.GetInt32(0),
-                                    LogSeverity = (LogSeverity)reader.GetInt32(1),
-                                    CreatedDateTime = reader.GetDateTime(2),
-                                    CreatedBy = reader.GetString(3),
-                                    Action = reader.GetString(4),
-                                    Message = reader.GetString(5)
-                                };
-
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                    log = (ILog)_factory.CreateEntity(
+                           nameof(DbLog),
+                           queryResult.LogId,
+                           queryResult.LogSeverity,
+                           queryResult.LogMessage,
+                           queryResult.LogAction,
+                           queryResult.LogCreatedBy,
+                           queryResult.LogCreatedDateTime);
                 }
+
             }
 
             return log;
@@ -155,40 +112,20 @@ namespace JobAgentClassLibrary.Loggings.Repositories
 
         public async Task<bool> RemoveAsync(ILog entity)
         {
-            int entityId = 0;
+            bool isDeleted = false;
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.DeleteUser))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spRemoveLog]";
+                var values = new
                 {
-                        new SqlParameter("@id", entity.Id)
+                    @logId = entity.Id
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spDeleteLog]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = int.Parse((await cmd.ExecuteScalarAsync()).ToString());
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                isDeleted = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
             }
 
-            if (entityId != 0)
-            {
-                return true;
-            }
-
-            return false;
+            return isDeleted;
         }
 
         public async Task<ILog> UpdateAsync(ILog entity)
@@ -197,39 +134,21 @@ namespace JobAgentClassLibrary.Loggings.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
             {
-                var values = new SqlParameter[]
+                var proc = "[JA.spUpdateLog]";
+                var values = new
                 {
-                   new SqlParameter("@id", entity.Id),
-                    new SqlParameter("@logSeverityId", entity.LogSeverity),
-                    new SqlParameter("@createdDateTime", entity.CreatedDateTime),
-                    new SqlParameter("@createdBy", entity.CreatedBy),
-                    new SqlParameter("@action", entity.Action),
-                    new SqlParameter("@message", entity.Message)
+                    @logId = entity.Id,
+                    @severityId = entity.LogSeverity,
+                    @createdDateTime = entity.CreatedDateTime,
+                    @createdBy = entity.CreatedBy,
+                    @action = entity.Action,
+                    @message = entity.Message
                 };
 
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "[JA.spUpdateLog]";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddRange(values);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-
-                        entityId = int.Parse((await cmd.ExecuteScalarAsync()).ToString());
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId >= 0)
-            {
-                return await GetByIdAsync(entityId);
-            }
+            if (entityId >= 0) return await GetByIdAsync(entityId);
 
             return null;
         }

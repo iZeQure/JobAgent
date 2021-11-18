@@ -166,7 +166,7 @@ else
                         var pageNumber = i;
 
                         <li class="@(i == _paginationModel.CurrentPage ? "page-item active" : "page-item")">
-                            <a class="page-link" href="/admin/settings/job/vacancies" @onclick="@(() => FilterJobAdverts(pageNumber))">@(i)</a>
+                            <a class="page-link" href="/admin/settings/job-vacancies" @onclick="@(() => FilterJobAdverts(pageNumber))">@(i)</a>
                         </li>
                     }
                 </ul>
