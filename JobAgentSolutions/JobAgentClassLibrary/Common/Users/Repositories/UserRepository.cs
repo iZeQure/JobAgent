@@ -59,7 +59,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
                 //isAuthenticated = dynamicValues.Get<bool>("@returnResult");
             }
-            
+
             return isAuthenticated;
         }
 
@@ -79,7 +79,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
                 var returnResult = dynamicValues.Get<int>("@returnResult");
 
-                if(returnResult == 1)
+                if (returnResult == 1)
                 {
                     userExists = true;
                 }
@@ -268,7 +268,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
         {
             bool isGranted = false;
 
-            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.ComplexUser))
             {
                 var proc = "[JA.spGrantUserArea]";
                 var values = new
@@ -350,7 +350,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
         public async Task<bool> UpdateUserPasswordAsync(IAuthUser user)
         {
-            bool updatedPassword = false;
+            bool passIsUpdated = false;
 
             if (user is AuthUser authUser)
             {
@@ -358,7 +358,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
 
                 using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
                 {
-                    var proc = "[JA.spValidateUserLogin]";
+                    var proc = "[JA.spUpdateUserSecurity]";
                     var values = new
                     {
                         @userId = authUser.Id,
@@ -366,20 +366,19 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
                         @userNewSalt = hashedUser.Salt
                     };
 
-                    updatedPassword = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
+                    passIsUpdated = (await conn.ExecuteAsync(proc, values, commandType: CommandType.StoredProcedure)) >= 1;
                 }
             }
 
-            return updatedPassword;
+            return passIsUpdated;
         }
 
-        public async Task<bool> UpdateUserAccessTokenAsync(IAuthUser user) 
+        public async Task<bool> UpdateUserAccessTokenAsync(IAuthUser user)
         {
             bool updatedToken = false;
 
             if (user is AuthUser authUser)
             {
-
                 using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.UpdateUser))
                 {
                     var proc = "[JA.spUpdateUserAccessToken]";
