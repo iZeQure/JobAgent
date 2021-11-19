@@ -13,10 +13,11 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
     {
         [Inject] private IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IStaticSearchFilterService StaticSearchFilterService { get; set; }
+        [Inject] protected IFilterTypeService FilterTypeService { get; set; }
 
         private StaticSearchFilterModel _staticSearchFilterModel = new();
         private IEnumerable<IStaticSearchFilter> _staticSearchFilters = new List<StaticSearchFilter>();
-        private IEnumerable<FilterType> _filterTypes = new List<FilterType>();
+        private IEnumerable<IFilterType> _filterTypes = new List<FilterType>();
         private IStaticSearchFilter _staticSearchFilter;
 
         private int _staticSearchFilterId = 0;
@@ -35,10 +36,25 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
             try
             {
                 var staticSearchFilterTask = StaticSearchFilterService.GetAllAsync();
+                var filterTypeTask = FilterTypeService.GetAllAsync();
 
-                await Task.WhenAll(staticSearchFilterTask);
+                await Task.WhenAll(staticSearchFilterTask, filterTypeTask);
 
                 _staticSearchFilters = staticSearchFilterTask.Result;
+                _filterTypes = filterTypeTask.Result;
+
+                foreach(var staticFilter in _staticSearchFilters)
+                {
+                    foreach(var filterType in _filterTypes)
+                    {
+                        if(staticFilter.FilterType.Id == filterType.Id)
+                        {
+                            staticFilter.FilterType.Name = filterType.Name;
+                            staticFilter.FilterType.Description = filterType.Description;
+                        }
+                    }
+                }
+
             }
             finally
             {
@@ -80,13 +96,12 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
             try
             {
                 var filters = await StaticSearchFilterService.GetAllAsync();
+                var filtertypes = await FilterTypeService.GetAllAsync();
 
-                if (filters == null)
-                {
-                    return;
-                }
+                if (filters == null || filtertypes == null) return;
 
                 _staticSearchFilters = filters;
+                _filterTypes = filtertypes;
             }
             finally
             {

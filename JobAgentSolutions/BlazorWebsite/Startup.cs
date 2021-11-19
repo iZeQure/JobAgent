@@ -110,6 +110,7 @@ namespace BlazorWebsite
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IDynamicSearchFilterRepository, DynamicSearchFilterRepository>();
             services.AddScoped<IStaticSearchFilterRepository, StaticSearchFilterRepository>();
+            services.AddScoped<IFilterTypeRepository, FilterTypeRepository>();
             services.AddScoped<ISpecializationRepository, SpecializationRepository>();
             services.AddScoped<ILoggingRepository, DbLogRepository>();
 
@@ -122,6 +123,7 @@ namespace BlazorWebsite
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IDynamicSearchFilterService, DynamicSearchFilterService>();
             services.AddScoped<IStaticSearchFilterService, StaticSearchFilterService>();
+            services.AddScoped<IFilterTypeService, FilterTypeService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IJobAdvertService, JobAdvertService>();
             services.AddScoped<IVacantJobService, VacantJobService>();

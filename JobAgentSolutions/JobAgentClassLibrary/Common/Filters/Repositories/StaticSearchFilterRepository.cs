@@ -36,8 +36,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
 
                 var values = new
                 {
-                    @id = entity.Id,
-                    @categoryId = entity.FilterType.Id,
+                    @filterTypeId = entity.FilterType.Id,
                     @key = entity.Key
                 };
 
@@ -80,7 +79,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
             IStaticSearchFilter staticSearchFilter = null;
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
-                var proc = "[JA.spGetStaticSearchFilterKeysById]";
+                var proc = "[JA.spGetStaticSearchFilterById]";
                 var values = new
                 {
                     @id = id

@@ -2,14 +2,14 @@
 @attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
 @using BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals;
 
-<PageDocumentTitle DocumentTitle="Administrer - Dynamiske Søgeord" />
+<PageDocumentTitle DocumentTitle="Administrer - Statiske Søgefiltre" />
 
 <div class="d-flex">
-    <PageHeadingTitle DisplayTitle="Søgeord til robot" />
+    <PageHeadingTitle DisplayTitle="Søgefiltre til robot" />
     <div class="d-inline-block">
 
         <a class="btn btn-sm btn-info cursor-pointer text-white" data-bs-toggle="modal" data-bs-target="#ModalCreateStaticSearchFilter">
-            Opret ny JobSide
+            Opret nyt søgefilter
         </a>
 
     </div>
@@ -17,34 +17,34 @@
 
 @if (dataIsLoading)
 {
-    <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="dataIsLoading" Message="Indlæser robot søgeord.." />
+    <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="dataIsLoading" Message="Indlæser robot søgefiltre.." />
 }
 else
 {
     @if (_staticSearchFilters == null)
     {
         <MessageAlert Alert="MessageAlert.AlertType.Info"
-                      Message="Indlæser robot søgeord.." IsLoading="true" />
+                      Message="Indlæser robot søgefiltre.." IsLoading="true" />
     }
     else
     {
         @if (!_staticSearchFilters.Any())
         {
             <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                          Message="Der blev ikke fundet nogen søgeord."
-                          MessageOptional="Opret søgeord, ved at trykke på knappen : Opret nyt søgeord." />
+                          Message="Der blev ikke fundet nogen søgefiltre."
+                          MessageOptional="Opret søgefilter, ved at trykke på knappen : Opret nyt søgefilter." />
         }
         else
         {
             <div class="table-responsive table-responsive-sm table-responsive-md">
                 <table class="table table-striped table-hover">
-                    <caption>Liste over søgeord..</caption>
+                    <caption>Liste over søgefiltre..</caption>
                     <thead class="table-primary text-light">
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Søgeord</th>
+                            <th scope="col">søgefilter</th>
                             <th scope="col">Filter Type</th>
-                            <th scope="col">Filter Beskrivelse</th>
+                            <th scope="col"></th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
@@ -56,17 +56,16 @@ else
                                 <th scope="row">@(staticSearchFilter.Id)</th>
                                 <td>@(staticSearchFilter.Key)</td>
                                 <td>@(staticSearchFilter.FilterType.Name)</td>
-                                <td>@(staticSearchFilter.FilterType.Description)</td>
                                 
                                 <td>
-                                    <span data-bs-toggle="modal" data-bs-target="#ModalEditStaticcSearchFilter" @onclick="@(mouseEvent => OnClick_EditLink(staticSearchFilter.Id))">
-                                        <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette søgeord." Color="Popover.PopoverType.Info" />
+                                    <span data-bs-toggle="modal" data-bs-target="#ModalEditStaticSearchFilter" @onclick="@(mouseEvent => OnClick_EditLink(staticSearchFilter.Id))">
+                                        <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette søgefilter." Color="Popover.PopoverType.Info" />
                                     </span>
                                 </td>
 
                                 <td>
                                     <span data-bs-toggle="modal" data-bs-target="#ModalRemoveStaticSearchFilter" @onclick="@(mouseEvent => ConfirmationWindow(staticSearchFilter.Id))">
-                                        <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte søgeord, forevigt!" Color="Popover.PopoverType.Danger" />
+                                        <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte søgefilter, forevigt!" Color="Popover.PopoverType.Danger" />
                                     </span>
                                 </td>
                             </tr>
