@@ -126,7 +126,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
                 var values = new
                 {
                     @id = entity.Id,
-                    @categoryId = entity.FilterType.Id,
+                    @filterTypeId= entity.FilterType.Id,
                     @key = entity.Key
                 };
 

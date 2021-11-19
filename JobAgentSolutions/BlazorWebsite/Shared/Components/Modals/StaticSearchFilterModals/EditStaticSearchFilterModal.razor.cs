@@ -13,110 +13,114 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
     public partial class EditStaticSearchFilterModal
     {
         [Parameter] public StaticSearchFilterModel Model { get; set; }
-        //[Inject] protected IRefreshProvider RefreshProvider { get; set; }
-        //[Inject] protected IJSRuntime JSRuntime { get; set; }
-        //[Inject] protected IStaticSearchFilterService StaticSearchFilterService { get; set; }
-        //[Inject] protected IFilterTypeService FilterTypeService { get; set; }
+        [Inject] protected IRefreshProvider RefreshProvider { get; set; }
+        [Inject] protected IJSRuntime JSRuntime { get; set; }
+        [Inject] protected IStaticSearchFilterService StaticSearchFilterService { get; set; }
+        [Inject] protected IFilterTypeService FilterTypeService { get; set; }
 
-        //private IEnumerable<IFilterType> _filterTypes = new List<FilterType>();
+        private IEnumerable<IFilterType> _filterTypes = new List<FilterType>();
+        private FilterType _filterType = new();
+        private int _filterTypeId = 0;
 
-        //private string _errorMessage = "";
-        //private bool _isProcessing = false;
-        //private bool _isLoading = false;
+        private string _errorMessage = "";
+        private bool _isProcessing = false;
+        private bool _isLoading = false;
 
-        //protected override async Task OnInitializedAsync()
-        //{
-        //    await LoadModalInformationAsync();
-        //}
+        protected override async Task OnInitializedAsync()
+        {
+            await LoadModalInformationAsync();
+        }
 
-        //private async Task LoadModalInformationAsync()
-        //{
-        //    _isLoading = true;
+        private async Task LoadModalInformationAsync()
+        {
+            _isLoading = true;
 
-        //    try
-        //    {
-        //        var filterTypeTask = FilterTypeService.GetAllAsync();
+            try
+            {
+                var filterTypeTask = FilterTypeService.GetAllAsync();
 
-        //        await Task.WhenAll(filterTypeTask);
+                await Task.WhenAll(filterTypeTask);
 
-        //        _filterTypes = filterTypeTask.Result;
+                _filterTypes = filterTypeTask.Result;
 
-        //        if (Model.FilterType == null)
-        //        {
-        //            Model.FilterType = new FilterType();
-        //        }
-        //        else
-        //        {
-        //            foreach (var filterType in _filterTypes)
-        //            {
-        //                if (Model.FilterType.Id == filterType.Id)
-        //                {
-        //                    Model.FilterType.Name = filterType.Name;
-        //                    Model.FilterType.Description = filterType.Description;
-        //                }
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _errorMessage = ex.Message;
-        //        Console.WriteLine(ex.Message);
-        //    }
-        //    finally
-        //    {
-        //        _isLoading = false;
-        //        StateHasChanged();
-        //    }
-        //}
+                if (Model.FilterType != null)
+                {
+                    _filterType = Model.FilterType;
+                }
+            }
+            catch (Exception ex)
+            {
+                _errorMessage = ex.Message;
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                _isLoading = false;
+                StateHasChanged();
+            }
+        }
 
-        //private async Task OnValidSubmit_EditJobVacancy()
-        //{
-        //    _isProcessing = true;
+        private async Task OnValidSubmit_EditJobVacancy()
+        {
+            _isProcessing = true;
 
-        //    try
-        //    {
-        //        StaticSearchFilter staticSearchFilter = new()
-        //        {
-        //            Id = Model.Id,
-        //            Key = Model.Key,
-        //            FilterType = Model.FilterType
-        //        };
+            try
+            {
+                foreach(var item in _filterTypes)
+                {
+                    if(_filterTypeId == item.Id)
+                    {
+                        _filterType = new()
+                        {
+                            Id = item.Id,
+                            Name = item.Name,
+                            Description = item.Description
+                        };
+                    }
+                }
 
-        //        bool isUpdated = false;
-        //        var result = await StaticSearchFilterService.UpdateAsync(staticSearchFilter);
+                StaticSearchFilter staticSearchFilter = new()
+                {
+                    Id = Model.Id,
+                    Key = Model.Key,
+                    FilterType = _filterType
+                };
 
-        //        if (result.Id == Model.Id && result.Key == Model.Key)
-        //        {
-        //            isUpdated = true;
-        //        }
+                bool isUpdated = false;
+                var result = await StaticSearchFilterService.UpdateAsync(staticSearchFilter);
 
-        //        if (!isUpdated)
-        //        {
-        //            _errorMessage = "Kunne ikke opdatere SøgeFilteret, grundet ukendt fejl.";
-        //            return;
-        //        }
+                if (result.Id == Model.Id && result.Key == Model.Key)
+                {
+                    isUpdated = true;
+                }
 
-        //        RefreshProvider.CallRefreshRequest();
-        //        await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditStaticSearchFilter");
-        //        await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _errorMessage = ex.Message;
-        //        Console.WriteLine(ex.Message);
-        //    }
-        //    finally
-        //    {
-        //        _isProcessing = false;
-        //    }
-        //}
+                if (!isUpdated)
+                {
+                    _errorMessage = "Kunne ikke opdatere SøgeFilteret, grundet ukendt fejl.";
+                    return;
+                }
 
-        //private void OnClick_CancelRequest()
-        //{
-        //    Model = new StaticSearchFilterModel();
-        //    Model.FilterType = new FilterType();
-        //    StateHasChanged();
-        //}
+                RefreshProvider.CallRefreshRequest();
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditStaticSearchFilter");
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
+            }
+            catch (Exception ex)
+            {
+                _errorMessage = ex.Message;
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                _isProcessing = false;
+            }
+        }
 
+        private void OnClick_CancelRequest()
+        {
+            Model = new StaticSearchFilterModel();
+            Model.FilterType = new FilterType();
+            _filterType = new();
+            StateHasChanged();
+        }
     }
 }
