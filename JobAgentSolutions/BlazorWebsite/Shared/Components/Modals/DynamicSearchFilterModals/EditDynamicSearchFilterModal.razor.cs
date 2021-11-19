@@ -81,7 +81,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
 
                 if (!isUpdated)
                 {
-                    _errorMessage = "Kunne ikke opdatere Jobside.";
+                    _errorMessage = "Kunne ikke opdatere Søgeordet, grundet ukendt fejl.";
                     return;
                 }
 
