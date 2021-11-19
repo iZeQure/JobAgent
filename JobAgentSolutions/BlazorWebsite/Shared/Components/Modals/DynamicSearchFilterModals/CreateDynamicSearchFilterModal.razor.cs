@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
 {
-    public partial class CreateDynamicSearchFilterModal
+    public partial class CreateDynamicSearchFilterModal : ComponentBase
     {
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }

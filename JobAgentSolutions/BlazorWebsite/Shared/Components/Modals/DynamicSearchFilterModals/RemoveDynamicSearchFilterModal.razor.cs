@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
 {
-    public partial class RemoveDynamicSearchFilterModal
+    public partial class RemoveDynamicSearchFilterModal : ComponentBase
     {
         [Parameter] public int Id { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
 {
-    public partial class EditStaticSearchFilterModal
+    public partial class EditStaticSearchFilterModal : ComponentBase
     {
         [Parameter] public StaticSearchFilterModel Model { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }

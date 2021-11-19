@@ -1,27 +1,26 @@
 ﻿using BlazorWebsite.Data.FormModels;
 using BlazorWebsite.Data.Providers;
-using JobAgentClassLibrary.Common.Categories;
-using JobAgentClassLibrary.Common.Categories.Entities;
-using JobAgentClassLibrary.Common.Filters;
-using JobAgentClassLibrary.Common.Filters.Entities;
+using JobAgentClassLibrary.Common.Companies;
+using JobAgentClassLibrary.Common.Companies.Entities;
+using JobAgentClassLibrary.Common.VacantJobs;
+using JobAgentClassLibrary.Common.VacantJobs.Entities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
+namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
 {
-    public partial class EditDynamicSearchFilterModal : ComponentBase
+    public partial class EditVacantJobModal : ComponentBase
     {
-        [Parameter] public DynamicSearchFilterModel Model { get; set; }
+        [Parameter] public VacantJobModel Model { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
-        [Inject] protected IDynamicSearchFilterService DynamicSearchFilterService { get; set; }
-        [Inject] protected ICategoryService CategoryService { get; set; }
+        [Inject] protected IVacantJobService JobPageService { get; set; }
+        [Inject] protected ICompanyService CompanyService { get; set; }
 
-        private IEnumerable<ICategory> _categories = new List<Category>();
-        private IEnumerable<ISpecialization> _specializations = new List<Specialization>();
+        private IEnumerable<ICompany> _companies = new List<Company>();
 
         private string _errorMessage = "";
         private bool _isProcessing = false;
@@ -38,13 +37,11 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
 
             try
             {
-                var companyTask = CategoryService.GetCategoriesAsync();
-                var specializationTask = CategoryService.GetSpecializationsAsync();
+                var companyTask = CompanyService.GetAllAsync();
 
-                await Task.WhenAll(companyTask, specializationTask);
+                await Task.WhenAll(companyTask);
 
-                _categories = companyTask.Result;
-                _specializations = specializationTask.Result;
+                _companies = companyTask.Result;
             }
             catch (Exception ex)
             {
@@ -63,36 +60,34 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
 
             try
             {
-                DynamicSearchFilter dynamicSearchFilter = new()
+                VacantJob vacantJob = new()
                 {
                     Id = Model.Id,
-                    CategoryId = Model.CategoryId,
-                    SpecializationId = Model.Specializationid,
-                    Key = Model.Key
+                    CompanyId = Model.CompanyId,
+                    URL = Model.URL
                 };
 
                 bool isUpdated = false;
-                var result = await DynamicSearchFilterService.UpdateAsync(dynamicSearchFilter);
+                var result = await JobPageService.UpdateAsync(vacantJob);
 
-                if (result.Id == Model.Id && result.Key == Model.Key)
+                if (result.Id == Model.Id && result.URL == Model.URL)
                 {
                     isUpdated = true;
                 }
 
                 if (!isUpdated)
                 {
-                    _errorMessage = "Kunne ikke opdatere Søgeordet, grundet ukendt fejl.";
+                    _errorMessage = "Kunne ikke opdatere stillingsopslaget.";
                     return;
                 }
 
                 RefreshProvider.CallRefreshRequest();
-                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditDynamicSearchFilter");
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditVacantJob");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
             }
             catch (Exception ex)
             {
                 _errorMessage = ex.Message;
-                Console.WriteLine(ex.Message);
             }
             finally
             {
@@ -102,9 +97,8 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
 
         private void OnClick_CancelRequest()
         {
-            Model = new DynamicSearchFilterModel();
+            Model = new VacantJobModel();
             StateHasChanged();
         }
-
     }
 }

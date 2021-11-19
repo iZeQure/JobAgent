@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Dashboard.RobotSettings
 {
-    public partial class StaticSearchFilterPage
+    public partial class StaticSearchFilterPage : ComponentBase
     {
         [Inject] private IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IStaticSearchFilterService StaticSearchFilterService { get; set; }

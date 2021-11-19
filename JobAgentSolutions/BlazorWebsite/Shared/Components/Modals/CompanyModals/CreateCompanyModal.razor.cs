@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
 {
-    public partial class CreateCompanyModal
+    public partial class CreateCompanyModal : ComponentBase
     {
         [Inject] protected IJSRuntime JSRuntime { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }

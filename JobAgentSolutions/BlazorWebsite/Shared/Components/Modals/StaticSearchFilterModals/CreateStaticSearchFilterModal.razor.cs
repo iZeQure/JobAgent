@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
 {
-    public partial class CreateStaticSearchFilterModal
+    public partial class CreateStaticSearchFilterModal : ComponentBase
     {
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }

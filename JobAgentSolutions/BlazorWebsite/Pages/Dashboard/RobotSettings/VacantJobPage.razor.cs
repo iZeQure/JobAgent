@@ -1,7 +1,9 @@
 ﻿using BlazorWebsite.Data.FormModels;
 using BlazorWebsite.Data.Providers;
-using JobAgentClassLibrary.Common.Filters;
-using JobAgentClassLibrary.Common.Filters.Entities;
+using JobAgentClassLibrary.Common.Companies;
+using JobAgentClassLibrary.Common.Companies.Entities;
+using JobAgentClassLibrary.Common.VacantJobs;
+using JobAgentClassLibrary.Common.VacantJobs.Entities;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -9,16 +11,18 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Dashboard.RobotSettings
 {
-    public partial class DynamicSearchFilterPage : ComponentBase
+    public partial class VacantJobPage : ComponentBase
     {
         [Inject] private IRefreshProvider RefreshProvider { get; set; }
-        [Inject] protected IDynamicSearchFilterService DynamicSearchFilterService { get; set; }
+        [Inject] protected IVacantJobService VacantJobService { get; set; }
+        [Inject] protected ICompanyService CompanyService { get; set; }
 
-        private DynamicSearchFilterModel _dynamicSearchFilterModel = new();
-        private IEnumerable<IDynamicSearchFilter> _dynamicSearchFilters;
-        private IDynamicSearchFilter _dynamicSearchFilter;
+        private VacantJobModel _vacantJobModel = new();
+        private IEnumerable<IVacantJob> _vacantJobs;
+        private IEnumerable<ICompany> _companies;
+        private IVacantJob _vacantJob;
 
-        private int _dynamicSearchFilterId = 0;
+        private int _vacantJobId = 0;
         private bool dataIsLoading = true;
 
         protected override async Task OnInitializedAsync()
@@ -33,11 +37,13 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
             dataIsLoading = true;
             try
             {
-                var dynamicSearchFilterTask = DynamicSearchFilterService.GetAllAsync();
+                var jobPageTask = VacantJobService.GetAllAsync();
+                var companyTask = CompanyService.GetAllAsync();
 
-                await Task.WhenAll(dynamicSearchFilterTask);
+                await Task.WhenAll(jobPageTask, companyTask);
 
-                _dynamicSearchFilters = dynamicSearchFilterTask.Result;
+                _vacantJobs = jobPageTask.Result;
+                _companies = companyTask.Result;
             }
             finally
             {
@@ -48,21 +54,20 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
 
         private void ConfirmationWindow(int id)
         {
-            _dynamicSearchFilterId = id;
+            _vacantJobId = id;
         }
 
         private async Task OnClick_EditLink(int id)
         {
             try
             {
-                _dynamicSearchFilter = await DynamicSearchFilterService.GetByIdAsync(id);
+                _vacantJob = await VacantJobService.GetByIdAsync(id);
 
-                _dynamicSearchFilterModel = new DynamicSearchFilterModel
+                _vacantJobModel = new VacantJobModel
                 {
-                    Id = _dynamicSearchFilter.Id,
-                    CategoryId = _dynamicSearchFilter.CategoryId,
-                    Specializationid = _dynamicSearchFilter.SpecializationId,
-                    Key = _dynamicSearchFilter.Key
+                    Id = _vacantJob.Id,
+                    CompanyId = _vacantJob.CompanyId,
+                    URL = _vacantJob.URL
                 };
             }
             catch (Exception ex)
@@ -79,19 +84,21 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
         {
             try
             {
-                var filters = await DynamicSearchFilterService.GetAllAsync();
+                var links = await VacantJobService.GetAllAsync();
 
-                if (filters == null)
+                if (links == null)
                 {
                     return;
                 }
 
-                _dynamicSearchFilters = filters;
+                _vacantJobs = links;
             }
             finally
             {
                 StateHasChanged();
             }
         }
+
+
     }
 }
