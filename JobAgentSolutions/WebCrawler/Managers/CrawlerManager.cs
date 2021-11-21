@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using WebCrawler.DataScrappers;
 using WebCrawler.DataSorters;
 
@@ -30,17 +31,18 @@ namespace WebCrawler.Managers
             _crawler.SetCrawlerUrl(url, pageDefinition);
         }
          
+        public List<string> GetLinksFound()
+        {
+            return _sorter.LinksFromSite;
+        }
+
         public void StarCrawler()
         {
             var hmltdocument = _crawler.Crawl();
             var htmlArray = _sorter.GetHtmlArray(hmltdocument);
 
             _sorter.HtmlArraySplitOn('a', htmlArray);
-
-            foreach (var item in _sorter.LinksFromSite)
-            {
-                Console.WriteLine(item);
-            }
+            
         }
 
     }
