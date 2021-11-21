@@ -57,11 +57,21 @@ namespace WebCrawler.Managers
             return _sorter.LinksFromSite;
         }
         
+
+
+
+
         /// <summary>
         /// Starts the crawler loops through all links provided then stops
         /// </summary>
         public void StarCrawler()
         {
+            foreach (var url in _urlsToCrawl)
+            {
+                _crawler.SetCrawlerUrl(url, UrlCutter.GetPageDefinitionFromUrl(url));
+            }
+
+
             var hmltdocument = _crawler.Crawl();
             var htmlArray = _sorter.GetHtmlArray(hmltdocument);
 

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Linq;
 using WebCrawler.DataScrappers;
+using static WebCrawler.DataScrappers.CrawlerSettings;
 
 namespace WebCrawler.DataSorters
 {
     public static class UrlCutter
     {
         static char[] urlSymbolsToRemove = { '/', '.' };
-        public static string GetPageDefinitionFromUrl(string url)
+        public static PageDefinitions GetPageDefinitionFromUrl(string url)
         {
             string result = null;
             // Splits the url into an array with base url components
@@ -20,21 +21,21 @@ namespace WebCrawler.DataSorters
                 if (item.Split(urlSymbolsToRemove[1]).Length > 1)
                 {
                     // Uses an enum with fixed base values to see if the base url is known by the crawler
-                    foreach (var pageDefinition in Enum.GetNames(typeof(CrawlerSettings.PageDefinitions)))
+                    foreach (var pageDefinition in Enum.GetNames(typeof(PageDefinitions)))
                     {
                         // Split to find the base url 
                         // so if the string array contains the page definition it will return it
                         result = item.Split(urlSymbolsToRemove[1]).FirstOrDefault(urlbase => urlbase.Contains(pageDefinition));
                         if(result is not null)
                         {
-                            return result;
+                            return Enum.GetNames(typeof(PageDefinitions)).Cast<PageDefinitions>().FirstOrDefault(x => x.ToString().Contains(result));
                         }
 
                     }
                 }
             }
 
-            return result;
+            throw new Exception("Nothing found");
         }
     }
 }
