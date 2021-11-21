@@ -2,6 +2,7 @@
 using OpenQA.Selenium.Chrome;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace WebCrawler.DataScrappers
 {
@@ -22,24 +23,28 @@ namespace WebCrawler.DataScrappers
             CrawlerSettings.SetPageDefinitions(pageDefinition);
         }
 
-        public HtmlDocument Crawl()
+        public async Task<HtmlDocument> Crawl()
         {
             HtmlDocument htmlDocument = new HtmlDocument();
-
-            if (!string.IsNullOrEmpty(CrawlerSettings.Url)) 
+            Task<HtmlDocument> task = new Task<HtmlDocument>(() => 
             {
-                _driver = new ChromeDriver(Environment.CurrentDirectory);
-                _driver.Navigate().GoToUrl(CrawlerSettings.Url);
+                if (!string.IsNullOrEmpty(CrawlerSettings.Url))
+                {
+                    _driver = new ChromeDriver(Environment.CurrentDirectory);
+                    _driver.Navigate().GoToUrl(CrawlerSettings.Url);
 
-                Thread.Sleep(1000);
-                var document = _driver.FindElements(OpenQA.Selenium.By.Id(CrawlerSettings.GetPageKeyWordForPage().ToString()));
+                    Thread.Sleep(1000);
+                    var document = _driver.FindElements(OpenQA.Selenium.By.Id(CrawlerSettings.GetPageKeyWordForPage().ToString()));
 
-                htmlDocument.LoadHtml(document[0].GetAttribute("innerHTML"));
-                _driver.Close();
-            }
+                    htmlDocument.LoadHtml(document[0].GetAttribute("innerHTML"));
+                    _driver.Close();
+                }
 
-            return htmlDocument;
+                return htmlDocument;
+
+            });
+
+            return await task;
         }
-
     }
 }

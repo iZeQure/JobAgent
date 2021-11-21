@@ -58,25 +58,21 @@ namespace WebCrawler.Managers
         }
         
 
-
-
-
         /// <summary>
         /// Starts the crawler loops through all links provided then stops
         /// </summary>
-        public void StarCrawler()
+        public async void StarCrawler()
         {
             foreach (var url in _urlsToCrawl)
             {
                 _crawler.SetCrawlerUrl(url, UrlCutter.GetPageDefinitionFromUrl(url));
+
+                var hmltdocument = await ((Crawler)_crawler).Crawl();
+                var htmlArray = _sorter.GetHtmlArray(hmltdocument);
+                
+                // Find some logic to go through the links and add them to url list
+                var links =  _sorter.HtmlArraySplitOn('a', htmlArray);
             }
-
-
-            var hmltdocument = _crawler.Crawl();
-            var htmlArray = _sorter.GetHtmlArray(hmltdocument);
-
-            _sorter.HtmlArraySplitOn('a', htmlArray);
-            
         }
 
     }
