@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31402.337
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JobAgentClassLibrary", "JobAgentClassLibrary\JobAgentClassLibrary.csproj", "{7D34F2CF-513C-4EAF-AFC8-F60530679891}"
 EndProject
@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JobAgentClassLibraryTests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWebsite", "BlazorWebsite\BlazorWebsite.csproj", "{78258704-60F1-4945-8665-5E2CC79EADDC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebCrawler", "WebCrawler\WebCrawler.csproj", "{3526452B-A844-4D1B-B2AB-E901222C299A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebCrawler", "WebCrawler\WebCrawler.csproj", "{3526452B-A844-4D1B-B2AB-E901222C299A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebCrawlerTests", "WebCrawlerTests\WebCrawlerTests.csproj", "{C1DCCF73-4250-453F-A34B-49C331ED891B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{3526452B-A844-4D1B-B2AB-E901222C299A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3526452B-A844-4D1B-B2AB-E901222C299A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3526452B-A844-4D1B-B2AB-E901222C299A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1DCCF73-4250-453F-A34B-49C331ED891B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1DCCF73-4250-453F-A34B-49C331ED891B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1DCCF73-4250-453F-A34B-49C331ED891B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1DCCF73-4250-453F-A34B-49C331ED891B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
