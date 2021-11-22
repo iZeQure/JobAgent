@@ -1,9 +1,6 @@
 ﻿using JobAgentClassLibrary.Loggings.Entities;
 using JobAgentClassLibrary.Loggings.Repositories;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Loggings
@@ -16,7 +13,6 @@ namespace JobAgentClassLibrary.Loggings
         {
             _repository = repository;
         }
-
 
         public async Task<ILog> CreateAsync(ILog entity)
         {

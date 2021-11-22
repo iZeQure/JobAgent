@@ -28,11 +28,11 @@ AdminContext.User.IsInRole("Udvikler"))
                 </li>
 
                 @*<li class="nav-item">
-                    <NavLink class="nav-link" href="/admin/settings/contracts">
-                        <span><i class="fas fa-file-signature"></i></span>
-                        Kontrakter
-                    </NavLink>
-                </li>*@
+                        <NavLink class="nav-link" href="/admin/settings/contracts">
+                            <span><i class="fas fa-file-signature"></i></span>
+                            Kontrakter
+                        </NavLink>
+                    </li>*@
 
                 <li class="nav-item">
                     <NavLink class="nav-link" href="/admin/settings/companies">
@@ -75,6 +75,7 @@ AdminContext.User.IsInRole("Udvikler"))
                         Min Bruger
                     </NavLink>
                 </li>
+
                 <li class="nav-item">
                     <NavLink class="nav-link" href="/admin/account/change-password">
                         <span><i class="fas fa-user-lock"></i></span>
@@ -100,11 +101,11 @@ AdminContext.User.IsInRole("Udvikler"))
                 </li>
 
                 @*<li class="nav-item">
-                    <NavLink class="nav-link" href="/admin/robot/settings/job-pages">
-                        <span><i class="fas fa-address-book"></i></span>
-                        Job Sider
-                    </NavLink>
-                </li>*@
+                        <NavLink class="nav-link" href="/admin/robot/settings/job-pages">
+                            <span><i class="fas fa-address-book"></i></span>
+                            Job Sider
+                        </NavLink>
+                    </li>*@
 
                 <li class="nav-item">
                     <NavLink class="nav-link" href="/admin/robot/settings/dynamic/search-filter">
@@ -138,15 +139,22 @@ AdminContext.User.IsInRole("Udvikler"))
 AdminContext.User.IsInRole("Udvikler"))
                 {
                     @*<li class="nav-item">
-                        <NavLink class="nav-link" href="/admin/system/settings/user-access">
-                            <span><i class="fas fa-low-vision"></i></span>
-                            Bruger Rettigheder
-                        </NavLink>
-                    </li>*@
+                            <NavLink class="nav-link" href="/admin/system/settings/user-access">
+                                <span><i class="fas fa-low-vision"></i></span>
+                                Bruger Rettigheder
+                            </NavLink>
+                        </li>*@
                 }
                 @if (AdminContext.User.IsInRole("Udvikler"))
                 {
 
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="/admin/system/settings/view-Dblog">
+                            <span><i class="fas fa-box"></i></span>
+                            Database Log
+                        </NavLink>
+                    </li>
+                    
                     <li class="nav-item">
                         <NavLink class="nav-link" href="/admin/system/settings/view-log">
                             <span><i class="fas fa-box"></i></span>
@@ -155,11 +163,11 @@ AdminContext.User.IsInRole("Udvikler"))
                     </li>
 
                     @*<li class="nav-item">
-                        <NavLink class="nav-link" href="/admin/system/settings/versioning">
-                            <span><i class="fas fa-code-branch"></i></span>
-                            Versionering
-                        </NavLink>
-                    </li>*@
+                            <NavLink class="nav-link" href="/admin/system/settings/versioning">
+                                <span><i class="fas fa-code-branch"></i></span>
+                                Versionering
+                            </NavLink>
+                        </li>*@
                 }
             </ul>
         }

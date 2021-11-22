@@ -24,6 +24,48 @@ namespace JobAgentClassLibrary.Loggings.Repositories
             _factory = factory;
         }
 
+        private int DetermineSeverityId(ILog entity)
+        {
+            int severityId = 0;
+
+            switch (entity.LogSeverity)
+            {
+                case LogSeverity.EMERGENCY:
+                    severityId = 1;
+                    break;
+
+                case LogSeverity.ALERT:
+                    severityId = 2;
+                    break;
+
+                case LogSeverity.CRITICAL:
+                    severityId = 3;
+                    break;
+
+                case LogSeverity.ERROR:
+                    severityId = 4;
+                    break;
+
+                case LogSeverity.WARNING:
+                    severityId = 5;
+                    break;
+
+                case LogSeverity.NOTIFICATION:
+                    severityId = 6;
+                    break;
+
+                case LogSeverity.INFO:
+                    severityId = 7;
+                    break;
+
+                case LogSeverity.DEBUG:
+                    severityId = 8;
+                    break;
+            }
+
+            return severityId;
+        }
+
 
         public async Task<ILog> CreateAsync(ILog entity)
         {
@@ -34,7 +76,7 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                 var proc = "[JA.spCreateLog]";
                 var values = new
                 {
-                    @severrityId = entity.LogSeverity,
+                    @severityId = DetermineSeverityId(entity),
                     @currentTime = entity.CreatedDateTime,
                     @createdBy = entity.CreatedBy,
                     @action = entity.Action,
@@ -51,7 +93,7 @@ namespace JobAgentClassLibrary.Loggings.Repositories
 
         public async Task<List<ILog>> GetAllAsync()
         {
-            List<ILog> vacantJobs = new();
+            List<ILog> logs = new();
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
@@ -63,7 +105,7 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                 {
                     foreach (var result in queryResult)
                     {
-                        ILog log = (ILog)_factory.CreateEntity(
+                        ILog log = (DbLog)_factory.CreateEntity(
                             nameof(DbLog),
                             result.LogId,
                             result.LogSeverity,
@@ -72,12 +114,12 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                             result.LogCreatedBy,
                             result.LogCreatedDateTime);
 
-                        vacantJobs.Add(log);
+                        logs.Add(log);
                     }
                 }
             }
 
-            return vacantJobs;
+            return logs;
         }
 
         public async Task<ILog> GetByIdAsync(int id)
@@ -85,10 +127,10 @@ namespace JobAgentClassLibrary.Loggings.Repositories
             ILog log = null;
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
-                var proc = "[JA.spGetLogId]";
+                var proc = "[JA.spGetLogById]";
                 var values = new
                 {
-                    @vacantJobId = id
+                    @logId = id
                 };
 
                 var queryResult = await conn.QuerySingleOrDefaultAsync<LogInformation>(proc, values, commandType: CommandType.StoredProcedure);

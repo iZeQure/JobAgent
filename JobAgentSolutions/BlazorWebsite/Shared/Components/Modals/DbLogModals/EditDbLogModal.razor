@@ -1,0 +1,91 @@
+﻿@attribute [Authorize(Roles = "Udvikler")]
+
+<div class="modal fade" id="ModalEditDbLog" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+
+            @if (_isLoading)
+            {
+                <MessageAlert IsLoading="_isLoading" Message="Indlæser data. Vent venligst.." Alert="MessageAlert.AlertType.Info" />
+
+            }
+            <MessageAlert Message="@(_errorMessage)" Alert="MessageAlert.AlertType.Error" />
+
+            @if (Model == null)
+            {
+                <MessageAlert Alert="MessageAlert.AlertType.Warning" FullWidth="true" Message="Vent venligst, henter detailjer på stillingsopslag!" />
+            }
+            else
+            {
+                <EditForm Model="Model" OnValidSubmit="OnValidSubmit_EditJobVacancy">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Rediger Stillingsopslag :</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col">
+                                <label for="regInputMessage" class="admin-label">Log besked :</label>
+                                <input id="regInputMessage" class="form-control form-control-sm" type="text" @bind="Model.Message" />
+                                <ValidationMessage For="@(() => Model.Message)" />
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="row">
+                            <div class="col">
+                                <label for="regInputAction" class="admin-label">Log Aktion :</label>
+                                <input id="regInputAction" class="form-control form-control-sm" type="text" @bind="Model.Action" />
+                                <ValidationMessage For="@(() => Model.Action)" />
+                            </div>
+                        </div>
+
+                        <hr />
+
+
+                        <div class="row">
+                            <div class="col">
+                                <label for="regInputSeverity" class="admin-label col-form-label col-form-label-sm">Log Type :</label>
+                                <select id="regInputSeverity" class="form-control form-control-sm" @bind="Model.LogSeverity">
+                                    <option value="0" selected>---Vælg den log type der passer til denne log---</option>
+                                    @foreach (var severity in _logSeverities)
+                                    {
+                                        <option value="@severity">@severity</option>
+                                    }
+                                </select>
+                                <ValidationMessage For="@(() => Model.LogSeverity)" />
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="row">
+                            <div class="col">
+                                <label for="regInputCreatedBy" class="admin-label">Bruger Email :</label>
+                                <input id="regInputCreatedBy" class="form-control form-control-sm" type="text" @bind="Model.CreatedBy" />
+                                <ValidationMessage For="@(() => Model.CreatedBy)" />
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="row">
+                            <div class="col">
+                                <label for="regInputCreatedBy" class="admin-label">Oprettelses Tid :</label>
+                                <input id="regInputCreatedBy" class="form-control form-control-sm" type="datetime" @bind="Model.CreatedDateTime" />
+                                <ValidationMessage For="@(() => Model.CreatedDateTime)" />
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="OnClick_CancelRequest" @onclick:preventDefault>Annuller</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@(_isProcessing)">Gem ændringer</button>
+                    </div>
+                </EditForm>
+            }
+        </div>
+    </div>
+</div>

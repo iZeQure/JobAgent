@@ -18,14 +18,8 @@ namespace JobAgentClassLibrary.Loggings.Factory
                 Action = ParseValue<string>(entityValues[3]),
                 CreatedBy = ParseValue<string>(entityValues[4]),
                 CreatedDateTime = ParseValue<DateTime>(entityValues[5])
-
             },
             _ => throw new ArgumentOutOfRangeException(nameof(paramName), paramName, "Couldn't create type. Out of range.")
         };
-
-        internal ILog CreateEntity(string v, object logId, object logSeverity, object logMessage, object logAction, object logCreatedBy, object logCreatedDateTime)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -9,7 +9,6 @@ namespace BlazorWebsite.Data.FormModels
 {
     public class LogModel
     {
-        [Required]
         public int Id { get; set; }
 
         [Required]
@@ -18,10 +17,8 @@ namespace BlazorWebsite.Data.FormModels
         [Required]
         public string Action { get; set; }
         
-        [Required]
         public string CreatedBy { get; set; }
         
-        [Required]
         public DateTime CreatedDateTime { get; set; }
         
         [Required]
