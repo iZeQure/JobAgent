@@ -11,7 +11,7 @@ namespace WebCrawler.Managers
         private IHtmlSorter _sorter;
         private ICrawler _crawler;
 
-        private List<string> _urlsToCrawl;
+        private List<List<string>> _urlsToCrawl;
 
         /// <summary>
         /// Gets links to crawl from db
@@ -26,7 +26,7 @@ namespace WebCrawler.Managers
             _crawler = crawler;
             _sorter = sorter;
             ((Crawler)_crawler).SetCrawlerSettings(new CrawlerSettings());
-            _urlsToCrawl = new List<string>();
+            _urlsToCrawl = new List<List<string>>();
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace WebCrawler.Managers
         public void SetUrl(string url, CrawlerSettings.PageDefinitions pageDefinition)
         {
             _crawler.SetCrawlerUrl(url, pageDefinition);
-            _urlsToCrawl.Add(url);
+            _urlsToCrawl.Add(new List<string>() { url });
         }
 
         /// <summary>
@@ -66,15 +66,19 @@ namespace WebCrawler.Managers
         /// </summary>
         public async Task<bool> StarCrawler()
         {
-            foreach (var url in _urlsToCrawl)
+            foreach (var urllist in _urlsToCrawl)
             {
-                _crawler.SetCrawlerUrl(url, UrlCutter.GetPageDefinitionFromUrl(url));
+                foreach (var url in urllist)
+                {
+                    _crawler.SetCrawlerUrl(url, UrlCutter.GetPageDefinitionFromUrl(url));
 
-                var hmltdocument = await ((Crawler)_crawler).Crawl();
-                var htmlArray = _sorter.GetHtmlArray(hmltdocument);
+                    var hmltdocument = await ((Crawler)_crawler).Crawl();
+                    var htmlArray = _sorter.GetHtmlArray(hmltdocument);
 
-                // Find some logic to go through the links and add them to url list
-                var links = _sorter.HtmlArraySplitOn('a', htmlArray);
+                    // Find some logic to go through the links and add them to url list
+                    var links = _sorter.HtmlArraySplitOn('a', htmlArray);
+                }
+                
             }
 
             return await Task.FromResult(true);
