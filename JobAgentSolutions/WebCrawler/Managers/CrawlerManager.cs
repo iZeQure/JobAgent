@@ -24,6 +24,7 @@ namespace WebCrawler.Managers
         {
             _crawler = crawler;
             _sorter = sorter;
+            ((Crawler)_crawler).SetCrawlerSettings(new CrawlerSettings());
             _urlsToCrawl = new List<string>();
         }
 
