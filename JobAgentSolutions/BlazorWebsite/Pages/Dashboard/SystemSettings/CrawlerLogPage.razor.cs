@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Dashboard.SystemSettings
 {
-    public partial class LogPage
+    public partial class CrawlerLogPage
     {
         [Inject] private IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected ILogService LogService { get; set; }
