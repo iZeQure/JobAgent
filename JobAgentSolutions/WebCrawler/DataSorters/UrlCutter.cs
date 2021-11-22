@@ -28,7 +28,7 @@ namespace WebCrawler.DataSorters
                         result = item.Split(urlSymbolsToRemove[1]).FirstOrDefault(urlbase => urlbase.Contains(pageDefinition));
                         if(result is not null)
                         {
-                            return Enum.GetNames(typeof(PageDefinitions)).Cast<PageDefinitions>().FirstOrDefault(x => x.ToString().Contains(result));
+                            return Enum.GetValues(typeof(PageDefinitions)).Cast<PageDefinitions>().FirstOrDefault(x => x.ToString().Contains(result));
                         }
 
                     }

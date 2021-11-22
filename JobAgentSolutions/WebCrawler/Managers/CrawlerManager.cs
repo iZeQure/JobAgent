@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using WebCrawler.DataScrappers;
 using WebCrawler.DataSorters;
 
@@ -46,6 +47,7 @@ namespace WebCrawler.Managers
         public void SetUrl(string url, CrawlerSettings.PageDefinitions pageDefinition)
         {
             _crawler.SetCrawlerUrl(url, pageDefinition);
+            _urlsToCrawl.Add(url);
         }
 
         /// <summary>
@@ -57,12 +59,12 @@ namespace WebCrawler.Managers
         {
             return _sorter.LinksFromSite;
         }
-        
+
 
         /// <summary>
         /// Starts the crawler loops through all links provided then stops
         /// </summary>
-        public async void StarCrawler()
+        public async Task<bool> StarCrawler()
         {
             foreach (var url in _urlsToCrawl)
             {
@@ -70,10 +72,12 @@ namespace WebCrawler.Managers
 
                 var hmltdocument = await ((Crawler)_crawler).Crawl();
                 var htmlArray = _sorter.GetHtmlArray(hmltdocument);
-                
+
                 // Find some logic to go through the links and add them to url list
-                var links =  _sorter.HtmlArraySplitOn('a', htmlArray);
+                var links = _sorter.HtmlArraySplitOn('a', htmlArray);
             }
+
+            return await Task.FromResult(true);
         }
 
     }

@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using OpenQA.Selenium.Chrome;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,8 +10,8 @@ namespace WebCrawler.DataScrappers
     public class Crawler : ICrawler
     {
         private ChromeDriver _driver;
-        public CrawlerSettings CrawlerSettings { get; private set; }     
-        
+        public CrawlerSettings CrawlerSettings { get; private set; }
+
         public void SetCrawlerSettings(CrawlerSettings settings)
         {
             CrawlerSettings = settings;
@@ -25,26 +26,36 @@ namespace WebCrawler.DataScrappers
 
         public async Task<HtmlDocument> Crawl()
         {
-            HtmlDocument htmlDocument = new HtmlDocument();
-            Task<HtmlDocument> task = new Task<HtmlDocument>(() => 
+            Task<HtmlDocument> task = null;
+            try
             {
-                if (!string.IsNullOrEmpty(CrawlerSettings.Url))
+                HtmlDocument htmlDocument = new HtmlDocument();
+                task = Task.Factory.StartNew(() =>
                 {
-                    _driver = new ChromeDriver(Environment.CurrentDirectory);
-                    _driver.Navigate().GoToUrl(CrawlerSettings.Url);
+                    if (!string.IsNullOrEmpty(CrawlerSettings.Url))
+                    {
+                        _driver = new ChromeDriver(Environment.CurrentDirectory);
+                        _driver.Navigate().GoToUrl(CrawlerSettings.Url);
 
-                    Thread.Sleep(1000);
-                    var document = _driver.FindElements(OpenQA.Selenium.By.Id(CrawlerSettings.GetPageKeyWordForPage().ToString()));
+                        Thread.Sleep(1000);
+                        var document = _driver.FindElements(OpenQA.Selenium.By.Id(CrawlerSettings.GetPageKeyWordForPage().ToString()));
 
-                    htmlDocument.LoadHtml(document[0].GetAttribute("innerHTML"));
-                    _driver.Close();
-                }
+                        htmlDocument.LoadHtml(document[0].GetAttribute("innerHTML"));
+                        _driver.Close();
+                    }
 
-                return htmlDocument;
+                    return htmlDocument;
 
-            });
+                });
 
-            return await task;
+            }
+            catch (Exception ex)
+            {
+                Debug.Print(ex.Message);
+            }
+
+            return await Task.FromResult(task.Result);
+
         }
     }
 }
