@@ -57,6 +57,7 @@ else
                             <th scope="col">LogSeveriy</th>
                             <th scope="col">CreatedBy</th>
                             <th scope="col">CreatedDateTime</th>
+                            <th scope="col">System</th>
                             <th scope="col"></th>
                             <th scope="col"></th>
                         </tr>
@@ -72,6 +73,7 @@ else
                                 <td>@(log.LogSeverity)</td>
                                 <td>@(log.CreatedBy)</td>
                                 <td>@(log.CreatedDateTime)</td>
+                                <td>@(log.LogType)</td>
 
                                 <td>
                                     <span data-bs-toggle="modal" data-bs-target="#ModalEditDbLog" @onclick="@(mouseEvent => OnClick_EditLink(log.Id))">

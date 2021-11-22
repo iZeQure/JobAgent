@@ -80,7 +80,8 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                     @currentTime = entity.CreatedDateTime,
                     @createdBy = entity.CreatedBy,
                     @action = entity.Action,
-                    @message = entity.Message
+                    @message = entity.Message,
+                    @logType = entity.LogType
                 };
 
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
@@ -112,7 +113,8 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                             result.LogMessage,
                             result.LogAction,
                             result.LogCreatedBy,
-                            result.LogCreatedDateTime);
+                            result.LogCreatedDateTime,
+                            result.LogType);
 
                         logs.Add(log);
                     }
@@ -144,7 +146,8 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                            queryResult.LogMessage,
                            queryResult.LogAction,
                            queryResult.LogCreatedBy,
-                           queryResult.LogCreatedDateTime);
+                           queryResult.LogCreatedDateTime,
+                           queryResult.LogType);
                 }
 
             }
@@ -184,7 +187,8 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                     @createdDateTime = entity.CreatedDateTime,
                     @createdBy = entity.CreatedBy,
                     @action = entity.Action,
-                    @message = entity.Message
+                    @message = entity.Message,
+                    @logType = entity.LogType
                 };
 
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);

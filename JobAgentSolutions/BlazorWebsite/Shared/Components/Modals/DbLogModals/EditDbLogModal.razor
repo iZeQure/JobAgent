@@ -69,6 +69,22 @@
                             </div>
                         </div>
 
+                        <hr />
+
+                        <div class="row">
+                            <div class="col">
+                                <label for="regInputType" class="admin-label col-form-label col-form-label-sm">System :</label>
+                                <select id="regInputType" class="form-control form-control-sm" @bind="Model.LogType">
+                                    <option value="0" selected>---Vælg det gældene system for denne log---</option>
+                                    @foreach (var type in _logTypes)
+                                    {
+                                        <option value="@type">@type</option>
+                                    }
+                                </select>
+                                <ValidationMessage For="@(() => Model.LogType)" />
+                            </div>
+                        </div>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="OnClick_CancelRequest" @onclick:preventDefault>Annuller</button>

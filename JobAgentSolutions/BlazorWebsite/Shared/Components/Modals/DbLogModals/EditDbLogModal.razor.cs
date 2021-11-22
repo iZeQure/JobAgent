@@ -19,6 +19,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
         [Inject] protected ILogService LogService { get; set; }
 
         private List<LogSeverity> _logSeverities = new();
+        private List<LogType> _logTypes = new();
         private IEnumerable<ILog> _logs;
 
         private string _errorMessage = "";
@@ -31,6 +32,11 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
             foreach (LogSeverity item in Enum.GetValues(typeof(LogSeverity)))
             {
                 _logSeverities.Add(item);
+            }
+
+            foreach (LogType type in Enum.GetValues(typeof(LogType)))
+            {
+                _logTypes.Add(type);
             }
 
             await LoadModalInformationAsync();
@@ -72,7 +78,8 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
                     Message = Model.Message,
                     LogSeverity = Model.LogSeverity,
                     CreatedBy = Model.CreatedBy,
-                    CreatedDateTime = Model.CreatedDateTime
+                    CreatedDateTime = Model.CreatedDateTime,
+                    LogType = Model.LogType
                 };
 
                 bool isUpdated = false;

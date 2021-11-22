@@ -16,12 +16,12 @@ namespace BlazorWebsite.Data.FormModels
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        public bool IsValidEmail(string email)
+        public bool IsValidEmail(string Email)
         {
             try
             {
-                var addr = new MailAddress(email);
-                return addr.Address == email;
+                var addr = new MailAddress(Email);
+                return addr.Address == Email;
             }
             catch
             {

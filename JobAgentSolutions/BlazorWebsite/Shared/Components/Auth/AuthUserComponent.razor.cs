@@ -1,4 +1,5 @@
-﻿using BlazorWebsite.Data.Providers;
+﻿using BlazorWebsite.Data.FormModels;
+using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Users;
 using JobAgentClassLibrary.Common.Users.Factory;
 using Microsoft.AspNetCore.Components;
@@ -33,7 +34,7 @@ namespace BlazorWebsite.Shared.Components.Auth
 
             try
             {
-                if (!_authUserModel.IsValidEmail())
+                if (!_authUserModel.IsValidEmail(_authUserModel.Email))
                 {
                     _message = "Fejl, den indtastede email er ikke gyldig.";
                     return;
@@ -60,33 +61,6 @@ namespace BlazorWebsite.Shared.Components.Auth
             finally
             {
                 _processignAuthRequest = false;
-            }
-        }
-    }
-
-    public class AuthUserModel
-    {
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Email adresse er påkrævet.")]
-        [StringLength(255, ErrorMessage = "Email er for long (255 karakter begrænse).")]
-        [EmailAddress(ErrorMessage = "Indtast en gyldig email adresse.")]
-        [DataType(DataType.EmailAddress)]
-        public string Email { get; set; }
-
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Adgangskode er påkrævet.")]
-        [StringLength(255)]
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
-
-        public bool IsValidEmail()
-        {
-            try
-            {
-                var addr = new MailAddress(Email);
-                return addr.Address == Email;
-            }
-            catch
-            {
-                return false;
             }
         }
     }

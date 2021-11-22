@@ -24,5 +24,6 @@ namespace JobAgentClassLibrary.Loggings.Entities.EntityMaps
         public string LogAction { get; set; }
         public string LogMessage { get; set; }
         public LogSeverity LogSeverity { get; set; }
+        public LogType LogType { get; set; }
     }
 }

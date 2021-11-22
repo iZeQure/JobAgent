@@ -17,7 +17,8 @@ namespace JobAgentClassLibrary.Loggings.Factory
                 Message = ParseValue<string>(entityValues[2]),
                 Action = ParseValue<string>(entityValues[3]),
                 CreatedBy = ParseValue<string>(entityValues[4]),
-                CreatedDateTime = ParseValue<DateTime>(entityValues[5])
+                CreatedDateTime = ParseValue<DateTime>(entityValues[5]),
+                LogType = ParseValue<LogType>(entityValues[6])
             },
             _ => throw new ArgumentOutOfRangeException(nameof(paramName), paramName, "Couldn't create type. Out of range.")
         };

@@ -24,5 +24,8 @@ namespace BlazorWebsite.Data.FormModels
         [Required]
         public LogSeverity LogSeverity { get; set; }
 
+        [Required]
+        public LogType LogType { get; set; }
+
     }
 }

@@ -25,6 +25,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
         private LogModel _logModel = new();
         private IEnumerable<ILog> _logs;
         private List<LogSeverity> _logSeverities = new();
+        private List<LogType> _logTypes = new();
         private EditContext _editContext;
 
         private string _errorMessage = "";
@@ -37,9 +38,14 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
             _editContext = new(_logModel);
             _editContext.AddDataAnnotationsValidation();
 
-            foreach (LogSeverity item in Enum.GetValues(typeof(LogSeverity)))
+            foreach (LogSeverity severity in Enum.GetValues(typeof(LogSeverity)))
             {
-                _logSeverities.Add(item);
+                _logSeverities.Add(severity);
+            }
+
+            foreach(LogType type in Enum.GetValues(typeof(LogType)))
+            {
+                _logTypes.Add(type);
             }
 
             var session = await AuthState;
@@ -97,7 +103,8 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
                     Message = _logModel.Message,
                     LogSeverity = _logModel.LogSeverity,
                     CreatedBy = _sessionUserEmail,
-                    CreatedDateTime = DateTime.Now
+                    CreatedDateTime = DateTime.Now,
+                    LogType = _logModel.LogType
                 };
 
                 bool isCreated = false;
