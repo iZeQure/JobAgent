@@ -4,6 +4,9 @@ using JobAgentClassLibrary.Common.VacantJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using WebCrawler.DataScrappers;
+using WebCrawler.DataSorters;
+using WebCrawler.Managers;
 
 namespace WebCrawler
 {
@@ -38,9 +41,13 @@ namespace WebCrawler
 
         private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
+        
             services.AddSingleton<IJobPageService, JobPageService>();
             services.AddSingleton<IVacantJobService, VacantJobService>();
-
+            services.AddSingleton<ICrawler, Crawler>();
+            services.AddSingleton<IHtmlSorter, HtmlSorter>();
+            services.AddSingleton<CrawlerManager>();
+            
         }
     }
 }

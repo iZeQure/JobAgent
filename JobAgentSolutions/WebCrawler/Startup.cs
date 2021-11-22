@@ -1,22 +1,23 @@
 ﻿using Microsoft.Extensions.Logging;
 using WebCrawler.DataScrappers;
+using WebCrawler.Managers;
 
 namespace WebCrawler
 {
     public class Startup
     {
         private readonly ILogger<Startup> _logger;
-        private readonly ICrawler _crawler;
+        private readonly CrawlerManager _crawlerManager;
 
-        public Startup(ILogger<Startup> logger, ICrawler crawler)
+        public Startup(ILogger<Startup> logger, CrawlerManager manager)
         {
-            _logger = logger;
-            _crawler = crawler;
+            _crawlerManager = manager;
         }
 
         public void StartCrawler()
         {
-            _crawler.Crawl();   
+            _crawlerManager.SetUrl("https://pms.praktikpladsen.dk/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20programmering", CrawlerSettings.PageDefinitions.praktikpladsen);
+            _crawlerManager.StarCrawler();
         }
     }
 }
