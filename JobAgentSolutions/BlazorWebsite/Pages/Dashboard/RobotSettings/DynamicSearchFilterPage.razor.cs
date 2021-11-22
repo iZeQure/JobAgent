@@ -1,5 +1,7 @@
 ﻿using BlazorWebsite.Data.FormModels;
 using BlazorWebsite.Data.Providers;
+using JobAgentClassLibrary.Common.Categories;
+using JobAgentClassLibrary.Common.Categories.Entities;
 using JobAgentClassLibrary.Common.Filters;
 using JobAgentClassLibrary.Common.Filters.Entities;
 using Microsoft.AspNetCore.Components;
@@ -12,10 +14,13 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
     public partial class DynamicSearchFilterPage : ComponentBase
     {
         [Inject] private IRefreshProvider RefreshProvider { get; set; }
+        [Inject] private ICategoryService CategoryService { get; set; }
         [Inject] protected IDynamicSearchFilterService DynamicSearchFilterService { get; set; }
 
         private DynamicSearchFilterModel _dynamicSearchFilterModel = new();
         private IEnumerable<IDynamicSearchFilter> _dynamicSearchFilters;
+        private IEnumerable<ICategory> _categories = new List<Category>();
+        private IEnumerable<ISpecialization> _specializations = new List<Specialization>();
         private IDynamicSearchFilter _dynamicSearchFilter;
 
         private int _dynamicSearchFilterId = 0;
@@ -34,10 +39,14 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
             try
             {
                 var dynamicSearchFilterTask = DynamicSearchFilterService.GetAllAsync();
+                var categoryTask = CategoryService.GetCategoriesAsync();
+                var specializationTask = CategoryService.GetSpecializationsAsync();
 
-                await Task.WhenAll(dynamicSearchFilterTask);
+                await Task.WhenAll(dynamicSearchFilterTask, categoryTask, specializationTask);
 
                 _dynamicSearchFilters = dynamicSearchFilterTask.Result;
+                _categories = categoryTask.Result;
+                _specializations = specializationTask.Result;
             }
             finally
             {

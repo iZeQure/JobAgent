@@ -43,8 +43,8 @@ else
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Søgeord</th>
-                            <th scope="col">CategoryId</th>
-                            <th scope="col">SpecializationId</th>
+                            <th scope="col">kategori</th>
+                            <th scope="col">Underkategori</th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
@@ -55,8 +55,21 @@ else
                             <tr id="@(jobPage.Id)">
                                 <th scope="row">@(jobPage.Id)</th>
                                 <td>@(jobPage.Key)</td>
-                                <td>@(jobPage.CategoryId)</td>
-                                <td>@(jobPage.SpecializationId)</td>
+                                @foreach (var category in _categories)
+                                {
+                                    if (jobPage.CategoryId == category.Id)
+                                    {
+                                        <td>@category.Name</td>
+                                    }
+                                }
+                                @foreach (var specialization in _specializations)
+                                {
+                                    if (jobPage.SpecializationId == specialization.Id)
+                                    {
+
+                                        <td>@(specialization.Name)</td>
+                                    }
+                                }
 
                                 <td>
                                     <span data-bs-toggle="modal" data-bs-target="#ModalEditDynamicSearchFilter" @onclick="@(mouseEvent => OnClick_EditLink(jobPage.Id))">
