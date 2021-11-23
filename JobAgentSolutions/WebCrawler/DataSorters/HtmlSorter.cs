@@ -51,6 +51,7 @@ namespace WebCrawler.DataSorters
                     LinksFromSite.Add(link);
                 }
             }
+
             return LinksFromSite;
         }
     }

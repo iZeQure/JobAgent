@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace WebCrawler.Models
 {
@@ -11,5 +7,10 @@ namespace WebCrawler.Models
         public string PageDefinition { get; set; }
         public string StartUrl { get; set; }
         public List<string> LinksFoundOnPage { get; set; }
+
+        public JobUrl()
+        {
+            LinksFoundOnPage = new List<string>();
+        }
     }
 }

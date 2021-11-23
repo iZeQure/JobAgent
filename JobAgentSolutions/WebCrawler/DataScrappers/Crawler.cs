@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using WebCrawler.DataSorters;
 
 namespace WebCrawler.DataScrappers
 {
@@ -41,7 +42,10 @@ namespace WebCrawler.DataScrappers
                         var document = _driver.FindElements(OpenQA.Selenium.By.Id(CrawlerSettings.GetPageKeyWordForPage().ToString()));
 
                         htmlDocument.LoadHtml(document[0].GetAttribute("innerHTML"));
+
                         _driver.Close();
+                        _driver.CloseDevToolsSession();
+                        _driver.Dispose();
                     }
 
                     return htmlDocument;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using WebCrawler.DataScrappers;
 using WebCrawler.DataSorters;
+using WebCrawler.Models;
 
 namespace WebCrawler.Managers
 {
@@ -10,8 +11,7 @@ namespace WebCrawler.Managers
     {
         private IHtmlSorter _sorter;
         private ICrawler _crawler;
-
-        private List<List<string>> _urlsToCrawl;
+        public JobUrl _jobUrl { get; set; }
 
         /// <summary>
         /// Gets links to crawl from db
@@ -26,7 +26,7 @@ namespace WebCrawler.Managers
             _crawler = crawler;
             _sorter = sorter;
             ((Crawler)_crawler).SetCrawlerSettings(new CrawlerSettings());
-            _urlsToCrawl = new List<List<string>>();
+            _jobUrl = new JobUrl();
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace WebCrawler.Managers
         public void SetUrl(string url, CrawlerSettings.PageDefinitions pageDefinition)
         {
             _crawler.SetCrawlerUrl(url, pageDefinition);
-            _urlsToCrawl.Add(new List<string>() { url });
+            _jobUrl.StartUrl = url;
         }
 
         /// <summary>
@@ -60,29 +60,44 @@ namespace WebCrawler.Managers
             return _sorter.LinksFromSite;
         }
 
-
         /// <summary>
         /// Starts the crawler loops through all links provided then stops
         /// </summary>
         public async Task<bool> StarCrawler()
         {
-            foreach (var urllist in _urlsToCrawl)
+            _crawler.SetCrawlerUrl(_jobUrl.StartUrl, UrlCutter.GetPageDefinitionFromUrl(_jobUrl.StartUrl));
+
+            // Starts the crawler
+            // returns the html
+            var hmltdocument = await ((Crawler)_crawler).Crawl();
+            
+            // Splits the html string for easier sort
+            var htmlArray = _sorter.GetHtmlArray(hmltdocument);
+            _jobUrl.LinksFoundOnPage = _sorter.GetLinksFromDocument(htmlArray);
+            
+            var sortedUrlList = UrlCutter.SortUrlPaths(_jobUrl.LinksFoundOnPage);
+            _jobUrl.LinksFoundOnPage = sortedUrlList;
+            if (sortedUrlList.Count > 0)
             {
-                foreach (var url in urllist)
+                foreach (var url in sortedUrlList)
                 {
-                    _crawler.SetCrawlerUrl(url, UrlCutter.GetPageDefinitionFromUrl(url));
+                    var baseUrl = UrlCutter.GetBaseUrl(_jobUrl.StartUrl);
+                    if(url.Split('.').Length <= 1 && !UrlCutter.CheckIfLinkLeadsToAFile(baseUrl + url) && !UrlCutter.CheckIfLinkExist(url))
+                    {
+                        _crawler.SetCrawlerUrl(baseUrl + url, UrlCutter.GetPageDefinitionFromUrl(baseUrl + url));
 
-                    var hmltdocument = await ((Crawler)_crawler).Crawl();
-                    var htmlArray = _sorter.GetHtmlArray(hmltdocument);
+                        hmltdocument = await ((Crawler)_crawler).Crawl();
+                        htmlArray = _sorter.GetHtmlArray(hmltdocument);
 
-                    // Find some logic to go through the links and add them to url list
-                    var links = _sorter.HtmlArraySplitOn('a', htmlArray);
+                        // Find some logic to go through the links and add them to url list
+                        var jobUrl = _sorter.HtmlArraySplitOn('a', htmlArray);
+
+                        _jobUrl.LinksFoundOnPage = _sorter.GetLinksFromDocument(htmlArray);
+                    }
                 }
-                
             }
 
             return await Task.FromResult(true);
         }
-
     }
 }
