@@ -138,12 +138,12 @@ AdminContext.User.IsInRole("Udvikler"))
                 @if (AdminContext.User.IsInRole("System Administrator") ||
 AdminContext.User.IsInRole("Udvikler"))
                 {
-                    @*<li class="nav-item">
+                    <li class="nav-item">
                             <NavLink class="nav-link" href="/admin/system/settings/user-access">
                                 <span><i class="fas fa-low-vision"></i></span>
                                 Bruger Rettigheder
                             </NavLink>
-                        </li>*@
+                        </li>
                 }
                 @if (AdminContext.User.IsInRole("Udvikler"))
                 {
