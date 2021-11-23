@@ -19,7 +19,12 @@ namespace JobAgentClassLibrary.Loggings
             return await _repository.CreateAsync(entity);
         }
 
-        public async Task<List<ILog>> GetAllAsync()
+        public async Task<List<ILog>> GetAllCrawlerLogsAsync()
+        {
+            return await _repository.GetAllCrawlerLogsAsync();
+        }
+
+        public async Task<List<ILog>> GetAllDbLogsAsync()
         {
             return await _repository.GetAllAsync();
         }

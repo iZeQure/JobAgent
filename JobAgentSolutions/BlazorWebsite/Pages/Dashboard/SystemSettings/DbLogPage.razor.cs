@@ -33,7 +33,7 @@ namespace BlazorWebsite.Pages.Dashboard.SystemSettings
             dataIsLoading = true;
             try
             {
-                var logTask = LogService.GetAllAsync();
+                var logTask = LogService.GetAllDbLogsAsync();
 
                 await Task.WhenAll(logTask);
 
@@ -64,7 +64,8 @@ namespace BlazorWebsite.Pages.Dashboard.SystemSettings
                     Message = _log.Message,
                     LogSeverity = _log.LogSeverity,
                     CreatedBy = _log.CreatedBy,
-                    CreatedDateTime = _log.CreatedDateTime
+                    CreatedDateTime = _log.CreatedDateTime,
+                    LogType = _log.LogType
                 };
             }
             catch (Exception ex)
@@ -81,7 +82,7 @@ namespace BlazorWebsite.Pages.Dashboard.SystemSettings
         {
             try
             {
-                var logs = await LogService.GetAllAsync();
+                var logs = await LogService.GetAllDbLogsAsync();
 
                 if (logs == null)
                 {

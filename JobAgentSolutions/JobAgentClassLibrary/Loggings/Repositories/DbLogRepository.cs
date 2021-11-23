@@ -4,10 +4,8 @@ using JobAgentClassLibrary.Core.Entities;
 using JobAgentClassLibrary.Loggings.Entities;
 using JobAgentClassLibrary.Loggings.Entities.EntityMaps;
 using JobAgentClassLibrary.Loggings.Factory;
-using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -98,7 +96,39 @@ namespace JobAgentClassLibrary.Loggings.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
-                var proc = "[JA.spGetLogs]";
+                var proc = "[JA.spGetDbLogs]";
+
+                var queryResult = await conn.QueryAsync<LogInformation>(proc, commandType: CommandType.StoredProcedure);
+
+                if (queryResult is not null && queryResult.Any())
+                {
+                    foreach (var result in queryResult)
+                    {
+                        ILog log = (DbLog)_factory.CreateEntity(
+                            nameof(DbLog),
+                            result.LogId,
+                            result.LogSeverity,
+                            result.LogMessage,
+                            result.LogAction,
+                            result.LogCreatedBy,
+                            result.LogCreatedDateTime,
+                            result.LogType);
+
+                        logs.Add(log);
+                    }
+                }
+            }
+
+            return logs;
+        }
+        
+        public async Task<List<ILog>> GetAllCrawlerLogsAsync()
+        {
+            List<ILog> logs = new();
+
+            using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
+            {
+                var proc = "[JA.spGetCrawlerLogs]";
 
                 var queryResult = await conn.QueryAsync<LogInformation>(proc, commandType: CommandType.StoredProcedure);
 
@@ -183,7 +213,7 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                 var values = new
                 {
                     @logId = entity.Id,
-                    @severityId = entity.LogSeverity,
+                    @severityId = DetermineSeverityId(entity),
                     @createdDateTime = entity.CreatedDateTime,
                     @createdBy = entity.CreatedBy,
                     @action = entity.Action,

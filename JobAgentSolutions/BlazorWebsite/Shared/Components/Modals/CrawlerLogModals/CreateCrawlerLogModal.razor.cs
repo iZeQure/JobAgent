@@ -13,9 +13,9 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
+namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
 {
-    public partial class CreateDbLogModal : ComponentBase
+    public partial class CreateCrawlerLogModal : ComponentBase
     {
         [CascadingParameter] private Task<AuthenticationState> AuthState { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
@@ -43,7 +43,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
                 _logSeverities.Add(severity);
             }
 
-            foreach(LogType type in Enum.GetValues(typeof(LogType)))
+            foreach (LogType type in Enum.GetValues(typeof(LogType)))
             {
                 _logTypes.Add(type);
             }
@@ -104,7 +104,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
                     LogSeverity = _logModel.LogSeverity,
                     CreatedBy = _sessionUserEmail,
                     CreatedDateTime = DateTime.Now,
-                    LogType = LogType.DATABASE
+                    LogType = LogType.CRAWLER
                 };
 
                 bool isCreated = false;
@@ -117,11 +117,11 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
 
                 if (!isCreated)
                 {
-                    _errorMessage = "Kunne ikke oprette Database Log grundet ukendt fejl";
+                    _errorMessage = "Kunne ikke oprette Robot Log grundet ukendt fejl";
                 }
 
                 RefreshProvider.CallRefreshRequest();
-                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateDbLog");
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateCrawlerLog");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{_logModel.Id}");
 
             }

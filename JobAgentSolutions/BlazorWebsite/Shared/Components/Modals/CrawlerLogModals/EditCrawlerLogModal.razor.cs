@@ -7,11 +7,12 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
-namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
+namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
 {
-    public partial class EditDbLogModal : ComponentBase
+    public partial class EditCrawlerLogModal : ComponentBase
     {
         [Parameter] public LogModel Model { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
@@ -79,7 +80,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
                     LogSeverity = Model.LogSeverity,
                     CreatedBy = Model.CreatedBy,
                     CreatedDateTime = Model.CreatedDateTime,
-                    LogType = LogType.DATABASE
+                    LogType = Model.LogType
                 };
 
                 bool isUpdated = false;
@@ -97,7 +98,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
                 }
 
                 RefreshProvider.CallRefreshRequest();
-                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditDbLog");
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditCrawlerLog");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
             }
             catch (Exception ex)
