@@ -96,7 +96,7 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
 
                 if (!isUpdated)
                 {
-                    _errorMessage = "Kunne ikke opdatere SøgeFilteret, grundet ukendt fejl.";
+                    _errorMessage = "Kunne ikke opdatere Søgefilteret, grundet ukendt fejl.";
                     return;
                 }
 

@@ -48,7 +48,21 @@
                                         <option value="0" selected>---Vælg en filtertype som passer til søgefilteret---</option>
                                         @foreach (var filterType in _filterTypes)
                                         {
-                                            <option value="@filterType.Id">@filterType.Name</option>
+                                            if (Model.FilterType != null)
+                                            {
+                                                if (Model.FilterType.Id == filterType.Id)
+                                                {
+                                                    <option value="@filterType.Id" selected>@filterType.Name</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@filterType.Id">@filterType.Name</option>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <option value="@filterType.Id">@filterType.Name</option>
+                                            }
                                         }
                                     </select>
                                 }
