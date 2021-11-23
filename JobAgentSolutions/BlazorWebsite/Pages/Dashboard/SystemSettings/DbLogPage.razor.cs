@@ -1,5 +1,6 @@
 ﻿using BlazorWebsite.Data.FormModels;
 using BlazorWebsite.Data.Providers;
+using JobAgentClassLibrary.Core.Entities;
 using JobAgentClassLibrary.Loggings;
 using JobAgentClassLibrary.Loggings.Entities;
 using Microsoft.AspNetCore.Components;
@@ -65,7 +66,7 @@ namespace BlazorWebsite.Pages.Dashboard.SystemSettings
                     LogSeverity = _log.LogSeverity,
                     CreatedBy = _log.CreatedBy,
                     CreatedDateTime = _log.CreatedDateTime,
-                    LogType = _log.LogType
+                    LogType = LogType.DATABASE
                 };
             }
             catch (Exception ex)
