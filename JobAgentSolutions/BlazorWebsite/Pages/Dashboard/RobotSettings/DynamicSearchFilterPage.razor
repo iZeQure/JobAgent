@@ -1,0 +1,99 @@
+﻿@page "/admin/robot/settings/dynamic/search-filter"
+@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
+@using BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals;
+
+<PageDocumentTitle DocumentTitle="Administrer - Dynamiske Søgeord" />
+
+<div class="d-flex">
+    <PageHeadingTitle DisplayTitle="Søgeord til robot" />
+    <div class="d-inline-block px-4 pt-4">
+
+        <a class="btn btn-sm btn-info cursor-pointer text-white" data-bs-toggle="modal" data-bs-target="#ModalCreateDynamicSearchFilter">
+            Opret nyt søgeord
+        </a>
+
+    </div>
+</div>
+
+@if (dataIsLoading)
+{
+    <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="dataIsLoading" Message="Indlæser robot søgeord.." />
+}
+else
+{
+    @if (_dynamicSearchFilters == null)
+    {
+        <MessageAlert Alert="MessageAlert.AlertType.Info"
+                      Message="Indlæser robot søgeord.." IsLoading="true" />
+    }
+    else
+    {
+        @if (!_dynamicSearchFilters.Any())
+        {
+            <MessageAlert Alert="MessageAlert.AlertType.Warning"
+                          Message="Der blev ikke fundet nogen søgeord."
+                          MessageOptional="Opret søgeord, ved at trykke på knappen : Opret nyt søgeord." />
+        }
+        else
+        {
+            <div class="table-responsive table-responsive-sm table-responsive-md">
+                <table class="table table-striped table-hover">
+                    <caption>Liste over søgeord..</caption>
+                    <thead class="table-primary text-light">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Søgeord</th>
+                            <th scope="col">kategori</th>
+                            <th scope="col">Underkategori</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var jobPage in _dynamicSearchFilters)
+                        {
+                            <tr id="@(jobPage.Id)">
+                                <th scope="row">@(jobPage.Id)</th>
+                                <td>@(jobPage.Key)</td>
+                                @foreach (var category in _categories)
+                                {
+                                    if (jobPage.CategoryId == category.Id)
+                                    {
+                                        <td>@category.Name</td>
+                                    }
+                                }
+                                @foreach (var specialization in _specializations)
+                                {
+                                    if (jobPage.SpecializationId == specialization.Id)
+                                    {
+
+                                        <td>@(specialization.Name)</td>
+                                    }
+                                }
+
+                                <td>
+                                    <span data-bs-toggle="modal" data-bs-target="#ModalEditDynamicSearchFilter" @onclick="@(mouseEvent => OnClick_EditLink(jobPage.Id))">
+                                        <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette søgeord." Color="Popover.PopoverType.Info" />
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span data-bs-toggle="modal" data-bs-target="#ModalRemoveDynamicSearchFilter" @onclick="@(mouseEvent => ConfirmationWindow(jobPage.Id))">
+                                        <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte søgeord, forevigt!" Color="Popover.PopoverType.Danger" />
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+
+    <CreateDynamicSearchFilterModal />
+
+    <EditDynamicSearchFilterModal Model="_dynamicSearchFilterModel" />
+
+    <RemoveDynamicSearchFilterModal Id="_dynamicSearchFilterId" />
+}

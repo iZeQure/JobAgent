@@ -1,0 +1,67 @@
+﻿@attribute [Authorize(Roles = "Udvikler")]
+
+
+<div id="ModalCreateDbLog" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+
+            <MessageAlert Message="@(_errorMessage)" Alert="MessageAlert.AlertType.Error" />
+
+            @if (_isLoading)
+            {
+                <MessageAlert IsLoading="@_isLoading" Alert="MessageAlert.AlertType.Info" Message="Vent venligst, henter nødvendig information.." />
+            }
+            else
+            {
+                <EditForm EditContext="_editContext" OnValidSubmit="OnValidSubmit_CreateLogAsync">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Nyt Log :</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col">
+                                <label for="regInputMessage" class="admin-label">Log besked :</label>
+                                <input id="regInputMessage" class="form-control form-control-sm" type="text" @bind="_logModel.Message" placeholder="Eksempel : Bad Login" />
+                                <ValidationMessage For="@(() => _logModel.Message)" />
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="row">
+                            <div class="col">
+                                <label for="regInputAction" class="admin-label">Log Aktion :</label>
+                                <input id="regInputAction" class="form-control form-control-sm" type="text" @bind="_logModel.Action" placeholder="Eksempel : Login" />
+                                <ValidationMessage For="@(() => _logModel.Action)" />
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="row">
+                            <div class="col">
+                                <label for="regInputSeverity" class="admin-label col-form-label col-form-label-sm">Log Type :</label>
+                                <select id="regInputSeverity" class="form-control form-control-sm" @bind="_logModel.LogSeverity">
+                                    <option value="0" selected>---Vælg den log type der passer til denne log---</option>
+                                    @foreach (var severity in _logSeverities)
+                                    {
+                                        <option value="@severity">@severity</option>
+                                    }
+                                </select>
+                                <ValidationMessage For="@(() => _logModel.LogSeverity)" />
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="OnClick_CancelRequest">Annuller</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_isProcessing">Opret Log</button>
+                    </div>
+                </EditForm>
+            }
+        </div>
+    </div>
+</div>

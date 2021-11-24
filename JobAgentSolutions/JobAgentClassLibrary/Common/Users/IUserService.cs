@@ -1,4 +1,5 @@
-﻿using JobAgentClassLibrary.Common.Users.Entities;
+﻿using JobAgentClassLibrary.Common.Areas.Entities;
+using JobAgentClassLibrary.Common.Users.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -23,5 +24,7 @@ namespace JobAgentClassLibrary.Common.Users
         Task<bool> RemoveAsync(IUser entity);
 
         Task<bool> CheckUserExistsAsync(string email);
+
+        Task<List<IArea>> GetUserConsultantAreasAsync(IUser user);
     }
 }

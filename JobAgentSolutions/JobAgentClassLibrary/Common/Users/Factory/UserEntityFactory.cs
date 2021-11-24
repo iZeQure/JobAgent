@@ -26,7 +26,7 @@ namespace JobAgentClassLibrary.Common.Users.Factory
                 FirstName = ParseValue<string>(entityValues[3]),
                 LastName = ParseValue<string>(entityValues[4]),
                 Email = ParseValue<string>(entityValues[5]),
-                AccessToken = ParseValue<string>(6)
+                AccessToken = ParseValue<string>(entityValues[6])
             },
             nameof(HashedUser) => new AuthUser
             {

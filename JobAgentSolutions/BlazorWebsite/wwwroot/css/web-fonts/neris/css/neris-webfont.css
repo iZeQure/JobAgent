@@ -1,0 +1,62 @@
+﻿﻿@font-face {
+    font-family: 'nerisblack';
+    src: url('../fonts/Neris-Black-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'nerisblack_italic';
+    src: url('../fonts/Neris-BlackItalic-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'nerisbold_italic';
+    src: url('../fonts/Neris-BoldItalic-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'nerislight';
+    src: url('../fonts/Neris-Light-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'nerislight_italic';
+    src: url('../fonts/Neris-LightItalic-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'nerissemibold';
+    src: url('../fonts/Neris-SemiBold-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'nerissemibold_italic';
+    src: url('../fonts/Neris-SemiBoldItalic-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'neristhin';
+    src: url('../fonts/Neris-Thin-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'neristhin_italic';
+    src: url('../fonts/Neris-ThinItalic-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}

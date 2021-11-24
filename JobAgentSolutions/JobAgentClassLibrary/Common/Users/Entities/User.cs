@@ -19,6 +19,6 @@ namespace JobAgentClassLibrary.Common.Users.Entities
 
         public int Id { get; set; }
 
-        public List<IArea> ConsultantAreas { get; set; }
+        public List<IArea> ConsultantAreas { get; set; } = new();
     }
 }

@@ -36,18 +36,14 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
 
                 var values = new
                 {
-                    @id = entity.Id,
-                    @categoryId = entity.FilterType.Id,
+                    @filterTypeId = entity.FilterType.Id,
                     @key = entity.Key
                 };
 
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId != 0)
-            {
-                return await GetByIdAsync(entityId);
-            }
+            if (entityId != 0) return await GetByIdAsync(entityId);
 
             return null;
         }
@@ -58,7 +54,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
             {
-                string proc = "[JA.spGetStaticSearchFilters]";
+                string proc = "[JA.spGetStaticFilterKeys]";
 
                 var queryResult = await conn.QueryAsync<StaticSearchFilterInformation>(proc, commandType: CommandType.StoredProcedure);
 
@@ -130,17 +126,14 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
                 var values = new
                 {
                     @id = entity.Id,
-                    @categoryId = entity.FilterType.Id,
+                    @filterTypeId= entity.FilterType.Id,
                     @key = entity.Key
                 };
 
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId >= 0)
-            {
-                return await GetByIdAsync(entityId);
-            }
+            if (entityId >= 0) return await GetByIdAsync(entityId);
 
             return null;
         }

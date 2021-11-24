@@ -1,0 +1,65 @@
+﻿@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
+
+<div id="ModalCreateStaticSearchFilter" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+
+            <MessageAlert Message="@(_errorMessage)" Alert="MessageAlert.AlertType.Error" />
+
+            @if (_isLoading)
+            {
+                <MessageAlert IsLoading="@_isLoading" Alert="MessageAlert.AlertType.Info" Message="Vent venligst, henter nødvendig information.." />
+            }
+            else
+            {
+                <EditForm EditContext="_editContext" OnValidSubmit="OnValidSubmit_CreateJobAdvertAsync">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Nyt Søgefilter :</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col">
+                                <label for="regInputKey" class="admin-label">Søgefilteret : </label>
+                                <input id="regInputKey" class="form-control form-control-sm" type="text" @bind="_staticSearchFilterModel.Key" placeholder="Eksempel : Programmering" />
+                                <ValidationMessage For="@(() => _staticSearchFilterModel.Key)" />
+
+                            </div>
+                        </div>
+
+
+                        <hr />
+
+                        <div class="row">
+                            <div class="col">
+                                <label for="regInputFilterType" class="admin-label">Filter type:</label>
+                                @if (_filterTypes == null || !_filterTypes.Any())
+                                {
+                                    <label class="col-form-label">Kunne ikke hente filtertyper eller er igang med at indlæse data...</label>
+                                }
+                                else
+                                {
+                                    <select id="regInputFilterType" class="form-control form-control-sm" type="text" @bind="_staticSearchFilterModel.FilterType.Id">
+                                        <option value="0" selected>---Vælg en filtertype som passer til Søgefilteret---</option>
+                                        @foreach (var filtertype in _filterTypes)
+                                        {
+                                            <option value="@filtertype.Id">@filtertype.Name</option>
+                                        }
+                                    </select>
+                                }
+                                <ValidationMessage For="@(() => _staticSearchFilterModel.FilterType.Id)" />
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="OnClick_CancelRequest">Annuller</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_isProcessing">Opret Søgefilter</button>
+                    </div>
+                </EditForm>
+            }
+        </div>
+    </div>
+</div>

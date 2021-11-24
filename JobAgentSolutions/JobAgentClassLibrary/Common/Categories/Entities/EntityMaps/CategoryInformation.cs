@@ -12,6 +12,11 @@ namespace JobAgentClassLibrary.Common.Categories.Entities.EntityMaps
 
         public List<ISpecialization> Specializations { get; set; }
 
+        public void AddRange(IEnumerable<ISpecialization> elements)
+        {
+            Specializations.AddRange(elements);
+        }
+
         [Key]
         public int CategoryId { get; set; }
 
