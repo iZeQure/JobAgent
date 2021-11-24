@@ -13,15 +13,20 @@ namespace WebCrawlerTests.CrawlerTests
 {
     public class CrawlerTest
     {
+        private readonly CrawlerManager crawlerManager;
+
+        public CrawlerTest(CrawlerManager crawlerManager)
+        {
+            this.crawlerManager = crawlerManager;
+        }
 
         [Theory]
         [InlineData("", PageDefinitions.praktikpladsen)]
         public void SetCrawlerUrl(string url, PageDefinitions pageDefinition)
         {
-            CrawlerManager crawlerManager = CrawlerFactory.GetCrawlerFactory.GetCrawlerManager();
             crawlerManager.SetUrl(url, pageDefinition);
 
-
+            Assert.NotNull(crawlerManager..StartUrl);
         }
     }
 }

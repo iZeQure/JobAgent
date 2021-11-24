@@ -37,10 +37,5 @@ namespace WebCrawler.Factories
         {
             return new HtmlSorter();
         }
-
-        public CrawlerManager GetCrawlerManager()
-        {
-            return new CrawlerManager(GetCrawler(), GetSorter());
-        }
     }
 }

@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebCrawler.Settings
+namespace WebCrawler.DataAccess
 {
-    public class FilterSettings
+    internal class DbCommunicator
     {
-        public int MyProperty { get; set; }
     }
 }

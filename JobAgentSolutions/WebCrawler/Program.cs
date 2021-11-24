@@ -1,4 +1,7 @@
 ﻿
+using JobAgentClassLibrary.Common.Categories;
+using JobAgentClassLibrary.Common.Companies;
+using JobAgentClassLibrary.Common.JobAdverts;
 using JobAgentClassLibrary.Common.JobPages;
 using JobAgentClassLibrary.Common.VacantJobs;
 using Microsoft.Extensions.Configuration;
@@ -42,12 +45,18 @@ namespace WebCrawler
         private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
         
+            services.AddSingleton<IJobAdvertService, JobAdvertService>();
             services.AddSingleton<IJobPageService, JobPageService>();
             services.AddSingleton<IVacantJobService, VacantJobService>();
+            services.AddSingleton<ICompanyService, CompanyService>();
+            services.AddSingleton<ICategoryService, CategoryService>();
+            
             services.AddSingleton<ICrawler, Crawler>();
             services.AddSingleton<IHtmlSorter, HtmlSorter>();
-            services.AddSingleton<CrawlerManager>();
             
+            services.AddSingleton<CrawlerManager>();
+
+
         }
     }
 }

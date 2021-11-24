@@ -1,4 +1,6 @@
 ﻿using HtmlAgilityPack;
+using JobAgentClassLibrary.Common.JobAdverts.Entities;
+using JobAgentClassLibrary.Common.JobPages.Entities;
 using System.Collections.Generic;
 
 namespace WebCrawler.DataSorters
@@ -34,6 +36,7 @@ namespace WebCrawler.DataSorters
                 if (item.Length > 5 && item.StartsWith(startsWith))
                     data.Add(item.Split('>'));
             }
+
             return data;
         }
 
@@ -51,8 +54,20 @@ namespace WebCrawler.DataSorters
                     LinksFromSite.Add(link);
                 }
             }
-
             return LinksFromSite;
+        }
+
+        public JobPage SortForJobPages(string htmlArray)
+        {
+            JobPage page = new JobPage();
+            return page;
+        }
+
+        public JobAdvert SortForAdverts(string htmlArray)
+        {
+            JobAdvert jobAdvert = new JobAdvert();
+
+            return jobAdvert;
         }
     }
 }
