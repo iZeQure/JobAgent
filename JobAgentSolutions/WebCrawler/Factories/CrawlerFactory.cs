@@ -28,14 +28,28 @@ namespace WebCrawler.Factories
             }
         }
 
-        private ICrawler GetCrawler()
+        public ICrawler GetCrawler()
         {
             return new Crawler();
         }
 
-        private IHtmlSorter GetSorter()
+        public IHtmlSorter GetSorter()
         {
             return new HtmlSorter();
+        }
+
+        public CrawlerManager GetCrawlerManager()
+        {
+            return new CrawlerManager(GetCrawler(), GetSorter());
+        }
+
+        public ICrawler PraktikPladsenCrawler()
+        {
+            Crawler crawler = new Crawler();
+
+
+
+            return crawler;
         }
     }
 }

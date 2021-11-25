@@ -57,17 +57,5 @@ namespace WebCrawler.DataSorters
             return LinksFromSite;
         }
 
-        public JobPage SortForJobPages(string htmlArray)
-        {
-            JobPage page = new JobPage();
-            return page;
-        }
-
-        public JobAdvert SortForAdverts(string htmlArray)
-        {
-            JobAdvert jobAdvert = new JobAdvert();
-
-            return jobAdvert;
-        }
     }
 }

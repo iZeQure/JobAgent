@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using WebCrawler.Models;
 
 namespace WebCrawler.DataScrappers
 {
@@ -9,9 +10,10 @@ namespace WebCrawler.DataScrappers
         private List<string> DiscordKeyWords { get; set; }
         private List<string> HrKeyWords { get; set; }
 
+        public JobUrlContainer JobUrl { get; set; }
+
         private int count;
 
-        public PageDefinitions PageDefinition { get; private set; }
         public string NextKeyWord { get; private set; }
 
         public CrawlerSettings()
@@ -19,6 +21,7 @@ namespace WebCrawler.DataScrappers
             PraktikpladsenKeyWords = new List<string>() { "resultater", "defs-table" };
             DrKeyWords = new List<string>() { };
             DiscordKeyWords = new List<string>() { };
+            JobUrl = new JobUrlContainer();
         }
 
         /// <summary>
@@ -40,7 +43,7 @@ namespace WebCrawler.DataScrappers
         /// <returns></returns>
         public List<string> GetKeyWordsForPage()
         {
-            switch (PageDefinition)
+            switch (JobUrl.PageDefinition)
             {
                 case PageDefinitions.praktikpladsen:
 
@@ -90,9 +93,10 @@ namespace WebCrawler.DataScrappers
         {
             praktikpladsen, dr, discord, hr
         }
+
         public void SetPageDefinitions(PageDefinitions pageDefinition)
         {
-            PageDefinition = pageDefinition;
+            JobUrl.PageDefinition = pageDefinition;
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using WebCrawler.DataScrappers;
 using WebCrawler.Factories;
 using WebCrawler.Managers;
+using WebCrawler.Models;
 using Xunit;
 using static WebCrawler.DataScrappers.CrawlerSettings;
 
@@ -13,20 +14,17 @@ namespace WebCrawlerTests.CrawlerTests
 {
     public class CrawlerTest
     {
-        private readonly CrawlerManager crawlerManager;
-
-        public CrawlerTest(CrawlerManager crawlerManager)
+        [Fact]
+        public async void Crawl_ShouldReturnSomeHtml()
         {
-            this.crawlerManager = crawlerManager;
-        }
+            ICrawler crawler = CrawlerFactory.GetCrawlerFactory.GetCrawler();
 
-        [Theory]
-        [InlineData("", PageDefinitions.praktikpladsen)]
-        public void SetCrawlerUrl(string url, PageDefinitions pageDefinition)
-        {
-            crawlerManager.SetUrl(url, pageDefinition);
+            
+            crawler.SetCrawlerUrl("https://pms.praktikpladsen.dk/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20programmering", PageDefinitions.praktikpladsen);
+            var data = await ((Crawler)crawler).Crawl("resultater");
 
-            Assert.NotNull(crawlerManager..StartUrl);
+            Assert.NotNull(data);
+
         }
     }
 }

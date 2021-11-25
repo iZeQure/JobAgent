@@ -14,19 +14,28 @@ namespace WebCrawler.DataScrappers
     public class Crawler : ICrawler
     {
         private ChromeDriver _driver;
-        public CrawlerSettings CrawlerSettings { get; private set; }
-        public JobUrl JobUrl { get; private set; } = new JobUrl();
+        public CrawlerSettings CrawlerSettings { get; private set; } = new CrawlerSettings();
+        
         public void SetCrawlerSettings(CrawlerSettings settings)
         {
             CrawlerSettings = settings;
         }
 
-        public void SetCrawlerUrl(string url, CrawlerSettings.PageDefinitions pageDefinition)
+        public void SetLinksToCrawl(List<IJobPage> jobPages)
         {
-            JobUrl.StartUrl = url;
-            CrawlerSettings.SetPageDefinitions(pageDefinition);
+            CrawlerSettings.JobUrl.LinksToCrawl = jobPages;
         }
 
+        public List<string> GetLinksFromSite()
+        {
+            return CrawlerSettings.JobUrl.LinksFoundOnPage;
+        }
+
+        public void SetCrawlerStartUrl(string url, CrawlerSettings.PageDefinitions pageDefinition)
+        {
+            CrawlerSettings.JobUrl.StartUrl = url;
+            CrawlerSettings.SetPageDefinitions(pageDefinition);
+        }
 
         public async Task<HtmlDocument> Crawl(string keyWord)
         {
@@ -37,10 +46,10 @@ namespace WebCrawler.DataScrappers
                 HtmlDocument htmlDocument = new HtmlDocument();
                 task = Task.Factory.StartNew(() =>
                 {
-                    if (!string.IsNullOrEmpty(JobUrl.StartUrl))
+                    if (!string.IsNullOrEmpty(CrawlerSettings.JobUrl.StartUrl))
                     {
                         _driver = new ChromeDriver(Environment.CurrentDirectory);
-                        _driver.Navigate().GoToUrl(JobUrl.StartUrl);
+                        _driver.Navigate().GoToUrl(CrawlerSettings.JobUrl.StartUrl);
 
                         Thread.Sleep(1000);
 
@@ -63,7 +72,9 @@ namespace WebCrawler.DataScrappers
             {
                 Debug.Print(ex.Message);
             }
+
             return await Task.FromResult(task.Result);
         }
+
     }
 }
