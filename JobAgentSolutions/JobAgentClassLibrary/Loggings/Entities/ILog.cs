@@ -11,5 +11,6 @@ namespace JobAgentClassLibrary.Loggings.Entities
         public string CreatedBy { get; }
         public string Action { get ;}
         public string Message { get ; }
+        public LogType LogType { get; set; }
     }
 }

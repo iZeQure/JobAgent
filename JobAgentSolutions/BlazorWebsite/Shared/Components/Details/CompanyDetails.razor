@@ -1,0 +1,29 @@
+﻿@using JobAgentClassLibrary.Common.Companies
+@using JobAgentClassLibrary.Common.Companies.Entities
+@using JobAgentClassLibrary.Common.VacantJobs
+
+@if (_companyDetails is not null)
+{
+    @_companyDetails.Name
+}
+
+@code {
+    /// <summary>
+    /// Represents a Vacant Job id used to get the unique id for the Company.
+    /// </summary>
+    [Parameter]
+    public int Id { get; set; }
+
+    [Inject]
+    protected ICompanyService CompanyService { get; set; }
+    [Inject]
+    protected IVacantJobService VacantJobService { get; set; }
+
+    private ICompany _companyDetails;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var vacantJob = await VacantJobService.GetByIdAsync(Id);
+        _companyDetails = await CompanyService.GetByIdAsync(vacantJob.CompanyId);
+    }
+}

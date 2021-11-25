@@ -24,6 +24,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
         public async Task<IJobAdvert> CreateAsync(IJobAdvert entity)
         {
             int entityId = 0;
+
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
             {
                 string proc = "[JA.spCreateJobAdvert]";
@@ -33,7 +34,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
                     @vacantJobId = entity.Id,
                     @categoryId = entity.CategoryId,
                     @specializationId = entity.SpecializationId,
-                    @jobAdvertTitlte = entity.Title,
+                    @jobAdvertTitle = entity.Title,
                     @jobAdvertSummary = entity.Summary,
                     @jobAdvertRegistrationDateTime = entity.RegistrationDateTime
                 };
@@ -41,10 +42,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId != 0)
-            {
-                return await GetByIdAsync(entityId);
-            }
+            if (entityId != 0) return await GetByIdAsync(entityId);
 
             return null;
         }
@@ -202,10 +200,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId >= 0)
-            {
-                return await GetByIdAsync(entityId);
-            }
+            if (entityId >= 0) return await GetByIdAsync(entityId);
 
             return null;
         }
