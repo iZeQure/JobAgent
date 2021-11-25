@@ -32,13 +32,15 @@ namespace WebCrawler.DataAccess
                 categories.Add(new Category()
                 {
                     Id = id,
-                    Name = name,
-                    Specializations = new List<ISpecialization>()
+                    Name = name
                 });
             }
 
             sqlConnection.CloseAsync();
             return categories;
         }
+
+
+
     }
 }
