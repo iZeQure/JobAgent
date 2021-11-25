@@ -7,7 +7,6 @@ namespace WebCrawler.DataSorters
 {
     public class HtmlSorter : IHtmlSorter
     {
-        public List<string> LinksFromSite { get; set; } = new List<string>();
         /// <summary>
         /// Returns a string array of a htmlpage 
         /// Splits the html on <
@@ -46,16 +45,16 @@ namespace WebCrawler.DataSorters
         /// <param name="htmlArray"></param>
         public List<string> GetLinksFromDocument(string[] htmlArray)
         {
+            List<string> linksFromSite = new List<string>();
             foreach (var item in htmlArray)
             {
                 if (item.Length > 7 && item.StartsWith('a'))
                 {
                     var link = item.Split('"')[1];
-                    LinksFromSite.Add(link);
+                    linksFromSite.Add(link);
                 }
             }
-            return LinksFromSite;
+            return linksFromSite;
         }
-
     }
 }
