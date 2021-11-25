@@ -1,0 +1,22 @@
+﻿@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
+
+<div class="modal fade" id="ModalRemoveCategory" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+
+            <MessageAlert Message="@(_errorMessage)" Alert="MessageAlert.AlertType.Error" />
+
+            @if (Id != 0)
+            {
+                <div class="modal-header">
+                    <h5 class="modal-title">Er du sikker på du vil slette dette søgeord?</h5>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-bs-dismiss="modal" @onclick="CancelRequest">Annuller</button>
+                    <button type="button" class="btn btn-danger" @onclick="@(() => OnClick_RemoveJobPage(Id))" disabled="@_isProcessing">Slet Uddanelse</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
