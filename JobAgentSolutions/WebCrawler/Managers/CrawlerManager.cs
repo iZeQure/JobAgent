@@ -25,16 +25,6 @@ namespace WebCrawler.Managers
             ((Crawler)_crawler).SetCrawlerSettings(new CrawlerSettings());
         }
         
-        /// <summary>
-        /// Used to get the links from the sorter
-        /// Returns empty list if HtmlArraySplitOn has not been run 
-        /// </summary>
-        /// <returns></returns>
-        public List<string> GetLinksFound()
-        {
-            return _sorter.LinksFromSite;
-        }
-
         public async Task<HtmlDocument> CrawlOnSpecifiedPage(string url, PageDefinitions pageDefinition)
         {
             try
