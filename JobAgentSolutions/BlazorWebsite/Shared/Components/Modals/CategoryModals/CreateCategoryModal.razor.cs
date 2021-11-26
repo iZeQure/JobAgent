@@ -114,7 +114,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
 
                 if (!specializationIsCreated)
                 {
-                    _errorMessage = "Kunne ikk eoprette specialer grundet ukendt fejl.";
+                    _errorMessage = "Kunne ikke oprette specialer grundet ukendt fejl.";
                 }
 
 

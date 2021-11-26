@@ -20,7 +20,6 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
         private IEnumerable<ICategory> _categories = new List<Category>();
         private IEnumerable<ISpecialization> _specializations = new List<Specialization>();
         private List<string> _newSpecializationNames = new();
-        private List<string> _oldSpecializationNames = new();
 
 
         private string _errorMessage = "";
@@ -64,12 +63,14 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
 
             try
             {
+
                 Category category = new()
                 {
                     Id = Model.CategoryId,
                     Name = Model.Categoryname
                 };
 
+                bool specializationIsCreated = true;
                 bool isUpdated = false;
                 var result = await CategoryService.UpdateAsync(category);
 
@@ -84,6 +85,30 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
                     return;
                 }
 
+                if (_newSpecializationNames.Count > 0)
+                {
+                    foreach (var name in _newSpecializationNames)
+                    {
+                        Specialization specialization = new()
+                        {
+                            CategoryId = Model.CategoryId,
+                            Name = name
+                        };
+
+                        var specializationResult = await CategoryService.CreateAsync(specialization);
+
+                        if (specializationResult.CategoryId != specialization.CategoryId && specialization.Name != specializationResult.Name)
+                        {
+                            specializationIsCreated = false;
+                        }
+                    }
+                }
+
+                if (!specializationIsCreated)
+                {
+                    _errorMessage = "Kunne ikke oprette specialer grundet ukendt fejl.";
+                }
+
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditCategory");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.CategoryId}");
@@ -95,9 +120,12 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
             }
             finally
             {
+                _newSpecializationNames = new();
+                _specializations = await CategoryService.GetSpecializationsAsync();
                 _isProcessing = false;
             }
         }
+
         private Task OnButtonClick_AssignNewSpecializationToList(string name)
         {
             _isProcessingNewSpecializationToList = true;
@@ -120,17 +148,19 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
             if (!result)
             {
                 _errorMessage = "Kunne ikke fjerne specialet, det er muligvis allerede slettet.";
-
-                return;
             }
 
-            _isProcessingNewSpecializationToList = false;
-            
+            _specializations = await CategoryService.GetSpecializationsAsync();
+
             StateHasChanged();
+
+            _isProcessingNewSpecializationToList = false;
+
         }
 
         private void OnClick_CancelRequest()
         {
+            _newSpecializationNames = new();
             Model = new CategoryModel();
             StateHasChanged();
         }

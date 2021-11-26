@@ -45,6 +45,18 @@
 
                         <hr />
 
+                        @if (_newSpecializationNames != null || _newSpecializationNames.Any())
+                        {
+                            <div class="row">
+                                <div class="col">
+                                    <label for="regShowNewSpecs" class="admin-label">Nye specialer : </label>
+                                    @foreach (var name in _newSpecializationNames)
+                                    {
+                                        <p>@name</p>
+                                    }
+                                </div>
+                            </div>
+                        }
                         @if (_specializations != null || _specializations.Any())
                         {
                             <div class="row">
