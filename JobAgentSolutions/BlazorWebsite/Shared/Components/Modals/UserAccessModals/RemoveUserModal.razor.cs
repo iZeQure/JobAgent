@@ -1,6 +1,5 @@
 ﻿using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Users;
-using JobAgentClassLibrary.Common.Users.Entities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
@@ -38,7 +37,6 @@ namespace BlazorWebsite.Shared.Components.Modals.UserAccessModals
                         _sessionUserEmail = sessionClaim.Value;
                     }
                 }
-
 
                 var user = await UserService.GetUserByIdAsync(id);
 
