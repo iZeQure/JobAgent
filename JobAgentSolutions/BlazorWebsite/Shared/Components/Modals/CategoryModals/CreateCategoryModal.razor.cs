@@ -93,7 +93,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
 
                 if (!categoryIsCreated)
                 {
-                    _errorMessage = "Kunne ikke oprette uddanelsen grundet ukendt fejl.";
+                    _errorMessage = "Kunne ikke oprette uddannelsen grundet ukendt fejl.";
                 }
 
                 foreach(var name in _newSpecializationNames)

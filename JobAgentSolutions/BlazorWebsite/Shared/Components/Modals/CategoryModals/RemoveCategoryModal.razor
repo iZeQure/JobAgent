@@ -9,12 +9,12 @@
             @if (Id != 0)
             {
                 <div class="modal-header">
-                    <h5 class="modal-title">Er du sikker på du vil slette dette søgeord?</h5>
+                    <h5 class="modal-title">Er du sikker på du vil slette denne uddannelse?</h5>
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-info" data-bs-dismiss="modal" @onclick="CancelRequest">Annuller</button>
-                    <button type="button" class="btn btn-danger" @onclick="@(() => OnClick_RemoveJobPage(Id))" disabled="@_isProcessing">Slet Uddanelse</button>
+                    <button type="button" class="btn btn-danger" @onclick="@(() => OnClick_RemoveJobPage(Id))" disabled="@_isProcessing">Slet Uddannelse</button>
                 </div>
             }
         </div>

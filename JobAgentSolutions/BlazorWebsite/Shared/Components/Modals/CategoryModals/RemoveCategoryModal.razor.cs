@@ -33,7 +33,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
 
                 if (!result)
                 {
-                    _errorMessage = "Kunne ikke fjerne uddanelsen, den er muligvis allerede slettet.";
+                    _errorMessage = "Kunne ikke fjerne uddannelsen, den er muligvis allerede slettet.";
 
                     return;
                 }
@@ -43,7 +43,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
             }
             catch (Exception ex)
             {
-                _errorMessage = "Kunne ikke fjerne uddanelsen grundet ukendt fejl.";
+                _errorMessage = "Kunne ikke fjerne uddannelsen grundet ukendt fejl.";
                 Console.WriteLine(ex.Message);
             }
             finally

@@ -106,7 +106,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
 
                 if (!specializationIsCreated)
                 {
-                    _errorMessage = "Kunne ikke oprette specialer grundet ukendt fejl.";
+                    _errorMessage = "Kunne ikke oprette speciale(r) grundet ukendt fejl.";
                 }
 
                 RefreshProvider.CallRefreshRequest();
