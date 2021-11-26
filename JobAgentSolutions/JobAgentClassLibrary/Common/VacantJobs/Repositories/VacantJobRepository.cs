@@ -21,7 +21,12 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
             _sqlDbManager = sqlDbManager;
             _factory = factory;
         }
-
+        
+        /// <summary>
+        /// Creates a new VacantJob in the database
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns>The created object</returns>
         public async Task<IVacantJob> CreateAsync(IVacantJob entity)
         {
             int entityId = 0;
@@ -43,6 +48,10 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
             return null;
         }
 
+        /// <summary>
+        /// Returns a list of all VacantJobs in the database
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<IVacantJob>> GetAllAsync()
         {
             List<IVacantJob> vacantJobs = new();
@@ -67,6 +76,11 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
             return vacantJobs;
         }
 
+        /// <summary>
+        /// Returns a specific VacantJob from the database
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<IVacantJob> GetByIdAsync(int id)
         {
             IVacantJob vacantJob = null;
@@ -91,6 +105,11 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
             return vacantJob;
         }
 
+        /// <summary>
+        /// Removes a VacantJob from the database
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public async Task<bool> RemoveAsync(IVacantJob entity)
         {
             bool isDeleted = false;
@@ -109,6 +128,11 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
             return isDeleted;
         }
 
+        /// <summary>
+        /// Updates a VacantJob in the database
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public async Task<IVacantJob> UpdateAsync(IVacantJob entity)
         {
             int entityId = 0;

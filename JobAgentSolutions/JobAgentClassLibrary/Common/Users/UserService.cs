@@ -19,6 +19,12 @@ namespace JobAgentClassLibrary.Common.Users
             _authAccess = authAccess;
         }
 
+        /// <summary>
+        /// Authenticates a user on login
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        /// <returns>Authuser object containing the users data</returns>
         public async Task<IAuthUser> AuthenticateUserLoginAsync(string email, string password)
         {
             var authUser = new AuthUser
@@ -66,11 +72,21 @@ namespace JobAgentClassLibrary.Common.Users
             return null;
         }
 
+        /// <summary>
+        /// Checks if a user exists in the system
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
         public async Task<bool> CheckUserExistsAsync(string email)
         {
             return await _userRepository.CheckUserExistsAsync(email);
         }
 
+        /// <summary>
+        /// Creates a new User in the database
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns>The created object</returns>
         public async Task<IUser> CreateAsync(IUser entity)
         {
             var user = await _userRepository.CreateAsync(entity);
@@ -86,6 +102,11 @@ namespace JobAgentClassLibrary.Common.Users
             return user;
         }
 
+        /// <summary>
+        /// Returns a specific User from the database
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
         public async Task<IUser> GetByEmailAsync(string email)
         {
             var user = await _userRepository.GetByEmailAsync(email);
@@ -101,6 +122,11 @@ namespace JobAgentClassLibrary.Common.Users
             return user;
         }
 
+        /// <summary>
+        /// Returns a specific User from the database
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<IUser> GetUserByIdAsync(int id)
         {
             var user = await _userRepository.GetByIdAsync(id);
@@ -116,11 +142,21 @@ namespace JobAgentClassLibrary.Common.Users
             return user;
         }
 
+        /// <summary>
+        /// Returns the salt of a User based off of a give email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
         public async Task<string> GetSaltByEmailAddressAsync(string email)
         {
             return await _userRepository.GetSaltByEmailAsync(email);
         }
 
+        /// <summary>
+        /// Returns a specific User from the database
+        /// </summary>
+        /// <param name="accessToken"></param>
+        /// <returns></returns>
         public async Task<IAuthUser> GetUserByAccessTokenAsync(string accessToken)
         {
             var user = await _userRepository.GetUserByAccessTokenAsync(accessToken);
@@ -136,6 +172,10 @@ namespace JobAgentClassLibrary.Common.Users
             return user;
         }
 
+        /// <summary>
+        /// Returns a list of all Users in the database
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<IUser>> GetUsersAsync()
         {
             var users = await _userRepository.GetAllAsync();
@@ -157,6 +197,12 @@ namespace JobAgentClassLibrary.Common.Users
             return users;
         }
 
+        /// <summary>
+        /// Grants a User a ConsultantArea
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="areaId"></param>
+        /// <returns></returns>
         public async Task<IUser> GrantAreaToUserAsync(IUser user, int areaId)
         {
             try
@@ -187,11 +233,22 @@ namespace JobAgentClassLibrary.Common.Users
             }
         }
 
+        /// <summary>
+        /// removes a User from the database
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public async Task<bool> RemoveAsync(IUser entity)
         {
             return await _userRepository.RemoveAsync(entity);
         }
 
+        /// <summary>
+        /// Removes a ConsultantArea from the User
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="areaId"></param>
+        /// <returns></returns>
         public async Task<IUser> RevokeAreaFromUserAsync(IUser user, int areaId)
         {
             try
@@ -222,6 +279,11 @@ namespace JobAgentClassLibrary.Common.Users
             }
         }
 
+        /// <summary>
+        /// Updates a User in the database
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public async Task<IUser> UpdateAsync(IUser entity)
         {
             var user = await _userRepository.UpdateAsync(entity);
@@ -237,11 +299,21 @@ namespace JobAgentClassLibrary.Common.Users
             return user;
         }
 
+        /// <summary>
+        /// Updates a Users password in the database
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public async Task<bool> UpdateUserPasswordAsync(IAuthUser user)
         {
             return await _userRepository.UpdateUserPasswordAsync(user);
         }
 
+        /// <summary>
+        /// Checks if a users accesstoken is valid
+        /// </summary>
+        /// <param name="accessToken"></param>
+        /// <returns></returns>
         public async Task<bool> ValidateUserAccessTokenAsync(string accessToken)
         {
             var tokenIsValid = await _userRepository.ValidateUserAccessTokenAsync(accessToken);
@@ -249,6 +321,11 @@ namespace JobAgentClassLibrary.Common.Users
             return tokenIsValid;
         }
 
+        /// <summary>
+        /// Returns a list of all a Users ConsultantAreas
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public async Task<List<IArea>> GetUserConsultantAreasAsync(IUser user)
         {
             return await _userRepository.GetUserConsultantAreasAsync(user);

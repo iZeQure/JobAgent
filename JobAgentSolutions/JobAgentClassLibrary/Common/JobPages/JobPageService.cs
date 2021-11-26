@@ -14,26 +14,50 @@ namespace JobAgentClassLibrary.Common.JobPages
             _jobPageRepository = jobPageRepository;
         }
 
+        /// <summary>
+        /// Creates a new JobPage in the database
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns>the created object</returns>
         public async Task<IJobPage> CreateAsync(IJobPage entity)
         {
             return await _jobPageRepository.CreateAsync(entity);
         }
 
+        /// <summary>
+        /// Returns a specific JobPage from the database
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<IJobPage> GetByIdAsync(int id)
         {
             return await _jobPageRepository.GetByIdAsync(id);
         }
 
+        /// <summary>
+        /// Returns all JobPages in the database
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<IJobPage>> GetJobPagesAsync()
         {
             return await _jobPageRepository.GetAllAsync();
         }
 
+        /// <summary>
+        /// Removes a JobPage from the database
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public async Task<bool> RemoveAsync(IJobPage entity)
         {
             return await _jobPageRepository.RemoveAsync(entity);
         }
 
+        /// <summary>
+        /// Updates a JobPage in the database
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public async Task<IJobPage> UpdateAsync(IJobPage entity)
         {
             return await _jobPageRepository.UpdateAsync(entity);
