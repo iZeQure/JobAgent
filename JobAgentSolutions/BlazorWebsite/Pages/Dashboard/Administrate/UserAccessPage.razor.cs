@@ -27,9 +27,8 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
         private IEnumerable<IRole> _roles;
         private IEnumerable<ILocation> _locations;
         private IUser _user;
-        private int _userId;
 
-        private int _jobPageId = 0;
+        private int _userId;
         private bool dataIsLoading = true;
 
         protected override async Task OnInitializedAsync()

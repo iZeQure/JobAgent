@@ -21,7 +21,6 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
         private IEnumerable<ISpecialization> _specializations = new List<Specialization>();
         private List<string> _newSpecializationNames = new();
 
-
         private string _errorMessage = "";
         private bool _isProcessing = false;
         private bool _isProcessingNewSpecializationToList = false;
@@ -155,7 +154,6 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
             StateHasChanged();
 
             _isProcessingNewSpecializationToList = false;
-
         }
 
         private void OnClick_CancelRequest()
@@ -164,7 +162,5 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
             Model = new CategoryModel();
             StateHasChanged();
         }
-
-
     }
 }

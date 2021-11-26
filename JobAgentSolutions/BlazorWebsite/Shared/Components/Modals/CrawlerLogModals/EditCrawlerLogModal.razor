@@ -26,7 +26,7 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col">
-                                <label for="regInputMessage" class="admin-label">Log besked :</label>
+                                <label for="regInputMessage" class="admin-label col-form-label col-form-label-sm">Log besked :</label>
                                 <input id="regInputMessage" class="form-control form-control-sm" type="text" @bind="Model.Message" />
                                 <ValidationMessage For="@(() => Model.Message)" />
                             </div>
@@ -36,7 +36,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="regInputAction" class="admin-label">Log Aktion :</label>
+                                <label for="regInputAction" class="admin-label col-form-label col-form-label-sm">Log Aktion :</label>
                                 <input id="regInputAction" class="form-control form-control-sm" type="text" @bind="Model.Action" />
                                 <ValidationMessage For="@(() => Model.Action)" />
                             </div>
@@ -63,7 +63,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="regInputCreatedBy" class="admin-label">Bruger Email :</label>
+                                <label for="regInputCreatedBy" class="admin-label col-form-label col-form-label-sm">Bruger Email :</label>
                                 <input id="regInputCreatedBy" class="form-control form-control-sm" type="text" @bind="Model.CreatedBy" />
                                 <ValidationMessage For="@(() => Model.CreatedBy)" />
                             </div>

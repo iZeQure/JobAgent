@@ -26,7 +26,7 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col">
-                                <label for="regInputCategory" class="admin-label">Uddannelses Navn : </label>
+                                <label for="regInputCategory" class="admin-label col-form-label col-form-label-sm">Uddannelses Navn : </label>
                                 <input id="regInputCategory" class="form-control form-control-sm" type="text" @bind="Model.Categoryname" placeholder="Eksempel : DataTekniker" />
                                 <ValidationMessage For="@(() => Model.Categoryname)" />
 
@@ -37,7 +37,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="regInputSpecialization" class="admin-label">Tilføj Speciale :</label>
+                                <label for="regInputSpecialization" class="admin-label col-form-label col-form-label-sm">Tilføj Speciale :</label>
                                 <input id="regInputSpecialization" class="form-control form-control-sm" type="text" @bind="Model.SpecializationName" />
                                 <button type="button" class="btn btn-outline-primary mt-2" @onclick="async () => await OnButtonClick_AssignNewSpecializationToList(Model.SpecializationName)" disabled="@_isProcessingNewSpecializationToList">Tilføj speciale</button>
                             </div>
@@ -49,7 +49,7 @@
                         {
                             <div class="row">
                                 <div class="col">
-                                    <label for="regShowNewSpecs" class="admin-label">Nye specialer : </label>
+                                    <label for="regShowNewSpecs" class="admin-label col-form-label col-form-label-sm">Nye specialer : </label>
                                     @foreach (var name in _newSpecializationNames)
                                     {
                                         <p>@name</p>
@@ -57,11 +57,14 @@
                                 </div>
                             </div>
                         }
+
+                        <hr />
+
                         @if (_specializations != null || _specializations.Any())
                         {
                             <div class="row">
                                 <div class="col">
-                                    <label for="regShowNewSpecs" class="admin-label">Specialer : </label>
+                                    <label for="regShowNewSpecs" class="admin-label col-form-label col-form-label-sm">Specialer : </label>
                                     @foreach (var specializaton in _specializations)
                                     {
                                         if (specializaton.CategoryId == Model.CategoryId)
