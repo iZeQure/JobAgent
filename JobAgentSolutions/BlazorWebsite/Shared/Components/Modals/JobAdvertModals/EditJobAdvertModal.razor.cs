@@ -91,7 +91,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
                 bool isUpdated = false;
                 var result = await JobAdvertService.UpdateAsync(jobAdvert);
 
-                if(result.Id == Model.Id && result.Title == Model.Title)
+                if (result.Id == Model.Id && result.Title == Model.Title)
                 {
                     isUpdated = true;
                 }

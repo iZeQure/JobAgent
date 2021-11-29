@@ -43,7 +43,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
                 _logSeverities.Add(severity);
             }
 
-            foreach(LogType type in Enum.GetValues(typeof(LogType)))
+            foreach (LogType type in Enum.GetValues(typeof(LogType)))
             {
                 _logTypes.Add(type);
             }

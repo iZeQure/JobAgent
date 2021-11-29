@@ -95,7 +95,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
                     _errorMessage = "Kunne ikke oprette uddannelsen grundet ukendt fejl.";
                 }
 
-                foreach(var name in _newSpecializationNames)
+                foreach (var name in _newSpecializationNames)
                 {
                     Specialization specialization = new()
                     {
@@ -105,7 +105,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
 
                     var specializationResult = await CategoryService.CreateAsync(specialization);
 
-                    if(specializationResult.CategoryId != specialization.CategoryId && specialization.Name != specializationResult.Name)
+                    if (specializationResult.CategoryId != specialization.CategoryId && specialization.Name != specializationResult.Name)
                     {
                         specializationIsCreated = false;
                     }

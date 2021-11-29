@@ -6,7 +6,7 @@
 
 <div class="d-flex">
     <PageHeadingTitle DisplayTitle="Administrer Stillingsopslag" />
-    <div class="d-inline-block px-4 pt-4" >
+    <div class="d-inline-block px-4 pt-4">
 
         @if (_createJobAdvertBtnIsDisabled)
         {
@@ -112,10 +112,10 @@ else
                                     <td>
                                         <SpecializationDetails @key="jobAdvert" Id="jobAdvert.SpecializationId" />
                                         @*@(Task.Run<string>(async () =>
-                                        {
-                                            var specializationName = (await CategoryService.GetSpecializationByIdAsync(jobAdvert.SpecializationId)).Name ?? "Kunne ikke indlæse speciale.";
-                                            return specializationName;
-                                        }))*@
+                                            {
+                                                var specializationName = (await CategoryService.GetSpecializationByIdAsync(jobAdvert.SpecializationId)).Name ?? "Kunne ikke indlæse speciale.";
+                                                return specializationName;
+                                            }))*@
                                     </td>
                                 }
                                 else
@@ -123,24 +123,24 @@ else
                                     <td>
                                         <CategoryDetails @key="jobAdvert" Id="jobAdvert.CategoryId" />
                                         @*@(Task.Run<string>(async () =>
-                                        {
-                                            var categoryName = (await CategoryService.GetCategoryByIdAsync(jobAdvert.CategoryId)).Name ?? "Kunne ikke indlæse kategori.";
-                                            return categoryName;
-                                        }))*@
+                                            {
+                                                var categoryName = (await CategoryService.GetCategoryByIdAsync(jobAdvert.CategoryId)).Name ?? "Kunne ikke indlæse kategori.";
+                                                return categoryName;
+                                            }))*@
                                     </td>
                                 }
                                 <td>
                                     <CompanyDetails @key="jobAdvert" Id="jobAdvert.Id" />
                                     @*@(Task.Run<string>(async () =>
-                                    {
-                                        var vacantJob = await VacantJobService.GetByIdAsync(jobAdvert.Id);
+                                        {
+                                            var vacantJob = await VacantJobService.GetByIdAsync(jobAdvert.Id);
 
-                                        if (vacantJob is null) return "Kunne ikke indlæse ejer på stillingsopslaget.";
+                                            if (vacantJob is null) return "Kunne ikke indlæse ejer på stillingsopslaget.";
 
-                                        var companyName = (await CompanyService.GetByIdAsync(vacantJob.CompanyId)).Name ?? "Kunne ikke indlæse virksomhed.";
+                                            var companyName = (await CompanyService.GetByIdAsync(vacantJob.CompanyId)).Name ?? "Kunne ikke indlæse virksomhed.";
 
-                                        return companyName;
-                                    }))*@
+                                            return companyName;
+                                        }))*@
                                 </td>
                                 <td>
                                     <span @onclick="(id => OnButtonClick_EditJobAdvert_LoadJobAdvertDetails(jobAdvert.Id))" data-bs-toggle="modal" data-bs-target="#ModalEditJobAdvert">

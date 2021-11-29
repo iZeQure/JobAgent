@@ -70,7 +70,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
                     URL = _jobPage.URL
                 };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine($"Open EditModal error: {ex.Message}");
             }

@@ -62,8 +62,8 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
 
                 _categoryModel = new CategoryModel
                 {
-                   CategoryId = _category.Id,
-                   Categoryname = _category.Name
+                    CategoryId = _category.Id,
+                    Categoryname = _category.Name
                 };
             }
             catch (Exception ex)

@@ -96,7 +96,7 @@ namespace BlazorWebsite
             /* Manager Injections */
             services.AddSingleton<ISqlDbManager, SqlDbManager>();
             services.AddTransient<ICryptographyService, HashingService>();
-          
+
 
             /* Repository Injections */
             services.AddScoped<IUserRepository, UserRepository>();

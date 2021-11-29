@@ -56,7 +56,7 @@ else
                                 <th scope="row">@(staticSearchFilter.Id)</th>
                                 <td>@(staticSearchFilter.Key)</td>
                                 <td>@(staticSearchFilter.FilterType.Name)</td>
-                                
+
                                 <td>
                                     <span data-bs-toggle="modal" data-bs-target="#ModalEditStaticSearchFilter" @onclick="@(mouseEvent => OnClick_EditLink(staticSearchFilter.Id))">
                                         <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette søgefilter." Color="Popover.PopoverType.Info" />

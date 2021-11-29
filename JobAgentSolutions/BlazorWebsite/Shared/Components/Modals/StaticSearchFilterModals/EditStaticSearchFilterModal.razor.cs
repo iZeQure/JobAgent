@@ -66,9 +66,9 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
 
             try
             {
-                foreach(var item in _filterTypes)
+                foreach (var item in _filterTypes)
                 {
-                    if(_filterTypeId == item.Id)
+                    if (_filterTypeId == item.Id)
                     {
                         _filterType = new()
                         {

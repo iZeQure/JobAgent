@@ -58,76 +58,76 @@
                                         }
                                     }
 
-                                    </select>
-                                    <ValidationMessage For="@(() => Model.Id)" />
-                                </div>
+                                </select>
+                                <ValidationMessage For="@(() => Model.Id)" />
                             </div>
+                        </div>
 
-                            <hr />
+                        <hr />
 
-                            <div class="row">
-                                <div class="col">
-                                    <label for="inputRegisteredDate" class="admin-label col-form-label col-form-label-sm">Opslag Registeret :</label>
-                                    <InputDate id="inputRegisteredDate" @bind-Value="@Model.RegistrationDateTime" TValue="DateTime" class="form-control form-control-sm"></InputDate>
-                                    <ValidationMessage For="@(() => Model.RegistrationDateTime)" />
-                                </div>
+                        <div class="row">
+                            <div class="col">
+                                <label for="inputRegisteredDate" class="admin-label col-form-label col-form-label-sm">Opslag Registeret :</label>
+                                <InputDate id="inputRegisteredDate" @bind-Value="@Model.RegistrationDateTime" TValue="DateTime" class="form-control form-control-sm"></InputDate>
+                                <ValidationMessage For="@(() => Model.RegistrationDateTime)" />
                             </div>
+                        </div>
 
-                            <hr />
+                        <hr />
 
-                            <div class="row">
-                                <div class="col">
-                                    <label for="inputConsultantArea" class="admin-label col-form-label col-form-label-sm">Kategori :</label>
-                                    <select class="form-control form-control-sm" @onchange="OnChange_SortSpecializationListByCategoryId">
-                                        @if (Model.CategoryId == 0)
+                        <div class="row">
+                            <div class="col">
+                                <label for="inputConsultantArea" class="admin-label col-form-label col-form-label-sm">Kategori :</label>
+                                <select class="form-control form-control-sm" @onchange="OnChange_SortSpecializationListByCategoryId">
+                                    @if (Model.CategoryId == 0)
+                                    {
+                                        <option value="0">Ikke Kategoriseret</option>
+                                    }
+
+                                    @foreach (var cat in _categories)
+                                    {
+                                        @if (cat.Id == Model.CategoryId)
                                         {
-                                            <option value="0">Ikke Kategoriseret</option>
+                                            <option value="@cat.Id" selected>@cat.Name</option>
                                         }
-
-                                        @foreach (var cat in _categories)
+                                        else
                                         {
-                                            @if (cat.Id == Model.CategoryId)
+                                            <option value="@cat.Id">@cat.Name</option>
+                                        }
+                                    }
+                                </select>
+                                <ValidationMessage For="@(() => Model.CategoryId)" />
+                            </div>
+                            @if (_sortedSpecializations.Count != 0)
+                            {
+                                <div class="col">
+                                    <label for="inputLocation" class="admin-label col-form-label col-form-label-sm">Kategori Speciale :</label>
+                                    <select class="form-control form-control-sm" @bind="Model.SpecializationId">
+                                        @foreach (var spec in _sortedSpecializations)
+                                        {
+                                            @if (spec.Id == Model.SpecializationId)
                                             {
-                                                <option value="@cat.Id" selected>@cat.Name</option>
+                                                <option value="@spec.Id">@spec.Name</option>
                                             }
                                             else
                                             {
-                                                <option value="@cat.Id">@cat.Name</option>
+                                                <option value="@spec.Id">@spec.Name</option>
                                             }
                                         }
                                     </select>
-                                    <ValidationMessage For="@(() => Model.CategoryId)" />
+                                    <ValidationMessage For="@(() => Model.SpecializationId)" />
                                 </div>
-                                @if (_sortedSpecializations.Count != 0)
-                                {
-                                    <div class="col">
-                                        <label for="inputLocation" class="admin-label col-form-label col-form-label-sm">Kategori Speciale :</label>
-                                        <select class="form-control form-control-sm" @bind="Model.SpecializationId">
-                                            @foreach (var spec in _sortedSpecializations)
-                                            {
-                                                @if (spec.Id == Model.SpecializationId)
-                                                {
-                                                    <option value="@spec.Id">@spec.Name</option>
-                                                }
-                                                else
-                                                {
-                                                    <option value="@spec.Id">@spec.Name</option>
-                                                }
-                                            }
-                                        </select>
-                                        <ValidationMessage For="@(() => Model.SpecializationId)" />
-                                    </div>
-                                }
-                            </div>
+                            }
                         </div>
+                    </div>
 
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="OnClick_CancelRequest" @onclick:preventDefault>Annuller</button>
-                            <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@(_isProcessing)">Gem ændringer</button>
-                        </div>
-                    </EditForm>
-                }
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="OnClick_CancelRequest" @onclick:preventDefault>Annuller</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@(_isProcessing)">Gem ændringer</button>
+                    </div>
+                </EditForm>
+            }
 
-                                </div>
-                            </div>
-                        </div>
+        </div>
+    </div>
+</div>

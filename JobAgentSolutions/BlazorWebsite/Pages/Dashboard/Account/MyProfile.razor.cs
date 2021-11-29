@@ -223,10 +223,10 @@ namespace BlazorWebsite.Pages.Dashboard.Account
 
                     bool result = false;
                     var updatedUser = await UserService.GrantAreaToUserAsync(_userSession, selectedAreaId);
-                    
-                    foreach(var item in updatedUser.ConsultantAreas)
+
+                    foreach (var item in updatedUser.ConsultantAreas)
                     {
-                        if(item.Id == selectedAreaId)
+                        if (item.Id == selectedAreaId)
                         {
                             result = true;
                         }
@@ -280,9 +280,9 @@ namespace BlazorWebsite.Pages.Dashboard.Account
                     bool result = true;
                     var updatedUser = await UserService.RevokeAreaFromUserAsync(_userSession, areaToBeRemoved.Id);
 
-                    foreach(var item in updatedUser.ConsultantAreas)
+                    foreach (var item in updatedUser.ConsultantAreas)
                     {
-                        if(item.Id == areaToBeRemoved.Id)
+                        if (item.Id == areaToBeRemoved.Id)
                         {
                             result = false;
                         }

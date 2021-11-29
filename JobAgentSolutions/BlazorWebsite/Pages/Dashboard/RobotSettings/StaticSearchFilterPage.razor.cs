@@ -43,11 +43,11 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
                 _staticSearchFilters = staticSearchFilterTask.Result;
                 _filterTypes = filterTypeTask.Result;
 
-                foreach(var staticFilter in _staticSearchFilters)
+                foreach (var staticFilter in _staticSearchFilters)
                 {
-                    foreach(var filterType in _filterTypes)
+                    foreach (var filterType in _filterTypes)
                     {
-                        if(staticFilter.FilterType.Id == filterType.Id)
+                        if (staticFilter.FilterType.Id == filterType.Id)
                         {
                             staticFilter.FilterType.Name = filterType.Name;
                             staticFilter.FilterType.Description = filterType.Description;

@@ -40,7 +40,7 @@ namespace BlazorWebsite.Shared.Components.Modals.UserAccessModals
 
                 var user = await UserService.GetUserByIdAsync(id);
 
-                if(user.Email == _sessionUserEmail)
+                if (user.Email == _sessionUserEmail)
                 {
                     _errorMessage = "Du kan ikke slette din egen bruger.";
                     return;

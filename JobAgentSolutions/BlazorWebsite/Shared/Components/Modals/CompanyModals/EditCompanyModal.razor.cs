@@ -34,7 +34,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
                 bool isUpdated = false;
                 var result = await CompanyService.UpdateAsync(company);
 
-                if(result.Id == company.Id && result.Name == company.Name)
+                if (result.Id == company.Id && result.Name == company.Name)
                 {
                     isUpdated = true;
                 }
@@ -43,9 +43,9 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
                 {
                     _errorMessage = "Kunne ikke opdatere virksomhed grundet ukendt fejl.";
                 }
-                    RefreshProvider.CallRefreshRequest();
-                    await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditCompany");
-                    await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.CompanyId}"); 
+                RefreshProvider.CallRefreshRequest();
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditCompany");
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.CompanyId}");
 
             }
             finally

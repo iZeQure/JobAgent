@@ -94,7 +94,7 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
                     Id = _staticSearchFilterModel.Id,
                     Key = _staticSearchFilterModel.Key,
                     FilterType = _staticSearchFilterModel.FilterType
-                    
+
                 };
 
                 bool isCreated = false;
