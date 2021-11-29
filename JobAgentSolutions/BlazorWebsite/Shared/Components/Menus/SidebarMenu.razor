@@ -27,13 +27,6 @@ AdminContext.User.IsInRole("Udvikler"))
                     </NavLink>
                 </li>
 
-                @*<li class="nav-item">
-                        <NavLink class="nav-link" href="/admin/settings/contracts">
-                            <span><i class="fas fa-file-signature"></i></span>
-                            Kontrakter
-                        </NavLink>
-                    </li>*@
-
                 <li class="nav-item">
                     <NavLink class="nav-link" href="/admin/settings/companies">
                         <span><i class="fas fa-building"></i></span>
@@ -107,13 +100,6 @@ AdminContext.User.IsInRole("Udvikler"))
                     </NavLink>
                 </li>
 
-                @*<li class="nav-item">
-                        <NavLink class="nav-link" href="/admin/robot/settings/job-pages">
-                            <span><i class="fas fa-address-book"></i></span>
-                            Job Sider
-                        </NavLink>
-                    </li>*@
-
                 <li class="nav-item">
                     <NavLink class="nav-link" href="/admin/robot/settings/dynamic/search-filter">
                         <span><i class="fas fa-sort-amount-down-alt"></i></span>
@@ -169,12 +155,6 @@ AdminContext.User.IsInRole("Udvikler"))
                         </NavLink>
                     </li>
 
-                    @*<li class="nav-item">
-                            <NavLink class="nav-link" href="/admin/system/settings/versioning">
-                                <span><i class="fas fa-code-branch"></i></span>
-                                Versionering
-                            </NavLink>
-                        </li>*@
                 }
             </ul>
         }
@@ -185,7 +165,6 @@ AdminContext.User.IsInRole("Udvikler"))
             <span class="input-group-text" id="search-addon"><i class="fas fa-search menu-icons"></i></span>
         </div>
 
-        @*<ul class="nav flex-column">*@
         <div class="accordion px-1" id="menuAccordionPanel">
 
             <MessageAlert Message="@(_errorMessage)" Alert="MessageAlert.AlertType.Error" />
@@ -194,14 +173,6 @@ AdminContext.User.IsInRole("Udvikler"))
             {
                 <MessageAlert Message="Indlæser kategorier . . ." Alert="MessageAlert.AlertType.Info" IsLoading="_isLoadingData" />
             }
-
-            @*<div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <NavLink class="accordion-button" Match="NavLinkMatch.All" href="@(GenerateNavLinkLocation())">
-                            Ikke Kategoriseret
-                        </NavLink>
-                    </h2>
-                </div>*@
 
             @if (_menu is not null)
             {
@@ -258,38 +229,5 @@ AdminContext.User.IsInRole("Udvikler"))
                 }
             }
         </div>
-
-
-        @*@foreach (var category in _menu)
-            {
-                if (category.Specializations.Count() == 0)
-                {
-                    <li class="nav-item">
-                        <NavLink class="nav-link" href="@category.Id">
-                            <span class="me-auto">@category.Name</span>
-                            <span class="badge bg-purple-300">@category.Specializations.Count()</span>
-                        </NavLink>
-                    </li>
-                }
-                @if (category.Specializations.Count() != 0)
-                {
-                    <li class="nav-item btn-group dropend">
-                            <NavLink type="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                <span class="me-auto">@category.Name</span>
-                                <span class="badge bg-purple-300">@category.Specializations.Count()</span>
-                            </NavLink>
-                            <ul class="dropdown-menu">
-                                @foreach (var specialization in category.Specializations)
-                                {
-                                    <NavLink class="dropdown-item text-left text-truncate w-auto" href="/job/{category.Id}/{specialization.Id}">
-                                        <span class="badge badge-info">@specialization.Name</span>
-                                        <span class="ml-2">@category.Name</span>
-                                    </NavLink>
-                                }
-                            </ul>
-                        </li>
-                }
-            }*@
-
     </NotAuthorized>
 </AuthorizeView>

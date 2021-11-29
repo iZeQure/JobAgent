@@ -110,43 +110,27 @@ else
                                 @if (jobAdvert.SpecializationId is not 0)
                                 {
                                     <td>
+                                        <CategoryDetails @key="jobAdvert" Id="jobAdvert.CategoryId" />
                                         <SpecializationDetails @key="jobAdvert" Id="jobAdvert.SpecializationId" />
-                                        @*@(Task.Run<string>(async () =>
-                                            {
-                                                var specializationName = (await CategoryService.GetSpecializationByIdAsync(jobAdvert.SpecializationId)).Name ?? "Kunne ikke indlæse speciale.";
-                                                return specializationName;
-                                            }))*@
                                     </td>
                                 }
                                 else
                                 {
                                     <td>
                                         <CategoryDetails @key="jobAdvert" Id="jobAdvert.CategoryId" />
-                                        @*@(Task.Run<string>(async () =>
-                                            {
-                                                var categoryName = (await CategoryService.GetCategoryByIdAsync(jobAdvert.CategoryId)).Name ?? "Kunne ikke indlæse kategori.";
-                                                return categoryName;
-                                            }))*@
                                     </td>
                                 }
+
                                 <td>
                                     <CompanyDetails @key="jobAdvert" Id="jobAdvert.Id" />
-                                    @*@(Task.Run<string>(async () =>
-                                        {
-                                            var vacantJob = await VacantJobService.GetByIdAsync(jobAdvert.Id);
-
-                                            if (vacantJob is null) return "Kunne ikke indlæse ejer på stillingsopslaget.";
-
-                                            var companyName = (await CompanyService.GetByIdAsync(vacantJob.CompanyId)).Name ?? "Kunne ikke indlæse virksomhed.";
-
-                                            return companyName;
-                                        }))*@
                                 </td>
+
                                 <td>
                                     <span @onclick="(id => OnButtonClick_EditJobAdvert_LoadJobAdvertDetails(jobAdvert.Id))" data-bs-toggle="modal" data-bs-target="#ModalEditJobAdvert">
                                         <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette opslag." Color="Popover.PopoverType.Info" />
                                     </span>
                                 </td>
+
                                 <td>
                                     <span @onclick="@(id => OnButtonClick_RemoveJobAdvert_StoreId(jobAdvert.Id))" data-bs-toggle="modal" data-bs-target="#ModalRemoveJobAdvert">
                                         <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />

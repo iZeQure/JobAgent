@@ -53,11 +53,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
                 dynamicValues.Add("@userPassword", hashedUserPassword);
                 dynamicValues.Add("@returnResult", SqlDbType.Bit, direction: ParameterDirection.Output);
 
-                //await conn.QueryAsync(proc, dynamicValues, commandType: CommandType.StoredProcedure);
-
                 isAuthenticated = await conn.QueryFirstOrDefaultAsync<bool>(proc, dynamicValues, commandType: CommandType.StoredProcedure);
-
-                //isAuthenticated = dynamicValues.Get<bool>("@returnResult");
             }
 
             return isAuthenticated;
