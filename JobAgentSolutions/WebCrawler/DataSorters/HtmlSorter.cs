@@ -56,5 +56,27 @@ namespace WebCrawler.DataSorters
             }
             return linksFromSite;
         }
+        
+        /// <summary>
+        /// Should only return list with job posts
+        /// </summary>
+        /// <param name="urls"></param>
+        /// <returns></returns>
+        public List<string> GetJobListFromPraktikpladsen(List<string> urls)
+        {
+            List<string> jobList = new List<string>();
+            return jobList;
+        }
+
+        /// <summary>
+        /// Should only return job pages found
+        /// </summary>
+        /// <param name="urls"></param>
+        /// <returns></returns>
+        public List<string> GetJobPagesFromPraktikpladsen(List<string> urls)
+        {
+            List<string> jobPages = new List<string>();
+            return jobPages;
+        }
     }
 }

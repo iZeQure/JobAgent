@@ -8,6 +8,11 @@ namespace WebCrawler.DataScrappers
 {
     public interface ICrawler
     {
-        
+        public CrawlerSettings CrawlerSettings { get; }
+        public void SetCrawlerSettings(CrawlerSettings settings);
+        public void SetLinksToCrawl(List<IJobPage> jobPages);
+        public List<string> GetLinksFromSite();
+        public void SetCrawlerStartUrl(string url, CrawlerSettings.PageDefinitions pageDefinition);
+        public Task<HtmlDocument> Crawl(string keyWord);
     }
 }

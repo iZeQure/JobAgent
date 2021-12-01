@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using JobAgentClassLibrary.Common.JobPages.Entities;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace WebCrawler.DataScrappers
     {
         private ChromeDriver _driver;
         public CrawlerSettings CrawlerSettings { get; private set; } = new CrawlerSettings();
-        
+
         public void SetCrawlerSettings(CrawlerSettings settings)
         {
             CrawlerSettings = settings;
@@ -53,8 +54,14 @@ namespace WebCrawler.DataScrappers
 
                         Thread.Sleep(1000);
 
-                        var document = _driver.FindElements(OpenQA.Selenium.By.Id(keyWord));
-                        if (document.Count > 0)
+                        var document = _driver.FindElements(By.Id(keyWord));
+
+                        if (document.Count < 1)
+                        {
+                            document = _driver.FindElements(By.ClassName(keyWord));
+                        }
+                        
+                        if(document.Count > 0)
                         {
                             htmlDocument.LoadHtml(document[0].GetAttribute("innerHTML"));
                             htmlDocuments.Add(htmlDocument);
@@ -75,6 +82,5 @@ namespace WebCrawler.DataScrappers
 
             return await Task.FromResult(task.Result);
         }
-
     }
 }
