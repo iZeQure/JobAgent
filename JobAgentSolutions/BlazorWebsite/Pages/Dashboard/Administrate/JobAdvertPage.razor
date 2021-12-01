@@ -109,8 +109,15 @@ else
 
                                 @if (jobAdvert.SpecializationId is not 0)
                                 {
+                                    @foreach (var category in _categories)
+                                    {
+                                        if (category.Id == jobAdvert.CategoryId)
+                                        {
+                                            _categoryName = category.Name;
+                                        }
+                                    }
                                     <td>
-                                        <CategoryDetails @key="jobAdvert" Id="jobAdvert.CategoryId" />
+                                        <p>@_categoryName</p>
                                         <SpecializationDetails @key="jobAdvert" Id="jobAdvert.SpecializationId" />
                                     </td>
                                 }

@@ -27,8 +27,10 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
         private JobAdvertPaginationModel _paginationModel = new();
         private JobAdvertModel _jobAdvertModel = new();
         private List<ICategory> _categories;
+
         private int _advertId = 0;
         private int _categoryId = 0;
+        private string _categoryName = string.Empty;
         private bool _createJobAdvertBtnIsDisabled = false;
         private bool _filteredContentFound = false;
         private bool _dataIsLoading = false;
