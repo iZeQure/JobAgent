@@ -42,7 +42,7 @@ else
             <div class="d-flex flex-row-reverse">
                 <div class="filter">
                     <select class="custom-select-sm" @bind="_categoryId">
-                        <option selected value="0">--- Vælg kategori ---</option>
+                        <option selected value="@int.MaxValue">--- Vælg kategori ---</option>
                         @if (_categories == null)
                         {
                             <option>Ingen Kategorier fundet!</option>

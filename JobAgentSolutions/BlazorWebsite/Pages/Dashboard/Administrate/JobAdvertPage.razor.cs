@@ -99,7 +99,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
 
         public async Task FilterJobAdverts(int page = 1)
         {
-            if (_categoryId is 0)
+            if (_categoryId is int.MaxValue)
             {
                 _paginationModel.CurrentPage = page;
                 _paginationModel.JobAdverts = (await JobAdvertService.GetJobAdvertsAsync())

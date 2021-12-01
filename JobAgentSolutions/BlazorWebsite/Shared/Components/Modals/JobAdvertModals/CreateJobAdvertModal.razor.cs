@@ -97,8 +97,8 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
                     Title = _jobAdvertModel.Title,
                     Summary = _jobAdvertModel.Summary,
                     RegistrationDateTime = _jobAdvertModel.RegistrationDateTime
-
                 };
+
                 bool isCreated = false;
                 var result = await JobAdvertService.CreateAsync(jobAdvert);
 
