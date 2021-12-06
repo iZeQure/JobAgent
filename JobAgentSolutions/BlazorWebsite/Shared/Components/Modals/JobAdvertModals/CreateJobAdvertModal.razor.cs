@@ -99,6 +99,12 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
                     RegistrationDateTime = _jobAdvertModel.RegistrationDateTime
                 };
 
+                if (await JobAdvertService.GetByIdAsync(jobAdvert.Id) != null)
+                {
+                    _errorMessage = "Der findes allerede et stillingsopslag for den valgte stillings side";
+                    return;
+                }
+
                 bool isCreated = false;
                 var result = await JobAdvertService.CreateAsync(jobAdvert);
 
