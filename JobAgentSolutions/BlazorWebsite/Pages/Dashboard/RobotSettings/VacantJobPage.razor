@@ -2,10 +2,10 @@
 @attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
 @using BlazorWebsite.Shared.Components.Modals.VacantJobModals;
 
-<PageDocumentTitle DocumentTitle="Administrer - Stillingsopslag" />
+<PageDocumentTitle DocumentTitle="Administrer - Stillinger" />
 
 <div class="d-flex">
-    <PageHeadingTitle DisplayTitle="Virksomheds Stillingsopslag" />
+    <PageHeadingTitle DisplayTitle="Virksomheds Stillinger" />
     <div class="d-inline-block px-4 pt-4">
 
         @if (_companies == null)
@@ -13,12 +13,12 @@
             <a class="btn btn-sm btn-info cursor-pointer text-white no-gutters disabled">
                 <span class="d-inline-block">Ikke Aktiveret</span>
             </a>
-            <span class="d-inline-block"><small class="text-danger font-weight-bolder">* Opret et Stillingsopslag for at benytte links.</small></span>
+            <span class="d-inline-block"><small class="text-danger font-weight-bolder">* Opret en Stilling for at benytte links.</small></span>
         }
         else
         {
             <a class="btn btn-sm btn-info cursor-pointer text-white" data-bs-toggle="modal" data-bs-target="#ModalCreateVacantJob">
-                Opret nyt stillingsopslag
+                Opret ny stilling
             </a>
         }
 
@@ -34,21 +34,21 @@ else
     @if (_vacantJobs == null)
     {
         <MessageAlert Alert="MessageAlert.AlertType.Info"
-                      Message="Indlæser robot links.." IsLoading="true" />
+                      Message="Indlæser stillinger.." IsLoading="true" />
     }
     else
     {
         @if (!_vacantJobs.Any())
         {
             <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                          Message="Der blev ikke fundet nogen links."
-                          MessageOptional="Opret links, ved at trykke på knappen : Opret nyt Link." />
+                          Message="Der blev ikke fundet nogen stillinger."
+                          MessageOptional="Opret stillinger, ved at trykke på knappen : Opret ny stilling." />
         }
         else
         {
             <div class="table-responsive table-responsive-sm table-responsive-md">
                 <table class="table table-striped table-hover">
-                    <caption>Liste over virksomheders stillingsopslag..</caption>
+                    <caption>Liste over virksomheders stillinger..</caption>
                     <thead class="table-primary text-light">
                         <tr>
                             <th scope="col">#</th>
@@ -75,13 +75,13 @@ else
 
                                 <td>
                                     <span data-bs-toggle="modal" data-bs-target="#ModalEditVacantJob" @onclick="@(mouseEvent => OnClick_EditLink(vacantJob.Id))">
-                                        <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne jobside." Color="Popover.PopoverType.Info" />
+                                        <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne stilling." Color="Popover.PopoverType.Info" />
                                     </span>
                                 </td>
 
                                 <td>
                                     <span data-bs-toggle="modal" data-bs-target="#ModalRemoveVacantJob" @onclick="@(mouseEvent => ConfirmationWindow(vacantJob.Id))">
-                                        <Popover Title="Forsigtig!" Body="Denne knap sletter den valgte jobside, forevigt!" Color="Popover.PopoverType.Danger" />
+                                        <Popover Title="Forsigtig!" Body="Denne knap sletter den valgte stilling, forevigt!" Color="Popover.PopoverType.Danger" />
                                     </span>
                                 </td>
                             </tr>
