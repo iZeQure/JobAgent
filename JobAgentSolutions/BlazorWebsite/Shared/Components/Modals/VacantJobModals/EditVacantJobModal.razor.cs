@@ -60,6 +60,11 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
 
             try
             {
+                if (!Model.URL.Contains("http://") || !Model.URL.Contains("https://"))
+                {
+                    Model.URL = "https://" + Model.URL;
+                }
+
                 VacantJob vacantJob = new()
                 {
                     Id = Model.Id,

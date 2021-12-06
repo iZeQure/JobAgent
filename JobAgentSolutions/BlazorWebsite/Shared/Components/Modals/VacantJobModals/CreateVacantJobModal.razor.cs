@@ -75,12 +75,16 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
             _isProcessing = true;
             try
             {
+                if (!_vacantJobModel.URL.Contains("http://") || !_vacantJobModel.URL.Contains("https://"))
+                {
+                    _vacantJobModel.URL = "https://" + _vacantJobModel.URL;
+                }
+
                 VacantJob vacantJob = new()
                 {
                     Id = _vacantJobModel.Id,
                     CompanyId = _vacantJobModel.CompanyId,
                     URL = _vacantJobModel.URL
-
                 };
 
                 bool isCreated = false;
