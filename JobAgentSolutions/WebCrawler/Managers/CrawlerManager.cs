@@ -18,12 +18,13 @@ namespace WebCrawler.Managers
         private ICrawler _crawler;
 
         private List<string> urlsFoundOnPraktikPladsen = new List<string>();
-        
+        private readonly DbCommunicator _dbCommunicator;
 
-        public CrawlerManager(CrawlerFactory factory)
+        public CrawlerManager(CrawlerFactory factory, DbCommunicator dbCommunicator)
         {
             _crawler = factory.GetCrawler();
             _sorter = factory.GetSorter();
+            _dbCommunicator = dbCommunicator;
         }
 
         public async Task<List<IJobPage>> GetJobPageDataFromPraktikPladsen()
