@@ -1,5 +1,4 @@
 ﻿using HtmlAgilityPack;
-using JobAgentClassLibrary.Common.JobPages.Entities;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System;
@@ -7,8 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using WebCrawler.DataSorters;
-using WebCrawler.Models;
 
 namespace WebCrawler.DataScrappers
 {
@@ -17,28 +14,17 @@ namespace WebCrawler.DataScrappers
         private ChromeDriver _driver;
         public CrawlerSettings CrawlerSettings { get; private set; } = new CrawlerSettings();
 
-        public void SetCrawlerSettings(CrawlerSettings settings)
+        public void SetCrawlerStartUrl(string url)
         {
-            CrawlerSettings = settings;
+            CrawlerSettings.UrlToCrawl = url;
         }
 
-        public void SetLinksToCrawl(List<IJobPage> jobPages)
+        public void SetKeyWord(string keyWord)
         {
-            CrawlerSettings.JobUrl.LinksToCrawl = jobPages;
+            CrawlerSettings.KeyWord = keyWord;
         }
 
-        public List<string> GetLinksFromSite()
-        {
-            return CrawlerSettings.JobUrl.LinksFoundOnPage;
-        }
-
-        public void SetCrawlerStartUrl(string url, CrawlerSettings.PageDefinitions pageDefinition)
-        {
-            CrawlerSettings.JobUrl.StartUrl = url;
-            CrawlerSettings.SetPageDefinitions(pageDefinition);
-        }
-
-        public async Task<HtmlDocument> Crawl(string keyWord)
+        public async Task<HtmlDocument> Crawl()
         {
             Task<HtmlDocument> task = null;
             try
@@ -47,18 +33,18 @@ namespace WebCrawler.DataScrappers
                 HtmlDocument htmlDocument = new HtmlDocument();
                 task = Task.Factory.StartNew(() =>
                 {
-                    if (!string.IsNullOrEmpty(CrawlerSettings.JobUrl.StartUrl))
+                    if (!string.IsNullOrEmpty(CrawlerSettings.UrlToCrawl) && !string.IsNullOrEmpty(CrawlerSettings.KeyWord))
                     {
                         _driver = new ChromeDriver(Environment.CurrentDirectory);
-                        _driver.Navigate().GoToUrl(CrawlerSettings.JobUrl.StartUrl);
+                        _driver.Navigate().GoToUrl(CrawlerSettings.UrlToCrawl);
 
                         Thread.Sleep(1000);
 
-                        var document = _driver.FindElements(By.Id(keyWord));
+                        var document = _driver.FindElements(By.Id(CrawlerSettings.KeyWord));
 
                         if (document.Count < 1)
                         {
-                            document = _driver.FindElements(By.ClassName(keyWord));
+                            document = _driver.FindElements(By.ClassName(CrawlerSettings.KeyWord));
                         }
                         
                         if(document.Count > 0)

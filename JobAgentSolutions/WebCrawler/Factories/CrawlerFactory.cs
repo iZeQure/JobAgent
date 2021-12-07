@@ -1,4 +1,5 @@
-﻿using WebCrawler.DataScrappers;
+﻿using Microsoft.Extensions.Configuration;
+using WebCrawler.DataScrappers;
 using WebCrawler.DataSorters;
 using WebCrawler.Managers;
 
@@ -7,23 +8,18 @@ namespace WebCrawler.Factories
     public class CrawlerFactory
     {
         private static CrawlerFactory _factory = null;
-        private static object controle = new object();
-        
+        private static object _controle = new object();
+
         public static CrawlerFactory GetCrawlerFactory
         {
             get
             {
-                lock (controle)
+                lock (_controle)
                 {
-                    if (_factory == null)
-                    {
-                        _factory = new CrawlerFactory();
+                    if (_factory is not null)
                         return _factory;
-                    }
                     else
-                    {
-                        return _factory;
-                    }
+                        return new CrawlerFactory();
                 }
             }
         }
@@ -40,16 +36,8 @@ namespace WebCrawler.Factories
 
         public CrawlerManager GetCrawlerManager()
         {
-            return new CrawlerManager(GetCrawler(), GetSorter());
+            return new CrawlerManager(this);
         }
 
-        public ICrawler PraktikPladsenCrawler()
-        {
-            Crawler crawler = new Crawler();
-
-
-
-            return crawler;
-        }
     }
 }

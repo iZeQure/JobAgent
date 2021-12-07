@@ -62,21 +62,20 @@ namespace WebCrawler.DataSorters
         /// </summary>
         /// <param name="urls"></param>
         /// <returns></returns>
-        public List<string> GetJobListFromPraktikpladsen(List<string> urls)
+        public List<string> SortPagesThatStartsWith(List<string> urls, string startsWith)
         {
             List<string> jobList = new List<string>();
-            return jobList;
-        }
+            foreach (var item in urls)
+            {
+                // Checks if the link starts with the right statement 
+                if (item.StartsWith(startsWith) && !jobList.Contains(item))
+                {
+                    // If it does and the list does not have a copy of it already
+                    jobList.Add(item);
+                }
+            }
 
-        /// <summary>
-        /// Should only return job pages found
-        /// </summary>
-        /// <param name="urls"></param>
-        /// <returns></returns>
-        public List<string> GetJobPagesFromPraktikpladsen(List<string> urls)
-        {
-            List<string> jobPages = new List<string>();
-            return jobPages;
+            return jobList;
         }
     }
 }

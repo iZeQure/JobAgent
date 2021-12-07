@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -27,29 +28,36 @@ namespace WebCrawler.DataAccess
             _connection = configuration.GetConnectionString("Default");
         }
 
-        public async Task<List<ICategory>> GetCategoriesAsync()
+        public async Task<IEnumerable<ICategory>> GetCategoriesAsync()
         {
             List<ICategory> categories = new();
 
-            using (var conn = new SqlConnection(_connection))
-            {
-                var proc = "[JA.spGetCategories]";
-
-                var queryResult = await conn.QueryAsync<CategoryInformation>(proc, commandType: CommandType.StoredProcedure);
-
-                if (queryResult is not null && queryResult.Any())
+                using (var conn = new SqlConnection(_connection))
                 {
-                    foreach (var result in queryResult)
+                    var proc = "[JA.spGetCategories]";
+                    try
                     {
-                        categories.Add(new Category()
+                        IEnumerable<CategoryInformation> queryResult = await conn.QueryAsync<CategoryInformation>(proc, commandType: CommandType.StoredProcedure);
+                    
+                        if (queryResult is not null && queryResult.Any())
                         {
-                            Id = result.Id,
-                            Name = result.Name
-                        });
+                            foreach (var result in queryResult)
+                            {
+                                categories.Add(new Category()
+                                {
+                                    Id = result.Id,
+                                    Name = result.Name
+                                });
+                            }
+                        }
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.Write(ex.Message);
                     }
                 }
-            }
-            return categories;
+
+                return categories;
         }
 
         public async Task<List<ISpecialization>> GetSpecializationsAsync()
@@ -125,7 +133,6 @@ namespace WebCrawler.DataAccess
                             Id = result.StaticSearchFilterId,
                             FilterType = new FilterType() { Id = result.FilterTypeId },
                             Key = result.StaticSearchFilterKey
-
                         });
                     }
                 }

@@ -1,15 +1,14 @@
 ﻿using HtmlAgilityPack;
-using JobAgentClassLibrary.Common.Companies;
-using JobAgentClassLibrary.Common.JobAdverts;
-using JobAgentClassLibrary.Common.JobAdverts.Entities;
-using JobAgentClassLibrary.Common.JobPages;
+using JobAgentClassLibrary.Common.JobPages.Entities;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
+using WebCrawler.DataAccess;
 using WebCrawler.DataScrappers;
 using WebCrawler.DataSorters;
-using WebCrawler.Models;
-using static WebCrawler.DataScrappers.CrawlerSettings;
+using WebCrawler.Factories;
 
 namespace WebCrawler.Managers
 {
@@ -18,53 +17,126 @@ namespace WebCrawler.Managers
         private IHtmlSorter _sorter;
         private ICrawler _crawler;
 
-        public CrawlerManager(ICrawler crawler, IHtmlSorter sorter)
+        private List<string> urlsFoundOnPraktikPladsen = new List<string>();
+        
+
+        public CrawlerManager(CrawlerFactory factory)
         {
-            _crawler = crawler;
-            _sorter = sorter;
-            ((Crawler)_crawler).SetCrawlerSettings(new CrawlerSettings());
+            _crawler = factory.GetCrawler();
+            _sorter = factory.GetSorter();
         }
 
-        public async Task<HtmlDocument> CrawlOnSpecifiedPage(string url, PageDefinitions pageDefinition, string keyWord)
+        public async Task<List<IJobPage>> GetJobPageDataFromPraktikPladsen()
         {
-            try
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<HtmlDocument>> GetJobsFromPraktikPladsen()
+        {
+            var linkResult = await CrawlPraktikPladsenForLinks();
+            List<HtmlDocument> htmlDocuments = new List<HtmlDocument>();
+
+            foreach (var item in urlsFoundOnPraktikPladsen)
             {
-                ((Crawler)_crawler).SetCrawlerStartUrl(url, pageDefinition);
-                var result = await ((Crawler)_crawler).Crawl(keyWord);
-                if (!string.IsNullOrEmpty(result.Text))
+                try
                 {
-                    var htmlArray = _sorter.GetHtmlArray(result);
-                    ((Crawler)_crawler).CrawlerSettings.JobUrl.LinksFoundOnPage = UrlCutter.SortUrlPaths(_sorter.GetLinksFromDocument(htmlArray));
+                    var result = await CrawlOnSpecifiedPage(((Crawler)_crawler).CrawlerSettings._baseUrls["PraktikPladsen"] + item, "defs-table");
+                    htmlDocuments.Add(result);
                 }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.StackTrace);
+                    Debug.WriteLine(ex.Message);
+                }
+            }
 
-                return result;
-            }
-            catch (Exception)
-            {
-                throw new Exception("Nothing found");
-            }
+            return htmlDocuments;
         }
 
-        public async Task<List<HtmlDocument>> CrawlPagesFound()
+        public async Task<List<string>> CrawlPraktikPladsenForLinks()
         {
-            foreach (var urlPath in ((Crawler)_crawler).CrawlerSettings.JobUrl.LinksFoundOnPage)
+            bool linksToCrawl = true;
+            int count = 0;
+            List<string> linksfound = new List<string>();
+            string startUrl = "";
+            linksfound.Add(new string("/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20programmering"));
+
+            while (linksToCrawl)
             {
-                var baseUrl = UrlCutter.GetBaseUrl(((Crawler)_crawler).CrawlerSettings.JobUrl.StartUrl);
-                var keyWords = _crawler.CrawlerSettings.GetKeyWordsForPage();
-                foreach (var item in keyWords)
+                if (startUrl != "")
                 {
-                    var result = await CrawlOnSpecifiedPage(baseUrl + urlPath, UrlCutter.GetPageDefinitionFromUrl(baseUrl), item);
-                    if (!string.IsNullOrEmpty(result.Text))
+                    var result = await CrawlOnSpecifiedPage(startUrl, "resultater");
+
+                    // Cuts the html doc into minor pieces 
+                    var htmlArray = _sorter.GetHtmlArray(result);
+                    // Gets the links found in html
+                    var links = _sorter.GetLinksFromDocument(htmlArray);
+                    // Sorts the links so only valid link remain 
+                    var sortedLinks = UrlCutter.SortUrlPaths(links);
+
+                    count = linksfound.Count;
+
+                    
+                    linksfound.AddRange(sortedLinks);
+                    linksfound = _sorter.SortPagesThatStartsWith(linksfound, "/soeg");
+                    urlsFoundOnPraktikPladsen.AddRange(sortedLinks);
+                    urlsFoundOnPraktikPladsen = _sorter.SortPagesThatStartsWith(urlsFoundOnPraktikPladsen, "/vis");
+
+                    if (linksfound.Count == count)
                     {
-                        _crawler.CrawlerSettings.JobUrl.HtmlDocuments.Add(result);
+                        linksToCrawl = false;
                     }
                 }
 
-                // add some logic to get jobpage data from site   
-                // only praktikpladsen for the first try 
+                startUrl = ((Crawler)_crawler).CrawlerSettings._baseUrls["PraktikPladsen"] + linksfound[linksfound.Count - 1];
             }
 
-            return _crawler.CrawlerSettings.JobUrl.HtmlDocuments;
+            return linksfound;
         }
+
+        public async Task<HtmlDocument> CrawlOnSpecifiedPage(string url, string keyWord)
+        {
+            try
+            {
+                ((Crawler)_crawler).SetCrawlerStartUrl(url);
+                ((Crawler)_crawler).SetKeyWord(keyWord);
+
+                var result = await ((Crawler)_crawler).Crawl();
+
+                if (string.IsNullOrEmpty(result.Text))
+                {
+                    throw new Exception("Nothing Found !!");
+                }
+                else
+                    return result;
+            }
+            catch (Exception)
+            {
+                throw new Exception("Nothing found !!");
+            }
+        }
+
+        //public async Task<List<HtmlDocument>> CrawlPagesFound()
+        //{
+        //    DbCommunicator dbCommunicator = new DbCommunicator(_configuration);
+        //    // Test to see if the call returns list of ICategory
+        //    foreach (var urlPath in ((Crawler)_crawler).CrawlerSettings.JobUrl.LinksFoundOnPage)
+        //    {
+        //        var baseUrl = UrlCutter.GetBaseUrl(((Crawler)_crawler).CrawlerSettings.JobUrl.StartUrl);
+        //        var keyWords = _crawler.CrawlerSettings.GetKeyWordsForPage();
+
+        //        foreach (var item in keyWords)
+        //        {
+        //            var result = await CrawlOnSpecifiedPage(baseUrl + urlPath, UrlCutter.GetPageDefinitionFromUrl(baseUrl), item);
+        //            if (!string.IsNullOrEmpty(result.Text))
+        //            {
+        //                _crawler.CrawlerSettings.JobUrl.HtmlDocuments.Add(result);
+        //            }
+        //        }
+        //        // add some logic to get jobpage data from site   
+        //        // only praktikpladsen for the first try 
+        //    }
+        //    return _crawler.CrawlerSettings.JobUrl.HtmlDocuments;
+        //}
     }
 }

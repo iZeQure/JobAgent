@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WebCrawler.DataScrappers;
 using WebCrawler.DataSorters;
+using WebCrawler.Factories;
 using WebCrawler.Managers;
 
 namespace WebCrawler
@@ -44,19 +45,17 @@ namespace WebCrawler
 
         private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-        
             services.AddSingleton<IJobAdvertService, JobAdvertService>();
             services.AddSingleton<IJobPageService, JobPageService>();
             services.AddSingleton<IVacantJobService, VacantJobService>();
             services.AddSingleton<ICompanyService, CompanyService>();
             services.AddSingleton<ICategoryService, CategoryService>();
-            
+
+            services.AddSingleton<CrawlerManager>();
             services.AddSingleton<ICrawler, Crawler>();
             services.AddSingleton<IHtmlSorter, HtmlSorter>();
+            services.AddSingleton<CrawlerFactory>();
             
-            services.AddSingleton<CrawlerManager>();
-
-
         }
     }
 }
