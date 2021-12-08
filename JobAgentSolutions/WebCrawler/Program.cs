@@ -56,7 +56,6 @@ namespace WebCrawler
             services.AddSingleton<CrawlerManager>();
             services.AddSingleton<ICrawler, Crawler>();
             services.AddSingleton<IHtmlSorter, HtmlSorter>();
-            
         }
     }
 }
