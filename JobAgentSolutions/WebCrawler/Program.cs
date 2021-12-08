@@ -7,6 +7,7 @@ using JobAgentClassLibrary.Common.VacantJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using WebCrawler.DataAccess;
 using WebCrawler.DataScrappers;
 using WebCrawler.DataSorters;
 using WebCrawler.Factories;
@@ -51,10 +52,10 @@ namespace WebCrawler
             services.AddSingleton<ICompanyService, CompanyService>();
             services.AddSingleton<ICategoryService, CategoryService>();
 
+            services.AddSingleton<DbCommunicator>();
             services.AddSingleton<CrawlerManager>();
             services.AddSingleton<ICrawler, Crawler>();
             services.AddSingleton<IHtmlSorter, HtmlSorter>();
-            services.AddSingleton<CrawlerFactory>();
             
         }
     }

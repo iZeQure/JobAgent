@@ -1,6 +1,8 @@
 ﻿using Dapper;
 using JobAgentClassLibrary.Common.Categories.Entities;
 using JobAgentClassLibrary.Common.Categories.Entities.EntityMaps;
+using JobAgentClassLibrary.Common.Companies.Entities;
+using JobAgentClassLibrary.Common.Companies.Entities.EntityMaps;
 using JobAgentClassLibrary.Common.Filters.Entities;
 using JobAgentClassLibrary.Common.Filters.Entities.EntityMaps;
 using JobAgentClassLibrary.Common.JobAdverts.Entities;
@@ -369,6 +371,31 @@ namespace WebCrawler.DataAccess
             if (entityId >= 0) return await GetVacantJobByIdAsync(entityId);
 
             return null;
+        }
+
+        public async Task<List<ICompany>> GetCompaniesAsync()
+        {
+            List<ICompany> companies = new();
+
+            using (var conn = new SqlConnection(_connection))
+            {
+                var proc = "[dbo].[JA.spGetCompanies]";
+
+                var queryResults = await conn.QueryAsync<CompanyInformation>(proc, commandType: CommandType.StoredProcedure);
+
+                if (queryResults is not null)
+                {
+                    foreach (var result in queryResults)
+                    {
+                        companies.Add(new Company()
+                        {
+                            Id = result.Id,
+                            Name = result.Name
+                        });
+                    }
+                }
+            }
+            return companies;
         }
     }
 }

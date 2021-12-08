@@ -16,11 +16,8 @@ namespace WebCrawler
 
         public async void StartCrawler()
         {
-            var jobs = await _crawlerManager.GetJobsFromPraktikPladsen();
-
-
+            var jobs = await _crawlerManager.GetJobPageDataFromPraktikPladsen();
             //var result = await _crawlerManager.CrawlPraktikpladsen();
-
             string wait = "";
         }
     }

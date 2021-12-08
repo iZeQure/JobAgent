@@ -1,9 +1,13 @@
 ﻿using HtmlAgilityPack;
+using JobAgentClassLibrary.Common.Companies.Entities;
+using JobAgentClassLibrary.Common.JobAdverts.Entities;
 using JobAgentClassLibrary.Common.JobPages.Entities;
+using JobAgentClassLibrary.Common.VacantJobs.Entities;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using WebCrawler.DataAccess;
 using WebCrawler.DataScrappers;
@@ -15,26 +19,54 @@ namespace WebCrawler.Managers
     public class CrawlerManager
     {
         private IHtmlSorter _sorter;
+        private readonly DbCommunicator _dbCommunicator;
         private ICrawler _crawler;
 
-        private List<string> urlsFoundOnPraktikPladsen = new List<string>();
-        private readonly DbCommunicator _dbCommunicator;
-
-        public CrawlerManager(CrawlerFactory factory, DbCommunicator dbCommunicator)
+        // Only for test 
+        // Final product should get the paths from db
+        private readonly List<string> mainUrlPathPraktikpladsen = new List<string>()
         {
-            _crawler = factory.GetCrawler();
-            _sorter = factory.GetSorter();
+                new string("/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20programmering"),
+                new string("/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20infrastruktur"),
+                new string("/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/IT-supporter")
+        };
+        
+        /// <summary>
+        /// This list holds the links found one the selected page
+        /// </summary>
+        private List<string> urlsFoundOnPraktikPladsen = new List<string>();
+        public CrawlerManager(ICrawler crawler, IHtmlSorter sorter, DbCommunicator dbCommunicator)
+        {
+            _crawler = crawler;
+            _sorter = sorter;
             _dbCommunicator = dbCommunicator;
         }
 
         public async Task<List<IJobPage>> GetJobPageDataFromPraktikPladsen()
         {
+            foreach (var urlPath in mainUrlPathPraktikpladsen)
+            {
+                var links = await CrawlPraktikPladsenForLinks(urlPath);
+                foreach (var item in urlsFoundOnPraktikPladsen)
+                {
+                    var companies = await _dbCommunicator.GetCompaniesAsync();
+                    var company = companies.FirstOrDefault(c => c.Name == "Praktikpladsen");
+                    VacantJob vacantJob = new VacantJob()
+                    {
+                        CompanyId = company.Id,
+                        URL = item
+                    };
+                }
+
+                urlsFoundOnPraktikPladsen = new List<string>();
+            }
+
             throw new NotImplementedException();
         }
 
-        public async Task<List<HtmlDocument>> GetJobsFromPraktikPladsen()
+        public async Task<List<HtmlDocument>> GetJobsFromPraktikPladsen(string startUrl)
         {
-            var linkResult = await CrawlPraktikPladsenForLinks();
+            var linkResult = await CrawlPraktikPladsenForLinks(startUrl);
             List<HtmlDocument> htmlDocuments = new List<HtmlDocument>();
 
             foreach (var item in urlsFoundOnPraktikPladsen)
@@ -50,23 +82,26 @@ namespace WebCrawler.Managers
                     Debug.WriteLine(ex.Message);
                 }
             }
-
             return htmlDocuments;
         }
 
-        public async Task<List<string>> CrawlPraktikPladsenForLinks()
+        /// <summary>
+        /// Used to crawl a specific kind fx programming. /soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20programmering
+        /// </summary>
+        /// <param name="startUrl"></param>
+        /// <returns></returns>
+        public async Task<List<string>> CrawlPraktikPladsenForLinks(string startUrlPath)
         {
             bool linksToCrawl = true;
             int count = 0;
             List<string> linksfound = new List<string>();
-            string startUrl = "";
-            linksfound.Add(new string("/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20programmering"));
+            linksfound.Add(new string(startUrlPath));
 
             while (linksToCrawl)
             {
-                if (startUrl != "")
+                if (startUrlPath != "")
                 {
-                    var result = await CrawlOnSpecifiedPage(startUrl, "resultater");
+                    var result = await CrawlOnSpecifiedPage(((Crawler)_crawler).CrawlerSettings._baseUrls["PraktikPladsen"] + startUrlPath, "resultater");
 
                     // Cuts the html doc into minor pieces 
                     var htmlArray = _sorter.GetHtmlArray(result);
@@ -76,7 +111,6 @@ namespace WebCrawler.Managers
                     var sortedLinks = UrlCutter.SortUrlPaths(links);
 
                     count = linksfound.Count;
-
                     
                     linksfound.AddRange(sortedLinks);
                     linksfound = _sorter.SortPagesThatStartsWith(linksfound, "/soeg");
@@ -89,7 +123,7 @@ namespace WebCrawler.Managers
                     }
                 }
 
-                startUrl = ((Crawler)_crawler).CrawlerSettings._baseUrls["PraktikPladsen"] + linksfound[linksfound.Count - 1];
+                startUrlPath = linksfound[linksfound.Count - 1];
             }
 
             return linksfound;

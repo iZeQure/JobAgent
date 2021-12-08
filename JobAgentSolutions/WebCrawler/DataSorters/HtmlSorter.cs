@@ -74,7 +74,6 @@ namespace WebCrawler.DataSorters
                     jobList.Add(item);
                 }
             }
-
             return jobList;
         }
     }
