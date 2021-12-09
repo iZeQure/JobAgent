@@ -4,14 +4,16 @@ using JobAgentClassLibrary.Core.Settings;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 
-namespace WebCrawlerTests
+namespace WebCrawler.DataAccess
 {
-    public static class SqlConfigurationSetup
+    public class SqlConfigurationSetup
     {
         public static ISqlDbManager SetupSqlDbManager()
         {
             var inMemorySettings = new Dictionary<string, string>
             {
+                //This is only for developing
+                //Release version must NOT have connectionstring data in code
                 {"ServerHost", "172.18.3.151" },
                 {"Database", "JobAgentDB_v2" }
             };
