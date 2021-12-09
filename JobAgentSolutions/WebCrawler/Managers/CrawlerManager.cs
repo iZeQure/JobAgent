@@ -35,11 +35,11 @@ namespace WebCrawler.Managers
         /// This list holds the links found one the selected page
         /// </summary>
         private List<string> urlsFoundOnPraktikPladsen = new List<string>();
-        public CrawlerManager(ICrawler crawler, IHtmlSorter sorter, DbCommunicator dbCommunicator)
+        public CrawlerManager(ICrawler crawler, IHtmlSorter sorter)
         {
+            _dbCommunicator = new DbCommunicator();
             _crawler = crawler;
             _sorter = sorter;
-            _dbCommunicator = dbCommunicator;
         }
 
         public async Task<List<IJobPage>> GetJobPageDataFromPraktikPladsen()

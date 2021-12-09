@@ -18,7 +18,6 @@ namespace WebCrawler
         {
             var jobs = await _crawlerManager.GetJobPageDataFromPraktikPladsen();
             //var result = await _crawlerManager.CrawlPraktikpladsen();
-            string wait = "";
         }
     }
 }
