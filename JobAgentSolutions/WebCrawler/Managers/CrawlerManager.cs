@@ -44,16 +44,18 @@ namespace WebCrawler.Managers
 
         public async Task<List<IJobPage>> GetJobPageDataFromPraktikPladsen()
         {
+            // This should come from db
             foreach (var urlPath in mainUrlPathPraktikpladsen)
             {
                 var links = await CrawlPraktikPladsenForLinks(urlPath);
                 foreach (var item in urlsFoundOnPraktikPladsen)
                 {
-                    var companies = await _dbCommunicator.GetCompaniesAsync();
-                    var company = companies.FirstOrDefault(c => c.Name == "Praktikpladsen");
+                    // Activate when methods runs 
+                    //var companies = await _dbCommunicator.GetCompaniesAsync();
+                    //var company = companies.FirstOrDefault(c => c.Name == "Praktikpladsen");
                     VacantJob vacantJob = new VacantJob()
                     {
-                        CompanyId = company.Id,
+                        CompanyId = 1, //company.Id,
                         URL = item
                     };
                 }
@@ -64,31 +66,11 @@ namespace WebCrawler.Managers
             throw new NotImplementedException();
         }
 
-        public async Task<List<HtmlDocument>> GetJobsFromPraktikPladsen(string startUrl)
-        {
-            var linkResult = await CrawlPraktikPladsenForLinks(startUrl);
-            List<HtmlDocument> htmlDocuments = new List<HtmlDocument>();
-
-            foreach (var item in urlsFoundOnPraktikPladsen)
-            {
-                try
-                {
-                    var result = await CrawlOnSpecifiedPage(((Crawler)_crawler).CrawlerSettings._baseUrls["PraktikPladsen"] + item, "defs-table");
-                    htmlDocuments.Add(result);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.StackTrace);
-                    Debug.WriteLine(ex.Message);
-                }
-            }
-            return htmlDocuments;
-        }
-
         /// <summary>
-        /// Used to crawl a specific kind fx programming. /soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20programmering
+        /// This method will look for all valid links it can find on the page 
+        /// Needs a start url fx https://pms.praktikpladsen.dk/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20programmering
         /// </summary>
-        /// <param name="startUrl"></param>
+        /// <param name="startUrlPath"></param>
         /// <returns></returns>
         public async Task<List<string>> CrawlPraktikPladsenForLinks(string startUrlPath)
         {
@@ -122,13 +104,18 @@ namespace WebCrawler.Managers
                         linksToCrawl = false;
                     }
                 }
-
                 startUrlPath = linksfound[linksfound.Count - 1];
             }
-
             return linksfound;
         }
 
+        /// <summary>
+        /// Crawls the url, and looks for keyword in classes and ids
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="keyWord"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<HtmlDocument> CrawlOnSpecifiedPage(string url, string keyWord)
         {
             try
