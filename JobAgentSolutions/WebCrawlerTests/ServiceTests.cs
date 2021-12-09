@@ -6,6 +6,7 @@ using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using WebCrawler.DataAccess;
 
 namespace WebCrawlerTests
 {
@@ -23,6 +24,7 @@ namespace WebCrawlerTests
 
             _jobAdvertService = new JobAdvertService(_jobAdvertRepository);
         }
+
 
         [Test]
         [Order(0)]
@@ -42,6 +44,7 @@ namespace WebCrawlerTests
             Assert.AreNotEqual(0, firstAdvert.Id);
             Assert.IsNotNull(firstAdvert.Title);
         }
+
 
         [Test]
         [Order(1)]
@@ -158,6 +161,5 @@ namespace WebCrawlerTests
             //Assert
             Assert.IsTrue(cleanupSuccess);
         }
-
     }
 }
