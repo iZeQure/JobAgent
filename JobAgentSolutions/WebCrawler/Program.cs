@@ -54,7 +54,7 @@ namespace WebCrawler
 
             services.AddSingleton<DbCommunicator>();
             services.AddSingleton<CrawlerManager>();
-            services.AddSingleton<ICrawler, Crawler>();
+            services.AddSingleton<Crawler>();
             services.AddSingleton<IHtmlSorter, HtmlSorter>();
         }
     }

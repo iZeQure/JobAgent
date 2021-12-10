@@ -10,21 +10,10 @@ using WebCrawler.Models;
 
 namespace WebCrawler.DataScrappers
 {
-    public class Crawler : ICrawler
+    public class Crawler
     {
         private ChromeDriver _driver;
-        public CrawlerSettings CrawlerSettings { get; private set; } = new CrawlerSettings();
-
-        public void SetCrawlerStartUrl(string url)
-        {
-            CrawlerSettings.UrlToCrawl = url;
-        }
-
-        public void SetKeyWord(string keyWord)
-        {
-            CrawlerSettings.KeyWord = keyWord;
-        }
-
+      
         public async Task<WebData> Crawl(string url, string keyWord)
         {
             Task<WebData> task = null;
