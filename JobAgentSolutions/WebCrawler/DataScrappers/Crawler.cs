@@ -12,8 +12,12 @@ namespace WebCrawler.DataScrappers
 {
     public class Crawler
     {
-        private ChromeDriver _driver;
-      
+        private IWebDriver _driver;
+        public Crawler(IWebDriver webDriver)
+        {
+            _driver = webDriver;
+        }
+
         public async Task<WebData> Crawl(string url, string keyWord)
         {
             Task<WebData> task = null;
@@ -47,7 +51,6 @@ namespace WebCrawler.DataScrappers
                         }
 
                         _driver.Close();
-                        _driver.CloseDevToolsSession();
                         _driver.Dispose();
                     }
 

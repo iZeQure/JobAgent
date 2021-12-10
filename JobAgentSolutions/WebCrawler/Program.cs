@@ -10,7 +10,6 @@ using Microsoft.Extensions.Hosting;
 using WebCrawler.DataAccess;
 using WebCrawler.DataScrappers;
 using WebCrawler.DataSorters;
-using WebCrawler.Factories;
 using WebCrawler.Managers;
 
 namespace WebCrawler
