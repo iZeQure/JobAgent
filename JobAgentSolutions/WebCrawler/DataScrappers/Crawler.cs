@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using WebCrawler.Models;
 
 namespace WebCrawler.DataScrappers
 {
@@ -24,33 +25,36 @@ namespace WebCrawler.DataScrappers
             CrawlerSettings.KeyWord = keyWord;
         }
 
-        public async Task<HtmlDocument> Crawl()
+        public async Task<WebData> Crawl(string url, string keyWord)
         {
-            Task<HtmlDocument> task = null;
+            Task<WebData> task = null;
+            WebData webData = new WebData();
+
             try
             {
-                List<HtmlDocument> htmlDocuments = new List<HtmlDocument>();
-                HtmlDocument htmlDocument = new HtmlDocument();
                 task = Task.Factory.StartNew(() =>
                 {
-                    if (!string.IsNullOrEmpty(CrawlerSettings.UrlToCrawl) && !string.IsNullOrEmpty(CrawlerSettings.KeyWord))
+                    if (!string.IsNullOrEmpty(url) && !string.IsNullOrEmpty(keyWord))
                     {
                         _driver = new ChromeDriver(Environment.CurrentDirectory);
-                        _driver.Navigate().GoToUrl(CrawlerSettings.UrlToCrawl);
+                        _driver.Navigate().GoToUrl(url);
 
                         Thread.Sleep(1000);
 
-                        var document = _driver.FindElements(By.Id(CrawlerSettings.KeyWord));
+                        var document = _driver.FindElements(By.Id(keyWord));
 
                         if (document.Count < 1)
                         {
-                            document = _driver.FindElements(By.ClassName(CrawlerSettings.KeyWord));
+                            document = _driver.FindElements(By.ClassName(keyWord));
                         }
-                        
-                        if(document.Count > 0)
+
+                        if (document.Count > 0)
                         {
-                            htmlDocument.LoadHtml(document[0].GetAttribute("innerHTML"));
-                            htmlDocuments.Add(htmlDocument);
+                            webData.Link = url;
+                            foreach (var item in document)
+                            {
+                                webData.Data.Add(item.Text);
+                            }
                         }
 
                         _driver.Close();
@@ -58,7 +62,7 @@ namespace WebCrawler.DataScrappers
                         _driver.Dispose();
                     }
 
-                    return htmlDocument;
+                    return webData;
                 });
             }
             catch (Exception ex)

@@ -42,22 +42,35 @@ namespace WebCrawler.Managers
             _dbCommunicator = dbCommunicator;
         }
 
-        public async Task<List<IJobPage>> GetJobPageDataFromPraktikPladsen()
+        public async Task<List<IJobPage>> GetDataFromPraktikpladsen()
         {
-            // This should come from db
+            var companies = await _dbCommunicator.GetCategoriesAsync();
+            var categories = await _dbCommunicator.GetCategoriesAsync();
+            var specializtion = await _dbCommunicator.GetSpecializationsAsync();
+
             foreach (var urlPath in mainUrlPathPraktikpladsen)
             {
+
                 var links = await CrawlPraktikPladsenForLinks(urlPath);
                 foreach (var item in urlsFoundOnPraktikPladsen)
                 {
-                    // Activate when methods runs 
-                    //var companies = await _dbCommunicator.GetCompaniesAsync();
-                    //var company = companies.FirstOrDefault(c => c.Name == "Praktikpladsen");
+                    
                     VacantJob vacantJob = new VacantJob()
                     {
-                        CompanyId = 1, //company.Id,
+                        CompanyId = companies.FirstOrDefault(x => x.Name == "Praktikpladsen").Id,
                         URL = item
                     };
+                    var createdVacantJob = await _dbCommunicator.CreateVacantJobAsync(vacantJob);
+
+
+                    JobAdvert jobAdvert = new JobAdvert()
+                    {
+                        Id = createdVacantJob.Id,
+                        CategoryId = categories.FirstOrDefault(c => c.Name.StartsWith("Data")).Id,
+
+                    };
+
+                    jobAdvert.SpecializationId = specializtion.FirstOrDefault(s => s.CategoryId == jobAdvert.CategoryId).Id;
                 }
 
                 urlsFoundOnPraktikPladsen = new List<string>();
@@ -123,14 +136,14 @@ namespace WebCrawler.Managers
                 ((Crawler)_crawler).SetCrawlerStartUrl(url);
                 ((Crawler)_crawler).SetKeyWord(keyWord);
 
-                var result = await ((Crawler)_crawler).Crawl();
+                var result = await ((Crawler)_crawler).Crawl(url, keyWord);
 
-                if (string.IsNullOrEmpty(result.Text))
+                if (string.IsNullOrEmpty(result.Data[0]))
                 {
                     throw new Exception("Nothing Found !!");
                 }
                 else
-                    return result;
+                    throw new NotImplementedException();
             }
             catch (Exception)
             {

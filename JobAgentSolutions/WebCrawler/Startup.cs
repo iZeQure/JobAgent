@@ -16,9 +16,21 @@ namespace WebCrawler
 
         public async void StartCrawler()
         {
-            var jobs = await _crawlerManager.GetDataFromPraktikpladsen();
-            //var result = await _crawlerManager.CrawlPraktikpladsen();
-            string wait = "";
+            Crawler crawler = new Crawler();
+            var data = await crawler.Crawl("https://pms.praktikpladsen.dk/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20programmering", "SoegOpslag_searchResultEntry__1M5O9");
+
+            foreach (var item in data.Data)
+            {
+                var dataArray = item.Split('/');
+                foreach (var dataArr in dataArray)
+                {
+                    Debug.WriteLine(dataArr);
+                }
+                
+            }
+
+
+            Debug.WriteLine("Done");
         }
     }
 }
