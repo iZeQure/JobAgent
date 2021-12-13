@@ -7,6 +7,8 @@ using JobAgentClassLibrary.Common.VacantJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using WebCrawler.DataAccess;
 using WebCrawler.DataScrappers;
 using WebCrawler.DataSorters;
@@ -50,7 +52,10 @@ namespace WebCrawler
             services.AddSingleton<IVacantJobService, VacantJobService>();
             services.AddSingleton<ICompanyService, CompanyService>();
             services.AddSingleton<ICategoryService, CategoryService>();
+            
+            services.AddSingleton<IWebDriver, ChromeDriver>();
 
+            services.AddSingleton<UrlCutter>();
             services.AddSingleton<DbCommunicator>();
             services.AddSingleton<CrawlerManager>();
             services.AddSingleton<Crawler>();
