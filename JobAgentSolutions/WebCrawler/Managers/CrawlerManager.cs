@@ -46,18 +46,15 @@ namespace WebCrawler.Managers
         }
 
 
-        public async Task<List<WebData>> GetDataFromPraktikpladsen(string startUrl)
+        public async Task<List<WebData>> GetDataFromPraktikpladsen()
         {
             List<WebData> webDataList = new();
-            var data = await _crawler.Crawl(startUrl, "resultater");
+            var jobListLinks = UrlCutter.CheckListForDublicates(await GetJobLinksFromPraktikpladsen(0));
 
-            data.JobLinks = UrlCutter.GetJobLinks(data.LinksFound);
-            data.JobListLinks = UrlCutter.GetLinkLists(data.LinksFound);
-
-            for (int i = 0; i < data.JobListLinks.Count; i++)
+            for (int i = 0; i < jobListLinks.Count; i++)
             {
                 WebData webData = new();
-                webData = await _crawler.Crawl(data.JobListLinks[i], "resultater");
+                webData = await _crawler.Crawl(jobListLinks[i], "resultater");
                 webData.JobLinks = UrlCutter.GetJobLinks(webData.LinksFound);
                 webData.JobListLinks = UrlCutter.GetLinkLists(webData.LinksFound);
                 webDataList.Add(webData);

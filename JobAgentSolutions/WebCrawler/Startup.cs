@@ -27,8 +27,7 @@ namespace WebCrawler
         public async void StartCrawler()
         {
             // var data = await _crawlerManager.GetDataFromPraktikpladsen("https://pms.praktikpladsen.dk/soeg-opslag/1/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20programmering");
-            var data = await _crawlerManager.GetJobLinksFromPraktikpladsen(0);
-            data = UrlCutter.CheckListForDublicates(data);
+            var data = await _crawlerManager.GetDataFromPraktikpladsen();
             _driver.Close();
             Debug.WriteLine("Done");
         }
