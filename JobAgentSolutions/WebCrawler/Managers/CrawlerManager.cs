@@ -1,16 +1,12 @@
-﻿using HtmlAgilityPack;
-using JobAgentClassLibrary.Common.Categories.Entities;
-using JobAgentClassLibrary.Common.JobAdverts.Entities;
-using JobAgentClassLibrary.Common.JobPages.Entities;
-using JobAgentClassLibrary.Common.VacantJobs.Entities;
-using System;
+﻿using JobAgentClassLibrary.Common.Categories.Entities;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using WebCrawler.DataAccess;
 using WebCrawler.DataScrappers;
 using WebCrawler.DataSorters;
+using WebCrawler.Models;
 
 namespace WebCrawler.Managers
 {
@@ -34,11 +30,40 @@ namespace WebCrawler.Managers
                 new string("/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/IT-supporter")
         };
 
-        public async Task<IEnumerable<ICategory>> Test()
+        public async Task<List<string>> GetJobLinksFromPraktikpladsen(int pageNumber)
         {
-            var data = await _dbCommunicator.GetCategoriesAsync();
+            List<string> linkList = new();
+            for (int i = pageNumber; i < 50; i++)
+            {
+                var data = await _crawler.Crawl($"https://pms.praktikpladsen.dk/soeg-opslag/{i}/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20programmering", "resultater");
+                if (data.Data.Count != 0)
+                {
+                    linkList.AddRange(UrlCutter.GetLinkLists(data.LinksFound));
+                }
+            }
 
-            return data;
+            return linkList;
+        }
+
+
+        public async Task<List<WebData>> GetDataFromPraktikpladsen(string startUrl)
+        {
+            List<WebData> webDataList = new();
+            var data = await _crawler.Crawl(startUrl, "resultater");
+
+            data.JobLinks = UrlCutter.GetJobLinks(data.LinksFound);
+            data.JobListLinks = UrlCutter.GetLinkLists(data.LinksFound);
+
+            for (int i = 0; i < data.JobListLinks.Count; i++)
+            {
+                WebData webData = new();
+                webData = await _crawler.Crawl(data.JobListLinks[i], "resultater");
+                webData.JobLinks = UrlCutter.GetJobLinks(webData.LinksFound);
+                webData.JobListLinks = UrlCutter.GetLinkLists(webData.LinksFound);
+                webDataList.Add(webData);
+            }
+
+            return webDataList;
         }
     }
 }

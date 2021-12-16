@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using WebCrawler.DataSorters;
 using WebCrawler.Models;
 
 namespace WebCrawler.DataScrappers
@@ -13,6 +14,7 @@ namespace WebCrawler.DataScrappers
     public class Crawler
     {
         private IWebDriver _driver;
+
         public Crawler(IWebDriver webDriver)
         {
             _driver = webDriver;
@@ -29,12 +31,12 @@ namespace WebCrawler.DataScrappers
                 {
                     if (!string.IsNullOrEmpty(url) && !string.IsNullOrEmpty(keyWord))
                     {
-                        _driver = new ChromeDriver(Environment.CurrentDirectory);
                         _driver.Navigate().GoToUrl(url);
 
                         Thread.Sleep(1000);
 
                         var document = _driver.FindElements(By.Id(keyWord));
+                        webData.Link = url;
 
                         if (document.Count < 1)
                         {
@@ -43,15 +45,18 @@ namespace WebCrawler.DataScrappers
 
                         if (document.Count > 0)
                         {
-                            webData.Link = url;
                             foreach (var item in document)
                             {
                                 webData.Data.Add(item.Text);
                             }
                         }
 
-                        _driver.Close();
-                        _driver.Dispose();
+                        var testData = _driver.FindElements(By.TagName("a"));
+
+                        foreach (var item in testData)
+                        {
+                            webData.LinksFound.Add(item.GetAttribute("href"));
+                        }
                     }
 
                     return webData;

@@ -10,10 +10,15 @@ namespace WebCrawler.Models
     {
         public List<string> Data { get; set; }
         public string Link { get; set; }
-
+        public List<string> LinksFound { get; set; }
+        public List<string> JobLinks { get; set; }
+        public List<string> JobListLinks { get; set; }
         public WebData()
         {
             Data = new List<string>();
+            LinksFound = new List<string>();
+            JobLinks = new List<string>();
+            JobListLinks = new List<string>();
         }
     }
 }
