@@ -1,7 +1,12 @@
-﻿using JobAgentClassLibrary.Common.Categories.Entities;
+﻿using JobAgentClassLibrary.Common.Categories;
+using JobAgentClassLibrary.Common.Categories.Entities;
+using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
+using JobAgentClassLibrary.Common.JobAdverts;
 using JobAgentClassLibrary.Common.JobAdverts.Entities;
+using JobAgentClassLibrary.Common.VacantJobs;
 using JobAgentClassLibrary.Common.VacantJobs.Entities;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,18 +23,28 @@ namespace WebCrawler.Managers
 {
     public class CrawlerManager
     {
-        private readonly DbCommunicator _dbCommunicator;
+        private readonly ICompanyService _companyService;
+        private readonly ICategoryService _categoryService;
+        private readonly IVacantJobService _vacantJobService;
+        private readonly IJobAdvertService _jobAdvertService;
+
+        private readonly ILogger<CrawlerManager> _logger;
+
         private Crawler _crawler;
 
-        public CrawlerManager(Crawler crawler, DbCommunicator dbCommunicator)
+        public CrawlerManager(Crawler crawler, ICompanyService companyService, ICategoryService categoryService, IVacantJobService vacantJobService, IJobAdvertService jobAdvertService, ILogger<CrawlerManager> logger)
         {
             _crawler = crawler;
-            _dbCommunicator = dbCommunicator;
+            _companyService = companyService;
+            _categoryService = categoryService;
+            _vacantJobService = vacantJobService;
+            _jobAdvertService = jobAdvertService;
+            _logger = logger;
         }
 
         // Only for test 
         // Final product should get the paths from db
-        private readonly List<string> mainUrlPathPraktikpladsen = new List<string>()
+        private readonly List<string> _mainUrlPathPraktikpladsen = new List<string>()
         {
                 new string("/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20programmering"),
                 new string("/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20infrastruktur"),
@@ -112,11 +127,14 @@ namespace WebCrawler.Managers
 
             try
             {
-                var companyList = _dbCommunicator.GetCompaniesAsync().Result;
-                var categories =  _dbCommunicator.GetCategoriesAsync().Result;
-                var specializations = _dbCommunicator.GetSpecializationsAsync().Result.Where(s => s.CategoryId == categories.First(c => c.Name.StartsWith("Data-")).Id).ToList();
+                var companyList = await _companyService.GetAllAsync();
+                var categories = await _categoryService.GetCategoriesAsync();
+                var specializations = (await _categoryService.GetSpecializationsAsync()).Where(s => s.CategoryId == categories.FirstOrDefault(c => c.Name.StartsWith("Data-")).Id).ToList();
 
                 var data = await GetWebData();
+
+                _logger.LogInformation($"Archived {data.Count} entities.");
+
                 foreach (var item in data)
                 {
                     using (StringReader sr = new(item.Data[0]))
@@ -124,14 +142,14 @@ namespace WebCrawler.Managers
                         vacantJob.CompanyId = companyList.FirstOrDefault(c => c.Name == "Praktikpladsen").Id;
                         vacantJob.URL = new string(item.Link);
 
-                        var newVacantJob = _dbCommunicator.CreateVacantJobAsync(vacantJob).Result;
+                        var newVacantJob = await _vacantJobService.CreateAsync(vacantJob);
 
                         jobAdvert.Id = newVacantJob.Id;
                         jobAdvert.RegistrationDateTime = DateTime.UtcNow;
                         jobAdvert.CategoryId = categories.FirstOrDefault(c => c.Name.StartsWith("Data")).Id;
                         jobAdvert.SpecializationId = specializations.First(s => s.Name.ToLower() == item.Specialization).Id;
 
-                        var newJobAdvert = _dbCommunicator.CreateAsync(jobAdvert).Result;
+                        var newJobAdvert = await _jobAdvertService.CreateAsync(jobAdvert);
                     }
                 }
 

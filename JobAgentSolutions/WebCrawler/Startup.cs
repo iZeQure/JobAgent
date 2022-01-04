@@ -17,16 +17,14 @@ namespace WebCrawler
     public class Startup
     {
         private readonly CrawlerManager _crawlerManager;
-        private readonly DbCommunicator dbCommunicator;
         private readonly IWebDriver _driver;
-        public Startup(ILogger<Startup> logger, CrawlerManager manager, DbCommunicator dbCommunicator, IWebDriver driver)
+        public Startup(ILogger<Startup> logger, CrawlerManager manager, IWebDriver driver)
         {
             _driver = driver;
             _crawlerManager = manager;
-            this.dbCommunicator = dbCommunicator;
         }
 
-        public async void StartCrawler()
+        public async Task StartCrawlerAsync()
         {
             var data = await _crawlerManager.LoadDataToDatabase();
 
