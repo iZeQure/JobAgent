@@ -33,7 +33,7 @@ namespace WebCrawler.DataScrappers
                     {
                         _driver.Navigate().GoToUrl(url);
 
-                        Thread.Sleep(1000);
+                        Thread.Sleep(100);
 
                         var document = _driver.FindElements(By.Id(keyWord));
                         webData.Link = url;
@@ -47,16 +47,19 @@ namespace WebCrawler.DataScrappers
                         {
                             foreach (var item in document)
                             {
-                                webData.Data.Add(item.Text);
+                                webData.Data.Add(new string(item.Text));
                             }
                         }
 
-                        var testData = _driver.FindElements(By.TagName("a"));
+                        var links = _driver.FindElements(By.TagName("a"));
 
-                        foreach (var item in testData)
+                        foreach (var link in links)
                         {
-                            webData.LinksFound.Add(item.GetAttribute("href"));
+                            webData.LinksFound.Add(link.GetAttribute("href"));
                         }
+
+                        webData.JobLinks = UrlCutter.GetJobLinks(webData.LinksFound);
+                        webData.JobListLinks = UrlCutter.GetLinkLists(webData.LinksFound);
                     }
 
                     return webData;

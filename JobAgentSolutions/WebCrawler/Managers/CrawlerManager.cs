@@ -1,6 +1,12 @@
 ﻿using JobAgentClassLibrary.Common.Categories.Entities;
+using JobAgentClassLibrary.Common.Companies.Entities;
+using JobAgentClassLibrary.Common.JobAdverts.Entities;
+using JobAgentClassLibrary.Common.VacantJobs.Entities;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using WebCrawler.DataAccess;
@@ -30,7 +36,40 @@ namespace WebCrawler.Managers
                 new string("/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/IT-supporter")
         };
 
-        public async Task<List<string>> GetJobLinksFromPraktikpladsen(int pageNumber)
+        /// <summary>
+        /// Gets data from jobpages uses the GetDataFromPraktikpladsen to get all links
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<WebData>> GetWebData()
+        {
+            List<WebData> webData = new();
+            var dataList = await GetDataFromPraktikpladsen();
+
+            foreach (var webdata in dataList)
+            {
+                foreach (var item in webdata.JobLinks)
+                {
+                    var data = await _crawler.Crawl(item, "main-content");
+                    data.JobListLinks.Add(webdata.Link);
+                    string[] url = webdata.Link.Split("0");
+
+                    data.Specialization = url[url.Length - 1];
+
+                    // Make check for Jobadvert
+                    webData.Add(data);
+                }
+            }
+
+            return webData;
+        }
+
+        /// <summary>
+        /// This method will crawl all job lists on praktikpladsen
+        /// page number starts at 0 as default
+        /// </summary>
+        /// <param name="pageNumber"></param>
+        /// <returns></returns>
+        public async Task<List<string>> GetJobLinksFromPraktikpladsen(int pageNumber = 0)
         {
             List<string> linkList = new();
             for (int i = pageNumber; i < 50; i++)
@@ -45,7 +84,11 @@ namespace WebCrawler.Managers
             return linkList;
         }
 
-
+        /// <summary>
+        /// This method will get all data from praktikpladsen 
+        /// It uses GetJobLinksFromPraktikpladsen to get all links to crawl
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<WebData>> GetDataFromPraktikpladsen()
         {
             List<WebData> webDataList = new();
@@ -55,12 +98,52 @@ namespace WebCrawler.Managers
             {
                 WebData webData = new();
                 webData = await _crawler.Crawl(jobListLinks[i], "resultater");
-                webData.JobLinks = UrlCutter.GetJobLinks(webData.LinksFound);
-                webData.JobListLinks = UrlCutter.GetLinkLists(webData.LinksFound);
                 webDataList.Add(webData);
             }
 
             return webDataList;
+        }
+
+        public async Task<bool> LoadDataToDatabase()
+        {
+            Company company = new Company();
+            VacantJob vacantJob = new VacantJob();
+            JobAdvert jobAdvert = new JobAdvert();
+
+            try
+            {
+                var companyList = _dbCommunicator.GetCompaniesAsync().Result;
+                var categories =  _dbCommunicator.GetCategoriesAsync().Result;
+                var specializations = _dbCommunicator.GetSpecializationsAsync().Result.Where(s => s.CategoryId == categories.First(c => c.Name.StartsWith("Data-")).Id).ToList();
+
+                var data = await GetWebData();
+                foreach (var item in data)
+                {
+                    using (StringReader sr = new(item.Data[0]))
+                    {
+                        vacantJob.CompanyId = companyList.FirstOrDefault(c => c.Name == "Praktikpladsen").Id;
+                        vacantJob.URL = new string(item.Link);
+
+                        var newVacantJob = _dbCommunicator.CreateVacantJobAsync(vacantJob).Result;
+
+                        jobAdvert.Id = newVacantJob.Id;
+                        jobAdvert.RegistrationDateTime = DateTime.UtcNow;
+                        jobAdvert.CategoryId = categories.FirstOrDefault(c => c.Name.StartsWith("Data")).Id;
+                        jobAdvert.SpecializationId = specializations.First(s => s.Name.ToLower() == item.Specialization).Id;
+
+                        var newJobAdvert = _dbCommunicator.CreateAsync(jobAdvert).Result;
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                Debug.WriteLine(ex.StackTrace);
+
+                return false;
+            }
         }
     }
 }

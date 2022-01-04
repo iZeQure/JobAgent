@@ -13,6 +13,7 @@ namespace WebCrawler.Models
         public List<string> LinksFound { get; set; }
         public List<string> JobLinks { get; set; }
         public List<string> JobListLinks { get; set; }
+        public string Specialization { get; set; }
         public WebData()
         {
             Data = new List<string>();
