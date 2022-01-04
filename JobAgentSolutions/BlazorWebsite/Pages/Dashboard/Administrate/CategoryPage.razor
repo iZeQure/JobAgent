@@ -34,15 +34,15 @@ else
     @if (_categories == null)
     {
         <MessageAlert Alert="MessageAlert.AlertType.Info"
-                      Message="Indlæser Uddannelser.." IsLoading="true" />
+              Message="Indlæser Uddannelser.." IsLoading="true" />
     }
     else
     {
-        @if (!_categories.Any())
+        @if (!PaginationService.CreatePaging(_categories).Any())
         {
             <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                          Message="Der blev ikke fundet nogen uddannelser."
-                          MessageOptional="Opret uddannelser, ved at trykke på knappen : Opret ny Uddannelse." />
+              Message="Der blev ikke fundet nogen uddannelser."
+              MessageOptional="Opret uddannelser, ved at trykke på knappen : Opret ny Uddannelse." />
         }
         else
         {
@@ -60,7 +60,7 @@ else
                     </thead>
                     <tbody>
 
-                        @foreach (var category in _categories)
+                        @foreach (var category in PaginationService.CreatePaging(_categories))
                         {
                             <tr id="@(category.Id)">
                                 <th scope="row">@(category.Id)</th>
@@ -83,6 +83,20 @@ else
                     </tbody>
                 </table>
             </div>
+
+            <nav aria-label="Page Navigation">
+                <ul class="pagination justify-content-center">
+                    @for (int i = 1; i <= PaginationService.PageCount(_categories); i++)
+                    {
+                        var pageNumber = i;
+
+                        <li class="@(i == PaginationService.CurrentPage ? "page-item active" : "page-item")">
+                            <a class="page-link" href="@NavigationManager.Uri" @onclick="@(() => PaginationService.ChangePage(pageNumber))">@(i)</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+
         }
     }
 

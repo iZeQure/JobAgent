@@ -24,15 +24,15 @@ else
     @if (_staticSearchFilters == null)
     {
         <MessageAlert Alert="MessageAlert.AlertType.Info"
-                      Message="Indlæser robot søgefiltre.." IsLoading="true" />
+              Message="Indlæser robot søgefiltre.." IsLoading="true" />
     }
     else
     {
-        @if (!_staticSearchFilters.Any())
+        @if (!PaginationService.CreatePaging(_staticSearchFilters).Any())
         {
             <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                          Message="Der blev ikke fundet nogen søgefiltre."
-                          MessageOptional="Opret søgefilter, ved at trykke på knappen : Opret nyt søgefilter." />
+              Message="Der blev ikke fundet nogen søgefiltre."
+              MessageOptional="Opret søgefilter, ved at trykke på knappen : Opret nyt søgefilter." />
         }
         else
         {
@@ -50,7 +50,7 @@ else
                     </thead>
                     <tbody>
 
-                        @foreach (var staticSearchFilter in _staticSearchFilters)
+                        @foreach (var staticSearchFilter in PaginationService.CreatePaging(_staticSearchFilters))
                         {
                             <tr id="@(staticSearchFilter.Id)">
                                 <th scope="row">@(staticSearchFilter.Id)</th>
@@ -73,6 +73,20 @@ else
                     </tbody>
                 </table>
             </div>
+
+            <nav aria-label="Page Navigation">
+                <ul class="pagination justify-content-center">
+                    @for (int i = 1; i <= PaginationService.PageCount(_staticSearchFilters); i++)
+                    {
+                        var pageNumber = i;
+
+                        <li class="@(i == PaginationService.CurrentPage ? "page-item active" : "page-item")">
+                            <a class="page-link" href="@NavigationManager.Uri" @onclick="@(() => PaginationService.ChangePage(pageNumber))">@(i)</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+
         }
     }
 

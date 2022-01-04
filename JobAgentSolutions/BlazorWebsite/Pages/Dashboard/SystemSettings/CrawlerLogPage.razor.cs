@@ -1,5 +1,6 @@
 ﻿using BlazorWebsite.Data.FormModels;
 using BlazorWebsite.Data.Providers;
+using BlazorWebsite.Data.Services;
 using JobAgentClassLibrary.Loggings;
 using JobAgentClassLibrary.Loggings.Entities;
 using Microsoft.AspNetCore.Components;
@@ -12,6 +13,8 @@ namespace BlazorWebsite.Pages.Dashboard.SystemSettings
     public partial class CrawlerLogPage
     {
         [Inject] private IRefreshProvider RefreshProvider { get; set; }
+        [Inject] protected PaginationService PaginationService { get; set; }
+        [Inject] protected NavigationManager NavigationManager { get; set; }
         [Inject] protected ILogService LogService { get; set; }
 
         private LogModel _logModel = new();

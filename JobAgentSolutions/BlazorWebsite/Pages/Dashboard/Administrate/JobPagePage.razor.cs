@@ -1,5 +1,6 @@
 ﻿using BlazorWebsite.Data.FormModels;
 using BlazorWebsite.Data.Providers;
+using BlazorWebsite.Data.Services;
 using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.JobPages;
@@ -14,6 +15,8 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
     public partial class JobPagePage : ComponentBase
     {
         [Inject] private IRefreshProvider RefreshProvider { get; set; }
+        [Inject] protected PaginationService PaginationService { get; set; }
+        [Inject] protected NavigationManager NavigationManager { get; set; }
         [Inject] protected IJobPageService JobPageService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
 

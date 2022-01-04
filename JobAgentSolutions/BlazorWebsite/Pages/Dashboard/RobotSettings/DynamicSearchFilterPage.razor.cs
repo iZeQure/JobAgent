@@ -1,5 +1,6 @@
 ﻿using BlazorWebsite.Data.FormModels;
 using BlazorWebsite.Data.Providers;
+using BlazorWebsite.Data.Services;
 using JobAgentClassLibrary.Common.Categories;
 using JobAgentClassLibrary.Common.Categories.Entities;
 using JobAgentClassLibrary.Common.Filters;
@@ -13,8 +14,10 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
 {
     public partial class DynamicSearchFilterPage : ComponentBase
     {
-        [Inject] private IRefreshProvider RefreshProvider { get; set; }
-        [Inject] private ICategoryService CategoryService { get; set; }
+        [Inject] protected IRefreshProvider RefreshProvider { get; set; }
+        [Inject] protected ICategoryService CategoryService { get; set; }
+        [Inject] protected NavigationManager NavigationManager { get;set; }
+        [Inject] protected PaginationService PaginationService { get; set; }
         [Inject] protected IDynamicSearchFilterService DynamicSearchFilterService { get; set; }
 
         private DynamicSearchFilterModel _dynamicSearchFilterModel = new();

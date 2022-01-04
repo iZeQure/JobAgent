@@ -34,15 +34,15 @@ else
     @if (_jobPages == null)
     {
         <MessageAlert Alert="MessageAlert.AlertType.Info"
-                      Message="Indlæser robot links.." IsLoading="true" />
+              Message="Indlæser robot links.." IsLoading="true" />
     }
     else
     {
-        @if (!_jobPages.Any())
+        @if (!PaginationService.CreatePaging(_jobPages).Any())
         {
             <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                          Message="Der blev ikke fundet nogen links."
-                          MessageOptional="Opret links, ved at trykke på knappen : Opret nyt Link." />
+              Message="Der blev ikke fundet nogen links."
+              MessageOptional="Opret links, ved at trykke på knappen : Opret nyt Link." />
         }
         else
         {
@@ -60,7 +60,7 @@ else
                     </thead>
                     <tbody>
 
-                        @foreach (var jobPage in _jobPages.OrderBy(x => x.CompanyId))
+                        @foreach (var jobPage in PaginationService.CreatePaging(_jobPages.OrderBy(x => x.CompanyId)))
                         {
                             <tr id="@(jobPage.Id)">
                                 <th scope="row">@(jobPage.Id)</th>
@@ -89,6 +89,20 @@ else
                     </tbody>
                 </table>
             </div>
+
+            <nav aria-label="Page Navigation">
+                <ul class="pagination justify-content-center">
+                    @for (int i = 1; i <= PaginationService.PageCount(_jobPages); i++)
+                    {
+                        var pageNumber = i;
+
+                        <li class="@(i == PaginationService.CurrentPage ? "page-item active" : "page-item")">
+                            <a class="page-link" href="@NavigationManager.Uri" @onclick="@(() => PaginationService.ChangePage(pageNumber))">@(i)</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+
         }
     }
 

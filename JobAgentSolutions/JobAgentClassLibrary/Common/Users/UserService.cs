@@ -42,7 +42,7 @@ namespace JobAgentClassLibrary.Common.Users
 
                 if (!tokenUpdated)
                 {
-                    throw new ArgumentException("Coudln't authenticate user, error while generating token.", nameof(email));
+                    throw new ArgumentException("Couldn't authenticate user, error while generating token.", nameof(email));
                 }
 
                 var returnedUser = await _userRepository.GetByEmailAsync(email);
@@ -62,8 +62,6 @@ namespace JobAgentClassLibrary.Common.Users
                         ConsultantAreas = areas,
                         AccessToken = authUser.AccessToken
                     };
-
-                    //auth.AccessToken = authUser.AccessToken;
 
                     return authenticatedUser;
                 }

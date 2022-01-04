@@ -1,5 +1,6 @@
 ﻿using BlazorWebsite.Data.FormModels;
 using BlazorWebsite.Data.Providers;
+using BlazorWebsite.Data.Services;
 using JobAgentClassLibrary.Common.Categories;
 using JobAgentClassLibrary.Common.Categories.Entities;
 using Microsoft.AspNetCore.Components;
@@ -13,6 +14,8 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
     {
         [Inject] private IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected ICategoryService CategoryService { get; set; }
+        [Inject] protected NavigationManager NavigationManager { get; set; }
+        [Inject] protected PaginationService PaginationService { get; set; }
 
         private CategoryModel _categoryModel = new();
         private IEnumerable<ICategory> _categories;

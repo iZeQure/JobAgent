@@ -1,5 +1,6 @@
 ﻿using BlazorWebsite.Data.FormModels;
 using BlazorWebsite.Data.Providers;
+using BlazorWebsite.Data.Services;
 using JobAgentClassLibrary.Common.Filters;
 using JobAgentClassLibrary.Common.Filters.Entities;
 using Microsoft.AspNetCore.Components;
@@ -12,6 +13,8 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
     public partial class StaticSearchFilterPage : ComponentBase
     {
         [Inject] private IRefreshProvider RefreshProvider { get; set; }
+        [Inject] protected NavigationManager NavigationManager { get; set; }
+        [Inject] protected PaginationService PaginationService { get; set; }
         [Inject] protected IStaticSearchFilterService StaticSearchFilterService { get; set; }
         [Inject] protected IFilterTypeService FilterTypeService { get; set; }
 

@@ -31,7 +31,7 @@
 }
 else
 {
-    @if (_paginationModel == null || _dataIsLoading)
+    @if (_jobAdverts == null || _dataIsLoading)
     {
         <MessageAlert Alert="MessageAlert.AlertType.Warning"
                       Message="Indlæser data, vent venligst!" />
@@ -70,7 +70,7 @@ else
             </div>
         </section>
 
-        @if (!_paginationModel.PaginatedJobAdverts.Any())
+        @if (!PaginationService.CreatePaging(_jobAdverts).Any())
         {
             if (_filteredContentFound == false)
             {
@@ -101,7 +101,7 @@ else
                     </thead>
                     <tbody>
 
-                        @foreach (var jobAdvert in _paginationModel.PaginatedJobAdverts)
+                        @foreach (var jobAdvert in PaginationService.CreatePaging(_jobAdverts))
                         {
                             <tr id="@jobAdvert.Id">
                                 <th scope="row">@jobAdvert.Id</th>
@@ -152,12 +152,12 @@ else
 
             <nav aria-label="Page Navigation">
                 <ul class="pagination justify-content-center">
-                    @for (int i = 1; i <= _paginationModel.PageCount(); i++)
+                    @for (int i = 1; i <= PaginationService.PageCount(_jobAdverts); i++)
                     {
                         var pageNumber = i;
 
-                        <li class="@(i == _paginationModel.CurrentPage ? "page-item active" : "page-item")">
-                            <a class="page-link" href="/admin/settings/job-vacancies" @onclick="@(() => FilterJobAdverts(pageNumber))">@(i)</a>
+                        <li class="@(i == PaginationService.CurrentPage ? "page-item active" : "page-item")">
+                            <a class="page-link" href="@NavigationManager.Uri" @onclick="@(() => PaginationService.ChangePage(pageNumber))">@(i)</a>
                         </li>
                     }
                 </ul>

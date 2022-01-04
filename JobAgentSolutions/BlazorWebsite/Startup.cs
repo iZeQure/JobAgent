@@ -1,5 +1,6 @@
 using Blazored.LocalStorage;
 using BlazorWebsite.Data.Providers;
+using BlazorWebsite.Data.Services;
 using JobAgentClassLibrary.Common.Areas;
 using JobAgentClassLibrary.Common.Areas.Factory;
 using JobAgentClassLibrary.Common.Areas.Repositories;
@@ -129,6 +130,7 @@ namespace BlazorWebsite
             services.AddScoped<IVacantJobService, VacantJobService>();
             services.AddScoped<IJobPageService, JobPageService>();
             services.AddScoped<ILogService, DbLogService>();
+            services.AddTransient<PaginationService>();
 
 
             /* Access Injections */

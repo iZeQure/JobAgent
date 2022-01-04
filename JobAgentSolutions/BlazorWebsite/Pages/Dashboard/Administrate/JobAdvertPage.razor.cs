@@ -1,9 +1,11 @@
 ﻿using BlazorWebsite.Data.FormModels;
 using BlazorWebsite.Data.Providers;
+using BlazorWebsite.Data.Services;
 using JobAgentClassLibrary.Common.Categories;
 using JobAgentClassLibrary.Common.Categories.Entities;
 using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.JobAdverts;
+using JobAgentClassLibrary.Common.JobAdverts.Entities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
@@ -18,15 +20,16 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
         [Parameter] public int JobAdvertId { get; set; }
         [Parameter] public int SpecializationId { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
+        [Inject] protected PaginationService PaginationService { get; set; }
         [Inject] protected IJobAdvertService JobAdvertService { get; set; }
         [Inject] protected ICategoryService CategoryService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
         [Inject] protected NavigationManager NavigationManager { get; set; }
 
-        private JobAdvertPaginationModel _paginationModel = new();
         private JobAdvertModel _jobAdvertModel = new();
         private List<ICategory> _categories;
+        private List<IJobAdvert> _jobAdverts;
 
         private int _advertId = 0;
         private int _categoryId = 0;
@@ -44,7 +47,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             {
                 _dataIsLoading = true;
 
-                _paginationModel.JobAdverts = await JobAdvertService.GetJobAdvertsAsync();
+                _jobAdverts = await JobAdvertService.GetJobAdvertsAsync();
                 _categories = await CategoryService.GetCategoriesAsync();
 
                 var company = (await CompanyService.GetAllAsync()).FirstOrDefault();
@@ -68,8 +71,8 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
         {
             try
             {
-                _paginationModel.ResetToDefaultSettings();
-                _paginationModel.JobAdverts = (await JobAdvertService.GetJobAdvertsAsync())
+                PaginationService.ResetDefaults();
+                _jobAdverts = (await JobAdvertService.GetJobAdvertsAsync())
                     .OrderBy(j => j.RegistrationDateTime)
                     .ToList();
             }
@@ -97,32 +100,21 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             _advertId = id;
         }
 
-        public async Task FilterJobAdverts(int page = 1)
+        public async Task FilterJobAdverts()
         {
-            if (_categoryId is int.MaxValue)
-            {
-                _paginationModel.CurrentPage = page;
-                _paginationModel.JobAdverts = (await JobAdvertService.GetJobAdvertsAsync())
-                    .OrderBy(j => j.RegistrationDateTime)
-                    .ToList();
-            }
-            else
-            {
-                _paginationModel.CurrentPage = page;
-                _paginationModel.JobAdverts = (await JobAdvertService.GetJobAdvertsAsync())
-                    .Where(j => j.CategoryId == _categoryId)
-                    .OrderBy(j => j.Id)
-                    .ToList();
+            _jobAdverts = (await JobAdvertService.GetJobAdvertsAsync())
+                .Where(j => j.CategoryId == _categoryId)
+                .OrderBy(j => j.Id)
+                .ToList();
 
-                _filteredContentFound = _paginationModel.JobAdverts.Any();
-            }
+            _filteredContentFound = _jobAdverts.Any();
         }
 
         public async Task ClearFilteredContent()
         {
             _categoryId = 0;
-            _paginationModel.ResetToDefaultSettings();
-            _paginationModel.JobAdverts = await JobAdvertService.GetJobAdvertsAsync();
+            PaginationService.ResetDefaults();
+            _jobAdverts = await JobAdvertService.GetJobAdvertsAsync();
         }
     }
 }
