@@ -65,8 +65,8 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
                             result.Id,
                             result.CategoryId,
                             result.SpecializationId,
-                            result.Title,
-                            result.Summary,
+                            result.Title ?? "",
+                            result.Summary ?? "",
                             result.RegistrationDateTime);
 
                         jobAdverts.Add(jobAdvert);

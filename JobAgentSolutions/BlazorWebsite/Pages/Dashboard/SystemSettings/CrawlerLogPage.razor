@@ -93,8 +93,8 @@ else
 
             <nav aria-label="Page Navigation">
                 <ul class="pagination justify-content-center">
-                    @for (int i = 1; i <= PaginationService.PageCount(_vacantJobs); i++)
-                    {
+                    @for (int i = 1; i <= PaginationService.PageCount(_logs); i++)
+                {
                         var pageNumber = i;
 
                         <li class="@(i == PaginationService.CurrentPage ? "page-item active" : "page-item")">

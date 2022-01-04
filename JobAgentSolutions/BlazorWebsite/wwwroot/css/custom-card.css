@@ -7,9 +7,10 @@
 }
 
 #job-wrapper {
-    max-height: 90vh;
+    max-height: 80vh;
     overflow-y: auto;
     overflow-x: hidden;
+    margin-bottom: 2rem;
 }
 
 .card {
