@@ -1,4 +1,5 @@
-﻿using JobAgentClassLibrary.Common.Companies;
+﻿using BlazorWebsite.Data.Services;
+using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.JobAdverts;
 using JobAgentClassLibrary.Common.JobAdverts.Entities;
@@ -20,6 +21,8 @@ namespace BlazorWebsite.Pages
         [Inject] protected ICompanyService CompanyService { get; set; }
         [Inject] protected IVacantJobService VacantJobService { get; set; }
         [Inject] protected IJobAdvertService JobAdvertService { get; set; }
+        [Inject] protected PaginationService PaginationService { get; set; }
+        [Inject] protected NavigationManager NavigationManager { get; set; }
 
         private CultureInfo cultureInfo = CultureInfo.CreateSpecificCulture("da-DK");
         private IEnumerable<IJobAdvert> _jobAdverts = new List<JobAdvert>();
@@ -50,17 +53,17 @@ namespace BlazorWebsite.Pages
                 _companies = await CompanyService.GetAllAsync();
                 var jobAdverts = await JobAdvertService.GetJobAdvertsAsync();
 
-                if (CategoryId == 0 && SpecializationId == 0)
+                if (CategoryId is 0 && SpecializationId is 0)
                 {
-                    _jobAdverts = jobAdverts.Where(x => x.CategoryId == 0 && x.SpecializationId == 0);
+                    _jobAdverts = jobAdverts.Where(x => x.CategoryId is 0 && x.SpecializationId is 0);
                 }
-                else if (SpecializationId == 0)
+                else if (SpecializationId is 0)
                 {
                     _jobAdverts = jobAdverts.Where(x => x.CategoryId == CategoryId);
                 }
-                else if (SpecializationId != 0)
+                else if (SpecializationId is not 0)
                 {
-                    _jobAdverts = jobAdverts.Where(x => x.CategoryId == SpecializationId);
+                    _jobAdverts = jobAdverts.Where(x => x.SpecializationId == SpecializationId);
                 }
             }
             catch (Exception ex)
