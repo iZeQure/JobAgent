@@ -67,20 +67,28 @@ namespace BlazorWebsite.Data.Providers
         /// <summary>
         /// Mark user as authenticated, if credentials is valid from server side.
         /// </summary>
-        /// <param name="genericAuthUser">Used to authenticate the current user.</param>
-        /// <returns>A authentication notification task changed.</returns>
-        public async Task MarkUserAsAuthenticated(IAuthUser genericAuthUser)
+        /// <exception cref="ArgumentNullException">
+        /// Is thrown if any of the parsed data in the method is invalid.
+        /// </exception>
+        /// <param name="authUser">Used to authenticate the current user.</param>
+        /// <returns>A <see cref="Task"/> that represents the authentication process.</returns>
+        public async Task MarkUserAsAuthenticated(IAuthUser authUser)
         {
-            if (string.IsNullOrEmpty(genericAuthUser.AccessToken))
+            if (authUser is null)
             {
-                throw new NullReferenceException("Couldn't authenticate user. Access token not found.");
+                throw new ArgumentNullException(nameof(authUser), "Authentication User was null, failed to authenticate.");
+            }
+
+            if (string.IsNullOrEmpty(authUser.AccessToken))
+            {
+                throw new ArgumentNullException(nameof(authUser.AccessToken),"Token was either null or empty, failed to authenticate.");
             }
 
             // Set the access token in the local memory.
-            await _localStorageService.SetItemAsync(ACCESS_TOKEN, genericAuthUser.AccessToken);
+            await _localStorageService.SetItemAsync(ACCESS_TOKEN, authUser.AccessToken);
 
             // Get current identity for the user.
-            ClaimsIdentity identity = await _access.GetClaimsIdentityAsync(genericAuthUser);
+            ClaimsIdentity identity = await _access.GetClaimsIdentityAsync(authUser);
 
             // Associate the identity with a principal.
             ClaimsPrincipal principal = new(identity);
