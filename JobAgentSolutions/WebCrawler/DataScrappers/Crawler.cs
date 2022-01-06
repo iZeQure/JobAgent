@@ -15,6 +15,7 @@ namespace WebCrawler.DataScrappers
 {
     public class Crawler
     {
+
         private readonly CrawlerDriver _driver;
         public string Url { get; set; }
         public IReadOnlyCollection<IWebElement> WebElements { get; set; }
@@ -99,6 +100,7 @@ namespace WebCrawler.DataScrappers
             }
 
             return DateTime.MinValue;
+
         }
     }
 }

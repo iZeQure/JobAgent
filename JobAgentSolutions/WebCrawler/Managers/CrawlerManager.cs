@@ -1,12 +1,8 @@
-﻿using JobAgentClassLibrary.Common.Categories;
-using JobAgentClassLibrary.Common.Categories.Entities;
-using JobAgentClassLibrary.Common.Companies;
+﻿using JobAgentClassLibrary.Common.Categories.Entities;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.Companies.Factory;
-using JobAgentClassLibrary.Common.JobAdverts;
 using JobAgentClassLibrary.Common.JobAdverts.Entities;
 using JobAgentClassLibrary.Common.JobAdverts.Factory;
-using JobAgentClassLibrary.Common.VacantJobs;
 using JobAgentClassLibrary.Common.VacantJobs.Entities;
 using JobAgentClassLibrary.Common.VacantJobs.Factory;
 using Microsoft.Extensions.Logging;

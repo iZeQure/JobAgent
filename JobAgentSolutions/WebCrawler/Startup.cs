@@ -26,12 +26,18 @@ namespace WebCrawler
 
         public async Task StartCrawlerAsync()
         {
+<<<<<<< HEAD
             Crawler crawler = new(_driver);
             //var data = await _crawlerManager.LoadDataToDatabase();
 
             var data = crawler.Crawl("https://pms.xn--lrepladsen-d6a.dk/vis-praktiksted/1019932318", "main-content");
 
             _driver.Dispose();
+=======
+            var data = await _crawlerManager.LoadDataToDatabase();
+
+            _driver.Close();
+>>>>>>> d609e52211d2e524853bc831354ec1f0add16389
             Debug.WriteLine("Done");
         }
     }

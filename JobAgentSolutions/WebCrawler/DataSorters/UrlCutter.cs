@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -7,7 +7,7 @@ using WebCrawler.DataAccess;
 
 namespace WebCrawler.DataSorters
 {
-    public static class UrlCutter
+    public class UrlCutter
     {
         public static DateTime GetDateFromstring(string dataString)
         {
@@ -24,7 +24,6 @@ namespace WebCrawler.DataSorters
 
             return DateTime.MinValue;
         }
-
         /// <summary>
         /// Returns a new list with the sorted job links 
         /// No dublicates is returned 
