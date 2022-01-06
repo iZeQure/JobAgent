@@ -1,4 +1,5 @@
-﻿using BlazorWebsite.Data.Providers;
+﻿using BlazorWebsite.Data.FormModels;
+using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Areas;
 using JobAgentClassLibrary.Common.Areas.Entities;
 using JobAgentClassLibrary.Common.Locations;
@@ -13,7 +14,6 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -34,10 +34,10 @@ namespace BlazorWebsite.Pages.Dashboard.Account
         private EditContext _editContext;
         private AccountProfileModel _accountProfileModel = new();
 
-        private IEnumerable<Location> _locations = new List<Location>();
-        private IEnumerable<Area> _areas = new List<Area>();
-        private IEnumerable<Role> _roles = new List<Role>();
-        private IEnumerable<Area> _assignedConsultantAreas = new List<Area>();
+        private IEnumerable<ILocation> _locations = new List<Location>();
+        private IEnumerable<IArea> _areas = new List<Area>();
+        private IEnumerable<IRole> _roles = new List<Role>();
+        private IEnumerable<IArea> _assignedConsultantAreas = new List<Area>();
 
         private string _successMessage = string.Empty;
         private string _errorMessage = string.Empty;
@@ -99,9 +99,9 @@ namespace BlazorWebsite.Pages.Dashboard.Account
                 {
                     await Task.WhenAll(userTask, locationsTask, areasTask, roleTask);
 
-                    _locations = (IEnumerable<Location>)locationsTask.Result;
-                    _areas = (IEnumerable<Area>)areasTask.Result;
-                    _roles = (IEnumerable<Role>)roleTask.Result;
+                    _locations = locationsTask.Result;
+                    _areas = areasTask.Result;
+                    _roles = roleTask.Result;
                     _userSession = userTask.Result;
 
                     if (_userSession == null)
@@ -110,7 +110,7 @@ namespace BlazorWebsite.Pages.Dashboard.Account
                         return;
                     }
 
-                    _assignedConsultantAreas = (IEnumerable<Area>)_userSession.ConsultantAreas;
+                    _assignedConsultantAreas = _userSession.ConsultantAreas;
                     _accountProfileModel = new()
                     {
                         RoleId = _userSession.RoleId,
@@ -317,34 +317,5 @@ namespace BlazorWebsite.Pages.Dashboard.Account
         {
             Console.WriteLine($"Form Invalid.");
         }
-    }
-
-    public class AccountProfileModel
-    {
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Email adresse er påkrævet.")]
-        [StringLength(maximumLength: 255, MinimumLength = 1)]
-        [EmailAddress(ErrorMessage = "Indtast en gyldig email adresse.")]
-        public string Email { get; set; }
-
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Udfyld venligst fornavn.")]
-        [StringLength(maximumLength: 128, MinimumLength = 1)]
-        public string FirstName { get; set; }
-
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Udfyld venligst efternavn.")]
-        [StringLength(maximumLength: 128, MinimumLength = 1)]
-        public string LastName { get; set; }
-
-        [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "Vælg venligst en lokation fra listen.")]
-        public int LocationId { get; set; }
-
-        [Required]
-        public int RoleId { get; set; }
-    }
-
-    public class AccountProfileDiverseModel
-    {
-        public int ConsultantAreaIdToBeAssigned { get; set; }
-        public int ConsultantAreaIdToBeRemoved { get; set; }
     }
 }

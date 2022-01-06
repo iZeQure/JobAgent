@@ -39,16 +39,13 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId != 0)
-            {
-                return await GetByIdAsync(entityId);
-            }
+            if (entityId != 0) return await GetByIdAsync(entityId);
 
             return null;
         }
 
         public async Task<List<IRole>> GetAllAsync()
-        {
+       {
             List<IRole> roles = new();
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
@@ -63,7 +60,7 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
                     {
                         IRole role = (IRole)_factory.CreateEntity(
                                 nameof(Role),
-                                result.Id, result.Name);
+                                result.Id, result.Name, result.Description);
 
                         roles.Add(role);
                     }
@@ -90,7 +87,7 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
                 {
                     role = (IRole)_factory.CreateEntity(
                                 nameof(Role),
-                                queryResult.Id, queryResult.Name);
+                                queryResult.Id, queryResult.Name, queryResult.Description);
                 }
             }
 
@@ -131,10 +128,7 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId >= 0)
-            {
-                return await GetByIdAsync(entityId);
-            }
+            if (entityId >= 0) return await GetByIdAsync(entityId);
 
             return null;
         }

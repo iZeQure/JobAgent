@@ -1,6 +1,4 @@
 ﻿using JobAgentClassLibrary.Common.Areas.Entities;
-using JobAgentClassLibrary.Common.Locations.Entities;
-using JobAgentClassLibrary.Common.Roles.Entities;
 using System.Collections.Generic;
 
 namespace JobAgentClassLibrary.Common.Users.Entities
@@ -21,6 +19,6 @@ namespace JobAgentClassLibrary.Common.Users.Entities
 
         public int Id { get; set; }
 
-        public List<IArea> ConsultantAreas { get; set; }
+        public List<IArea> ConsultantAreas { get; set; } = new();
     }
 }

@@ -1,0 +1,104 @@
+﻿@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
+
+<div class="modal fade" id="ModalEditDynamicSearchFilter" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+
+            @if (_isLoading)
+            {
+                <MessageAlert IsLoading="_isLoading" Message="Indlæser data. Vent venligst.." Alert="MessageAlert.AlertType.Info" />
+
+            }
+            <MessageAlert Message="@(_errorMessage)" Alert="MessageAlert.AlertType.Error" />
+
+            @if (Model == null)
+            {
+                <MessageAlert Alert="MessageAlert.AlertType.Warning" FullWidth="true" Message="Vent venligst, henter detailjer på Søgeordet!" />
+            }
+            else
+            {
+        <EditForm Model="Model" OnValidSubmit="OnValidSubmit_EditJobVacancy">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Rediger Søgeord :</h5>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col">
+                        <label for="regInputKey" class="admin-label">Søgeordet : </label>
+                        <input id="regInputKey" class="form-control form-control-sm" type="text" @bind="Model.Key" placeholder="Eksempel : Programmering" />
+                        <ValidationMessage For="@(() => Model.Key)" />
+
+                    </div>
+                </div>
+
+
+                <hr />
+
+                <div class="row">
+                    <div class="col">
+                        <label for="regInputCategory" class="admin-label">Kategori</label>
+                        @if (_categories == null || !_categories.Any())
+                        {
+                            <label class="col-form-label">Kunne ikke hente kategorier eller er igang med at indlæse data...</label>
+                        }
+                        else
+                        {
+                            <select id="regInputCategory" class="form-control form-control-sm" type="text" @bind="Model.CategoryId">
+                                <option value="0" selected>---Vælg en kategori som passer til søgeordet---</option>
+                                @foreach (var category in _categories)
+                                {
+                                    <option value="@category.Id">@category.Name</option>
+                                }
+                            </select>
+                        }
+                        <ValidationMessage For="@(() => Model.CategoryId)" />
+
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="row">
+                    <div class="col">
+
+                        @if (Model.CategoryId == 0)
+                        { }
+                        else
+                        {
+                            <label for="regInputSpecialization" class="admin-label">Underkategori</label>
+                            @if (_specializations == null || !_specializations.Any())
+                            {
+                                <label class="col-form-label">Kunne ikke hente underkategorier eller er igang med at indlæse data...</label>
+                            }
+                            else
+                            {
+                                <select id="regInputSpecialization" class="form-control form-control-sm" type="text" @bind="Model.Specializationid">
+
+                                    <option value="0" selected>---Vælg en underkategori som passer til søgeordet---</option>
+                                    @foreach (var specialization in _specializations)
+                                    {
+                                        if (specialization.CategoryId == Model.CategoryId)
+                                        {
+                                            <option value="@specialization.Id">@specialization.Name</option>
+                                        }
+                                    }
+                                </select>
+                            }
+                            <ValidationMessage For="@(() => Model.Specializationid)" />
+                        }
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="OnClick_CancelRequest" @onclick:preventDefault>Annuller</button>
+                <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@(_isProcessing)">Gem ændringer</button>
+            </div>
+        </EditForm>
+            }
+        </div>
+    </div>
+</div>

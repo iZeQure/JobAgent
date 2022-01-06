@@ -1,9 +1,6 @@
 ﻿using JobAgentClassLibrary.Loggings.Entities;
 using JobAgentClassLibrary.Loggings.Repositories;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Loggings
@@ -17,13 +14,17 @@ namespace JobAgentClassLibrary.Loggings
             _repository = repository;
         }
 
-
         public async Task<ILog> CreateAsync(ILog entity)
         {
             return await _repository.CreateAsync(entity);
         }
 
-        public async Task<List<ILog>> GetAllAsync()
+        public async Task<List<ILog>> GetAllCrawlerLogsAsync()
+        {
+            return await _repository.GetAllCrawlerLogsAsync();
+        }
+
+        public async Task<List<ILog>> GetAllDbLogsAsync()
         {
             return await _repository.GetAllAsync();
         }

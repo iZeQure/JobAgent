@@ -1,27 +1,38 @@
-﻿using Microsoft.Extensions.Logging;
-using SkpJobCrawler.Crawler;
-using System;
+﻿using JobAgentClassLibrary.Common.Categories.Entities;
+using Microsoft.Extensions.Logging;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Diagnostics;
+using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
+using WebCrawler.DataAccess;
+using WebCrawler.DataScrappers;
+using WebCrawler.DataSorters;
+using WebCrawler.Managers;
 
 namespace WebCrawler
 {
     public class Startup
     {
-        private readonly ILogger<Startup> _logger;
-        private readonly ICrawler crawler;
-
-        public Startup(ILogger<Startup> logger, ICrawler crawler)
+        private readonly CrawlerManager _crawlerManager;
+        private readonly IWebDriver _driver;
+        public Startup(ILogger<Startup> logger, CrawlerManager manager, IWebDriver driver)
         {
-            _logger = logger;
-            this.crawler = crawler;
+            _driver = driver;
+            _crawlerManager = manager;
         }
 
-        public void StartCrawler()
+        public async Task StartCrawlerAsync()
         {
-            crawler.GetVacantJobs();   
+            Crawler crawler = new(_driver);
+            //var data = await _crawlerManager.LoadDataToDatabase();
+
+            var data = crawler.Crawl("https://pms.xn--lrepladsen-d6a.dk/vis-praktiksted/1019932318", "main-content");
+
+            _driver.Dispose();
+            Debug.WriteLine("Done");
         }
     }
 }

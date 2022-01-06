@@ -1,0 +1,59 @@
+﻿@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
+
+<div id="ModalCreateJobPage" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+
+            <MessageAlert Message="@(_errorMessage)" Alert="MessageAlert.AlertType.Error" />
+
+            @if (_isLoading)
+            {
+                <MessageAlert IsLoading="@_isLoading" Alert="MessageAlert.AlertType.Info" Message="Vent venligst, henter nødvendig information.." />
+            }
+            else
+            {
+                <EditForm EditContext="_editContext" OnValidSubmit="OnValidSubmit_CreateJobAdvertAsync">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Nyt Stillingsopslag :</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col">
+                                <label for="regInputTitle" class="admin-label">Jobsiden's Link :</label>
+                                <input id="regInputTitle" class="form-control form-control-sm" type="text" @bind="_jobPageModel.URL" placeholder="Eksempel : www.dinhjemmeside.dk/jobs" />
+                                <ValidationMessage For="@(() => _jobPageModel.URL)" />
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="row">
+                            <div class="col">
+                                <label for="regInputCompany" class="admin-label col-form-label col-form-label-sm">Stillingsopslag Tilhører :</label>
+                                @if (_jobPages == null || !_jobPages.Any())
+                                {
+                                    <label class="col-form-label">Kunne ikke hente job sider eller er igang med at indlæse data..</label>
+                                }
+                                else
+                                {
+                                    <select id="regInputCompany" class="form-control form-control-sm" @bind="_jobPageModel.CompanyId">
+                                        <option value="0" selected>---Vælg en job side fra listen som tilhører stillingsopslaget---</option>
+                                        @foreach (var company in _companies)
+                                        {
+                                            <option value="@company.Id">@company.Name</option>
+                                        }
+                                    </select>
+                                }
+                                <ValidationMessage For="@(() => _jobPageModel.Id)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="OnClick_CancelRequest">Annuller</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_isProcessing">Opret Jobside</button>
+                    </div>
+                </EditForm>
+            }
+        </div>
+    </div>
+</div>

@@ -6,5 +6,8 @@ namespace JobAgentClassLibrary.Common.Users.Entities.EntityMaps
     /// Handles the mapping when authenticating a user.
     /// </summary>
     [Table("AuthUserView")]
-    public class AuthUserView : AuthUser, IAuthUser { }
+    public class AuthUserView : AuthUser, IAuthUser 
+    {
+        public int UserId { get; set; }
+    }
 }

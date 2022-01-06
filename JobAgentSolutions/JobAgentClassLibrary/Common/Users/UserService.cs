@@ -1,4 +1,5 @@
-﻿using JobAgentClassLibrary.Common.Users.Entities;
+﻿using JobAgentClassLibrary.Common.Areas.Entities;
+using JobAgentClassLibrary.Common.Users.Entities;
 using JobAgentClassLibrary.Common.Users.Repositories;
 using JobAgentClassLibrary.Security.interfaces;
 using System;
@@ -38,13 +39,27 @@ namespace JobAgentClassLibrary.Common.Users
                     throw new ArgumentException("Coudln't authenticate user, error while generating token.", nameof(email));
                 }
 
-                var user = await _userRepository.GetByEmailAsync(email);
+                var returnedUser = await _userRepository.GetByEmailAsync(email);
 
-                if (user is not null && user is AuthUser auth)
+                if (returnedUser is not null)
                 {
-                    auth.AccessToken = authUser.AccessToken;
+                    var areas = await _userRepository.GetUserConsultantAreasAsync(returnedUser);
+                    
+                    var authenticatedUser = new AuthUser
+                    {
+                        Id = returnedUser.Id,
+                        RoleId = returnedUser.RoleId,
+                        LocationId = returnedUser.LocationId,
+                        FirstName = returnedUser.FirstName,
+                        LastName = returnedUser.LastName,
+                        Email = returnedUser.Email,
+                        ConsultantAreas = areas,
+                        AccessToken = authUser.AccessToken
+                    };
 
-                    return auth;
+                    //auth.AccessToken = authUser.AccessToken;
+
+                    return authenticatedUser;
                 }
             }
 
@@ -114,7 +129,7 @@ namespace JobAgentClassLibrary.Common.Users
             {
                 var consultantAreas = await _userRepository.GetUserConsultantAreasAsync(authUser);
 
-                authUser.ConsultantAreas.Clear();
+                authUser.ConsultantAreas = new();
                 authUser.ConsultantAreas.AddRange(consultantAreas);
             }
 
@@ -232,6 +247,11 @@ namespace JobAgentClassLibrary.Common.Users
             var tokenIsValid = await _userRepository.ValidateUserAccessTokenAsync(accessToken);
 
             return tokenIsValid;
+        }
+
+        public async Task<List<IArea>> GetUserConsultantAreasAsync(IUser user)
+        {
+            return await _userRepository.GetUserConsultantAreasAsync(user);
         }
     }
 }

@@ -33,7 +33,6 @@ namespace JobAgentClassLibrary.Common.JobPages.Repositories
                 
                 var values = new
                 {
-                    @jobPageId = entity.Id,
                     @companyId = entity.CompanyId,
                     @jobPageUrl = entity.URL
                 };
@@ -41,10 +40,7 @@ namespace JobAgentClassLibrary.Common.JobPages.Repositories
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId != 0)
-            {
-                return await GetByIdAsync(entityId);
-            }
+            if (entityId != 0) return await GetByIdAsync(entityId);
 
             return null;
         }
@@ -133,10 +129,7 @@ namespace JobAgentClassLibrary.Common.JobPages.Repositories
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId >= 0)
-            {
-                return await GetByIdAsync(entityId);
-            }
+            if (entityId >= 0) return await GetByIdAsync(entityId);
 
             return null;
         }

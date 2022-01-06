@@ -1,6 +1,6 @@
 ﻿namespace JobAgentClassLibrary.Common.Filters.Entities
 {
-    public class FilterType : IFilter
+    public class FilterType : IFilterType
     {
         public int Id { get; set; }
 
