@@ -224,6 +224,16 @@ input::placeholder {
     color: var(--clr-neutral-900);
 }
 
+.page-link {
+    position: relative;
+    display: block;
+    color: #0d6efd;
+    text-decoration: none;
+    background-color: var(--clr-bg);
+    border: 1px solid #dee2e6;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
 #userprofile-container p {
     color: var(--clr-white);
     margin: 0;
