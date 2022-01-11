@@ -77,7 +77,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
             _isProcessing = true;
             try
             {
-                if(_jobPageModel.CompanyId <= 0)
+                if (_jobPageModel.CompanyId <= 0)
                 {
                     _errorMessage = "Vælg et company for at tilføje link.";
                     return;
@@ -91,7 +91,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
                         return;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     _errorMessage = "Fejl i Jobsidens Link. Prøv igen eller tjek for fejl.";
                     return;
@@ -104,7 +104,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
                     URL = _jobPageModel.URL
 
                 };
-                
+
                 var result = await JobPageService.CreateAsync(jobPage);
 
                 if (result is null)

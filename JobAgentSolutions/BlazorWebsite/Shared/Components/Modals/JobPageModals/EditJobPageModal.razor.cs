@@ -6,6 +6,7 @@ using JobAgentClassLibrary.Common.JobPages;
 using JobAgentClassLibrary.Common.JobPages.Entities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using PolicyLibrary.Validators;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
         [Inject] protected IJobPageService JobPageService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
 
+        private DefaultValidator defaultValidator = new();
         private IEnumerable<ICompany> _companies = new List<Company>();
 
         private string _errorMessage = "";
@@ -60,6 +62,27 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
 
             try
             {
+
+                if (Model.CompanyId <= 0)
+                {
+                    _errorMessage = "Vælg et company for at tilføje link.";
+                    return;
+                }
+
+                try
+                {
+                    if (!defaultValidator.ValidateUrl(Model.URL))
+                    {
+                        _errorMessage = "Ikke en valid URL.";
+                        return;
+                    }
+                }
+                catch (Exception)
+                {
+                    _errorMessage = "Fejl i Jobsidens Link. Prøv igen eller tjek for fejl.";
+                    return;
+                }
+
                 JobPage jobPage = new()
                 {
                     Id = Model.Id,

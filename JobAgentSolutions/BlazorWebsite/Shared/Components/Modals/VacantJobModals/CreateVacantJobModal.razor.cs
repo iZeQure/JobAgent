@@ -8,6 +8,7 @@ using JobAgentClassLibrary.Security.Providers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
+using PolicyLibrary.Validators;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
         [Inject] protected IVacantJobService VacantJobService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
 
+        private DefaultValidator defaultValidator = new();
         private VacantJobModel _vacantJobModel = new();
         private IEnumerable<IVacantJob> _jobPages;
         private IEnumerable<ICompany> _companies;
@@ -75,9 +77,24 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
             _isProcessing = true;
             try
             {
-                if (!_vacantJobModel.URL.Contains("http://") || !_vacantJobModel.URL.Contains("https://"))
+                if (_vacantJobModel.CompanyId <= 0)
                 {
-                    _vacantJobModel.URL = "https://" + _vacantJobModel.URL;
+                    _errorMessage = "Vælg et company for at tilføje link.";
+                    return;
+                }
+
+                try
+                {
+                    if (!defaultValidator.ValidateUrl(_vacantJobModel.URL))
+                    {
+                        _errorMessage = "Ikke en valid URL.";
+                        return;
+                    }
+                }
+                catch (Exception)
+                {
+                    _errorMessage = "Fejl i Jobsidens Link. Prøv igen eller tjek for fejl.";
+                    return;
                 }
 
                 VacantJob vacantJob = new()

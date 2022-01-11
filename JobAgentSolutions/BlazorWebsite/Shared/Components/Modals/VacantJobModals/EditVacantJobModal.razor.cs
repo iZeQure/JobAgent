@@ -6,6 +6,7 @@ using JobAgentClassLibrary.Common.VacantJobs;
 using JobAgentClassLibrary.Common.VacantJobs.Entities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using PolicyLibrary.Validators;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -17,9 +18,10 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
         [Parameter] public VacantJobModel Model { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
-        [Inject] protected IVacantJobService JobPageService { get; set; }
+        [Inject] protected IVacantJobService VacantJobService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
 
+        private DefaultValidator defaultValidator = new();
         private IEnumerable<ICompany> _companies = new List<Company>();
 
         private string _errorMessage = "";
@@ -60,9 +62,24 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
 
             try
             {
-                if (!Model.URL.Contains("http://") || !Model.URL.Contains("https://"))
+                if (Model.CompanyId <= 0)
                 {
-                    Model.URL = "https://" + Model.URL;
+                    _errorMessage = "Vælg et company for at tilføje link.";
+                    return;
+                }
+
+                try
+                {
+                    if (!defaultValidator.ValidateUrl(Model.URL))
+                    {
+                        _errorMessage = "Ikke en valid URL.";
+                        return;
+                    }
+                }
+                catch (Exception)
+                {
+                    _errorMessage = "Fejl i Jobsidens Link. Prøv igen eller tjek for fejl.";
+                    return;
                 }
 
                 VacantJob vacantJob = new()
@@ -73,7 +90,7 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
                 };
 
                 bool isUpdated = false;
-                var result = await JobPageService.UpdateAsync(vacantJob);
+                var result = await VacantJobService.UpdateAsync(vacantJob);
 
                 if (result.Id == Model.Id && result.URL == Model.URL)
                 {
