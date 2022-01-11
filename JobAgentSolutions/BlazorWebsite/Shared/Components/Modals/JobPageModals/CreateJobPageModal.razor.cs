@@ -8,6 +8,7 @@ using JobAgentClassLibrary.Security.Providers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
+using PolicyLibrary.Validators;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
         [Inject] protected IJobPageService JobPageService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
 
+        private DefaultValidator defaultValidator = new();
         private JobPageModel _jobPageModel = new();
         private IEnumerable<IJobPage> _jobPages;
         private IEnumerable<ICompany> _companies;
@@ -75,6 +77,26 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
             _isProcessing = true;
             try
             {
+                if(_jobPageModel.CompanyId <= 0)
+                {
+                    _errorMessage = "Vælg et company for at tilføje link.";
+                    return;
+                }
+
+                try
+                {
+                    if (!defaultValidator.ValidateUrl(_jobPageModel.URL))
+                    {
+                        _errorMessage = "Ikke en valid URL.";
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _errorMessage = "Fejl i Jobsidens Link. Prøv igen eller tjek for fejl.";
+                    return;
+                }
+
                 JobPage jobPage = new()
                 {
                     Id = _jobPageModel.Id,
@@ -82,28 +104,23 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
                     URL = _jobPageModel.URL
 
                 };
-
-                bool isCreated = false;
+                
                 var result = await JobPageService.CreateAsync(jobPage);
 
-                if (result.Id == _jobPageModel.Id && result.URL == _jobPageModel.URL)
+                if (result is null)
                 {
-                    isCreated = true;
-                }
-
-                if (!isCreated)
-                {
-                    _errorMessage = "Kunne ikke oprette stilingsopslag grundet ukendt fejl";
+                    _errorMessage = "Fejl i oprettelse af jobside.";
+                    return;
                 }
 
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateJobPage");
-                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{_jobPageModel.Id}");
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{result.Id}");
 
             }
             catch (Exception ex)
             {
-                _errorMessage = ex.Message;
+                _errorMessage = "Kunne ikke oprette stilingsopslag grundet ukendt fejl";
             }
             finally
             {

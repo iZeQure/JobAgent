@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JobAgentClassLibraryTests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWebsite", "BlazorWebsite\BlazorWebsite.csproj", "{78258704-60F1-4945-8665-5E2CC79EADDC}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolicyLibrary", "..\PolicyLibrary\PolicyLibrary.csproj", "{A63B3669-A7EC-43A6-96AE-163791D960FB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{78258704-60F1-4945-8665-5E2CC79EADDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78258704-60F1-4945-8665-5E2CC79EADDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78258704-60F1-4945-8665-5E2CC79EADDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A63B3669-A7EC-43A6-96AE-163791D960FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A63B3669-A7EC-43A6-96AE-163791D960FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A63B3669-A7EC-43A6-96AE-163791D960FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A63B3669-A7EC-43A6-96AE-163791D960FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\PolicyLibrary\PolicyLibrary.csproj" />
     <ProjectReference Include="..\JobAgentClassLibrary\JobAgentClassLibrary.csproj" />
   </ItemGroup>
 
