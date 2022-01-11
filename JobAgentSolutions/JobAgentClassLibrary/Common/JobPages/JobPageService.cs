@@ -21,7 +21,15 @@ namespace JobAgentClassLibrary.Common.JobPages
         /// <returns>the created object</returns>
         public async Task<IJobPage> CreateAsync(IJobPage entity)
         {
-            return await _jobPageRepository.CreateAsync(entity);
+            try
+            {
+                return await _jobPageRepository.CreateAsync(entity);
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.WriteLine(ex.Message);
+                return null;
+            }
         }
 
         /// <summary>

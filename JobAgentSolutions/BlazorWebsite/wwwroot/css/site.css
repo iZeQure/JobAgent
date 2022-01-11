@@ -60,7 +60,6 @@ h5 {
     color: var(--bs-table-bg-override) !important;
     position: relative;
     font-family: var(--ff-h5);
-    font-size: .75rem;
     text-decoration: none;
     text-align: left;
     text-transform: uppercase;
