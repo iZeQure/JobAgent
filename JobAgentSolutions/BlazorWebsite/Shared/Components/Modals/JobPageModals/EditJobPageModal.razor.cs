@@ -90,15 +90,9 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
                     URL = Model.URL
                 };
 
-                bool isUpdated = false;
                 var result = await JobPageService.UpdateAsync(jobPage);
 
-                if (result.Id == Model.Id && result.URL == Model.URL)
-                {
-                    isUpdated = true;
-                }
-
-                if (!isUpdated)
+                if (result is null)
                 {
                     _errorMessage = "Kunne ikke opdatere Jobside.";
                     return;
@@ -108,9 +102,9 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditJobPage");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _errorMessage = ex.Message;
+                _errorMessage = "Kunne ikke opdatere jobside grundet ukendt fejl.";
             }
             finally
             {

@@ -39,7 +39,15 @@ namespace JobAgentClassLibrary.Common.JobPages
         /// <returns></returns>
         public async Task<IJobPage> GetByIdAsync(int id)
         {
-            return await _jobPageRepository.GetByIdAsync(id);
+            try
+            {
+                return await _jobPageRepository.GetByIdAsync(id);
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.WriteLine(ex.Message);
+                return null;
+            }
         }
 
         /// <summary>
@@ -48,7 +56,15 @@ namespace JobAgentClassLibrary.Common.JobPages
         /// <returns></returns>
         public async Task<List<IJobPage>> GetJobPagesAsync()
         {
-            return await _jobPageRepository.GetAllAsync();
+            try
+            {
+                return await _jobPageRepository.GetAllAsync();
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.WriteLine(ex.Message);
+                return null;
+            }
         }
 
         /// <summary>
@@ -58,7 +74,15 @@ namespace JobAgentClassLibrary.Common.JobPages
         /// <returns></returns>
         public async Task<bool> RemoveAsync(IJobPage entity)
         {
-            return await _jobPageRepository.RemoveAsync(entity);
+            try
+            {
+                return await _jobPageRepository.RemoveAsync(entity);
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.WriteLine(ex.Message);
+                return false;
+            }
         }
 
         /// <summary>
@@ -68,7 +92,15 @@ namespace JobAgentClassLibrary.Common.JobPages
         /// <returns></returns>
         public async Task<IJobPage> UpdateAsync(IJobPage entity)
         {
-            return await _jobPageRepository.UpdateAsync(entity);
+            try
+            {
+                return await _jobPageRepository.UpdateAsync(entity);
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.WriteLine(ex.Message);
+                return null;
+            }
         }
     }
 }

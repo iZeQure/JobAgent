@@ -19,27 +19,67 @@ namespace JobAgentClassLibrary.Common.VacantJobs
 
         public async Task<IVacantJob> CreateAsync(IVacantJob entity)
         {
-            return await _repository.CreateAsync(entity);
+            try
+            {
+                return await _repository.CreateAsync(entity);
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.WriteLine(ex.Message);
+                return null;
+            }
         }
 
         public async Task<List<IVacantJob>> GetAllAsync()
         {
-            return await _repository.GetAllAsync();
+            try
+            {
+                return await _repository.GetAllAsync();
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.WriteLine(ex.Message);
+                return null;
+            }
         }
 
         public async Task<IVacantJob> GetByIdAsync(int id)
         {
-            return await _repository.GetByIdAsync(id);
+            try
+            {
+                return await _repository.GetByIdAsync(id);
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.WriteLine(ex.Message);
+                return null;
+            }
         }
 
         public async Task<bool> RemoveAsync(IVacantJob entity)
         {
-            return await _repository.RemoveAsync(entity);
+            try
+            {
+                return await _repository.RemoveAsync(entity);
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.WriteLine(ex.Message);
+                return false;
+            }
         }
 
         public async Task<IVacantJob> UpdateAsync(IVacantJob entity)
         {
-            return await _repository.UpdateAsync(entity);
+            try
+            {
+                return await _repository.UpdateAsync(entity);
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.WriteLine(ex.Message);
+                return null;
+            }
         }
 
 

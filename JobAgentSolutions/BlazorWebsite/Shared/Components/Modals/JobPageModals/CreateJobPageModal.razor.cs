@@ -118,9 +118,9 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{result.Id}");
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _errorMessage = "Kunne ikke oprette stilingsopslag grundet ukendt fejl";
+                _errorMessage = "Kunne ikke oprette jobside grundet ukendt fejl";
             }
             finally
             {

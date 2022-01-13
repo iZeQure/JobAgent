@@ -74,7 +74,6 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
 
         private async Task OnValidSubmit_CreateJobAdvertAsync()
         {
-            _isProcessing = true;
             try
             {
                 if (_vacantJobModel.CompanyId <= 0)
@@ -104,17 +103,12 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
                     URL = _vacantJobModel.URL
                 };
 
-                bool isCreated = false;
                 var result = await VacantJobService.CreateAsync(vacantJob);
 
-                if (result.Id == _vacantJobModel.Id && result.URL == _vacantJobModel.URL)
+                if (result is null)
                 {
-                    isCreated = true;
-                }
-
-                if (!isCreated)
-                {
-                    _errorMessage = "Kunne ikke oprette stilingsopslag grundet ukendt fejl";
+                    _errorMessage = "Fejl i oprettelse af stillingsopslag.";
+                    return;
                 }
 
                 RefreshProvider.CallRefreshRequest();
@@ -122,9 +116,9 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{_vacantJobModel.Id}");
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _errorMessage = ex.Message;
+                _errorMessage = "Kunne ikke rette stillingsopslag grundet ukendt fejl.";
             }
             finally
             {
