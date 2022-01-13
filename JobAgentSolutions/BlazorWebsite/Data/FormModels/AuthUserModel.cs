@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using JobAgentClassLibrary.Core.Entities;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Mail;
 
 namespace BlazorWebsite.Data.FormModels
 {
-    public class AuthUserModel
+    public class AuthUserModel : BaseModel
     {
         [Required(AllowEmptyStrings = false, ErrorMessage = "Email adresse er påkrævet.")]
         [StringLength(255, ErrorMessage = "Email er for long (255 karakter begrænse).")]
