@@ -1,7 +1,6 @@
 ﻿using JobAgentClassLibrary.Common.JobAdverts.Entities;
 using JobAgentClassLibrary.Common.JobAdverts.Repositories;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.JobAdverts
@@ -22,7 +21,14 @@ namespace JobAgentClassLibrary.Common.JobAdverts
         /// <returns>The created object</returns>
         public async Task<IJobAdvert> CreateAsync(IJobAdvert entity)
         {
-            return await _repository.CreateAsync(entity);
+            IJobAdvert checkupAdvert = await _repository.GetByIdAsync(entity.Id);
+            
+            if (checkupAdvert is null)
+            {
+                return await _repository.CreateAsync(entity);
+            }
+
+            return checkupAdvert;
         }
 
         /// <summary>

@@ -1,6 +1,7 @@
 ﻿using BlazorWebsite.Data.FormModels;
 using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Core.Entities;
+using JobAgentClassLibrary.Extensions;
 using JobAgentClassLibrary.Loggings;
 using JobAgentClassLibrary.Loggings.Entities;
 using Microsoft.AspNetCore.Components;
@@ -24,7 +25,6 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
         private IEnumerable<ILog> _logs;
 
         private string _errorMessage = "";
-        private bool _isProcessing = false;
         private bool _isLoading = false;
 
         protected override async Task OnInitializedAsync()
@@ -68,9 +68,11 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
 
         private async Task OnValidSubmit_EditJobVacancy()
         {
-            _isProcessing = true;
-
-            try
+            if (Model.IsProcessing is true)
+            {
+                return;
+            }
+            using (var _ = Model.TimedEndOfOperation())
             {
                 DbLog DbLog = new()
                 {
@@ -83,31 +85,20 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
                     LogType = Model.LogType
                 };
 
-                bool isUpdated = false;
                 var result = await LogService.UpdateAsync(DbLog);
 
-                if (result.Id == Model.Id && result.Message == Model.Message)
+                if (result is null)
                 {
-                    isUpdated = true;
-                }
-
-                if (!isUpdated)
-                {
-                    _errorMessage = "Kunne ikke opdatere Log.";
+                    _errorMessage = "Fejl under opdatering af Log.";
                     return;
                 }
+            }
 
+            if (Model.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditCrawlerLog");
-                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
-            }
-            catch (Exception ex)
-            {
-                _errorMessage = ex.Message;
-            }
-            finally
-            {
-                _isProcessing = false;
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}"); 
             }
         }
 

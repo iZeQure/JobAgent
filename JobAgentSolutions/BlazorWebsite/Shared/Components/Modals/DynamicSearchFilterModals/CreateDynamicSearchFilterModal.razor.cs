@@ -4,6 +4,7 @@ using JobAgentClassLibrary.Common.Categories;
 using JobAgentClassLibrary.Common.Categories.Entities;
 using JobAgentClassLibrary.Common.Filters;
 using JobAgentClassLibrary.Common.Filters.Entities;
+using JobAgentClassLibrary.Extensions;
 using JobAgentClassLibrary.Security.Providers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -29,7 +30,6 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
 
         private string _errorMessage = "";
         private bool _isLoading = false;
-        private bool _isProcessing = false;
 
         protected override async Task OnInitializedAsync()
         {
@@ -75,8 +75,14 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
 
         private async Task OnValidSubmit_CreateJobAdvertAsync()
         {
-            _isProcessing = true;
-            try
+            if (_dynamicSearchFilterModel.IsProcessing is true)
+            {
+                return;
+            }
+
+            IDynamicSearchFilter result = null;
+
+            using (var _ = _dynamicSearchFilterModel.TimedEndOfOperation())
             {
                 DynamicSearchFilter dynamicSearchFilter = new()
                 {
@@ -85,32 +91,20 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
                     Key = _dynamicSearchFilterModel.Key
                 };
 
-                bool isCreated = false;
-                var result = await DynamicSearchFilterService.CreateAsync(dynamicSearchFilter);
+                result = await DynamicSearchFilterService.CreateAsync(dynamicSearchFilter);
 
-                if (result.CategoryId == _dynamicSearchFilterModel.CategoryId && result.Key == _dynamicSearchFilterModel.Key)
+                if (result is null)
                 {
-                    isCreated = true;
+                    _errorMessage = "Fejl under oprettelse af filteret.";
+                    return;
                 }
+            }
 
-                if (!isCreated)
-                {
-                    _errorMessage = "Kunne ikke oprette søgeord grundet ukendt fejl";
-                }
-
+            if (_dynamicSearchFilterModel.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateDynamicSearchFilter");
-                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{_dynamicSearchFilterModel.Id}");
-
-            }
-            catch (Exception ex)
-            {
-                _errorMessage = ex.Message;
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                _isProcessing = false;
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{result.Id}"); 
             }
         }
 

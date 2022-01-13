@@ -4,6 +4,7 @@ using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.JobPages;
 using JobAgentClassLibrary.Common.JobPages.Entities;
+using JobAgentClassLibrary.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using PolicyLibrary.Validators;
@@ -25,7 +26,6 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
         private IEnumerable<ICompany> _companies = new List<Company>();
 
         private string _errorMessage = "";
-        private bool _isProcessing = false;
         private bool _isLoading = false;
 
         protected override async Task OnInitializedAsync()
@@ -58,9 +58,11 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
 
         private async Task OnValidSubmit_EditJobVacancy()
         {
-            _isProcessing = true;
-
-            try
+            if (Model.IsProcessing is true)
+            {
+                return;
+            }
+            using (var _ = Model.TimedEndOfOperation())
             {
 
                 if (Model.CompanyId <= 0)
@@ -97,18 +99,13 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
                     _errorMessage = "Kunne ikke opdatere Jobside.";
                     return;
                 }
+            }
 
+            if (Model.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditJobPage");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
-            }
-            catch (Exception)
-            {
-                _errorMessage = "Kunne ikke opdatere jobside grundet ukendt fejl.";
-            }
-            finally
-            {
-                _isProcessing = false;
             }
         }
 

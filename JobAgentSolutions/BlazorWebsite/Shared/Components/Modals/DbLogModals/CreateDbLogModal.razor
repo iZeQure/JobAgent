@@ -57,8 +57,8 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="OnClick_CancelRequest">Annuller</button>
-                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_isProcessing">Opret Log</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" disabled="@_logModel.IsProcessing" @onclick="OnClick_CancelRequest">Annuller</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_logModel.IsProcessing">Opret Log</button>
                     </div>
                 </EditForm>
             }

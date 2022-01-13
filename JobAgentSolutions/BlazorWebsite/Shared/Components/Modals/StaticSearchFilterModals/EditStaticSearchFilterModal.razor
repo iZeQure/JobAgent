@@ -73,8 +73,8 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="OnClick_CancelRequest" @onclick:preventDefault>Annuller</button>
-                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@(_isProcessing)">Gem ændringer</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" disabled="@(Model.IsProcessing)" @onclick="OnClick_CancelRequest" @onclick:preventDefault>Annuller</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@(Model.IsProcessing)">Gem ændringer</button>
                     </div>
                 </EditForm>
             }

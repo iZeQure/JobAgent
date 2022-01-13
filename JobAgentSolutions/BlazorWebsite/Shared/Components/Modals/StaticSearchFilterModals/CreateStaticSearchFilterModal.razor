@@ -40,23 +40,26 @@
                                 }
                                 else
                                 {
-                                    <select id="regInputFilterType" class="form-control form-control-sm" type="text" @bind="_staticSearchFilterModel.FilterType.Id">
-                                        <option value="0" selected>---Vælg en filtertype som passer til Søgefilteret---</option>
-                                        @foreach (var filtertype in _filterTypes)
-                                        {
-                                            <option value="@filtertype.Id">@filtertype.Name</option>
-                                        }
-                                    </select>
+                                    @if (_staticSearchFilterModel.FilterType is not null)
+                                    {
+                                        <select id="regInputFilterType" class="form-control form-control-sm" type="text" @bind="_staticSearchFilterModel.FilterType.Id">
+                                            <option value="0" selected>---Vælg en filtertype som passer til Søgefilteret---</option>
+                                            @foreach (var filtertype in _filterTypes)
+                                            {
+                                                <option value="@filtertype.Id">@filtertype.Name</option>
+                                            }
+                                        </select>
+                                        <ValidationMessage For="@(() => _staticSearchFilterModel.FilterType.Id)" />
+                                    }
                                 }
-                                <ValidationMessage For="@(() => _staticSearchFilterModel.FilterType.Id)" />
 
                             </div>
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="OnClick_CancelRequest">Annuller</button>
-                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_isProcessing">Opret Søgefilter</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" disabled="@_staticSearchFilterModel.IsProcessing" @onclick="OnClick_CancelRequest">Annuller</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_staticSearchFilterModel.IsProcessing">Opret Søgefilter</button>
                     </div>
                 </EditForm>
             }

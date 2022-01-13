@@ -4,6 +4,7 @@ using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.JobPages;
 using JobAgentClassLibrary.Common.JobPages.Entities;
+using JobAgentClassLibrary.Extensions;
 using JobAgentClassLibrary.Security.Providers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -30,7 +31,6 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
 
         private string _errorMessage = "";
         private bool _isLoading = false;
-        private bool _isProcessing = false;
 
         protected override async Task OnInitializedAsync()
         {
@@ -74,8 +74,14 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
 
         private async Task OnValidSubmit_CreateJobAdvertAsync()
         {
-            _isProcessing = true;
-            try
+            if (_jobPageModel.IsProcessing is true)
+            {
+                return;
+            }
+
+            IJobPage result = null;
+
+            using (var _ = _jobPageModel.TimedEndOfOperation())
             {
                 if (_jobPageModel.CompanyId <= 0)
                 {
@@ -105,26 +111,20 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
 
                 };
 
-                var result = await JobPageService.CreateAsync(jobPage);
+                result = await JobPageService.CreateAsync(jobPage);
 
                 if (result is null)
                 {
                     _errorMessage = "Fejl i oprettelse af jobside.";
                     return;
                 }
+            }
 
+            if (_jobPageModel.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateJobPage");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{result.Id}");
-
-            }
-            catch (Exception)
-            {
-                _errorMessage = "Kunne ikke oprette jobside grundet ukendt fejl";
-            }
-            finally
-            {
-                _isProcessing = false;
             }
         }
 

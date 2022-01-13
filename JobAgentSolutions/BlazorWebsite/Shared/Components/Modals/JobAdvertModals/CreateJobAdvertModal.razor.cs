@@ -8,6 +8,7 @@ using JobAgentClassLibrary.Common.JobAdverts;
 using JobAgentClassLibrary.Common.JobAdverts.Entities;
 using JobAgentClassLibrary.Common.VacantJobs;
 using JobAgentClassLibrary.Common.VacantJobs.Entities;
+using JobAgentClassLibrary.Extensions;
 using JobAgentClassLibrary.Security.Providers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -38,7 +39,6 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
 
         private string _errorMessage = "";
         private bool _isLoading = false;
-        private bool _isProcessing = false;
 
         protected override async Task OnInitializedAsync()
         {
@@ -86,8 +86,14 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
 
         private async Task OnValidSubmit_CreateJobAdvertAsync()
         {
-            _isProcessing = true;
-            try
+            if (_jobAdvertModel.IsProcessing is true)
+            {
+                return;
+            }
+
+            IJobAdvert result = null;
+
+            using (var _ = _jobAdvertModel.TimedEndOfOperation())
             {
                 JobAdvert jobAdvert = new()
                 {
@@ -99,46 +105,20 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
                     RegistrationDateTime = _jobAdvertModel.RegistrationDateTime
                 };
 
-                var tempAdvert = await JobAdvertService.GetByIdAsync(jobAdvert.Id);
-                if (tempAdvert != null)
+                result = await JobAdvertService.CreateAsync(jobAdvert);
+
+                if (result is null)
                 {
-                    foreach (var vacantJob in _vacantJobs)
-                    {
-                        foreach (var company in _companies)
-                        {
-                            if (vacantJob.Id == tempAdvert.Id)
-                            {
-                                _errorMessage = $"Der findes allerede et stillingsopslag for [{company.Name} - {vacantJob.URL}]";
-                            }
-                        }
-                    }
+                    _errorMessage = "Fejl i oprettelse af JobOpslag.";
                     return;
                 }
-
-                bool isCreated = false;
-                var result = await JobAdvertService.CreateAsync(jobAdvert);
-
-                if (result.Id == _jobAdvertModel.Id && result.Title == _jobAdvertModel.Title)
-                {
-                    isCreated = true;
-                }
-
-                if (isCreated)
-                {
-                    RefreshProvider.CallRefreshRequest();
-                    await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateJobAdvert");
-                    return;
-                }
-
-                _errorMessage = "Kunne ikke oprette stilingsopslag!";
             }
-            catch (Exception ex)
+
+            if (_jobAdvertModel.IsProcessing is false)
             {
-                _errorMessage = ex.Message;
-            }
-            finally
-            {
-                _isProcessing = false;
+                RefreshProvider.CallRefreshRequest();
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateJobAdvert");
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{result.Id}");
             }
         }
 

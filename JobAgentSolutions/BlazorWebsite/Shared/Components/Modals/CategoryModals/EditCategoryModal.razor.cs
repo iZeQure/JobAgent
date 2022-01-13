@@ -2,6 +2,7 @@
 using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Categories;
 using JobAgentClassLibrary.Common.Categories.Entities;
+using JobAgentClassLibrary.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
@@ -58,11 +59,12 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
 
         private async Task OnValidSubmit_EditJobVacancy()
         {
-            _isProcessing = true;
-
-            try
+            if (Model.IsProcessing is true)
             {
-
+                return;
+            }
+            using (var _ = Model.TimedEndOfOperation())
+            {
                 Category category = new()
                 {
                     Id = Model.CategoryId,
@@ -70,17 +72,11 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
                 };
 
                 bool specializationIsCreated = true;
-                bool isUpdated = false;
                 var result = await CategoryService.UpdateAsync(category);
 
-                if (result.Id == Model.CategoryId && result.Name == Model.Categoryname)
+                if (result is null)
                 {
-                    isUpdated = true;
-                }
-
-                if (!isUpdated)
-                {
-                    _errorMessage = "Kunne ikke opdatere Uddannelsen, grundet ukendt fejl.";
+                    _errorMessage = "Fejl under opdatering af Uddannelse.";
                     return;
                 }
 
@@ -96,32 +92,22 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
 
                         var specializationResult = await CategoryService.CreateAsync(specialization);
 
-                        if (specializationResult.CategoryId != specialization.CategoryId && specialization.Name != specializationResult.Name)
+                        if (specializationIsCreated is false)
                         {
-                            specializationIsCreated = false;
+                            _errorMessage = "Fejl under opdatering af speciale.";
+                            return;
                         }
                     }
                 }
-
-                if (!specializationIsCreated)
-                {
-                    _errorMessage = "Kunne ikke oprette speciale(r) grundet ukendt fejl.";
-                }
-
-                RefreshProvider.CallRefreshRequest();
-                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditCategory");
-                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.CategoryId}");
             }
-            catch (Exception ex)
-            {
-                _errorMessage = ex.Message;
-                Console.WriteLine(ex.Message);
-            }
-            finally
+
+            if (Model.IsProcessing is false)
             {
                 _newSpecializationNames = new();
                 _specializations = await CategoryService.GetSpecializationsAsync();
-                _isProcessing = false;
+                RefreshProvider.CallRefreshRequest();
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditCategory");
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.CategoryId}");
             }
         }
 

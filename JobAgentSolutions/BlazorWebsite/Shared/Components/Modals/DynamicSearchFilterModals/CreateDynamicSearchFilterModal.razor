@@ -89,8 +89,8 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="OnClick_CancelRequest">Annuller</button>
-                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_isProcessing">Opret Søgeord</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" disabled="@_dynamicSearchFilterModel.IsProcessing" @onclick="OnClick_CancelRequest">Annuller</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_dynamicSearchFilterModel.IsProcessing">Opret Søgeord</button>
                     </div>
                 </EditForm>
             }

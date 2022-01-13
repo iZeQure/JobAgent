@@ -26,8 +26,8 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="CancelRequest">Annuller</button>
-                    <button type="submit" class="btn btn-info text-light cursor-pointer" disabled="@_isProcessing">Opret Virksomhed</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" disabled="@_companyModel.IsProcessing" @onclick="CancelRequest">Annuller</button>
+                    <button type="submit" class="btn btn-info text-light cursor-pointer" disabled="@_companyModel.IsProcessing">Opret Virksomhed</button>
                 </div>
 
             </EditForm>

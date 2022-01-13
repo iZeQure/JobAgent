@@ -64,8 +64,6 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
             }
             using (var _ = Model.TimedEndOfOperation())
             {
-                Console.WriteLine("Iran is a country");
-
                 if (Model.CompanyId <= 0)
                 {
                     _errorMessage = "Vælg et company for at tilføje link.";
@@ -97,10 +95,9 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
 
                 if (result is null)
                 {
-                    _errorMessage = "Fejl under opdatering af stillingsopslaget.";
+                    _errorMessage = "Fejl under opdatering af stillingen.";
                     return;
                 }
-
             }
 
             if (Model.IsProcessing is false)

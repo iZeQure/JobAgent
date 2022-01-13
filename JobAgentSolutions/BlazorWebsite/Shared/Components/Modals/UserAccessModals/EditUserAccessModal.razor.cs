@@ -6,6 +6,7 @@ using JobAgentClassLibrary.Common.Roles;
 using JobAgentClassLibrary.Common.Roles.Entities;
 using JobAgentClassLibrary.Common.Users;
 using JobAgentClassLibrary.Common.Users.Entities;
+using JobAgentClassLibrary.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
@@ -28,7 +29,6 @@ namespace BlazorWebsite.Shared.Components.Modals.UserAccessModals
         private IEnumerable<IUser> _users;
 
         private string _errorMessage = "";
-        private bool _isProcessing = false;
         private bool _isLoading = false;
 
         protected override async Task OnInitializedAsync()
@@ -63,9 +63,12 @@ namespace BlazorWebsite.Shared.Components.Modals.UserAccessModals
 
         private async Task OnValidSubmit_EditUser()
         {
-            _isProcessing = true;
+            if (Model.IsProcessing is true)
+            {
+                return;
+            }
 
-            try
+            using (var _ = Model.TimedEndOfOperation())
             {
                 IUser user = new User()
                 {
@@ -77,31 +80,20 @@ namespace BlazorWebsite.Shared.Components.Modals.UserAccessModals
                     Email = Model.Email
                 };
 
-                bool isUpdated = false;
                 var result = await UserService.UpdateAsync(user);
 
-                if (result.Id == Model.Id && result.RoleId == Model.RoleId)
+                if (result is null)
                 {
-                    isUpdated = true;
-                }
-
-                if (!isUpdated)
-                {
-                    _errorMessage = "Kunne ikke opdatere Log.";
+                    _errorMessage = "Fejl i opdatering af brugeren.";
                     return;
                 }
+            }
 
+            if (Model.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditUserAccess");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
-            }
-            catch (Exception ex)
-            {
-                _errorMessage = ex.Message;
-            }
-            finally
-            {
-                _isProcessing = false;
             }
         }
 

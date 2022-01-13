@@ -49,8 +49,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="OnClick_CancelRequest">Annuller</button>
-                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_isProcessing">Opret Jobside</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" disabled="@_jobPageModel.IsProcessing" @onclick="OnClick_CancelRequest">Annuller</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_jobPageModel.IsProcessing">Opret Jobside</button>
                     </div>
                 </EditForm>
             }

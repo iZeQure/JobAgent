@@ -2,12 +2,14 @@
 using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Filters;
 using JobAgentClassLibrary.Common.Filters.Entities;
+using JobAgentClassLibrary.Extensions;
 using JobAgentClassLibrary.Security.Providers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
@@ -26,7 +28,6 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
 
         private string _errorMessage = "";
         private bool _isLoading = false;
-        private bool _isProcessing = false;
 
         protected override async Task OnInitializedAsync()
         {
@@ -57,21 +58,12 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
                 _staticSearchFilters = companyTask.Result;
                 _filterTypes = filterTypeTask.Result;
 
-
                 foreach (var staticFilter in _staticSearchFilters)
                 {
-                    foreach (var filterType in _filterTypes)
-                    {
-                        if (staticFilter.FilterType.Id == filterType.Id)
-                        {
-                            staticFilter.FilterType.Name = filterType.Name;
-                            staticFilter.FilterType.Description = filterType.Description;
-                        }
-                    }
+                    var filterType = _filterTypes.FirstOrDefault(x => x.Id == staticFilter.FilterType.Id);
+                    staticFilter.FilterType.Name = filterType.Name;
+                    staticFilter.FilterType.Description = filterType.Description;
                 }
-
-                _staticSearchFilterModel.FilterType = new();
-
             }
             catch (Exception)
             {
@@ -86,8 +78,14 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
 
         private async Task OnValidSubmit_CreateJobAdvertAsync()
         {
-            _isProcessing = true;
-            try
+            if (_staticSearchFilterModel.IsProcessing is true)
+            {
+                return;
+            }
+
+            IStaticSearchFilter result = null;
+
+            using (var _ = _staticSearchFilterModel.TimedEndOfOperation())
             {
                 StaticSearchFilter staticSearchFilter = new()
                 {
@@ -97,32 +95,20 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
 
                 };
 
-                bool isCreated = false;
-                var result = await StaticcSearchFilterService.CreateAsync(staticSearchFilter);
+                result = await StaticcSearchFilterService.CreateAsync(staticSearchFilter);
 
-                if (result.Id == _staticSearchFilterModel.Id && result.Key == _staticSearchFilterModel.Key)
+                if (result is null)
                 {
-                    isCreated = true;
+                    _errorMessage = "Fejl under oprettelse af filter.";
+                    return;
                 }
+            }
 
-                if (!isCreated)
-                {
-                    _errorMessage = "Kunne ikke oprette søgeord grundet ukendt fejl";
-                }
-
+            if (_staticSearchFilterModel.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateStaticSearchFilter");
-                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{_staticSearchFilterModel.Id}");
-
-            }
-            catch (Exception ex)
-            {
-                _errorMessage = ex.Message;
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                _isProcessing = false;
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{result.Id}");
             }
         }
 

@@ -8,6 +8,7 @@ using JobAgentClassLibrary.Common.JobAdverts;
 using JobAgentClassLibrary.Common.JobAdverts.Entities;
 using JobAgentClassLibrary.Common.VacantJobs;
 using JobAgentClassLibrary.Common.VacantJobs.Entities;
+using JobAgentClassLibrary.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
@@ -34,7 +35,6 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
         private List<ISpecialization> _sortedSpecializations = new List<ISpecialization>();
 
         private string _errorMessage = "";
-        private bool _isProcessing = false;
         private bool _isLoading = false;
 
         protected override async Task OnInitializedAsync()
@@ -73,10 +73,14 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
 
         private async Task OnValidSubmit_EditJobVacancy()
         {
-            _isProcessing = true;
-
-            try
+            if (Model.IsProcessing is true)
             {
+                return;
+            }
+            using (var _ = Model.TimedEndOfOperation())
+            {
+
+
                 JobAdvert jobAdvert = new()
                 {
                     Id = Model.Id,
@@ -88,31 +92,20 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
 
                 };
 
-                bool isUpdated = false;
                 var result = await JobAdvertService.UpdateAsync(jobAdvert);
 
-                if (result.Id == Model.Id && result.Title == Model.Title)
+                if (result is null)
                 {
-                    isUpdated = true;
-                }
-
-                if (!isUpdated)
-                {
-                    _errorMessage = "Kunne ikke opdatere stillingsopslag.";
+                    _errorMessage = "Fejl under opdatering af JobOpslaget.";
                     return;
                 }
+            }
 
+            if (Model.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditJobAdvert");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
-            }
-            catch (Exception ex)
-            {
-                _errorMessage = ex.Message;
-            }
-            finally
-            {
-                _isProcessing = false;
             }
         }
 

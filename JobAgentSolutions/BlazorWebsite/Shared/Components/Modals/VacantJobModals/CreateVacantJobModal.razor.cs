@@ -4,6 +4,7 @@ using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.VacantJobs;
 using JobAgentClassLibrary.Common.VacantJobs.Entities;
+using JobAgentClassLibrary.Extensions;
 using JobAgentClassLibrary.Security.Providers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -30,7 +31,6 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
 
         private string _errorMessage = "";
         private bool _isLoading = false;
-        private bool _isProcessing = false;
 
         protected override async Task OnInitializedAsync()
         {
@@ -74,7 +74,14 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
 
         private async Task OnValidSubmit_CreateJobAdvertAsync()
         {
-            try
+            if (_vacantJobModel.IsProcessing is true)
+            {
+                return;
+            }
+
+            IVacantJob result = null;
+
+            using (var _ = _vacantJobModel.TimedEndOfOperation())
             {
                 if (_vacantJobModel.CompanyId <= 0)
                 {
@@ -103,26 +110,20 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
                     URL = _vacantJobModel.URL
                 };
 
-                var result = await VacantJobService.CreateAsync(vacantJob);
+                result = await VacantJobService.CreateAsync(vacantJob);
 
                 if (result is null)
                 {
-                    _errorMessage = "Fejl i oprettelse af stillingsopslag.";
+                    _errorMessage = "Fejl i oprettelse af stilling.";
                     return;
                 }
+            }
 
+            if (_vacantJobModel.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateVacantJob");
-                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{_vacantJobModel.Id}");
-
-            }
-            catch (Exception)
-            {
-                _errorMessage = "Kunne ikke rette stillingsopslag grundet ukendt fejl.";
-            }
-            finally
-            {
-                _isProcessing = false;
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{result.Id}");
             }
         }
 

@@ -2,6 +2,7 @@
 using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Categories;
 using JobAgentClassLibrary.Common.Categories.Entities;
+using JobAgentClassLibrary.Extensions;
 using JobAgentClassLibrary.Security.Providers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -28,7 +29,6 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
         private string _errorMessage = "";
         private bool _isProcessingNewSpecializationToList = false;
         private bool _isLoading = false;
-        private bool _isProcessing = false;
 
         protected override async Task OnInitializedAsync()
         {
@@ -72,27 +72,27 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
 
         private async Task OnValidSubmit_CreateJobAdvertAsync()
         {
-            _isProcessing = true;
-            try
+            if (_categoryModel.IsProcessing is true)
             {
+                return;
+            }
+
+            ICategory categoryResult = null;
+
+            using (var _ = _categoryModel.TimedEndOfOperation())
+            {
+
                 Category category = new()
                 {
                     Name = _categoryModel.Categoryname
                 };
 
-                bool categoryIsCreated = false;
-                bool specializationIsCreated = true;
-                var categoryResult = await CategoryService.CreateAsync(category);
+                categoryResult = await CategoryService.CreateAsync(category);
 
-                if (categoryResult.Name == _categoryModel.Categoryname)
+                if (categoryResult is null)
                 {
-                    categoryIsCreated = true;
-                    _categoryModel.CategoryId = categoryResult.Id;
-                }
-
-                if (!categoryIsCreated)
-                {
-                    _errorMessage = "Kunne ikke oprette uddannelsen grundet ukendt fejl.";
+                    _errorMessage = "Fejl i oprettelse af Uddannelse.";
+                    return;
                 }
 
                 foreach (var name in _newSpecializationNames)
@@ -105,31 +105,19 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
 
                     var specializationResult = await CategoryService.CreateAsync(specialization);
 
-                    if (specializationResult.CategoryId != specialization.CategoryId && specialization.Name != specializationResult.Name)
+                    if (specializationResult is null)
                     {
-                        specializationIsCreated = false;
+                        _errorMessage = "Fejl i oprettelse af Speciale.";
+                        return;
                     }
                 }
+            }
 
-                if (!specializationIsCreated)
-                {
-                    _errorMessage = "Kunne ikke oprette specialer grundet ukendt fejl.";
-                }
-
-
+            if (_categoryModel.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateCategory");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{_categoryModel.CategoryId}");
-
-            }
-            catch (Exception ex)
-            {
-                _errorMessage = ex.Message;
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                _isProcessing = false;
             }
         }
 

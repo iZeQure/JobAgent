@@ -2,11 +2,11 @@
 using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
+using JobAgentClassLibrary.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
-using System;
 using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
@@ -19,7 +19,6 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
 
         private EditContext _editContext;
         private CompanyModel _companyModel = new();
-        private bool _isProcessing = false;
         private bool _showError = false;
         private string _errorMessage = string.Empty;
 
@@ -33,51 +32,37 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
 
         private async Task OnValidSubmit_CreateCompany()
         {
-            try
+            if (_companyModel.IsProcessing is true)
             {
-                if (_companyModel != null)
+                return;
+            }
+            using (var _ = _companyModel.TimedEndOfOperation())
+            {
+                Company company = new()
                 {
-                    _isProcessing = true;
+                    Id = _companyModel.CompanyId,
+                    Name = _companyModel.Name
+                };
 
-                    Company company = new()
-                    {
-                        Id = _companyModel.CompanyId,
-                        Name = _companyModel.Name
-                    };
+                var result = await CompanyService.CreateAsync(company);
 
-                    bool isCreated = false;
-                    var result = await CompanyService.CreateAsync(company);
-
-                    if (result.Id == _companyModel.CompanyId && result.Name == _companyModel.Name)
-                    {
-                        isCreated = true;
-                    }
-
-                    if (!isCreated)
-                    {
-                        _errorMessage = "Kunne ikke oprette virksomheden grundet ukendt fejl.";
-                    }
-
-                    RefreshProvider.CallRefreshRequest();
-                    await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateCompany");
-                    await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{_companyModel.CompanyId}");
-
+                if (result is null)
+                {
+                    _errorMessage = "Fejl under oprettelse af Virksomehed.";
+                    return;
                 }
             }
-            catch (Exception ex)
-            {
-                _errorMessage = ex.Message;
-            }
-            finally
-            {
-                _isProcessing = false;
 
+            if (_companyModel.IsProcessing is false)
+            {
+                RefreshProvider.CallRefreshRequest();
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateCompany");
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{_companyModel.CompanyId}");
             }
         }
 
         private void CancelRequest(MouseEventArgs e)
         {
-            _isProcessing = false;
             _companyModel = new();
             StateHasChanged();
         }
