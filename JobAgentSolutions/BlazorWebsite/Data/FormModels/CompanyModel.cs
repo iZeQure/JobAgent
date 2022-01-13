@@ -1,9 +1,9 @@
-﻿using System;
+﻿using JobAgentClassLibrary.Core.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace BlazorWebsite.Data.FormModels
 {
-    public class CompanyModel
+    public class CompanyModel : BaseModel
     {
         [Required]
         public int CompanyId { get; set; }

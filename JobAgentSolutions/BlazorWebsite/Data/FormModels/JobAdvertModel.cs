@@ -1,9 +1,10 @@
-﻿using System;
+﻿using JobAgentClassLibrary.Core.Entities;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace BlazorWebsite.Data.FormModels
 {
-    public class JobAdvertModel
+    public class JobAdvertModel : BaseModel
     {
         [Required(AllowEmptyStrings = false, ErrorMessage = "* Vælg venligst en tilhører fra listen.")]
         [Range(1, int.MaxValue, ErrorMessage = "* Vælg venligst en tilhører fra listen.")]

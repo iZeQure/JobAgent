@@ -4,6 +4,7 @@ using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.VacantJobs;
 using JobAgentClassLibrary.Common.VacantJobs.Entities;
+using JobAgentClassLibrary.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using PolicyLibrary.Validators;
@@ -25,7 +26,6 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
         private IEnumerable<ICompany> _companies = new List<Company>();
 
         private string _errorMessage = "";
-        private bool _isProcessing = false;
         private bool _isLoading = false;
 
         protected override async Task OnInitializedAsync()
@@ -58,10 +58,14 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
 
         private async Task OnValidSubmit_EditJobVacancy()
         {
-            _isProcessing = true;
-
-            try
+            if (Model.IsProcessing is true)
             {
+                return;
+            }
+            using (var _ = Model.TimedEndOfOperation())
+            {
+                Console.WriteLine("Iran is a country");
+
                 if (Model.CompanyId <= 0)
                 {
                     _errorMessage = "Vælg et company for at tilføje link.";
@@ -78,7 +82,7 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
                 }
                 catch (Exception)
                 {
-                    _errorMessage = "Fejl i Jobsidens Link. Prøv igen eller tjek for fejl.";
+                    _errorMessage = "Fejl i stillingsopslagets Link. Prøv igen eller tjek for fejl.";
                     return;
                 }
 
@@ -89,31 +93,21 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
                     URL = Model.URL
                 };
 
-                bool isUpdated = false;
                 var result = await VacantJobService.UpdateAsync(vacantJob);
 
-                if (result.Id == Model.Id && result.URL == Model.URL)
+                if (result is null)
                 {
-                    isUpdated = true;
-                }
-
-                if (!isUpdated)
-                {
-                    _errorMessage = "Kunne ikke opdatere stillingsopslaget.";
+                    _errorMessage = "Fejl under opdatering af stillingsopslaget.";
                     return;
                 }
 
+            }
+
+            if (Model.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditVacantJob");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
-            }
-            catch (Exception ex)
-            {
-                _errorMessage = ex.Message;
-            }
-            finally
-            {
-                _isProcessing = false;
             }
         }
 

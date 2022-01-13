@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using JobAgentClassLibrary.Core.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace BlazorWebsite.Data.FormModels
 {
-    public class CategoryModel
+    public class CategoryModel : BaseModel
     {
         [Required]
         public int CategoryId { get; set; }
