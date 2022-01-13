@@ -22,6 +22,7 @@ namespace WebCrawler.DataScrappers.Drivers
         {
             Task<IReadOnlyCollection<IWebElement>> task = Task<IReadOnlyCollection<IWebElement>>.Factory.StartNew(() =>
             {
+                _webDriver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(120);
                 _webDriver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(sleepSeconds);
                 _webDriver.Navigate().GoToUrl(url);
                 return _webDriver.FindElements(By.TagName("a"));
@@ -40,6 +41,7 @@ namespace WebCrawler.DataScrappers.Drivers
         {
             Task<IReadOnlyCollection<IWebElement>> webElements = Task<IReadOnlyCollection<IWebElement>>.Factory.StartNew(() =>
             {
+                _webDriver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(3000);
                 _webDriver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(sleepSeconds);
                 _webDriver.Navigate().GoToUrl(url);
                 var data = _webDriver.FindElements(by);

@@ -25,6 +25,7 @@ using OpenQA.Selenium.Chrome;
 using System.Threading.Tasks;
 using WebCrawler.DataAccess;
 using WebCrawler.DataScrappers;
+using WebCrawler.DataScrappers.Drivers;
 using WebCrawler.DataSorters;
 using WebCrawler.Managers;
 
@@ -90,6 +91,7 @@ namespace WebCrawler
 
             services.AddSingleton<IWebDriver, ChromeDriver>();
 
+            services.AddSingleton<CrawlerDriver>();
             services.AddSingleton<UrlCutter>();
             services.AddSingleton<CrawlerManager>();
             services.AddSingleton<Crawler>();

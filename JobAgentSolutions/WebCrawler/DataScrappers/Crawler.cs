@@ -15,7 +15,6 @@ namespace WebCrawler.DataScrappers
 {
     public class Crawler
     {
-
         private readonly CrawlerDriver _driver;
         public string Url { get; set; }
         public IReadOnlyCollection<IWebElement> WebElements { get; set; }
@@ -63,8 +62,11 @@ namespace WebCrawler.DataScrappers
                         links.Add(new WebData() { Url = Url, Text = item.GetAttribute("href") });
                     }
                 }
+
                 return links;
+            
             });
+
             return await Task.FromResult(await task);
         }
 
@@ -100,7 +102,6 @@ namespace WebCrawler.DataScrappers
             }
 
             return DateTime.MinValue;
-
         }
     }
 }

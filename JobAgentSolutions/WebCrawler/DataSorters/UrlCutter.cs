@@ -1,3 +1,4 @@
+using JobAgentClassLibrary.Common.Categories.Entities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,34 +25,75 @@ namespace WebCrawler.DataSorters
 
             return DateTime.MinValue;
         }
-        /// <summary>
-        /// Returns a new list with the sorted job links 
-        /// No dublicates is returned 
-        /// </summary>
-        /// <param name="linksToSort"></param>
-        /// <returns></returns>
-        public static List<string> GetJobLinks(List<string> linksToSort)
-        {
-            List<string> sortedList = new();
-            string[] splitedLink;
 
-            foreach (var item in linksToSort)
+        /// <summary>
+        /// This method uses the string extention StartsWith to determine if it contains the category
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="categories"></param>
+        /// <returns></returns>
+        private static string TestStartsWith(string url, List<ICategory> categories)
+        {
+            var stringArray = url.Split('/');
+            foreach (var category in categories)
             {
-                splitedLink = item.Split('/');
-                foreach (var part in splitedLink)
+                var subString = category.Name.Substring(0, 4);
+                var test = stringArray.FirstOrDefault(x => x.ToLower().StartsWith(subString.ToLower()));
+                if (test is not null)
                 {
-                    // checks if there is a (vis) reference 
-                    // /vis is before all links to the jobpage on praktikpladsen
-                    if (part.StartsWith("vis"))
-                    {
-                        sortedList.Add(item);
-                    }
+                    return category.Name;
                 }
             }
-            // Checks for dublicates 
-            return CheckListForDublicates(sortedList);
+
+            return null;
         }
 
+        /// <summary>
+        /// This method uses the string extention EndsWith to determine if it contains the category
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="categories"></param>
+        /// <returns></returns>
+        private static string TestEndsWith(string url, List<ICategory> categories)
+        {
+            var stringArray = url.Split('/');
+            foreach (var category in categories)
+            {
+                var subString = category.Name.Substring(category.Name.Length - 5, 5);
+                var test = stringArray.FirstOrDefault(x => x.ToLower().EndsWith(subString.ToLower()));
+                if (test is not null)
+                {
+                    return category.Name;
+                }
+            }
+
+            return null;
+        }
+
+        
+        /// <summary>
+        /// This method is used to get the category for a job
+        /// Checks the url for key categories from db
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="categories"></param>
+        /// <returns></returns>
+        public static string GetCategoryFromUrl(string url, List<ICategory> categories)
+        {
+            string result = TestStartsWith(url, categories);
+            if (result is not null)
+            {
+                return result;
+            }
+            result = TestEndsWith(url, categories);
+            if (result is not null)
+            {
+                return result;
+            }
+            return null;
+        }
+
+   
         /// <summary>
         /// Makes a new list with links that is not dublicated 
         /// </summary>
@@ -69,39 +111,10 @@ namespace WebCrawler.DataSorters
                     sortedList.Add(item);
                 }
             }
-
+            
             return sortedList;
         }
 
-        /// <summary>
-        /// Only returns the links that matches the main path to job link list on praktikpladsen
-        /// </summary>
-        /// <param name="links"></param>
-        /// <returns></returns>
-        public static List<string> GetLinkLists(List<string> links)
-        {
-            List<string> sortedList = new();
-            string[] splitedLink;
-            foreach (var item in links)
-            {
-                splitedLink = item.Split('/');
-
-                foreach (var part in splitedLink)
-                {
-                    bool isInt = false;
-                    if (splitedLink.Length > 4)
-                    {
-                        isInt = int.TryParse(splitedLink[4], out _);
-
-                    }
-
-                    if (part.StartsWith("soeg") &&  isInt == true )
-                    {
-                        sortedList.Add(item);
-                    }
-                }
-            }
-            return CheckListForDublicates(sortedList);
-        }
+        
     }
 }
