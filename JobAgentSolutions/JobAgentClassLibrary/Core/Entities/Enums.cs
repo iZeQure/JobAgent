@@ -7,7 +7,7 @@
 
     public enum LogType
     {
-        DATABASE, CRAWLER
+        DATABASE, SERVICE, WEBSITE, CRAWLER
     }
 
     public enum DbCredentialType

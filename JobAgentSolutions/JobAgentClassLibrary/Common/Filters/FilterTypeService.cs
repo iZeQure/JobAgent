@@ -1,5 +1,8 @@
 ﻿using JobAgentClassLibrary.Common.Filters.Entities;
 using JobAgentClassLibrary.Common.Filters.Repositories;
+using JobAgentClassLibrary.Core.Entities;
+using JobAgentClassLibrary.Loggings;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -8,10 +11,12 @@ namespace JobAgentClassLibrary.Common.Filters
     public class FilterTypeService : IFilterTypeService
     {
         private readonly IFilterTypeRepository _repository;
+        private readonly ILogService _logService;
 
-        public FilterTypeService(IFilterTypeRepository repository)
+        public FilterTypeService(IFilterTypeRepository repository, ILogService logService)
         {
             _repository = repository;
+            _logService = logService;
         }
 
         /// <summary>
@@ -21,7 +26,15 @@ namespace JobAgentClassLibrary.Common.Filters
         /// <returns>The created object</returns>
         public async Task<IFilterType> CreateAsync(IFilterType entity)
         {
-            return await _repository.CreateAsync(entity);
+            try
+            {
+                return await _repository.CreateAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to create FilterType", nameof(CreateAsync), nameof(FilterTypeService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -30,7 +43,15 @@ namespace JobAgentClassLibrary.Common.Filters
         /// <returns></returns>
         public async Task<List<IFilterType>> GetAllAsync()
         {
-            return await _repository.GetAllAsync();
+            try
+            {
+                return await _repository.GetAllAsync();
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to get FilterTypes", nameof(GetAllAsync), nameof(FilterTypeService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -40,7 +61,15 @@ namespace JobAgentClassLibrary.Common.Filters
         /// <returns></returns>
         public async Task<IFilterType> GetByIdAsync(int id)
         {
-            return await _repository.GetByIdAsync(id);
+            try
+            {
+                return await _repository.GetByIdAsync(id);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to get FilterType by id", nameof(GetByIdAsync), nameof(FilterTypeService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -50,7 +79,15 @@ namespace JobAgentClassLibrary.Common.Filters
         /// <returns></returns>
         public async Task<bool> RemoveAsync(IFilterType entity)
         {
-            return await _repository.RemoveAsync(entity);
+            try
+            {
+                return await _repository.RemoveAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to remove FilterType", nameof(RemoveAsync), nameof(FilterTypeService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -60,7 +97,15 @@ namespace JobAgentClassLibrary.Common.Filters
         /// <returns></returns>
         public async Task<IFilterType> UpdateAsync(IFilterType entity)
         {
-            return await _repository.UpdateAsync(entity);
+            try
+            {
+                return await _repository.UpdateAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to update FilterType", nameof(UpdateAsync), nameof(FilterTypeService), LogType.SERVICE);
+                throw;
+            }
         }
     }
 }

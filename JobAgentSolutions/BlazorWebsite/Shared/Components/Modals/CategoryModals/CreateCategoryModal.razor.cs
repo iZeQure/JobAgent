@@ -79,38 +79,46 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
 
             ICategory categoryResult = null;
 
-            using (var _ = _categoryModel.TimedEndOfOperation())
+            try
             {
-
-                Category category = new()
+                using (var _ = _categoryModel.TimedEndOfOperation())
                 {
-                    Name = _categoryModel.Categoryname
-                };
 
-                categoryResult = await CategoryService.CreateAsync(category);
-
-                if (categoryResult is null)
-                {
-                    _errorMessage = "Fejl i oprettelse af Uddannelse.";
-                    return;
-                }
-
-                foreach (var name in _newSpecializationNames)
-                {
-                    Specialization specialization = new()
+                    Category category = new()
                     {
-                        CategoryId = _categoryModel.CategoryId,
-                        Name = name
+                        Name = _categoryModel.Categoryname
                     };
 
-                    var specializationResult = await CategoryService.CreateAsync(specialization);
+                    categoryResult = await CategoryService.CreateAsync(category);
 
-                    if (specializationResult is null)
+                    if (categoryResult is null)
                     {
-                        _errorMessage = "Fejl i oprettelse af Speciale.";
+                        _errorMessage = "Fejl i oprettelse af Uddannelse.";
                         return;
                     }
+
+                    foreach (var name in _newSpecializationNames)
+                    {
+                        Specialization specialization = new()
+                        {
+                            CategoryId = _categoryModel.CategoryId,
+                            Name = name
+                        };
+
+                        var specializationResult = await CategoryService.CreateAsync(specialization);
+
+                        if (specializationResult is null)
+                        {
+                            _errorMessage = "Fejl i oprettelse af Speciale.";
+                            return;
+                        }
+                    }
                 }
+            }
+            catch (Exception)
+            {
+                _errorMessage = "Noget gik galt.";
+                return;
             }
 
             if (_categoryModel.IsProcessing is false)

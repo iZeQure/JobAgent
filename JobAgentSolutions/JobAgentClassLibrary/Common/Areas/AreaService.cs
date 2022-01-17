@@ -1,5 +1,8 @@
 ﻿using JobAgentClassLibrary.Common.Areas.Entities;
 using JobAgentClassLibrary.Common.Areas.Repositories;
+using JobAgentClassLibrary.Core.Entities;
+using JobAgentClassLibrary.Loggings;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -8,10 +11,12 @@ namespace JobAgentClassLibrary.Common.Areas
     public class AreaService : IAreaService
     {
         private readonly IAreaRepository _repository;
+        private readonly ILogService _logService;
 
-        public AreaService(IAreaRepository repository)
+        public AreaService(IAreaRepository repository, ILogService logService)
         {
             _repository = repository;
+            _logService = logService;
         }
 
         /// <summary>
@@ -21,7 +26,15 @@ namespace JobAgentClassLibrary.Common.Areas
         /// <returns>The saved object</returns>
         public async Task<IArea> CreateAsync(IArea entity)
         {
-            return await _repository.CreateAsync(entity);
+            try
+            {
+                return await _repository.CreateAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to create area", nameof(CreateAsync), nameof(AreaService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -30,7 +43,15 @@ namespace JobAgentClassLibrary.Common.Areas
         /// <returns></returns>
         public async Task<List<IArea>> GetAllAsync()
         {
-            return await _repository.GetAllAsync();
+            try
+            {
+                return await _repository.GetAllAsync();
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to get areas", nameof(GetAllAsync), nameof(AreaService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -40,7 +61,15 @@ namespace JobAgentClassLibrary.Common.Areas
         /// <returns></returns>
         public async Task<IArea> GetByIdAsync(int id)
         {
-            return await _repository.GetByIdAsync(id);
+            try
+            {
+                return await _repository.GetByIdAsync(id);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to get area by id", nameof(GetByIdAsync), nameof(AreaService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -50,7 +79,15 @@ namespace JobAgentClassLibrary.Common.Areas
         /// <returns></returns>
         public async Task<bool> RemoveAsync(IArea entity)
         {
-            return await _repository.RemoveAsync(entity);
+            try
+            {
+                return await _repository.RemoveAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to remove area", nameof(RemoveAsync), nameof(AreaService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -60,7 +97,15 @@ namespace JobAgentClassLibrary.Common.Areas
         /// <returns></returns>
         public async Task<IArea> UpdateAsync(IArea entity)
         {
-            return await _repository.UpdateAsync(entity);
+            try
+            {
+                return await _repository.UpdateAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to update area", nameof(UpdateAsync), nameof(AreaService), LogType.SERVICE);
+                throw;
+            }
         }
     }
 }

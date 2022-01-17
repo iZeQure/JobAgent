@@ -1,6 +1,8 @@
 ﻿using JobAgentClassLibrary.Common.Areas.Entities;
 using JobAgentClassLibrary.Common.Users.Entities;
 using JobAgentClassLibrary.Common.Users.Repositories;
+using JobAgentClassLibrary.Core.Entities;
+using JobAgentClassLibrary.Loggings;
 using JobAgentClassLibrary.Security.interfaces;
 using System;
 using System.Collections.Generic;
@@ -12,11 +14,13 @@ namespace JobAgentClassLibrary.Common.Users
     {
         private readonly IUserRepository _userRepository;
         private readonly IAuthenticationAccess _authAccess;
+        private readonly ILogService _logService;
 
-        public UserService(IUserRepository userRepository, IAuthenticationAccess authAccess)
+        public UserService(IUserRepository userRepository, IAuthenticationAccess authAccess, ILogService logService)
         {
             _userRepository = userRepository;
             _authAccess = authAccess;
+            _logService = logService;
         }
 
         /// <summary>
@@ -27,47 +31,55 @@ namespace JobAgentClassLibrary.Common.Users
         /// <returns>Authuser object containing the users data</returns>
         public async Task<IAuthUser> AuthenticateUserLoginAsync(string email, string password)
         {
-            var authUser = new AuthUser
+            try
             {
-                Email = email,
-                Password = password
-            };
-
-            var isAuthenticated = await _userRepository.AuthenticateUserLoginAsync(authUser);
-
-            if (isAuthenticated)
-            {
-                authUser.AccessToken = await _authAccess.GenerateAccessTokenAsync(authUser);
-                var tokenUpdated = await _userRepository.UpdateUserAccessTokenAsync(authUser);
-
-                if (!tokenUpdated)
+                var authUser = new AuthUser
                 {
-                    throw new ArgumentException("Couldn't authenticate user, error while generating token.", nameof(email));
-                }
+                    Email = email,
+                    Password = password
+                };
 
-                var returnedUser = await _userRepository.GetByEmailAsync(email);
+                var isAuthenticated = await _userRepository.AuthenticateUserLoginAsync(authUser);
 
-                if (returnedUser is not null)
+                if (isAuthenticated)
                 {
-                    var areas = await _userRepository.GetUserConsultantAreasAsync(returnedUser);
-                    
-                    var authenticatedUser = new AuthUser
+                    authUser.AccessToken = await _authAccess.GenerateAccessTokenAsync(authUser);
+                    var tokenUpdated = await _userRepository.UpdateUserAccessTokenAsync(authUser);
+
+                    if (!tokenUpdated)
                     {
-                        Id = returnedUser.Id,
-                        RoleId = returnedUser.RoleId,
-                        LocationId = returnedUser.LocationId,
-                        FirstName = returnedUser.FirstName,
-                        LastName = returnedUser.LastName,
-                        Email = returnedUser.Email,
-                        ConsultantAreas = areas,
-                        AccessToken = authUser.AccessToken
-                    };
+                        throw new ArgumentException("Couldn't authenticate user, error while generating token.", nameof(email));
+                    }
 
-                    return authenticatedUser;
+                    var returnedUser = await _userRepository.GetByEmailAsync(email);
+
+                    if (returnedUser is not null)
+                    {
+                        var areas = await _userRepository.GetUserConsultantAreasAsync(returnedUser);
+
+                        var authenticatedUser = new AuthUser
+                        {
+                            Id = returnedUser.Id,
+                            RoleId = returnedUser.RoleId,
+                            LocationId = returnedUser.LocationId,
+                            FirstName = returnedUser.FirstName,
+                            LastName = returnedUser.LastName,
+                            Email = returnedUser.Email,
+                            ConsultantAreas = areas,
+                            AccessToken = authUser.AccessToken
+                        };
+
+                        return authenticatedUser;
+                    }
                 }
-            }
 
-            return null;
+                return null;
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to authenticate user", nameof(AuthenticateUserLoginAsync), nameof(UserService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -108,9 +120,10 @@ namespace JobAgentClassLibrary.Common.Users
 
                 return user;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                await _logService.LogError(ex, "Failed to create user", nameof(CreateAsync), nameof(UserService), LogType.SERVICE);
+                throw;
             }
         }
 
@@ -135,9 +148,10 @@ namespace JobAgentClassLibrary.Common.Users
 
                 return user;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                await _logService.LogError(ex, "Failed to get user by email", nameof(GetByEmailAsync), nameof(UserService), LogType.SERVICE);
+                throw;
             }
         }
 
@@ -162,9 +176,10 @@ namespace JobAgentClassLibrary.Common.Users
 
                 return user;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                await _logService.LogError(ex, "Failed to get user by id", nameof(GetUserByIdAsync), nameof(UserService), LogType.SERVICE);
+                throw;
             }
         }
 
@@ -179,9 +194,10 @@ namespace JobAgentClassLibrary.Common.Users
             {
                 return await _userRepository.GetSaltByEmailAsync(email);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                await _logService.LogError(ex, "Failed to get salt", nameof(GetSaltByEmailAddressAsync), nameof(UserService), LogType.SERVICE);
+                throw;
             }
         }
 
@@ -206,9 +222,10 @@ namespace JobAgentClassLibrary.Common.Users
 
                 return user;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                await _logService.LogError(ex, "Failed to get user by accesstoken", nameof(GetUserByAccessTokenAsync), nameof(UserService), LogType.SERVICE);
+                throw;
             }
         }
 
@@ -238,9 +255,10 @@ namespace JobAgentClassLibrary.Common.Users
 
                 return users;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                await _logService.LogError(ex, "Failed to get users", nameof(GetUsersAsync), nameof(UserService), LogType.SERVICE);
+                throw;
             }
         }
 
@@ -273,9 +291,10 @@ namespace JobAgentClassLibrary.Common.Users
 
                 throw new Exception("Error occurred. Consultant area was NOT granted.");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                await _logService.LogError(ex, "Failed to grant user area", nameof(GrantAreaToUserAsync), nameof(UserService), LogType.SERVICE);
+                throw;
             }
         }
 
@@ -290,9 +309,10 @@ namespace JobAgentClassLibrary.Common.Users
             {
                 return await _userRepository.RemoveAsync(entity);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return false;
+                await _logService.LogError(ex, "Failed to remove user", nameof(RemoveAsync), nameof(UserService), LogType.SERVICE);
+                throw;
             }
         }
 
@@ -325,9 +345,10 @@ namespace JobAgentClassLibrary.Common.Users
 
                 throw new Exception("Error occurred. Consultant area was NOT revoked.");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                await _logService.LogError(ex, "Failed to revoke area from user", nameof(RevokeAreaFromUserAsync), nameof(UserService), LogType.SERVICE);
+                throw;
             }
         }
 
@@ -352,9 +373,10 @@ namespace JobAgentClassLibrary.Common.Users
 
                 return user;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                await _logService.LogError(ex, "Failed to Update user", nameof(UpdateAsync), nameof(UserService), LogType.SERVICE);
+                throw;
             }
         }
 
@@ -369,9 +391,10 @@ namespace JobAgentClassLibrary.Common.Users
             {
                 return await _userRepository.UpdateUserPasswordAsync(user);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return false;
+                await _logService.LogError(ex, "Failed to update user password", nameof(UpdateUserPasswordAsync), nameof(UserService), LogType.SERVICE);
+                throw;
             }
         }
 
@@ -388,9 +411,10 @@ namespace JobAgentClassLibrary.Common.Users
 
                 return tokenIsValid;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return false;
+                await _logService.LogError(ex, "Failed to validate user token", nameof(ValidateUserAccessTokenAsync), nameof(UserService), LogType.SERVICE);
+                throw;
             }
         }
 
@@ -405,9 +429,10 @@ namespace JobAgentClassLibrary.Common.Users
             {
                 return await _userRepository.GetUserConsultantAreasAsync(user);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                await _logService.LogError(ex, "Failed to get user ares", nameof(GetUserConsultantAreasAsync), nameof(UserService), LogType.SERVICE);
+                throw;
             }
         }
     }

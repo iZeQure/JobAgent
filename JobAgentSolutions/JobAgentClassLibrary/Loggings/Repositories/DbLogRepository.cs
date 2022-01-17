@@ -22,49 +22,6 @@ namespace JobAgentClassLibrary.Loggings.Repositories
             _factory = factory;
         }
 
-        private int DetermineSeverityId(ILog entity)
-        {
-            int severityId = 0;
-
-            switch (entity.LogSeverity)
-            {
-                case LogSeverity.EMERGENCY:
-                    severityId = 1;
-                    break;
-
-                case LogSeverity.ALERT:
-                    severityId = 2;
-                    break;
-
-                case LogSeverity.CRITICAL:
-                    severityId = 3;
-                    break;
-
-                case LogSeverity.ERROR:
-                    severityId = 4;
-                    break;
-
-                case LogSeverity.WARNING:
-                    severityId = 5;
-                    break;
-
-                case LogSeverity.NOTIFICATION:
-                    severityId = 6;
-                    break;
-
-                case LogSeverity.INFO:
-                    severityId = 7;
-                    break;
-
-                case LogSeverity.DEBUG:
-                    severityId = 8;
-                    break;
-            }
-
-            return severityId;
-        }
-
-
         public async Task<ILog> CreateAsync(ILog entity)
         {
             int entityId = 0;
@@ -74,7 +31,7 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                 var proc = "[JA.spCreateLog]";
                 var values = new
                 {
-                    @severityId = DetermineSeverityId(entity),
+                    @severityId = (int)entity.LogSeverity,
                     @currentTime = entity.CreatedDateTime,
                     @createdBy = entity.CreatedBy,
                     @action = entity.Action,
@@ -213,7 +170,7 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                 var values = new
                 {
                     @logId = entity.Id,
-                    @severityId = DetermineSeverityId(entity),
+                    @severityId = (int)entity.LogSeverity,
                     @createdDateTime = entity.CreatedDateTime,
                     @createdBy = entity.CreatedBy,
                     @action = entity.Action,

@@ -1,5 +1,8 @@
 ﻿using JobAgentClassLibrary.Common.JobPages.Entities;
 using JobAgentClassLibrary.Common.JobPages.Repositories;
+using JobAgentClassLibrary.Core.Entities;
+using JobAgentClassLibrary.Loggings;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -8,10 +11,12 @@ namespace JobAgentClassLibrary.Common.JobPages
     public class JobPageService : IJobPageService
     {
         private readonly IJobPageRepository _jobPageRepository;
+        private readonly ILogService _logService;
 
-        public JobPageService(IJobPageRepository jobPageRepository)
+        public JobPageService(IJobPageRepository jobPageRepository, ILogService logService)
         {
             _jobPageRepository = jobPageRepository;
+            _logService = logService;
         }
 
         /// <summary>
@@ -25,10 +30,10 @@ namespace JobAgentClassLibrary.Common.JobPages
             {
                 return await _jobPageRepository.CreateAsync(entity);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                System.Console.WriteLine(ex.Message);
-                return null;
+                await _logService.LogError(ex, "Failed to create JobPage", nameof(CreateAsync), nameof(JobPageService), LogType.SERVICE);
+                throw;
             }
         }
 
@@ -43,10 +48,10 @@ namespace JobAgentClassLibrary.Common.JobPages
             {
                 return await _jobPageRepository.GetByIdAsync(id);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                System.Console.WriteLine(ex.Message);
-                return null;
+                await _logService.LogError(ex, "Failed to get JobPage by id", nameof(GetByIdAsync), nameof(JobPageService), LogType.SERVICE);
+                throw;
             }
         }
 
@@ -60,10 +65,10 @@ namespace JobAgentClassLibrary.Common.JobPages
             {
                 return await _jobPageRepository.GetAllAsync();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                System.Console.WriteLine(ex.Message);
-                return null;
+                await _logService.LogError(ex, "Failed to get JobPages", nameof(GetJobPagesAsync), nameof(JobPageService), LogType.SERVICE);
+                throw;
             }
         }
 
@@ -78,10 +83,10 @@ namespace JobAgentClassLibrary.Common.JobPages
             {
                 return await _jobPageRepository.RemoveAsync(entity);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                System.Console.WriteLine(ex.Message);
-                return false;
+                await _logService.LogError(ex, "Failed to remove JobPage", nameof(RemoveAsync), nameof(JobPageService), LogType.SERVICE);
+                throw;
             }
         }
 
@@ -96,10 +101,10 @@ namespace JobAgentClassLibrary.Common.JobPages
             {
                 return await _jobPageRepository.UpdateAsync(entity);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                System.Console.WriteLine(ex.Message);
-                return null;
+                await _logService.LogError(ex, "Failed to update JobPage", nameof(UpdateAsync), nameof(JobPageService), LogType.SERVICE);
+                throw;
             }
         }
     }

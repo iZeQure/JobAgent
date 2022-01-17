@@ -1,5 +1,8 @@
 ﻿using JobAgentClassLibrary.Common.Locations.Entities;
 using JobAgentClassLibrary.Common.Locations.Repositories;
+using JobAgentClassLibrary.Core.Entities;
+using JobAgentClassLibrary.Loggings;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -8,10 +11,12 @@ namespace JobAgentClassLibrary.Common.Locations
     public class LocationService : ILocationService
     {
         private readonly ILocationRepository _locationRepository;
+        private readonly ILogService _logService;
 
-        public LocationService(ILocationRepository locationRepository)
+        public LocationService(ILocationRepository locationRepository, ILogService logService)
         {
             _locationRepository = locationRepository;
+            _logService = logService;
         }
 
         /// <summary>
@@ -21,7 +26,15 @@ namespace JobAgentClassLibrary.Common.Locations
         /// <returns>The created object</returns>
         public async Task<ILocation> CreateAsync(ILocation entity)
         {
-            return await _locationRepository.CreateAsync(entity);
+            try
+            {
+                return await _locationRepository.CreateAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to create location", nameof(CreateAsync), nameof(LocationService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -31,7 +44,15 @@ namespace JobAgentClassLibrary.Common.Locations
         /// <returns></returns>
         public async Task<ILocation> GetByIdAsync(int id)
         {
-            return await _locationRepository.GetByIdAsync(id);
+            try
+            {
+                return await _locationRepository.GetByIdAsync(id);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to get location by id", nameof(GetByIdAsync), nameof(LocationService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -40,7 +61,15 @@ namespace JobAgentClassLibrary.Common.Locations
         /// <returns></returns>
         public async Task<List<ILocation>> GetLocationsAsync()
         {
-            return await _locationRepository.GetAllAsync();
+            try
+            {
+                return await _locationRepository.GetAllAsync();
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to get locations", nameof(GetLocationsAsync), nameof(LocationService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -50,7 +79,15 @@ namespace JobAgentClassLibrary.Common.Locations
         /// <returns></returns>
         public async Task<bool> RemoveAsync(ILocation entity)
         {
-            return await _locationRepository.RemoveAsync(entity);
+            try
+            {
+                return await _locationRepository.RemoveAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to remove location", nameof(RemoveAsync), nameof(LocationService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -60,7 +97,16 @@ namespace JobAgentClassLibrary.Common.Locations
         /// <returns></returns>
         public async Task<ILocation> UpdateAsync(ILocation entity)
         {
-            return await _locationRepository.UpdateAsync(entity);
+            try
+            {
+                return await _locationRepository.UpdateAsync(entity);
+            }
+            catch (Exception ex)
+            {
+
+                await _logService.LogError(ex, "Failed to update location", nameof(UpdateAsync), nameof(LocationService), LogType.SERVICE);
+                throw;
+            }
         }
     }
 }

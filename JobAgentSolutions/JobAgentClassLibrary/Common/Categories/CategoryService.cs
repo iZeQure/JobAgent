@@ -1,5 +1,7 @@
 ﻿using JobAgentClassLibrary.Common.Categories.Entities;
 using JobAgentClassLibrary.Common.Categories.Repositories;
+using JobAgentClassLibrary.Core.Entities;
+using JobAgentClassLibrary.Loggings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,21 +13,31 @@ namespace JobAgentClassLibrary.Common.Categories
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly ISpecializationRepository _specializationRepository;
+        private readonly ILogService _logService;
 
-        public CategoryService(ICategoryRepository categoryRepository, ISpecializationRepository specializationRepository)
+        public CategoryService(ICategoryRepository categoryRepository, ISpecializationRepository specializationRepository, ILogService logService)
         {
             _categoryRepository = categoryRepository;
             _specializationRepository = specializationRepository;
+            _logService = logService;
         }
 
-        /// <summary>
+        /// <summary>   
         /// Creates a new Category in the database
         /// </summary>
         /// <param name="entity"></param>
         /// <returns>The saved object</returns>
         public async Task<ICategory> CreateAsync(ICategory entity)
         {
-            return await _categoryRepository.CreateAsync(entity);
+            try
+            {
+                return await _categoryRepository.CreateAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to create category", nameof(CreateAsync), nameof(CategoryService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -35,7 +47,15 @@ namespace JobAgentClassLibrary.Common.Categories
         /// <returns>returns the saved object</returns>
         public async Task<ISpecialization> CreateAsync(ISpecialization entity)
         {
-            return await _specializationRepository.CreateAsync(entity);
+            try
+            {
+                return await _specializationRepository.CreateAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to create specialization", nameof(CreateAsync), nameof(CategoryService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -44,7 +64,15 @@ namespace JobAgentClassLibrary.Common.Categories
         /// <returns></returns>
         public async Task<List<ICategory>> GetCategoriesAsync()
         {
-            return await _categoryRepository.GetAllAsync();
+            try
+            {
+                return await _categoryRepository.GetAllAsync();
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to get categories", nameof(GetCategoriesAsync), nameof(CategoryService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -54,7 +82,15 @@ namespace JobAgentClassLibrary.Common.Categories
         /// <returns></returns>
         public async Task<ICategory> GetCategoryByIdAsync(int id)
         {
-            return await _categoryRepository.GetByIdAsync(id);
+            try
+            {
+                return await _categoryRepository.GetByIdAsync(id);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to get category by id", nameof(GetCategoryByIdAsync), nameof(CategoryService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -63,33 +99,41 @@ namespace JobAgentClassLibrary.Common.Categories
         /// <returns></returns>
         public async Task<List<ICategory>> GetMenuAsync()
         {
-            var categoriesTask = _categoryRepository.GetAllAsync();
-            var specializationsTask = _specializationRepository.GetAllAsync();
-
             try
             {
-                await Task.WhenAll(categoriesTask, specializationsTask);
+                var categoriesTask = _categoryRepository.GetAllAsync();
+                var specializationsTask = _specializationRepository.GetAllAsync();
+
+                try
+                {
+                    await Task.WhenAll(categoriesTask, specializationsTask);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+
+                var categories = categoriesTask.Result;
+                var specializations = specializationsTask.Result;
+
+                foreach (var c in categories)
+                {
+                    if (c.Id is 0) continue;
+
+                    var matches = specializations.Where(s => s.CategoryId == c.Id);
+
+                    if (!matches.Any()) continue;
+
+                    c.AddRange(matches);
+                }
+
+                return categories;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                await _logService.LogError(ex, "Failed to get menu", nameof(GetMenuAsync), nameof(CategoryService), LogType.SERVICE);
                 throw;
             }
-
-            var categories = categoriesTask.Result;
-            var specializations = specializationsTask.Result;
-
-            foreach (var c in categories)
-            {
-                if (c.Id is 0) continue;
-
-                var matches = specializations.Where(s => s.CategoryId == c.Id);
-
-                if (!matches.Any()) continue;
-
-                c.AddRange(matches);
-            }
-
-            return categories;
         }
 
         /// <summary>
@@ -99,7 +143,15 @@ namespace JobAgentClassLibrary.Common.Categories
         /// <returns></returns>
         public async Task<ISpecialization> GetSpecializationByIdAsync(int id)
         {
-            return await _specializationRepository.GetByIdAsync(id);
+            try
+            {
+                return await _specializationRepository.GetByIdAsync(id);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to get specialization by id", nameof(GetSpecializationByIdAsync), nameof(CategoryService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -108,7 +160,15 @@ namespace JobAgentClassLibrary.Common.Categories
         /// <returns></returns>
         public async Task<List<ISpecialization>> GetSpecializationsAsync()
         {
-            return await _specializationRepository.GetAllAsync();
+            try
+            {
+                return await _specializationRepository.GetAllAsync();
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to get specializations", nameof(GetSpecializationsAsync), nameof(CategoryService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -118,7 +178,15 @@ namespace JobAgentClassLibrary.Common.Categories
         /// <returns></returns>
         public async Task<bool> RemoveAsync(ICategory entity)
         {
-            return await _categoryRepository.RemoveAsync(entity);
+            try
+            {
+                return await _categoryRepository.RemoveAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to remove category", nameof(RemoveAsync), nameof(CategoryService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -128,7 +196,15 @@ namespace JobAgentClassLibrary.Common.Categories
         /// <returns></returns>
         public async Task<bool> RemoveAsync(ISpecialization entity)
         {
-            return await _specializationRepository.RemoveAsync(entity);
+            try
+            {
+                return await _specializationRepository.RemoveAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to remove specialization", nameof(RemoveAsync), nameof(CategoryService), LogType.SERVICE);
+                throw;
+            }
         }
 
         /// <summary>
@@ -138,9 +214,17 @@ namespace JobAgentClassLibrary.Common.Categories
         /// <returns></returns>
         public async Task<ICategory> UpdateAsync(ICategory entity)
         {
-            return await _categoryRepository.UpdateAsync(entity);
+            try
+            {
+                return await _categoryRepository.UpdateAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to update category", nameof(UpdateAsync), nameof(CategoryService), LogType.SERVICE);
+                throw;
+            }
         }
-        
+
         /// <summary>
         /// Updates a Specialization in the database
         /// </summary>
@@ -148,7 +232,15 @@ namespace JobAgentClassLibrary.Common.Categories
         /// <returns></returns>
         public async Task<ISpecialization> UpdateAsync(ISpecialization entity)
         {
-            return await _specializationRepository.UpdateAsync(entity);
+            try
+            {
+                return await _specializationRepository.UpdateAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to update specialization", nameof(UpdateAsync), nameof(CategoryService), LogType.SERVICE);
+                throw;
+            }
         }
     }
 }

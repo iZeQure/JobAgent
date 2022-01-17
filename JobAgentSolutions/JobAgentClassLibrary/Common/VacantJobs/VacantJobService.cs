@@ -1,9 +1,9 @@
 ﻿using JobAgentClassLibrary.Common.VacantJobs.Entities;
 using JobAgentClassLibrary.Common.VacantJobs.Repositories;
+using JobAgentClassLibrary.Core.Entities;
+using JobAgentClassLibrary.Loggings;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.VacantJobs
@@ -11,6 +11,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs
     public class VacantJobService : IVacantJobService
     {
         private readonly IVacantJobRepository _repository;
+        private readonly ILogService _logService;
 
         public VacantJobService(IVacantJobRepository repository)
         {
@@ -23,9 +24,9 @@ namespace JobAgentClassLibrary.Common.VacantJobs
             {
                 return await _repository.CreateAsync(entity);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                System.Console.WriteLine(ex.Message);
+                await _logService.LogError(ex, "Failed to create VacantJob", nameof(CreateAsync), nameof(VacantJobService), LogType.SERVICE);
                 return null;
             }
         }
@@ -38,7 +39,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs
             }
             catch (System.Exception ex)
             {
-                System.Console.WriteLine(ex.Message);
+                await _logService.LogError(ex, "Failed to get all VacantJobs", nameof(GetAllAsync), nameof(VacantJobService), LogType.SERVICE);
                 return null;
             }
         }
@@ -51,7 +52,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs
             }
             catch (System.Exception ex)
             {
-                System.Console.WriteLine(ex.Message);
+                await _logService.LogError(ex, "Failed to get VacantJob by id", nameof(GetByIdAsync), nameof(VacantJobService), LogType.SERVICE);
                 return null;
             }
         }
@@ -64,7 +65,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs
             }
             catch (System.Exception ex)
             {
-                System.Console.WriteLine(ex.Message);
+                await _logService.LogError(ex, "Failed to remove VacantJob", nameof(RemoveAsync), nameof(VacantJobService), LogType.SERVICE);
                 return false;
             }
         }
@@ -77,11 +78,10 @@ namespace JobAgentClassLibrary.Common.VacantJobs
             }
             catch (System.Exception ex)
             {
-                System.Console.WriteLine(ex.Message);
+                await _logService.LogError(ex, "Failed to update VacantJob", nameof(UpdateAsync), nameof(VacantJobService), LogType.SERVICE);
                 return null;
             }
         }
-
 
     }
 }
