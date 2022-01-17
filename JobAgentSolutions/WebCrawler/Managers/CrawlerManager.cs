@@ -104,7 +104,7 @@ namespace WebCrawler.Managers
                 var title = GetTitleFromJobAdvert(jobAdvertLinks[i].Text);
                 var summary = GetSummaryFromJobAdvert(jobAdverts[i].Text);
                 var date = UrlCutter.GetDateFromstring(jobAdverts[i].Text);
-                var newlyCreatedJobAdvert = jobAdvertEntityFactory.CreateEntity(nameof(JobAdvert), 1, categoryId, 1, title, "", jobAdverts[i].ExpireDate);
+                var newlyCreatedJobAdvert = jobAdvertEntityFactory.CreateEntity(nameof(JobAdvert), 1, categoryId, 1, title, summary, jobAdverts[i].ExpireDate);
             }
 
             return false;
