@@ -1,14 +1,18 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using BlazorWebsite.Data.Providers;
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Diverse
 {
     public partial class MessageAlert : ComponentBase
     {
-        [Parameter] public string Message { get; set; } = string.Empty;
+        [Parameter] public string Message { get; set; }
         [Parameter] public string MessageOptional { get; set; } = string.Empty;
         [Parameter] public AlertType Alert { get; set; }
-        [Parameter] public bool IsLoading { get; set; } = false;
-        [Parameter] public bool FullWidth { get; set; } = true;
+        [Parameter] public bool IsLoading { get; set; }
+        [Parameter] public bool FullWidth { get; set; }
+        [Inject] protected ILogger<MessageAlert> Logger { get; set; }
 
         public string Container
         {
@@ -21,11 +25,26 @@ namespace BlazorWebsite.Shared.Components.Diverse
             }
         }
 
-        protected override void OnInitialized()
+        protected override Task OnParametersSetAsync()
         {
-            StateHasChanged();
+            if (string.IsNullOrEmpty(Message))
+            {
+                return Task.CompletedTask;
+            }
+
+            var x = Task.Delay(3000)
+                .ContinueWith(x =>
+                {
+                    Logger.LogInformation("Trying to clear: {0}", Message);
+                    Message = "";
+                    return x.IsCompleted;
+                });
+
+            return x;
         }
 
         public enum AlertType { Info, Warning, Error, Success }
+
+
     }
 }

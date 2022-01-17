@@ -29,13 +29,13 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
         [Inject] protected ICategoryService CategoryService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
 
+        private EditContext _editContext;
         private JobAdvertModel _jobAdvertModel = new();
-        private IEnumerable<IVacantJob> _vacantJobs;
-        private IEnumerable<ICategory> _categories;
         private IEnumerable<ICompany> _companies;
+        private IEnumerable<ICategory> _categories;
+        private IEnumerable<IVacantJob> _vacantJobs;
         private IEnumerable<ISpecialization> _specializations;
         private IEnumerable<ISpecialization> _sortedSpecializations;
-        private EditContext _editContext;
 
         private string _errorMessage = "";
         private bool _isLoading = false;
