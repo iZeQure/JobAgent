@@ -26,9 +26,9 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
         private List<string> _newSpecializationNames = new();
         private EditContext _editContext;
 
-        private string _errorMessage = "";
         private bool _isProcessingNewSpecializationToList = false;
         private bool _isLoading = false;
+        private string _errorMessage;
 
         protected override async Task OnInitializedAsync()
         {
@@ -77,12 +77,11 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
                 return;
             }
 
-            ICategory categoryResult = null;
-
             try
             {
                 using (var _ = _categoryModel.TimedEndOfOperation())
                 {
+                    ICategory categoryResult = null;
 
                     Category category = new()
                     {
@@ -96,6 +95,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
                         _errorMessage = "Fejl i oprettelse af Uddannelse.";
                         return;
                     }
+                    _categoryModel.CategoryId = categoryResult.Id;
 
                     foreach (var name in _newSpecializationNames)
                     {
@@ -129,17 +129,27 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
             }
         }
 
-        private Task OnButtonClick_AssignNewSpecializationToList(string name)
+        private void OnButtonClick_AssignNewSpecializationToList(string name)
         {
+            if (string.IsNullOrEmpty(name))
+            {
+                _errorMessage = "Udfyld felt før du trykker på knappen.";
+                return;
+            }
+
+            if (_newSpecializationNames.Contains(name))
+            {
+                _errorMessage = "Du har allerede tilføjet dette speciale.";
+                return;
+            }
+
             _newSpecializationNames.Add(name);
-
             StateHasChanged();
-
-            return Task.CompletedTask;
         }
 
         private void OnClick_CancelRequest()
         {
+            _newSpecializationNames = new();
             _categoryModel = new();
             _editContext = new(_categoryModel);
             StateHasChanged();

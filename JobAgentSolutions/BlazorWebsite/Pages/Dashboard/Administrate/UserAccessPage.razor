@@ -1,5 +1,6 @@
 ﻿@page "/admin/system/settings/user-access"
 @attribute [Authorize(Roles = "System Administrator, Udvikler")]
+@inherits BasePage
 @using BlazorWebsite.Shared.Components.Modals.UserAccessModals;
 
 <PageDocumentTitle DocumentTitle="Administrer - Virksomheds Links" />
@@ -13,7 +14,7 @@ else
     @if (_users == null)
     {
         <MessageAlert Alert="MessageAlert.AlertType.Info"
-                      Message="Indlæser brugere.." IsLoading="true" />
+              Message="Indlæser brugere.." IsLoading="true" />
     }
     else
     {
@@ -34,7 +35,7 @@ else
                 </thead>
                 <tbody>
 
-                    @foreach (var user in _users.OrderBy(x => x.FullName))
+                    @foreach (var user in PaginationService.CreatePaging(_users).OrderBy(x => x.FullName))
                     {
                         <tr id="@(user.Id)">
                             <th scope="row">@(user.Id)</th>
@@ -71,6 +72,19 @@ else
                 </tbody>
             </table>
         </div>
+
+        <nav aria-label="Page Navigation">
+            <ul class="pagination justify-content-center">
+                @for (int i = 1; i <= PaginationService.PageCount(_users); i++)
+                {
+                    var pageNumber = i;
+
+                    <li class="@(i == PaginationService.CurrentPage ? "page-item active" : "page-item")">
+                        <a class="page-link" href="@NavigationManager.Uri" @onclick="@(() => PaginationService.ChangePage(pageNumber))">@(i)</a>
+                    </li>
+                }
+            </ul>
+        </nav>
     }
 
     <EditUserAccessModal Model="_userModel" Roles="_roles" Locations="_locations" />

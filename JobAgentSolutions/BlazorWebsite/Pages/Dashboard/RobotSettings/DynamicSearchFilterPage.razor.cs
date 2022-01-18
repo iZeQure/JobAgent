@@ -12,12 +12,9 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Dashboard.RobotSettings
 {
-    public partial class DynamicSearchFilterPage : ComponentBase
+    public partial class DynamicSearchFilterPage
     {
-        [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected ICategoryService CategoryService { get; set; }
-        [Inject] protected NavigationManager NavigationManager { get;set; }
-        [Inject] protected PaginationService PaginationService { get; set; }
         [Inject] protected IDynamicSearchFilterService DynamicSearchFilterService { get; set; }
 
         private DynamicSearchFilterModel _dynamicSearchFilterModel = new();
@@ -31,8 +28,6 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
 
         protected override async Task OnInitializedAsync()
         {
-            RefreshProvider.RefreshRequest += RefreshContent;
-
             await LoadData();
         }
 
@@ -87,7 +82,7 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
             }
         }
 
-        private async Task RefreshContent()
+        public override async Task RefreshContent()
         {
             try
             {

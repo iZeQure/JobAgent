@@ -50,8 +50,6 @@ namespace BlazorWebsite.Pages.Dashboard.Account
             }
 
             changePasswordModel.Email = _sessionUserEmail;
-
-            await base.OnInitializedAsync();
         }
 
 

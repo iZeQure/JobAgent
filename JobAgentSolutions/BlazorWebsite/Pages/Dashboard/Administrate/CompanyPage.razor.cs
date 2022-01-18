@@ -1,5 +1,5 @@
 ﻿using BlazorWebsite.Data.FormModels;
-using BlazorWebsite.Data.Providers;
+using BlazorWebsite.Data.Services;
 using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using Microsoft.AspNetCore.Components;
@@ -10,11 +10,10 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Dashboard.Administrate
 {
-    public partial class CompanyPage : ComponentBase
+    public partial class CompanyPage
     {
         [Inject] protected ICompanyService CompanyService { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
-        [Inject] protected IRefreshProvider RefreshProvider { get; set; }
 
         private CompanyModel _companyModel = new();
         private IEnumerable<ICompany> _companies = new List<Company>();
@@ -25,21 +24,21 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
 
         protected override async Task OnInitializedAsync()
         {
-            RefreshProvider.RefreshRequest += UpdateContentAsync;
-
-            _companies = await CompanyService.GetAllAsync();
-
-            await base.OnInitializedAsync();
+            await LoadData();
         }
 
-        private async Task UpdateContentAsync()
+        private async Task LoadData()
         {
+            _isLoadingData = true;
             try
             {
                 _companies = await CompanyService.GetAllAsync();
             }
-            catch (Exception) { errorMessage = "Ukendt Fejl ved opdatering af virksomheder."; }
-            finally { StateHasChanged(); }
+            finally
+            {
+                _isLoadingData = false;
+                StateHasChanged();
+            }
         }
 
         private async void OnClick_OpenEditModal(int id)
@@ -69,5 +68,16 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
         {
             _companyId = id;
         }
+
+        public override async Task RefreshContent()
+        {
+            try
+            {
+                _companies = await CompanyService.GetAllAsync();
+            }
+            catch (Exception) { errorMessage = "Ukendt Fejl ved opdatering af virksomheder."; }
+            finally { StateHasChanged(); }
+        }
+
     }
 }

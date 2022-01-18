@@ -23,11 +23,9 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
         private List<string> _newSpecializationNames = new();
 
         private string _errorMessage = "";
-        private bool _isProcessing = false;
-        private bool _isProcessingNewSpecializationToList = false;
         private bool _isLoading = false;
 
-        protected override async Task OnInitializedAsync()
+        protected override async Task OnParametersSetAsync()
         {
             await LoadModalInformationAsync();
         }
@@ -63,42 +61,51 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
             {
                 return;
             }
-            using (var _ = Model.TimedEndOfOperation())
+
+            try
             {
-                Category category = new()
+                using (var _ = Model.TimedEndOfOperation())
                 {
-                    Id = Model.CategoryId,
-                    Name = Model.Categoryname
-                };
-
-                bool specializationIsCreated = true;
-                var result = await CategoryService.UpdateAsync(category);
-
-                if (result is null)
-                {
-                    _errorMessage = "Fejl under opdatering af Uddannelse.";
-                    return;
-                }
-
-                if (_newSpecializationNames.Count > 0)
-                {
-                    foreach (var name in _newSpecializationNames)
+                    Category category = new()
                     {
-                        Specialization specialization = new()
-                        {
-                            CategoryId = Model.CategoryId,
-                            Name = name
-                        };
+                        Id = Model.CategoryId,
+                        Name = Model.Categoryname
+                    };
 
-                        var specializationResult = await CategoryService.CreateAsync(specialization);
+                    bool specializationIsCreated = true;
+                    var result = await CategoryService.UpdateAsync(category);
 
-                        if (specializationIsCreated is false)
+                    if (result is null)
+                    {
+                        _errorMessage = "Fejl under opdatering af Uddannelse.";
+                        return;
+                    }
+
+                    if (_newSpecializationNames.Count > 0)
+                    {
+                        foreach (var name in _newSpecializationNames)
                         {
-                            _errorMessage = "Fejl under opdatering af speciale.";
-                            return;
+                            Specialization specialization = new()
+                            {
+                                CategoryId = Model.CategoryId,
+                                Name = name
+                            };
+
+                            var specializationResult = await CategoryService.CreateAsync(specialization);
+
+                            if (specializationIsCreated is false)
+                            {
+                                _errorMessage = "Fejl under opdatering af speciale.";
+                                return;
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception)
+            {
+                _errorMessage = "Noget gik galt.";
+                return;
             }
 
             if (Model.IsProcessing is false)
@@ -111,35 +118,43 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
             }
         }
 
-        private Task OnButtonClick_AssignNewSpecializationToList(string name)
+        private void OnButtonClick_AssignNewSpecializationToList(string name)
         {
-            _isProcessingNewSpecializationToList = true;
+            if (string.IsNullOrEmpty(name))
+            {
+                return;
+            }
+
+            if (_newSpecializationNames.Contains(name))
+            {
+                _errorMessage = "Du har allerede tilføjet dette speciale.";
+                return;
+            }
 
             _newSpecializationNames.Add(name);
-
             StateHasChanged();
-
-            _isProcessingNewSpecializationToList = false;
-
-            return Task.CompletedTask;
         }
 
         private async Task OnButtonClick_RemoveNewSpecialization(ISpecialization entity)
         {
-            _isProcessingNewSpecializationToList = true;
-
-            var result = await CategoryService.RemoveAsync(entity);
-
-            if (!result)
+            try
             {
-                _errorMessage = "Kunne ikke fjerne specialet, det er muligvis allerede slettet.";
+                var result = await CategoryService.RemoveAsync(entity);
+
+                if (!result)
+                {
+                    _errorMessage = "Kunne ikke fjerne specialet, det er muligvis allerede slettet.";
+                }
+
+                _specializations = await CategoryService.GetSpecializationsAsync();
+            }
+            catch (Exception)
+            {
+                _errorMessage = "Der skete en fejl.";
+                return;
             }
 
-            _specializations = await CategoryService.GetSpecializationsAsync();
-
             StateHasChanged();
-
-            _isProcessingNewSpecializationToList = false;
         }
 
         private void OnClick_CancelRequest()

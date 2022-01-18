@@ -12,11 +12,8 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Dashboard.Administrate
 {
-    public partial class JobPagePage : ComponentBase
+    public partial class JobPagePage
     {
-        [Inject] private IRefreshProvider RefreshProvider { get; set; }
-        [Inject] protected PaginationService PaginationService { get; set; }
-        [Inject] protected NavigationManager NavigationManager { get; set; }
         [Inject] protected IJobPageService JobPageService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
 
@@ -30,8 +27,6 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
 
         protected override async Task OnInitializedAsync()
         {
-            RefreshProvider.RefreshRequest += RefreshContent;
-
             await LoadData();
         }
 
@@ -83,7 +78,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             }
         }
 
-        private async Task RefreshContent()
+        public override async Task RefreshContent()
         {
             try
             {

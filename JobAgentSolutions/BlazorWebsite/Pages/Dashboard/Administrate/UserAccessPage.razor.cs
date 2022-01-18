@@ -1,5 +1,4 @@
 ﻿using BlazorWebsite.Data.FormModels;
-using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Locations;
 using JobAgentClassLibrary.Common.Locations.Entities;
 using JobAgentClassLibrary.Common.Roles;
@@ -14,9 +13,8 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Dashboard.Administrate
 {
-    public partial class UserAccessPage : ComponentBase
+    public partial class UserAccessPage
     {
-        [Inject] private IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
         [Inject] protected IUserService UserService { get; set; }
         [Inject] protected IRoleService RoleService { get; set; }
@@ -91,7 +89,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             }
         }
 
-        private async Task RefreshContent()
+        public override async Task RefreshContent()
         {
             try
             {

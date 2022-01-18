@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Menus
 {
-    public partial class SidebarMenu : ComponentBase
+    public partial class SidebarMenu : ComponentBase, IDisposable
     {
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected ICategoryService CategoryService { get; set; }
@@ -23,22 +23,22 @@ namespace BlazorWebsite.Shared.Components.Menus
 
         protected async override Task OnInitializedAsync()
         {
-            RefreshProvider.RefreshRequest += UpdateContentAsync;
+            //RefreshProvider.RefreshRequest += UpdateContentAsync;
 
-            try
-            {
-                _isLoadingData = true;
-                _menu = await CategoryService.GetMenuAsync();
-            }
-            catch (Exception)
-            {
-                _errorMessage = "Fejl ved indløsning af menue.";
-            }
-            finally
-            {
-                _isLoadingData = false;
-                StateHasChanged();
-            }
+            //try
+            //{
+            //    _isLoadingData = true;
+            //    _menu = await CategoryService.GetMenuAsync();
+            //}
+            //catch (Exception)
+            //{
+            //    _errorMessage = "Fejl ved indløsning af menue.";
+            //}
+            //finally
+            //{
+            //    _isLoadingData = false;
+            //    StateHasChanged();
+            //}
         }
 
         private async Task UpdateContentAsync()
@@ -91,6 +91,12 @@ namespace BlazorWebsite.Shared.Components.Menus
                 default:
                     return NAVLINK_JOB_PREFIX + "uncategorized";
             }
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+            RefreshProvider.RefreshRequest -= UpdateContentAsync;
         }
     }
 }

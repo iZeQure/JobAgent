@@ -10,11 +10,8 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Dashboard.RobotSettings
 {
-    public partial class StaticSearchFilterPage : ComponentBase
+    public partial class StaticSearchFilterPage
     {
-        [Inject] private IRefreshProvider RefreshProvider { get; set; }
-        [Inject] protected NavigationManager NavigationManager { get; set; }
-        [Inject] protected PaginationService PaginationService { get; set; }
         [Inject] protected IStaticSearchFilterService StaticSearchFilterService { get; set; }
         [Inject] protected IFilterTypeService FilterTypeService { get; set; }
 
@@ -28,8 +25,6 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
 
         protected override async Task OnInitializedAsync()
         {
-            RefreshProvider.RefreshRequest += RefreshContent;
-
             await LoadData();
         }
 
@@ -94,7 +89,7 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
             }
         }
 
-        private async Task RefreshContent()
+        public override async Task RefreshContent()
         {
             try
             {

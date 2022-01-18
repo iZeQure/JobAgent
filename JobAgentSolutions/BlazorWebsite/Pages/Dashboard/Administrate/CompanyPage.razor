@@ -1,5 +1,6 @@
 ﻿@page "/admin/settings/companies"
 @attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
+@inherits BasePage
 @using BlazorWebsite.Shared.Components.Modals.CompanyModals;
 
 <PageDocumentTitle DocumentTitle="Administrer - Virksomheds Indstillinger" />
@@ -23,11 +24,11 @@
     }
     else
     {
-        @if (_companies.Count() == 0)
+        @if (!PaginationService.CreatePaging(_companies).Any())
         {
             <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                          Message="Der blev ikke fundet nogen virksomheder."
-                          MessageOptional="Opret virksomheder, ved at trykke på knappen : Opret ny Virksomhed." />
+              Message="Der blev ikke fundet nogen virksomheder."
+              MessageOptional="Opret virksomheder, ved at trykke på knappen : Opret ny Virksomhed." />
         }
         else
         {
@@ -44,7 +45,7 @@
                     </thead>
                     <tbody>
 
-                        @foreach (var company in _companies)
+                        @foreach (var company in PaginationService.CreatePaging(_companies))
                         {
                             <tr id="@(company.Id)">
                                 <th scope="row">@(company.Id)</th>
@@ -65,6 +66,19 @@
                     </tbody>
                 </table>
             </div>
+
+            <nav aria-label="Page Navigation">
+                <ul class="pagination justify-content-center">
+                    @for (int i = 1; i <= PaginationService.PageCount(_companies); i++)
+                    {
+                        var pageNumber = i;
+
+                        <li class="@(i == PaginationService.CurrentPage ? "page-item active" : "page-item")">
+                            <a class="page-link" href="@NavigationManager.Uri" @onclick="@(() => PaginationService.ChangePage(pageNumber))">@(i)</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
         }
 
         <CreateCompanyModal />
@@ -77,6 +91,6 @@
 else
 {
     <MessageAlert Alert="MessageAlert.AlertType.Error"
-                  Message="Prøv at genindlæs siden."
-                  MessageOptional="@(errorMessage)" />
+              Message="Prøv at genindlæs siden."
+              MessageOptional="@(errorMessage)" />
 }

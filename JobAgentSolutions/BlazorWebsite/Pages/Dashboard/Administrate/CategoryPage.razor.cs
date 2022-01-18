@@ -1,5 +1,4 @@
 ﻿using BlazorWebsite.Data.FormModels;
-using BlazorWebsite.Data.Providers;
 using BlazorWebsite.Data.Services;
 using JobAgentClassLibrary.Common.Categories;
 using JobAgentClassLibrary.Common.Categories.Entities;
@@ -10,11 +9,9 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Dashboard.Administrate
 {
-    public partial class CategoryPage : ComponentBase
+    partial class CategoryPage
     {
-        [Inject] private IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected ICategoryService CategoryService { get; set; }
-        [Inject] protected NavigationManager NavigationManager { get; set; }
         [Inject] protected PaginationService PaginationService { get; set; }
 
         private CategoryModel _categoryModel = new();
@@ -27,8 +24,6 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
 
         protected override async Task OnInitializedAsync()
         {
-            RefreshProvider.RefreshRequest += RefreshContent;
-
             await LoadData();
         }
 
@@ -66,7 +61,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
                 _categoryModel = new CategoryModel
                 {
                     CategoryId = _category.Id,
-                    Categoryname = _category.Name
+                    Categoryname = _category.Name,
                 };
             }
             catch (Exception ex)
@@ -79,14 +74,14 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             }
         }
 
-        private async Task RefreshContent()
+        public override async Task RefreshContent()
         {
             try
             {
                 var cats = await CategoryService.GetCategoriesAsync();
                 var specs = await CategoryService.GetSpecializationsAsync();
 
-                if (cats == null || specs == null)
+                if (cats is null || specs is null)
                 {
                     return;
                 }
@@ -99,6 +94,5 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
                 StateHasChanged();
             }
         }
-
     }
 }

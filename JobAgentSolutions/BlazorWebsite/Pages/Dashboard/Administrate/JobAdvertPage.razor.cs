@@ -15,17 +15,15 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Dashboard.Administrate
 {
-    public partial class JobAdvertPage : ComponentBase
+    public partial class JobAdvertPage
     {
         [Parameter] public int JobAdvertId { get; set; }
         [Parameter] public int SpecializationId { get; set; }
-        [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected PaginationService PaginationService { get; set; }
         [Inject] protected IJobAdvertService JobAdvertService { get; set; }
         [Inject] protected ICategoryService CategoryService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
-        [Inject] protected NavigationManager NavigationManager { get; set; }
 
         private JobAdvertModel _jobAdvertModel = new();
         private List<ICategory> _categories;
@@ -41,8 +39,6 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
 
         protected override async Task OnInitializedAsync()
         {
-            RefreshProvider.RefreshRequest += RefreshDataAsync;
-
             try
             {
                 _dataIsLoading = true;
@@ -67,7 +63,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             }
         }
 
-        private async Task RefreshDataAsync()
+        public override async Task RefreshContent()
         {
             try
             {

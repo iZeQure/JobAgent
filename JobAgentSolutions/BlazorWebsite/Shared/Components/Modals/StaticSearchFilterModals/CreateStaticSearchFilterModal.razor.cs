@@ -78,37 +78,46 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
 
         private async Task OnValidSubmit_CreateJobAdvertAsync()
         {
-            if (_staticSearchFilterModel.IsProcessing is true)
+            try
             {
-                return;
-            }
-
-            IStaticSearchFilter result = null;
-
-            using (var _ = _staticSearchFilterModel.TimedEndOfOperation())
-            {
-                StaticSearchFilter staticSearchFilter = new()
+                if (_staticSearchFilterModel.IsProcessing is true)
                 {
-                    Id = _staticSearchFilterModel.Id,
-                    Key = _staticSearchFilterModel.Key,
-                    FilterType = _staticSearchFilterModel.FilterType
-
-                };
-
-                result = await StaticcSearchFilterService.CreateAsync(staticSearchFilter);
-
-                if (result is null)
-                {
-                    _errorMessage = "Fejl under oprettelse af filter.";
                     return;
                 }
+
+                IStaticSearchFilter result = null;
+
+                using (var _ = _staticSearchFilterModel.TimedEndOfOperation())
+                {
+                    StaticSearchFilter staticSearchFilter = new()
+                    {
+                        Id = _staticSearchFilterModel.Id,
+                        Key = _staticSearchFilterModel.Key,
+                        FilterType = _staticSearchFilterModel.FilterType
+
+                    };
+
+                    result = await StaticcSearchFilterService.CreateAsync(staticSearchFilter);
+
+                    if (result is null)
+                    {
+                        _errorMessage = "Fejl under oprettelse af filter.";
+                        return;
+                    }
+                }
+                _staticSearchFilterModel.Id = result.Id;
+            }
+            catch (Exception)
+            {
+                _errorMessage = "Noget gik galt.";
+                return;
             }
 
             if (_staticSearchFilterModel.IsProcessing is false)
             {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateStaticSearchFilter");
-                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{result.Id}");
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{_staticSearchFilterModel.Id}");
             }
         }
 
