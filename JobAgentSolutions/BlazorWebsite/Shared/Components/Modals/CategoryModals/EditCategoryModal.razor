@@ -67,10 +67,11 @@
                                 <div class="row">
                                     <div class="col">
                                         <label for="regShowNewSpecs" class="admin-label col-form-label col-form-label-sm">Specialer : </label>
+                                        <hr />
                                         @foreach (var specializaton in _category.Specializations)
                                         {
-                                            <p>@specializaton.Name</p>
                                             <span @onclick="@(mouseEvent => OnButtonClick_RemoveNewSpecialization(specializaton))">
+                                                @specializaton.Name
                                                 <Popover Title="Forsigtig!" Body="Denne knap sletter specialet, forevigt!" Color="Popover.PopoverType.Danger" />
                                             </span>
                                             <hr />
