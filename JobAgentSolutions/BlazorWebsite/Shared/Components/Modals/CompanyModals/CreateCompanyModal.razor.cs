@@ -27,7 +27,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
             _editContext = new(_companyModel);
             _editContext.AddDataAnnotationsValidation();
 
-            return base.OnInitializedAsync();
+            return Task.CompletedTask;
         }
 
         private async Task OnValidSubmit_CreateCompany()

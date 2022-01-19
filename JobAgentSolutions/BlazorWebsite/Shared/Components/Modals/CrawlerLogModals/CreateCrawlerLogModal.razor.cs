@@ -24,7 +24,6 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
         [Inject] protected ILogService LogService { get; set; }
 
         private LogModel _logModel = new();
-        private IEnumerable<ILog> _logs;
         private List<LogSeverity> _logSeverities = new();
         private List<LogType> _logTypes = new();
         private EditContext _editContext;
@@ -56,38 +55,6 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
                 {
                     _sessionUserEmail = sessionClaim.Value;
                 }
-            }
-
-            await LoadModalInformation();
-        }
-
-        private async Task LoadModalInformation()
-        {
-            _isLoading = true;
-
-            try
-            {
-                var logTask = LogService.GetAllDbLogsAsync();
-
-                try
-                {
-                    await TaskExtProvider.WhenAll(logTask);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-
-                _logs = logTask.Result;
-            }
-            catch (Exception)
-            {
-                _errorMessage = "Uventet fejl. Prøv at genindlæse siden.";
-            }
-            finally
-            {
-                _isLoading = false;
-                StateHasChanged();
             }
         }
 

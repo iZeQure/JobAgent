@@ -23,7 +23,6 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
         [Inject] protected ICategoryService CategoryService { get; set; }
 
         private DynamicSearchFilterModel _dynamicSearchFilterModel = new();
-        private IEnumerable<IDynamicSearchFilter> _dynamicSearchFilters;
         private IEnumerable<ICategory> _categories;
         private IEnumerable<ISpecialization> _specializations;
         private EditContext _editContext;
@@ -45,20 +44,18 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
 
             try
             {
-                var companyTask = DynamicSearchFilterService.GetAllAsync();
                 var categoryTask = CategoryService.GetCategoriesAsync();
                 var specializationTask = CategoryService.GetSpecializationsAsync();
 
                 try
                 {
-                    await TaskExtProvider.WhenAll(companyTask, categoryTask, specializationTask);
+                    await TaskExtProvider.WhenAll(categoryTask, specializationTask);
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error: {ex.Message}");
                 }
 
-                _dynamicSearchFilters = companyTask.Result;
                 _categories = categoryTask.Result;
                 _specializations = specializationTask.Result;
             }

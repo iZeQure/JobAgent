@@ -20,8 +20,6 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
         [Inject] protected ICategoryService CategoryService { get; set; }
 
         private CategoryModel _categoryModel = new();
-        private IEnumerable<ICategory> _categories;
-        private IEnumerable<ISpecialization> _specializations;
         private IEnumerable<ISpecialization> _newSpecializations = new List<Specialization>();
         private List<string> _newSpecializationNames = new();
         private EditContext _editContext;
@@ -30,44 +28,12 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
         private bool _isLoading = false;
         private string _errorMessage;
 
-        protected override async Task OnInitializedAsync()
+        protected override Task OnInitializedAsync()
         {
             _editContext = new(_categoryModel);
             _editContext.AddDataAnnotationsValidation();
 
-            await LoadModalInformation();
-        }
-
-        private async Task LoadModalInformation()
-        {
-            _isLoading = true;
-
-            try
-            {
-                var categoryTask = CategoryService.GetCategoriesAsync();
-                var specializationTask = CategoryService.GetSpecializationsAsync();
-
-                try
-                {
-                    await TaskExtProvider.WhenAll(categoryTask, specializationTask);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-
-                _categories = categoryTask.Result;
-                _specializations = specializationTask.Result;
-            }
-            catch (Exception)
-            {
-                _errorMessage = "Uventet fejl. Prøv at genindlæse siden.";
-            }
-            finally
-            {
-                _isLoading = false;
-                StateHasChanged();
-            }
+            return Task.CompletedTask;
         }
 
         private async Task OnValidSubmit_CreateJobAdvertAsync()
