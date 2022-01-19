@@ -3,7 +3,7 @@
 @inherits BasePage
 @using BlazorWebsite.Shared.Components.Modals.UserAccessModals;
 
-<PageDocumentTitle DocumentTitle="Administrer - Virksomheds Links" />
+<PageDocumentTitle DocumentTitle="Administrer - BrugerRettigheder" />
 
 @if (dataIsLoading)
 {
@@ -18,7 +18,7 @@ else
     }
     else
     {
-
+        <PageHeadingTitle DisplayTitle="Administrer BrugerRettigheder" />
         <div class="table-responsive table-responsive-sm table-responsive-md">
             <table class="table table-striped table-hover">
                 <caption>Liste over system brugere..</caption>
@@ -75,7 +75,7 @@ else
 
         <nav aria-label="Page Navigation">
             <ul class="pagination justify-content-center">
-                @for (int i = 1; i <= PaginationService.PageCount(_users); i++)
+                @for (int i = 1; i <= PaginationService.MaxPages; i++)
                 {
                     var pageNumber = i;
 
@@ -90,5 +90,4 @@ else
     <EditUserAccessModal Model="_userModel" Roles="_roles" Locations="_locations" />
 
     <RemoveUserModal Id="_userId" />
-
 }

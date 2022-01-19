@@ -153,7 +153,7 @@ else
 
             <nav aria-label="Page Navigation">
                 <ul class="pagination justify-content-center">
-                    @for (int i = 1; i <= PaginationService.PageCount(_jobAdverts); i++)
+                    @for (int i = 1; i <= PaginationService.MaxPages; i++)
                     {
                         var pageNumber = i;
 
