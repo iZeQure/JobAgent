@@ -143,8 +143,10 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
                 _errorMessage = "Der skete en fejl.";
                 return;
             }
-
-            StateHasChanged();
+            finally
+            {
+                RefreshProvider.CallRefreshRequest();
+            }
         }
 
         private void OnClick_CancelRequest()
