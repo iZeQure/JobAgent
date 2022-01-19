@@ -23,22 +23,22 @@ namespace BlazorWebsite.Shared.Components.Menus
 
         protected async override Task OnInitializedAsync()
         {
-            //RefreshProvider.RefreshRequest += UpdateContentAsync;
+            RefreshProvider.RefreshRequest += UpdateContentAsync;
 
-            //try
-            //{
-            //    _isLoadingData = true;
-            //    _menu = await CategoryService.GetMenuAsync();
-            //}
-            //catch (Exception)
-            //{
-            //    _errorMessage = "Fejl ved indløsning af menue.";
-            //}
-            //finally
-            //{
-            //    _isLoadingData = false;
-            //    StateHasChanged();
-            //}
+            try
+            {
+                _isLoadingData = true;
+                _menu = await CategoryService.GetMenuAsync();
+            }
+            catch (Exception)
+            {
+                _errorMessage = "Fejl ved indløsning af menue.";
+            }
+            finally
+            {
+                _isLoadingData = false;
+                StateHasChanged();
+            }
         }
 
         private async Task UpdateContentAsync()
