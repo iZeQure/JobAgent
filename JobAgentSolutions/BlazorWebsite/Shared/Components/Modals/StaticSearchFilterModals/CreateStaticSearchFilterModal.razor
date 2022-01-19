@@ -15,13 +15,13 @@
                 <EditForm EditContext="_editContext" OnValidSubmit="OnValidSubmit_CreateJobAdvertAsync">
 
                     <div class="modal-header">
-                        <h5 class="modal-title">Nyt Søgefilter :</h5>
+                        <h5 class="modal-title">Nyt Søgefilter:</h5>
                     </div>
 
                     <div class="modal-body">
                         <div class="row">
                             <div class="col">
-                                <label for="regInputKey" class="admin-label col-form-label col-form-label-sm">Søgefilteret : </label>
+                                <label for="regInputKey" class="admin-label col-form-label col-form-label-sm">Søgefilteret:</label>
                                 <input id="regInputKey" class="form-control form-control-sm" type="text" @bind="_staticSearchFilterModel.Key" placeholder="Eksempel : Programmering" />
                                 <ValidationMessage For="@(() => _staticSearchFilterModel.Key)" />
 

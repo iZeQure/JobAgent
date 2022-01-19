@@ -15,14 +15,14 @@
                 <EditForm EditContext="_editContext" OnValidSubmit="OnValidSubmit_CreateJobAdvertAsync">
 
                     <div class="modal-header">
-                        <h5 class="modal-title">Nyt Stillingsopslag :</h5>
+                        <h5 class="modal-title">Nyt Stillingsopslag:</h5>
                     </div>
 
                     <div class="modal-body">
 
                         <div class="row">
                             <div class="col">
-                                <label for="regInputTitle" class="admin-label col-form-label col-form-label-sm">Stillingsopslagets Titel :</label>
+                                <label for="regInputTitle" class="admin-label col-form-label col-form-label-sm">Stillingsopslagets Titel::</label>
                                 <input id="regInputTitle" class="form-control form-control-sm" type="text" @bind="_jobAdvertModel.Title" placeholder="Eksempel : Kager på en ny måde .." />
                                 <ValidationMessage For="@(() => _jobAdvertModel.Title)" />
                             </div>
@@ -32,7 +32,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="regInputDesc" class="admin-label col-form-label col-form-label-sm">Stillingsopslags Kort-Beskrivelse :</label>
+                                <label for="regInputDesc" class="admin-label col-form-label col-form-label-sm">Stillingsopslags Kort-Beskrivelse:</label>
                                 <InputTextArea id="regInputDesc" class="form-control form-control-sm" style="max-height: 450px; min-height: 150px;" @bind-Value="_jobAdvertModel.Summary" placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."></InputTextArea>
                                 <ValidationMessage For="@(() => _jobAdvertModel.Summary)" />
                             </div>
@@ -42,7 +42,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="regInputRegistrationDate" class="admin-label col-form-label col-form-label-sm">Kontrakt Registreret Dato :</label>
+                                <label for="regInputRegistrationDate" class="admin-label col-form-label col-form-label-sm">Kontrakt Registreret Dato:</label>
                                 <InputDate TValue="DateTime" @bind-Value="@(_jobAdvertModel.RegistrationDateTime)" id="regInputRegistrationDate" class="form-control form-control-sm" />
                                 <ValidationMessage For="@(() => _jobAdvertModel.RegistrationDateTime)" />
                             </div>
@@ -52,7 +52,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="regInputCompany" class="admin-label col-form-label col-form-label-sm">Stillingsopslag Tilhører :</label>
+                                <label for="regInputCompany" class="admin-label col-form-label col-form-label-sm">Stillingsopslag Tilhører:</label>
                                 @if (_vacantJobs == null || !_vacantJobs.Any())
                                 {
                                     <label class="col-form-label">Kunne ikke hente job sider eller er igang med at indlæse data..</label>

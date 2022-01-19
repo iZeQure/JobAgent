@@ -20,7 +20,7 @@
                 <EditForm Model="Model" OnValidSubmit="OnValidSubmit_EditJobVacancy">
 
                     <div class="modal-header">
-                        <h5 class="modal-title">Rediger Stillingsopslag :</h5>
+                        <h5 class="modal-title">Rediger Stillingsopslag:</h5>
                     </div>
 
                     <div class="modal-body">
@@ -36,7 +36,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="inputCompany" class="admin-label col-form-label col-form-label-sm">Virksomhed :</label>
+                                <label for="inputCompany" class="admin-label col-form-label col-form-label-sm">Virksomhed:</label>
                                 <select class="form-control form-control-sm" @bind="Model.CompanyId">
 
                                     @foreach (var company in _companies)

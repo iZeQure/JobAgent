@@ -15,13 +15,13 @@
                 <EditForm EditContext="_editContext" OnValidSubmit="OnValidSubmit_CreateJobAdvertAsync">
 
                     <div class="modal-header">
-                        <h5 class="modal-title">Nyt Søgeord :</h5>
+                        <h5 class="modal-title">Nyt Søgeord:</h5>
                     </div>
 
                     <div class="modal-body">
                         <div class="row">
                             <div class="col">
-                                <label for="regInputKey" class="admin-label col-form-label col-form-label-sm">Søgeordet : </label>
+                                <label for="regInputKey" class="admin-label col-form-label col-form-label-sm">Søgeordet:</label>
                                 <input id="regInputKey" class="form-control form-control-sm" type="text" @bind="_dynamicSearchFilterModel.Key" placeholder="Eksempel : Programmering" />
                                 <ValidationMessage For="@(() => _dynamicSearchFilterModel.Key)" />
 
@@ -33,7 +33,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="regInputCategory" class="admin-label col-form-label col-form-label-sm">Kategori</label>
+                                <label for="regInputCategory" class="admin-label col-form-label col-form-label-sm">Kategori:</label>
                                 @if (_categories == null || !_categories.Any())
                                 {
                                     <label class="col-form-label">Kunne ikke hente kategorier eller er igang med at indlæse data...</label>
@@ -60,7 +60,7 @@
 
                                 @if (_dynamicSearchFilterModel.CategoryId is not 0 && _hasSpecs)
                                 {
-                                    <label for="regInputSpecialization" class="admin-label col-form-label col-form-label-sm">Specialer</label>
+                                    <label for="regInputSpecialization" class="admin-label col-form-label col-form-label-sm">Specialer:</label>
 
                                     <select id="regInputSpecialization" class="form-control form-control-sm" type="text" @bind="_dynamicSearchFilterModel.Specializationid">
 

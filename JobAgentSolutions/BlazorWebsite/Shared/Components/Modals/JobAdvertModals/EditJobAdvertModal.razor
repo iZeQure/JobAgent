@@ -20,13 +20,13 @@
                 <EditForm Model="Model" OnValidSubmit="OnValidSubmit_EditJobVacancy">
 
                     <div class="modal-header">
-                        <h5 class="modal-title">Rediger Stillingsopslag :</h5>
+                        <h5 class="modal-title">Rediger Stillingsopslag:</h5>
                     </div>
 
                     <div class="modal-body">
                         <div class="row">
                             <div class="col">
-                                <label for="inputTitle" class="admin-label col-form-label col-form-label-sm">Titel :</label>
+                                <label for="inputTitle" class="admin-label col-form-label col-form-label-sm">Titel:</label>
                                 <input id="inputTitle" type="text" class="form-control form-control-sm" placeholder="Indtast titel" @bind-value="Model.Title" />
                                 <ValidationMessage For="@(() => Model.Title)" />
                             </div>
@@ -34,7 +34,7 @@
                         <hr />
                         <div class="row">
                             <div class="col">
-                                <label for="inputDesc" class="admin-label col-form-label col-form-label-sm">Kort-Beskrivelse :</label>
+                                <label for="inputDesc" class="admin-label col-form-label col-form-label-sm">Kort-Beskrivelse:</label>
                                 <textarea id="inputDesc" class="form-control form-control-sm" style="max-height: 450px; min-height: 150px;" @bind="Model.Summary"></textarea>
                                 <ValidationMessage For="@(() => Model.Summary)" />
                             </div>
@@ -44,7 +44,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="inputCompany" class="admin-label col-form-label col-form-label-sm">Job side :</label>
+                                <label for="inputCompany" class="admin-label col-form-label col-form-label-sm">Job side:</label>
                                 <select class="form-control form-control-sm" @bind="Model.Id">
 
                                     @foreach (var vacantJob in _vacantJobs)

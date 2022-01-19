@@ -20,13 +20,13 @@
                 <EditForm Model="Model" OnValidSubmit="OnValidSubmit_EditJobVacancy">
 
                     <div class="modal-header">
-                        <h5 class="modal-title">Rediger søgefilteret :</h5>
+                        <h5 class="modal-title">Rediger søgefilteret:</h5>
                     </div>
 
                     <div class="modal-body">
                         <div class="row">
                             <div class="col">
-                                <label for="regInputKey" class="admin-label col-form-label col-form-label-sm">Søgefilteret : </label>
+                                <label for="regInputKey" class="admin-label col-form-label col-form-label-sm">Søgefilteret:</label>
                                 <input id="regInputKey" class="form-control form-control-sm" type="text" @bind="Model.Key" placeholder="Eksempel : opslagsdato" />
                                 <ValidationMessage For="@(() => Model.Key)" />
 
@@ -37,7 +37,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="regInputFilterType" class="admin-label col-form-label col-form-label-sm">Filter type :</label>
+                                <label for="regInputFilterType" class="admin-label col-form-label col-form-label-sm">Filter type:</label>
                                 @if (_filterTypes == null || !_filterTypes.Any())
                                 {
                                     <label class="col-form-label">Kunne ikke hente søgefiltre eller er igang med at indlæse data...</label>

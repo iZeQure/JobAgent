@@ -14,12 +14,12 @@
             {
                 <EditForm EditContext="_editContext" OnValidSubmit="OnValidSubmit_CreateJobAdvertAsync">
                     <div class="modal-header">
-                        <h5 class="modal-title">Ny Stilling :</h5>
+                        <h5 class="modal-title">Ny Stilling:</h5>
                     </div>
                     <div class="modal-body">
                         <div class="row">
                             <div class="col">
-                                <label for="regInputTitle" class="admin-label col-form-label col-form-label-sm">Jobsiden's Link :</label>
+                                <label for="regInputTitle" class="admin-label col-form-label col-form-label-sm">Jobsiden's Link:</label>
                                 <input id="regInputTitle" class="form-control form-control-sm" type="text" @bind="_vacantJobModel.URL" placeholder="Eksempel : www.dinhjemmeside.dk/jobs" />
                                 <ValidationMessage For="@(() => _vacantJobModel.URL)" />
                             </div>
@@ -29,7 +29,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="regInputCompany" class="admin-label col-form-label col-form-label-sm">Stillingen Tilhører :</label>
+                                <label for="regInputCompany" class="admin-label col-form-label col-form-label-sm">Stillingen Tilhører:</label>
                                 @if (_jobPages == null || !_jobPages.Any())
                                 {
                                     <label class="col-form-label">Kunne ikke hente stillinger eller er igang med at indlæse data..</label>
