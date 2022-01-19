@@ -1,4 +1,5 @@
 ﻿using JobAgentClassLibrary.Common.Categories.Entities;
+using JobAgentClassLibrary.Common.Categories.Factory;
 using JobAgentClassLibrary.Common.Categories.Repositories;
 using JobAgentClassLibrary.Core.Entities;
 using JobAgentClassLibrary.Loggings;
@@ -13,6 +14,7 @@ namespace JobAgentClassLibrary.Common.Categories
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly ISpecializationRepository _specializationRepository;
+        private readonly CategoryEntityFactory _factory;
         private readonly ILogService _logService;
 
         public CategoryService(ICategoryRepository categoryRepository, ISpecializationRepository specializationRepository, ILogService logService)
@@ -239,6 +241,29 @@ namespace JobAgentClassLibrary.Common.Categories
             catch (Exception ex)
             {
                 await _logService.LogError(ex, "Failed to update specialization", nameof(UpdateAsync), nameof(CategoryService), LogType.SERVICE);
+                throw;
+            }
+        }
+
+        public async Task<ICategory> GetCategoryWithSpecializationsById(int id)
+        {
+            try
+            {
+                ICategory category = await GetCategoryByIdAsync(id);
+
+                foreach (ISpecialization specialization in await GetSpecializationsAsync())
+                {
+                    if (specialization.CategoryId == id)
+                    {
+                        category.Specializations.Add(specialization);
+                    }
+                }
+
+                return category;
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to get category details", nameof(GetCategoryWithSpecializationsById), nameof(CategoryService), LogType.SERVICE);
                 throw;
             }
         }

@@ -18,8 +18,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
         [Inject] protected IJSRuntime JSRuntime { get; set; }
         [Inject] protected ICategoryService CategoryService { get; set; }
 
-        private IEnumerable<ICategory> _categories = new List<Category>();
-        private IEnumerable<ISpecialization> _specializations = new List<Specialization>();
+        private ICategory _category;
         private List<string> _newSpecializationNames = new();
 
         private string _errorMessage = "";
@@ -36,13 +35,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
 
             try
             {
-                var companyTask = CategoryService.GetCategoriesAsync();
-                var specializationTask = CategoryService.GetSpecializationsAsync();
-
-                await Task.WhenAll(companyTask, specializationTask);
-
-                _categories = companyTask.Result;
-                _specializations = specializationTask.Result;
+                _category = await CategoryService.GetCategoryWithSpecializationsById(Model.CategoryId);
             }
             catch (Exception ex)
             {
@@ -111,7 +104,6 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
             if (Model.IsProcessing is false)
             {
                 _newSpecializationNames = new();
-                _specializations = await CategoryService.GetSpecializationsAsync();
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditCategory");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.CategoryId}");
@@ -145,8 +137,6 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
                 {
                     _errorMessage = "Kunne ikke fjerne specialet, det er muligvis allerede slettet.";
                 }
-
-                _specializations = await CategoryService.GetSpecializationsAsync();
             }
             catch (Exception)
             {

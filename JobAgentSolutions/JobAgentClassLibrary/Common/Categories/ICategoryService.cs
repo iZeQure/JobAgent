@@ -17,5 +17,6 @@ namespace JobAgentClassLibrary.Common.Categories
         Task<ISpecialization> GetSpecializationByIdAsync(int id);
         Task<bool> RemoveAsync(ISpecialization entity);
         Task<ISpecialization> UpdateAsync(ISpecialization entity);
+        Task<ICategory> GetCategoryWithSpecializationsById(int id);
     }
 }

@@ -45,7 +45,7 @@
 
                         <hr />
 
-                        @if (_newSpecializationNames != null || _newSpecializationNames.Any())
+                        @if (_newSpecializationNames != null && _newSpecializationNames.Any())
                         {
                             <div class="row">
                                 <div class="col">
@@ -60,14 +60,14 @@
 
                         <hr />
 
-                        @if (_specializations != null || _specializations.Any())
+                        @if (_category is not null)
                         {
-                            <div class="row">
-                                <div class="col">
-                                    <label for="regShowNewSpecs" class="admin-label col-form-label col-form-label-sm">Specialer : </label>
-                                    @foreach (var specializaton in _specializations)
-                                    {
-                                        if (specializaton.CategoryId == Model.CategoryId)
+                            if (_category.Specializations != null && _category.Specializations.Any())
+                            {
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="regShowNewSpecs" class="admin-label col-form-label col-form-label-sm">Specialer : </label>
+                                        @foreach (var specializaton in _category.Specializations)
                                         {
                                             <p>@specializaton.Name</p>
                                             <span @onclick="@(mouseEvent => OnButtonClick_RemoveNewSpecialization(specializaton))">
@@ -75,9 +75,9 @@
                                             </span>
                                             <hr />
                                         }
-                                    }
+                                    </div>
                                 </div>
-                            </div>
+                            }
                         }
                     </div>
 
