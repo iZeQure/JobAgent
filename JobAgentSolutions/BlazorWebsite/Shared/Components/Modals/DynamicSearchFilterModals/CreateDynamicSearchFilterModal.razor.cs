@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
@@ -29,6 +30,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
 
         private string _errorMessage = "";
         private bool _isLoading = false;
+        private bool _hasSpecs = false;
 
         protected override async Task OnInitializedAsync()
         {
@@ -102,6 +104,21 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateDynamicSearchFilter");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{result.Id}"); 
+            }
+        }
+
+        private async Task OnChange_CheckCategorySpecializations(ChangeEventArgs e)
+        {
+            _dynamicSearchFilterModel.CategoryId = int.Parse(e.Value.ToString());
+            ICategory category = await CategoryService.GetCategoryWithSpecializationsById(_dynamicSearchFilterModel.CategoryId);
+
+            if (category.Specializations.Any())
+            {
+                _hasSpecs = true;
+            }
+            else
+            {
+                _hasSpecs = false;
             }
         }
 

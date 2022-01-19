@@ -14,7 +14,6 @@ namespace JobAgentClassLibrary.Common.Categories
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly ISpecializationRepository _specializationRepository;
-        private readonly CategoryEntityFactory _factory;
         private readonly ILogService _logService;
 
         public CategoryService(ICategoryRepository categoryRepository, ISpecializationRepository specializationRepository, ILogService logService)

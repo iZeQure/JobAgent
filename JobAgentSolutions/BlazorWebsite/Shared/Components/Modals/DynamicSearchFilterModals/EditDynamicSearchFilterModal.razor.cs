@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
@@ -26,6 +27,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
 
         private string _errorMessage = "";
         private bool _isLoading = false;
+        private bool _hasSpecs;
 
         protected override async Task OnInitializedAsync()
         {
@@ -38,13 +40,15 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
 
             try
             {
-                var companyTask = CategoryService.GetCategoriesAsync();
+                var categoryTask = CategoryService.GetCategoriesAsync();
                 var specializationTask = CategoryService.GetSpecializationsAsync();
 
-                await Task.WhenAll(companyTask, specializationTask);
+                await Task.WhenAll(categoryTask, specializationTask);
 
-                _categories = companyTask.Result;
+                _categories = categoryTask.Result;
                 _specializations = specializationTask.Result;
+
+                await DetermineIfAnySpezializations();
             }
             catch (Exception ex)
             {
@@ -87,6 +91,26 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditDynamicSearchFilter");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
+            }
+        }
+
+        private async Task OnChange_CheckCategorySpecializations(ChangeEventArgs e)
+        {
+            Model.CategoryId = int.Parse(e.Value.ToString());
+            await DetermineIfAnySpezializations();
+        }
+
+        private async Task DetermineIfAnySpezializations()
+        {
+            ICategory category = await CategoryService.GetCategoryWithSpecializationsById(Model.CategoryId);
+
+            if (category.Specializations.Any())
+            {
+                _hasSpecs = true;
+            }
+            else
+            {
+                _hasSpecs = false;
             }
         }
 

@@ -26,7 +26,7 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col">
-                                <label for="regInputKey" class="admin-label col-form-label col-form-label-sm">Søgeordet : </label>
+                                <label for="regInputKey" class="admin-label col-form-label col-form-label-sm">Søgeordet: </label>
                                 <input id="regInputKey" class="form-control form-control-sm" type="text" @bind="Model.Key" placeholder="Eksempel : Programmering" />
                                 <ValidationMessage For="@(() => Model.Key)" />
 
@@ -38,14 +38,14 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="regInputCategory" class="admin-label col-form-label col-form-label-sm">Kategori</label>
+                                <label for="regInputCategory" class="admin-label col-form-label col-form-label-sm">Kategori:</label>
                                 @if (_categories == null || !_categories.Any())
                                 {
                                     <label class="col-form-label">Kunne ikke hente kategorier eller er igang med at indlæse data...</label>
                                 }
                                 else
                                 {
-                                    <select id="regInputCategory" class="form-control form-control-sm" type="text" @bind="Model.CategoryId">
+                                    <select id="regInputCategory" class="form-control form-control-sm" type="text" value="@Model.CategoryId" @onchange="OnChange_CheckCategorySpecializations">
                                         <option value="0" selected>---Vælg en kategori som passer til søgeordet---</option>
                                         @foreach (var category in _categories)
                                         {
@@ -63,29 +63,21 @@
                         <div class="row">
                             <div class="col">
 
-                                @if (Model.CategoryId == 0)
-                                { }
-                                else
+                                @if (_hasSpecs)
                                 {
-                                    <label for="regInputSpecialization" class="admin-label col-form-label col-form-label-sm">Underkategori</label>
-                                    @if (_specializations == null || !_specializations.Any())
-                                    {
-                                        <label class="col-form-label">Kunne ikke hente underkategorier eller er igang med at indlæse data...</label>
-                                    }
-                                    else
-                                    {
-                                        <select id="regInputSpecialization" class="form-control form-control-sm" type="text" @bind="Model.Specializationid">
+                                    <label for="regInputSpecialization" class="admin-label col-form-label col-form-label-sm">Specialer</label>
 
-                                            <option value="0" selected>---Vælg en underkategori som passer til søgeordet---</option>
-                                            @foreach (var specialization in _specializations)
+                                    <select id="regInputSpecialization" class="form-control form-control-sm" type="text" @bind="Model.Specializationid">
+
+                                        <option value="0" selected>---Vælg en underkategori som passer til søgeordet---</option>
+                                        @foreach (var specialization in _specializations)
+                                        {
+                                            if (specialization.CategoryId == Model.CategoryId)
                                             {
-                                                if (specialization.CategoryId == Model.CategoryId)
-                                                {
-                                                    <option value="@specialization.Id">@specialization.Name</option>
-                                                }
+                                                <option value="@specialization.Id">@specialization.Name</option>
                                             }
-                                        </select>
-                                    }
+                                        }
+                                    </select>
                                     <ValidationMessage For="@(() => Model.Specializationid)" />
                                 }
 
