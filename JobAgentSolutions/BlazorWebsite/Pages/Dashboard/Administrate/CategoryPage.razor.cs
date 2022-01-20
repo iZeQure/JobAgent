@@ -12,7 +12,6 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
     partial class CategoryPage
     {
         [Inject] protected ICategoryService CategoryService { get; set; }
-        [Inject] protected PaginationService PaginationService { get; set; }
 
         private CategoryModel _categoryModel = new();
         private IEnumerable<ICategory> _categories;

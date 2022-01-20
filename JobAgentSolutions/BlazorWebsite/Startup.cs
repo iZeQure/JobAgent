@@ -59,7 +59,7 @@ namespace BlazorWebsite
 
             /* Service Injections */
             services.AddEntityServices();
-            services.AddTransient<PaginationService>();
+            services.AddScoped<PaginationService>();
 
 
             /* Access Injections */

@@ -72,19 +72,7 @@ else
                 </tbody>
             </table>
         </div>
-
-        <nav aria-label="Page Navigation">
-            <ul class="pagination justify-content-center">
-                @for (int i = 1; i <= PaginationService.MaxPages; i++)
-                {
-                    var pageNumber = i;
-
-                    <li class="@(i == PaginationService.CurrentPage ? "page-item active" : "page-item")">
-                        <a class="page-link" href="@NavigationManager.Uri" @onclick="@(() => PaginationService.ChangePage(pageNumber))">@(i)</a>
-                    </li>
-                }
-            </ul>
-        </nav>
+        <Paging/>
     }
 
     <EditUserAccessModal Model="_userModel" Roles="_roles" Locations="_locations" />

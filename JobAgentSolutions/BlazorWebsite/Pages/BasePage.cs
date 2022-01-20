@@ -20,14 +20,20 @@ namespace BlazorWebsite.Pages
             if (firstRender)
             {
                 RefreshProvider.RefreshRequest += RefreshContent;
+                PaginationService.OnPageChange += OnPageChange_RenderPage;
             }
+        }
+        public async Task OnPageChange_RenderPage()
+        {
+            await InvokeAsync(StateHasChanged);
         }
 
         public abstract Task RefreshContent();
 
-        public void Dispose()
+        public virtual void Dispose()
         {
-            RefreshProvider.RefreshRequest -= RefreshContent;
+            RefreshProvider.RefreshRequest -= RefreshContent; 
+            PaginationService.OnPageChange -= OnPageChange_RenderPage;
         }
     }
 }

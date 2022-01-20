@@ -2,14 +2,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BlazorWebsite.Data.Services
 {
     public class PaginationService : ComponentBase
     {
+        public event Func<Task> OnPageChange;
+
         public int CurrentPage { get; set; } = 1;
 
-        public int PageSize { get; set; } = 10;
+        public int PageSize { get; set; } = 25;
 
         public int TotalItems { get; set; }
 
@@ -52,6 +55,8 @@ namespace BlazorWebsite.Data.Services
             }
 
             CurrentPage = page;
+
+            OnPageChange?.Invoke();
         }
 
         public void ResetDefaults()
