@@ -9,10 +9,23 @@ namespace BlazorWebsite.Data.Services
     public class PaginationService : ComponentBase
     {
         public event Func<Task> OnPageChange;
+        public event Func<Task> OnPageSizeChange;
+        private int _pageSize = 25;
+        private int _currentPage = 1;
 
-        public int CurrentPage { get; set; } = 1;
+        public int CurrentPage { get => _currentPage; set { _currentPage = value; OnPageChange?.Invoke(); } }
 
-        public int PageSize { get; set; } = 25;
+        public int PageSize
+        {
+            get => _pageSize;
+
+            set
+            {
+                _currentPage = 1;
+                _pageSize = value;
+                OnPageSizeChange?.Invoke();
+            }
+        }
 
         public int TotalItems { get; set; }
 
@@ -23,7 +36,7 @@ namespace BlazorWebsite.Data.Services
         {
             if (data is null) return 0;
 
-            double smallestValue = Math.Ceiling(data.Count() / (double)PageSize);
+            double smallestValue = Math.Ceiling(data.Count() / (double)_pageSize);
 
             return Convert.ToInt32(smallestValue);
         }
@@ -32,31 +45,30 @@ namespace BlazorWebsite.Data.Services
         {
             TotalItems = data.Count();
             MaxPages = PageCount(data);
-            int start = (CurrentPage - 1) * PageSize;
+            int start = (_currentPage - 1) * _pageSize;
 
             IEnumerable<TPagingModel> paginatedResults =
                 data.Skip(start)
-                    .Take(PageSize);
+                    .Take(_pageSize);
 
             return paginatedResults;
         }
 
         public void ChangePage(int page = 1)
         {
-            if(CurrentPage < 1)
+            if (_currentPage < 1)
             {
                 CurrentPage = 1;
                 return;
             }
 
-            if(CurrentPage >= MaxPages)
+            if (_currentPage > MaxPages)
             {
-
+                CurrentPage = MaxPages;
+                return;
             }
 
             CurrentPage = page;
-
-            OnPageChange?.Invoke();
         }
 
         public void ResetDefaults()

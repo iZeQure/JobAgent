@@ -21,9 +21,16 @@ namespace BlazorWebsite.Pages
             {
                 RefreshProvider.RefreshRequest += RefreshContent;
                 PaginationService.OnPageChange += OnPageChange_RenderPage;
+                PaginationService.OnPageSizeChange += OnPageSizeChange_RenderPage;
             }
         }
+
         public async Task OnPageChange_RenderPage()
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+
+        public async Task OnPageSizeChange_RenderPage()
         {
             await InvokeAsync(StateHasChanged);
         }
@@ -34,6 +41,7 @@ namespace BlazorWebsite.Pages
         {
             RefreshProvider.RefreshRequest -= RefreshContent; 
             PaginationService.OnPageChange -= OnPageChange_RenderPage;
+            PaginationService.OnPageSizeChange -= OnPageSizeChange_RenderPage;
         }
     }
 }
