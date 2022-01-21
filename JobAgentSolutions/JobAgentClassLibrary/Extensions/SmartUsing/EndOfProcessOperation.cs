@@ -15,7 +15,6 @@ namespace JobAgentClassLibrary.Extensions.SmartUsing
         public void Dispose()
         {
             _model.IsProcessing = !_model.IsProcessing;
-            Console.WriteLine(_model.IsProcessing);
         }
     }
 }

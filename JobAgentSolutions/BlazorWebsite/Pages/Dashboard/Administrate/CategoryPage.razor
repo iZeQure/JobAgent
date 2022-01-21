@@ -22,13 +22,14 @@
                 Opret ny Uddannelse
             </a>
         }
-
     </div>
 </div>
 
 @if (dataIsLoading)
 {
-    <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="dataIsLoading" Message="Indlæser uddannelser.." />
+    Message = "Indlæser Uddannelser...";
+    @*<MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="dataIsLoading" Message="Indlæser uddannelser.." />*@
+    <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="dataIsLoading" Message="@Message" />
 }
 else
 {

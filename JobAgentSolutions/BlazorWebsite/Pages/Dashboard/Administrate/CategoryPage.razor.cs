@@ -1,4 +1,5 @@
 ﻿using BlazorWebsite.Data.FormModels;
+using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Categories;
 using JobAgentClassLibrary.Common.Categories.Entities;
 using Microsoft.AspNetCore.Components;
@@ -11,7 +12,6 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
     partial class CategoryPage
     {
         [Inject] protected ICategoryService CategoryService { get; set; }
-
         private CategoryModel _categoryModel = new();
         private IEnumerable<ICategory> _categories;
         private IEnumerable<ISpecialization> _specializations;

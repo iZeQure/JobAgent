@@ -67,7 +67,7 @@ namespace BlazorWebsite
 
 
             /* Provider Injections */
-            services.AddTransient<IMessageClearProvider, MessageClearProvider>();
+            services.AddTransient<MessageClearProvider>();
             services.AddScoped<IRefreshProvider, RefreshProvider>();
             services.AddScoped<MyAuthStateProvider>();
             services.AddScoped<AuthenticationStateProvider>(provider =>

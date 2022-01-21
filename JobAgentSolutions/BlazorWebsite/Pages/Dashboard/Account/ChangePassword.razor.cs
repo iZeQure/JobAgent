@@ -14,7 +14,7 @@ namespace BlazorWebsite.Pages.Dashboard.Account
     public partial class ChangePassword
     {
         [CascadingParameter] private Task<AuthenticationState> AuthState { get; set; }
-        [Inject] protected IMessageClearProvider MessageClearProvider { get; set; }
+        [Inject] protected MessageClearProvider MessageClearProvider { get; set; }
         [Inject] public IUserService UserService { get; set; }
 
         private AlertType alertType;

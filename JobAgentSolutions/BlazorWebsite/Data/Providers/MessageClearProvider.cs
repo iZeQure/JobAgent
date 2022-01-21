@@ -1,19 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 
 namespace BlazorWebsite.Data.Providers
 {
-    public class MessageClearProvider : IMessageClearProvider
+    public class MessageClearProvider
     {
-        public Task ClearMessageOnIntervalAsync(string message, int milliseconds = 3000)
-        {
-            var x = Task.Delay(milliseconds)
-                .ContinueWith(x =>
-                {
-                    message = string.Empty;
-                    return x.IsCompleted;
-                });
-
-            return x;
-        }
+        public event EventHandler<bool> MessageCleared;
     }
 }
