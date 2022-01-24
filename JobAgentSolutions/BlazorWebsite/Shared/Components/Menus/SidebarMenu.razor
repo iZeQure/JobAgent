@@ -100,23 +100,23 @@ AdminContext.User.IsInRole("Udvikler"))
                     </NavLink>
                 </li>
 
-                <li class="nav-item">
+                @*<li class="nav-item">
                     <NavLink class="nav-link" href="/admin/robot/settings/dynamic/search-filter">
                         <span><i class="fas fa-sort-amount-down-alt"></i></span>
                         Dynamisk Søge Filter
                     </NavLink>
-                </li>
+                </li>*@
             }
 
             @if (AdminContext.User.IsInRole("System Administrator") ||
 AdminContext.User.IsInRole("Udvikler"))
             {
-                <li class="nav-item">
+                @*<li class="nav-item">
                     <NavLink class="nav-link" href="/admin/robot/settings/static/search-filter">
                         <span><i class="fas fa-filter"></i></span>
                         Statisk Søge Filter
                     </NavLink>
-                </li>
+                </li>*@
             }
         </ul>
 

@@ -28,14 +28,15 @@
 
 @if (dataIsLoading)
 {
-    <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="dataIsLoading" Message="Indlæser logs.." />
+    Message = "Indlæser Logs...";
+    <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="dataIsLoading" Message="@Message" />
 }
 else
 {
     @if (_logs == null)
     {
-        <MessageAlert Alert="MessageAlert.AlertType.Info"
-              Message="Indlæser robot links.." IsLoading="true" />
+        Message = "Indlæser Logs...";
+        <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="dataIsLoading" Message="@Message" />
     }
     else
     {
@@ -74,17 +75,17 @@ else
                                 <td>@(log.CreatedBy)</td>
                                 <td>@(log.CreatedDateTime)</td>
 
-                                <td>
+                                @*<td>
                                     <span data-bs-toggle="modal" data-bs-target="#ModalEditDbLog" @onclick="@(mouseEvent => OnClick_EditLink(log.Id))">
-                                        <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne jobside." Color="Popover.PopoverType.Info" />
+                                    <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne jobside." Color="Popover.PopoverType.Info" />
                                     </span>
-                                </td>
+                                    </td>
 
-                                <td>
+                                    <td>
                                     <span data-bs-toggle="modal" data-bs-target="#ModalRemoveDbLog" @onclick="@(mouseEvent => ConfirmationWindow(log.Id))">
-                                        <Popover Title="Forsigtig!" Body="Denne knap sletter den valgte jobside, forevigt!" Color="Popover.PopoverType.Danger" />
+                                    <Popover Title="Forsigtig!" Body="Denne knap sletter den valgte jobside, forevigt!" Color="Popover.PopoverType.Danger" />
                                     </span>
-                                </td>
+                                    </td>*@
 
                             </tr>
                         }
