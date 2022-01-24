@@ -3,7 +3,6 @@ using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Core.Entities;
 using JobAgentClassLibrary.Loggings;
 using JobAgentClassLibrary.Loggings.Entities;
-using JobAgentClassLibrary.Security.Providers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
@@ -23,12 +22,12 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
         [Inject] protected ILogService LogService { get; set; }
 
         private LogModel _logModel = new();
-        private List<LogSeverity> _logSeverities = new();
-        private List<LogType> _logTypes = new();
+        private readonly List<LogSeverity> _logSeverities = new();
+        private readonly List<LogType> _logTypes = new();
         private EditContext _editContext;
 
         private string _errorMessage = "";
-        private bool _isLoading = false;
+        private readonly bool _isLoading = false;
         private bool _isProcessing = false;
         private string _sessionUserEmail;
 
