@@ -5,6 +5,9 @@ using JobAgentClassLibrary.Common.Categories.Repositories;
 using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Factory;
 using JobAgentClassLibrary.Common.Companies.Repositories;
+using JobAgentClassLibrary.Common.Filters;
+using JobAgentClassLibrary.Common.Filters.Factory;
+using JobAgentClassLibrary.Common.Filters.Repositories;
 using JobAgentClassLibrary.Common.JobAdverts;
 using JobAgentClassLibrary.Common.JobAdverts.Factory;
 using JobAgentClassLibrary.Common.JobAdverts.Repositories;
@@ -55,8 +58,8 @@ namespace WebCrawler
 
         private static void BuildConfiguration(string envName, IConfigurationBuilder configuration) =>
           configuration
-              .AddJsonFile("appsettings.json")
-              .AddJsonFile($"appsettings.{envName ?? "Production"}.json", optional: true)
+              //.AddJsonFile("appsettings.json")
+              //.AddJsonFile($"appsettings.{envName ?? "Production"}.json", optional: true)
               .AddUserSecrets<Program>()
               .AddEnvironmentVariables();
 
@@ -75,22 +78,27 @@ namespace WebCrawler
             services.AddSingleton<VacantJobEntityFactory>();
             services.AddSingleton<CompanyEntityFactory>();
             services.AddSingleton<CategoryEntityFactory>();
+            services.AddSingleton<DynamicSearchFilterEntityFactory>();
 
+            //------------------- Repositories
             services.AddScoped<IJobAdvertRepository, JobAdvertRepository>();
             services.AddScoped<IJobPageRepository, JobPageRepository>();
             services.AddScoped<IVacantJobRepository, VacantJobRepository>();
             services.AddScoped<ICompanyRepository, CompanyRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<ISpecializationRepository, SpecializationRepository>();
+            services.AddScoped<IDynamicSearchFilterRepository, DynamicSearchFilterRepository>();
 
+            //------------------- Services 
             services.AddScoped<IJobAdvertService, JobAdvertService>();
             services.AddScoped<IJobPageService, JobPageService>();
             services.AddScoped<IVacantJobService, VacantJobService>();
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IDynamicSearchFilterService, DynamicSearchFilterService>();
 
+            //------------------- Crawler
             services.AddSingleton<IWebDriver, ChromeDriver>();
-
             services.AddSingleton<CrawlerDriver>();
             services.AddSingleton<UrlCutter>();
             services.AddSingleton<CrawlerManager>();
