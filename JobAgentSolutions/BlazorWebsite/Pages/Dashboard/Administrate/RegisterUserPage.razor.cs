@@ -39,10 +39,10 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             _locations = new List<ILocation>();
             _regAccModel = new();
 
-            await LoadInformation();
+            await LoadInformationAsync();
         }
 
-        private async Task LoadInformation()
+        private async Task LoadInformationAsync()
         {
             errorOcurred = false;
             dataIsLoading = true;
@@ -63,7 +63,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             }
         }
 
-        private async Task OnValidSubmit_RegisterAccountAsync()
+        private async Task OnValidSubmit_RegisterAccountAsyncAsync()
         {
             ClearMessages();
 
@@ -138,7 +138,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             }
         }
 
-        private async Task OnEmailFocusOut_CheckForExistence(FocusEventArgs e)
+        private async Task OnEmailFocusOut_CheckForExistenceAsync(FocusEventArgs e)
         {
             try
             {

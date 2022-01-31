@@ -66,7 +66,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
             }
         }
 
-        private async Task OnValidSubmit_EditLog()
+        private async Task OnValidSubmit_EditLogAsync()
         {
             if (Model.IsProcessing is true)
             {

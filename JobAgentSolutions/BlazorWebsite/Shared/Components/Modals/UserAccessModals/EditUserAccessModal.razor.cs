@@ -61,7 +61,7 @@ namespace BlazorWebsite.Shared.Components.Modals.UserAccessModals
             }
         }
 
-        private async Task OnValidSubmit_EditUser()
+        private async Task OnValidSubmit_EditUserAsync()
         {
             if (Model.IsProcessing is true)
             {

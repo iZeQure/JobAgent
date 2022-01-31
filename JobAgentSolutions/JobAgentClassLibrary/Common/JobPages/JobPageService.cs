@@ -63,7 +63,7 @@ namespace JobAgentClassLibrary.Common.JobPages
         {
             try
             {
-                return await _jobPageRepository.GetAllAsync();
+                return await _jobPageRepository.GetAllSystemLogsAsync();
             }
             catch (Exception ex)
             {

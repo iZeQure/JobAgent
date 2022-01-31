@@ -43,7 +43,7 @@ namespace JobAgentClassLibrary.Common.Locations.Repositories
             return null;
         }
 
-        public async Task<List<ILocation>> GetAllAsync()
+        public async Task<List<ILocation>> GetAllSystemLogsAsync()
         {
             List<ILocation> locations = new();
 

@@ -23,10 +23,10 @@ namespace BlazorWebsite.Pages.Dashboard.SystemSettings
         {
             RefreshProvider.RefreshRequest += RefreshContent;
 
-            await LoadData();
+            await LoadDataAsync();
         }
 
-        private async Task LoadData()
+        private async Task LoadDataAsync()
         {
             dataIsLoading = true;
             try

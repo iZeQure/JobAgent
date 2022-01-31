@@ -74,7 +74,7 @@ else
                                 }
 
                                 <td>
-                                    <span data-bs-toggle="modal" data-bs-target="#ModalEditDynamicSearchFilter" @onclick="@(mouseEvent => OnClick_EditLink(dynamicSearchFilter.Id))">
+                                    <span data-bs-toggle="modal" data-bs-target="#ModalEditDynamicSearchFilter" @onclick="@(mouseEvent => OnClick_EditLinkAsync(dynamicSearchFilter.Id))">
                                         <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette søgeord." Color="Popover.PopoverType.Info" />
                                     </span>
                                 </td>

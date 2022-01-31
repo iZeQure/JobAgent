@@ -37,10 +37,10 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
             _editContext = new(_vacantJobModel);
             _editContext.AddDataAnnotationsValidation();
 
-            await LoadModalInformation();
+            await LoadModalInformationAsync();
         }
 
-        private async Task LoadModalInformation()
+        private async Task LoadModalInformationAsync()
         {
             _isLoading = true;
 

@@ -48,7 +48,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
             return null;
         }
 
-        public async Task<List<IStaticSearchFilter>> GetAllAsync()
+        public async Task<List<IStaticSearchFilter>> GetAllSystemLogsAsync()
         {
             List<IStaticSearchFilter> staticSearchFilters = new();
 

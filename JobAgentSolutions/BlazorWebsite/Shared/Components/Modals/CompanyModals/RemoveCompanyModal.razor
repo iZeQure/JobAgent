@@ -16,7 +16,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-info" data-bs-dismiss="modal" @onclick="CancelRequest">Annuller</button>
-                    <button type="button" class="btn btn-danger" @onclick="@(() => OnClick_RemoveCompany(CompanyId))" disabled="@_isProcessing">Slet Virksomhed</button>
+                    <button type="button" class="btn btn-danger" @onclick="@(() => OnClick_RemoveCompanyAsync(CompanyId))" disabled="@_isProcessing">Slet Virksomhed</button>
                 </div>
             }
         </div>

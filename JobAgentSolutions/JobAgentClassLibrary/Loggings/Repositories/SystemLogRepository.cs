@@ -47,7 +47,7 @@ namespace JobAgentClassLibrary.Loggings.Repositories
             return null;
         }
 
-        public async Task<List<ILog>> GetAllAsync()
+        public async Task<List<ILog>> GetAllSystemLogsAsync()
         {
             List<ILog> logs = new();
 

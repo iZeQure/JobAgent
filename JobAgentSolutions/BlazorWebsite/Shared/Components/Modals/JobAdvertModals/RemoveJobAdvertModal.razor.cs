@@ -18,7 +18,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
         private string _errorMessage = "";
         private bool _isProcessing = false;
 
-        private async Task OnClick_RemoveJobAdvert(int id)
+        private async Task OnClick_RemoveJobAdvertAsync(int id)
         {
             try
             {

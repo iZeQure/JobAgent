@@ -19,7 +19,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
         private bool _showError = false;
         private string _errorMessage = string.Empty;
 
-        private async Task OnValidSubmit_UpdateCompany()
+        private async Task OnValidSubmit_UpdateCompanyAsync()
         {
             if (Model.IsProcessing is true)
             {

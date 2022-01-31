@@ -34,15 +34,15 @@ namespace BlazorWebsite.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            await LoadData();
+            await LoadDataAsync();
         }
 
         protected override async Task OnParametersSetAsync()
         {
-            await LoadData();
+            await LoadDataAsync();
         }
 
-        private async Task LoadData()
+        private async Task LoadDataAsync()
         {
             _isLoadingData = true;
             try

@@ -76,7 +76,7 @@ namespace BlazorWebsite.Pages.Dashboard.Account
                     _hasValidSession = false;
                 }
 
-                await LoadingData();
+                await LoadingDataAsync();
             }
             finally
             {
@@ -84,7 +84,7 @@ namespace BlazorWebsite.Pages.Dashboard.Account
             }
         }
 
-        private async Task LoadingData()
+        private async Task LoadingDataAsync()
         {
             if (!string.IsNullOrEmpty(_sessionUserEmail))
             {
@@ -127,7 +127,7 @@ namespace BlazorWebsite.Pages.Dashboard.Account
             }
         }
 
-        private async Task OnValidSubmit_ChangeUserInformation()
+        private async Task OnValidSubmit_ChangeUserInformationAsync()
         {
             Console.WriteLine($"Form Submitted");
 

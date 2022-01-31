@@ -37,10 +37,10 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
             _editContext = new(_dynamicSearchFilterModel);
             _editContext.AddDataAnnotationsValidation();
 
-            await LoadModalInformation();
+            await LoadModalInformationAsync();
         }
 
-        private async Task LoadModalInformation()
+        private async Task LoadModalInformationAsync()
         {
             _isLoading = true;
 
@@ -72,7 +72,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
             }
         }
 
-        private async Task OnValidSubmit_CreateDynamicSearchFilter()
+        private async Task OnValidSubmit_CreateDynamicSearchFilterAsync()
         {
             if (_dynamicSearchFilterModel.IsProcessing is true)
             {
@@ -107,7 +107,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
             }
         }
 
-        private async Task OnChange_CheckCategorySpecializations(ChangeEventArgs e)
+        private async Task OnChange_CheckCategorySpecializationsAsync(ChangeEventArgs e)
         {
             _dynamicSearchFilterModel.CategoryId = int.Parse(e.Value.ToString());
             ICategory category = await CategoryService.GetCategoryWithSpecializationsById(_dynamicSearchFilterModel.CategoryId);

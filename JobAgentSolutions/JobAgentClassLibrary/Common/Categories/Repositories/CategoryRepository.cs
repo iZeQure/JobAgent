@@ -42,7 +42,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
             return null;
         }
 
-        public async Task<List<ICategory>> GetAllAsync()
+        public async Task<List<ICategory>> GetAllSystemLogsAsync()
         {
             List<ICategory> categories = new();
 

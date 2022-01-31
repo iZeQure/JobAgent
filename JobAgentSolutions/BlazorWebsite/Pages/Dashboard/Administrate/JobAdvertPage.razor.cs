@@ -75,7 +75,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             finally { StateHasChanged(); }
         }
 
-        public async Task OnButtonClick_EditJobAdvert_LoadJobAdvertDetails(int id)
+        public async Task OnButtonClick_EditJobAdvert_LoadJobAdvertDetailsAsync(int id)
         {
             var details = await JobAdvertService.GetByIdAsync(id);
 
@@ -95,7 +95,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             _advertId = id;
         }
 
-        public async Task FilterJobAdverts()
+        public async Task FilterJobAdvertsAsync()
         {
             _jobAdverts = (await JobAdvertService.GetJobAdvertsAsync())
                 .Where(j => j.CategoryId == _categoryId)
@@ -105,7 +105,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             _filteredContentFound = _jobAdverts.Any();
         }
 
-        public async Task ClearFilteredContent()
+        public async Task ClearFilteredContentAsync()
         {
             _categoryId = 0;
             PaginationService.ResetDefaults();

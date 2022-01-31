@@ -45,7 +45,7 @@ namespace JobAgentClassLibrary.Common.Companies
         {
             try
             {
-                return await _repository.GetAllAsync();
+                return await _repository.GetAllSystemLogsAsync();
             }
             catch (Exception ex)
             {

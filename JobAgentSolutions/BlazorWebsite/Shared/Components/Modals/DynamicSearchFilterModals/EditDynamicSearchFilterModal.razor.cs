@@ -48,7 +48,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
                 _categories = categoryTask.Result;
                 _specializations = specializationTask.Result;
 
-                await DetermineIfAnySpezializations();
+                await DetermineIfAnySpezializationsAsync();
             }
             catch (Exception ex)
             {
@@ -61,7 +61,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
             }
         }
 
-        private async Task OnValidSubmit_EditDynamicSearchFilter()
+        private async Task OnValidSubmit_EditDynamicSearchFilterAsync()
         {
             if (Model.IsProcessing is true)
             {
@@ -94,13 +94,13 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
             }
         }
 
-        private async Task OnChange_CheckCategorySpecializations(ChangeEventArgs e)
+        private async Task OnChange_CheckCategorySpecializationsAsync(ChangeEventArgs e)
         {
             Model.CategoryId = int.Parse(e.Value.ToString());
-            await DetermineIfAnySpezializations();
+            await DetermineIfAnySpezializationsAsync();
         }
 
-        private async Task DetermineIfAnySpezializations()
+        private async Task DetermineIfAnySpezializationsAsync()
         {
             ICategory category = await CategoryService.GetCategoryWithSpecializationsById(Model.CategoryId);
 

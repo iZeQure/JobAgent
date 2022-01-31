@@ -18,7 +18,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
         private string _errorMessage = "";
         private bool _isProcessing = false;
 
-        private async Task OnClick_RemoveCategory(int id)
+        private async Task OnClick_RemoveCategoryAsync(int id)
         {
             try
             {

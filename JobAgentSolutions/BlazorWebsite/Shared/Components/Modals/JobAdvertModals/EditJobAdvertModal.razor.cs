@@ -71,7 +71,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
             }
         }
 
-        private async Task OnValidSubmit_EditJobAdvert()
+        private async Task OnValidSubmit_EditJobAdvertAsync()
         {
             if (Model.IsProcessing is true)
             {

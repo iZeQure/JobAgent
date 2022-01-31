@@ -22,7 +22,7 @@ namespace BlazorWebsite.Shared.Components.Modals.UserAccessModals
         private string _sessionUserEmail;
 
 
-        private async Task OnClick_RemoveJobPage(int id)
+        private async Task OnClick_RemoveJobPageAsync(int id)
         {
             try
             {

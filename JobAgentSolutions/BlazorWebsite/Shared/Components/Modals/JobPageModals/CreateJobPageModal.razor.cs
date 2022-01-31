@@ -37,10 +37,10 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
             _editContext = new(_jobPageModel);
             _editContext.AddDataAnnotationsValidation();
 
-            await LoadModalInformation();
+            await LoadModalInformationAsync();
         }
 
-        private async Task LoadModalInformation()
+        private async Task LoadModalInformationAsync()
         {
             _isLoading = true;
 
@@ -72,7 +72,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
             }
         }
 
-        private async Task OnValidSubmit_CreateJobPage()
+        private async Task OnValidSubmit_CreateJobPageAsync()
         {
             if (_jobPageModel.IsProcessing is true)
             {

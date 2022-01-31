@@ -18,8 +18,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
         private string _errorMessage = "";
         private bool _isProcessing = false;
 
-        private async Task OnClick_RemoveLog
-            (int id)
+        private async Task OnClick_RemoveLogAsync(int id)
         {
             try
             {

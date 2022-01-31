@@ -33,10 +33,10 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
             _editContext = new(_staticSearchFilterModel);
             _editContext.AddDataAnnotationsValidation();
 
-            await LoadModalInformation();
+            await LoadModalInformationAsync();
         }
 
-        private async Task LoadModalInformation()
+        private async Task LoadModalInformationAsync()
         {
             _isLoading = true;
 
@@ -56,7 +56,7 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
             }
         }
 
-        private async Task OnValidSubmit_CreateStaticSearchFilter()
+        private async Task OnValidSubmit_CreateStaticSearchFilterAsync()
         {
             try
             {

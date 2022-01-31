@@ -53,7 +53,7 @@ namespace BlazorWebsite.Pages.Dashboard.Account
         }
 
 
-        private async Task OnValidSubmit_ChangeUserPassword()
+        private async Task OnValidSubmit_ChangeUserPasswordAsync()
         {
             try
             {

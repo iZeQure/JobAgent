@@ -75,7 +75,7 @@ else
                                 <td>@(jobPage.URL)</td>
 
                                 <td>
-                                    <span data-bs-toggle="modal" data-bs-target="#ModalEditJobPage" @onclick="@(mouseEvent => OnClick_EditLink(jobPage.Id))">
+                                    <span data-bs-toggle="modal" data-bs-target="#ModalEditJobPage" @onclick="@(mouseEvent => OnClick_EditLinkAsync(jobPage.Id))">
                                         <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne jobside." Color="Popover.PopoverType.Info" />
                                     </span>
                                 </td>

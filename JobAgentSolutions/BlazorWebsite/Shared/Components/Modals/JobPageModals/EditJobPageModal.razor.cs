@@ -56,7 +56,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
             }
         }
 
-        private async Task OnValidSubmit_EditJobVacancy()
+        private async Task OnValidSubmit_EditJobVacancyAsync()
         {
             if (Model.IsProcessing is true)
             {

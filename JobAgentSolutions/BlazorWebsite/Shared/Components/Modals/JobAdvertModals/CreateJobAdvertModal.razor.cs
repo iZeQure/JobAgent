@@ -45,10 +45,10 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
             _editContext = new(_jobAdvertModel);
             _editContext.AddDataAnnotationsValidation();
 
-            await LoadModalInformation();
+            await LoadModalInformationAsync();
         }
 
-        private async Task LoadModalInformation()
+        private async Task LoadModalInformationAsync()
         {
             _isLoading = true;
 

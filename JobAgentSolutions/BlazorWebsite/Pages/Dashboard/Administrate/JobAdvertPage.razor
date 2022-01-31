@@ -65,8 +65,8 @@ else
         <section id="filterControls" class="mb-3">
             <div class="d-flex flex-row-reverse">
                 <div class="action">
-                    <button class="btn btn-sm btn-outline-info" @onclick="@(() => FilterJobAdverts())">Filtrér</button>
-                    <button class="btn btn-sm btn-outline-dark" @onclick="@(() => ClearFilteredContent())">Ryd Filtrering</button>
+                    <button class="btn btn-sm btn-outline-info" @onclick="@(() => FilterJobAdvertsAsync())">Filtrér</button>
+                    <button class="btn btn-sm btn-outline-dark" @onclick="@(() => ClearFilteredContentAsync())">Ryd Filtrering</button>
                 </div>
             </div>
         </section>
@@ -134,7 +134,7 @@ else
                                 </td>
 
                                 <td>
-                                    <span @onclick="(id => OnButtonClick_EditJobAdvert_LoadJobAdvertDetails(jobAdvert.Id))" data-bs-toggle="modal" data-bs-target="#ModalEditJobAdvert">
+                                    <span @onclick="(id => OnButtonClick_EditJobAdvert_LoadJobAdvertDetailsAsync(jobAdvert.Id))" data-bs-toggle="modal" data-bs-target="#ModalEditJobAdvert">
                                         <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette opslag." Color="Popover.PopoverType.Info" />
                                     </span>
                                 </td>

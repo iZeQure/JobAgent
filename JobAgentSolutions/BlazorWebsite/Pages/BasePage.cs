@@ -23,8 +23,8 @@ namespace BlazorWebsite.Pages
             if (firstRender)
             {
                 RefreshProvider.RefreshRequest += RefreshContent;
-                PaginationService.OnPageChange += OnPageChange_RenderPage;
-                PaginationService.OnPageSizeChange += OnPageSizeChange_RenderPage;
+                PaginationService.OnPageChange += OnPageChange_RenderPageAsync;
+                PaginationService.OnPageSizeChange += OnPageSizeChange_RenderPageAsync;
                 MessageClearProvider.MessageCleared += OnMessageCleared_ClearMessage;
             }
         }
@@ -34,12 +34,12 @@ namespace BlazorWebsite.Pages
             PaginationService.CurrentPage = 1;
         }
 
-        public async Task OnPageChange_RenderPage()
+        public async Task OnPageChange_RenderPageAsync()
         {
             await InvokeAsync(StateHasChanged);
         }
 
-        public async Task OnPageSizeChange_RenderPage()
+        public async Task OnPageSizeChange_RenderPageAsync()
         {
             await InvokeAsync(StateHasChanged);
         }
@@ -57,8 +57,8 @@ namespace BlazorWebsite.Pages
         public virtual void Dispose()
         {
             RefreshProvider.RefreshRequest -= RefreshContent;
-            PaginationService.OnPageChange -= OnPageChange_RenderPage;
-            PaginationService.OnPageSizeChange -= OnPageSizeChange_RenderPage;
+            PaginationService.OnPageChange -= OnPageChange_RenderPageAsync;
+            PaginationService.OnPageSizeChange -= OnPageSizeChange_RenderPageAsync;
             MessageClearProvider.MessageCleared -= OnMessageCleared_ClearMessage;
         }
     }

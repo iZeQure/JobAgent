@@ -48,7 +48,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
             }
         }
 
-        private async Task OnValidSubmit_EditCategory()
+        private async Task OnValidSubmit_EditCategoryAsync()
         {
             if (Model.IsProcessing is true)
             {
@@ -127,7 +127,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
             StateHasChanged();
         }
 
-        private async Task OnButtonClick_RemoveNewSpecialization(ISpecialization entity)
+        private async Task OnButtonClick_RemoveNewSpecializationAsync(ISpecialization entity)
         {
             try
             {

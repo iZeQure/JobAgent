@@ -30,7 +30,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
             return Task.CompletedTask;
         }
 
-        private async Task OnValidSubmit_CreateCompany()
+        private async Task OnValidSubmit_CreateCompanyAsync()
         {
             if (_companyModel.IsProcessing is true)
             {

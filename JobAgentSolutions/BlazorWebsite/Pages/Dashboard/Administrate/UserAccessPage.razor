@@ -60,7 +60,7 @@ else
                             }
 
                             <td>
-                                <span data-bs-toggle="modal" data-bs-target="#ModalEditUserAccess" @onclick="@(mouseEvent => OnClick_EditLink(user.Id))">
+                                <span data-bs-toggle="modal" data-bs-target="#ModalEditUserAccess" @onclick="@(mouseEvent => OnClick_EditLinkAsync(user.Id))">
                                     <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne bruger." Color="Popover.PopoverType.Info" />
                                 </span>
                             </td>

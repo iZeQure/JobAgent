@@ -51,7 +51,7 @@
                                 <th scope="row">@(company.Id)</th>
                                 <td>@(company.Name)</td>
                                 <td>
-                                    <span @onclick="(OnClickEvent => OnClick_OpenEditModal(company.Id))" data-bs-toggle="modal" data-bs-target="#ModalEditCompany">
+                                    <span @onclick="(OnClickEvent => OnClick_OpenEditModalAsync(company.Id))" data-bs-toggle="modal" data-bs-target="#ModalEditCompany">
                                         <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne virksomehd." Color="Popover.PopoverType.Info" />
                                     </span>
                                 </td>

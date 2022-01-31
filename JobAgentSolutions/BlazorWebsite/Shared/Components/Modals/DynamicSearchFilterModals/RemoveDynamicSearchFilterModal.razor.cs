@@ -18,7 +18,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
         private string _errorMessage = "";
         private bool _isProcessing = false;
 
-        private async Task OnClick_RemoveDynamicSearchFilter(int id)
+        private async Task OnClick_RemoveDynamicSearchFilterAsync(int id)
         {
             try
             {

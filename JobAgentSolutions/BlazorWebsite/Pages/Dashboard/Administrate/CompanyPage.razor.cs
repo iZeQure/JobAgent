@@ -23,10 +23,10 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
 
         protected override async Task OnInitializedAsync()
         {
-            await LoadData();
+            await LoadDataAsync();
         }
 
-        private async Task LoadData()
+        private async Task LoadDataAsync()
         {
             _isLoadingData = true;
             try
@@ -40,7 +40,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             }
         }
 
-        private async void OnClick_OpenEditModal(int id)
+        private async void OnClick_OpenEditModalAsync(int id)
         {
             try
             {

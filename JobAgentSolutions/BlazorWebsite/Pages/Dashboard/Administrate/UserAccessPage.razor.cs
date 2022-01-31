@@ -33,10 +33,10 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
         {
             RefreshProvider.RefreshRequest += RefreshContent;
 
-            await LoadData();
+            await LoadDataAsync();
         }
 
-        private async Task LoadData()
+        private async Task LoadDataAsync()
         {
             dataIsLoading = true;
             try
@@ -63,7 +63,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             _userId = id;
         }
 
-        private async Task OnClick_EditLink(int id)
+        private async Task OnClick_EditLinkAsync(int id)
         {
             try
             {

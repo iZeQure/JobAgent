@@ -19,7 +19,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
         private string _errorMessage = "";
         private bool _isProcessing = false;
 
-        private async Task OnClick_RemoveCompany(int id)
+        private async Task OnClick_RemoveCompanyAsync(int id)
         {
             try
             {

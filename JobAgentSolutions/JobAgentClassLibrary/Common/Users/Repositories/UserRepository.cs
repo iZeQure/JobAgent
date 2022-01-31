@@ -113,7 +113,7 @@ namespace JobAgentClassLibrary.Common.Users.Repositories
             return null;
         }
 
-        public async Task<List<IUser>> GetAllAsync()
+        public async Task<List<IUser>> GetAllSystemLogsAsync()
         {
             List<IUser> users = new();
 

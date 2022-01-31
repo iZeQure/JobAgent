@@ -18,7 +18,7 @@
 
     @if (!string.IsNullOrEmpty(_sessionUserEmail))
     {
-        <EditForm Model="_accountProfileModel" OnValidSubmit="OnValidSubmit_ChangeUserInformation" class="mb-3">
+        <EditForm Model="_accountProfileModel" OnValidSubmit="OnValidSubmit_ChangeUserInformationAsync" class="mb-3">
             <div class="row mb-3">
                 <div class="col">
                     <label for="inputEmail">Email Adresse:</label>

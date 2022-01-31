@@ -47,7 +47,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
             return null;
         }
 
-        public async Task<List<IJobAdvert>> GetAllAsync()
+        public async Task<List<IJobAdvert>> GetAllSystemLogsAsync()
         {
             List<IJobAdvert> jobAdverts = new();
 

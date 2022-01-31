@@ -31,7 +31,7 @@ namespace JobAgentClassLibrary.Loggings
 
         public async Task<List<ILog>> GetAllSystemLogsAsync()
         {
-            return await _repository.GetAllAsync();
+            return await _repository.GetAllSystemLogsAsync();
         }
 
         public async Task<ILog> GetByIdAsync(int id)

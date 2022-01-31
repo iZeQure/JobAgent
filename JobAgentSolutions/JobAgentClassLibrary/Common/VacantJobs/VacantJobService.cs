@@ -35,7 +35,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs
         {
             try
             {
-                return await _repository.GetAllAsync();
+                return await _repository.GetAllSystemLogsAsync();
             }
             catch (System.Exception ex)
             {

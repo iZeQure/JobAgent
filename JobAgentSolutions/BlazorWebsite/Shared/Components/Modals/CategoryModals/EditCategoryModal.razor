@@ -17,7 +17,7 @@
             }
             else
             {
-                <EditForm Model="Model" OnValidSubmit="OnValidSubmit_EditCategory">
+                <EditForm Model="Model" OnValidSubmit="OnValidSubmit_EditCategoryAsync">
 
                     <div class="modal-header">
                         <h5 class="modal-title">Rediger Uddannelse:</h5>
@@ -70,7 +70,7 @@
                                         <hr />
                                         @foreach (var specializaton in _category.Specializations)
                                         {
-                                            <span @onclick="@(mouseEvent => OnButtonClick_RemoveNewSpecialization(specializaton))">
+                                            <span @onclick="@(mouseEvent => OnButtonClick_RemoveNewSpecializationAsync(specializaton))">
                                                 @specializaton.Name
                                                 <Popover Title="Forsigtig!" Body="Denne knap sletter specialet, forevigt!" Color="Popover.PopoverType.Danger" />
                                             </span>
