@@ -36,7 +36,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
             return Task.CompletedTask;
         }
 
-        private async Task OnValidSubmit_CreateJobAdvertAsync()
+        private async Task OnValidSubmit_CreateCategoryAsync()
         {
             if (_categoryModel.IsProcessing is true)
             {

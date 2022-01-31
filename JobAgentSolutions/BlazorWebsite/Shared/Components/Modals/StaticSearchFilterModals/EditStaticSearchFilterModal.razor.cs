@@ -60,7 +60,7 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
             }
         }
 
-        private async Task OnValidSubmit_EditJobVacancy()
+        private async Task OnValidSubmit_EditStaticSearchFilter()
         {
             if (Model.IsProcessing is true)
             {

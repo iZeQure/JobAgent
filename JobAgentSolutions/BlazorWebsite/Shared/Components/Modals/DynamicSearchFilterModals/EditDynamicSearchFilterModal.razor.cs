@@ -61,7 +61,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
             }
         }
 
-        private async Task OnValidSubmit_EditJobVacancy()
+        private async Task OnValidSubmit_EditDynamicSearchFilter()
         {
             if (Model.IsProcessing is true)
             {

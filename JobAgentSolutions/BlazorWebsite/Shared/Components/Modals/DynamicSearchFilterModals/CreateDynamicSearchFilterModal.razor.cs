@@ -72,7 +72,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
             }
         }
 
-        private async Task OnValidSubmit_CreateJobAdvertAsync()
+        private async Task OnValidSubmit_CreateDynamicSearchFilter()
         {
             if (_dynamicSearchFilterModel.IsProcessing is true)
             {

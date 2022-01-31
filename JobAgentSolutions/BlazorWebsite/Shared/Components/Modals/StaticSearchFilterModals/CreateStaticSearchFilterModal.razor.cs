@@ -18,11 +18,10 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
     {
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
-        [Inject] protected IStaticSearchFilterService StaticcSearchFilterService { get; set; }
+        [Inject] protected IStaticSearchFilterService StaticSearchFilterService { get; set; }
         [Inject] protected IFilterTypeService FilterTypeService { get; set; }
 
         private StaticSearchFilterModel _staticSearchFilterModel = new();
-        private IEnumerable<IStaticSearchFilter> _staticSearchFilters;
         private IEnumerable<IFilterType> _filterTypes;
         private EditContext _editContext;
 
@@ -43,27 +42,8 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
 
             try
             {
-                var companyTask = StaticcSearchFilterService.GetAllAsync();
-                var filterTypeTask = FilterTypeService.GetAllAsync();
-
-                try
-                {
-                    await TaskExtProvider.WhenAll(companyTask, filterTypeTask);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-
-                _staticSearchFilters = companyTask.Result;
-                _filterTypes = filterTypeTask.Result;
-
-                foreach (var staticFilter in _staticSearchFilters)
-                {
-                    var filterType = _filterTypes.FirstOrDefault(x => x.Id == staticFilter.FilterType.Id);
-                    staticFilter.FilterType.Name = filterType.Name;
-                    staticFilter.FilterType.Description = filterType.Description;
-                }
+                _filterTypes = await FilterTypeService.GetAllAsync();
+                _staticSearchFilterModel.FilterType = (FilterType)_filterTypes.FirstOrDefault();
             }
             catch (Exception)
             {
@@ -76,7 +56,7 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
             }
         }
 
-        private async Task OnValidSubmit_CreateJobAdvertAsync()
+        private async Task OnValidSubmit_CreateStaticSearchFilter()
         {
             try
             {
@@ -97,7 +77,7 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
 
                     };
 
-                    result = await StaticcSearchFilterService.CreateAsync(staticSearchFilter);
+                    result = await StaticSearchFilterService.CreateAsync(staticSearchFilter);
 
                     if (result is null)
                     {

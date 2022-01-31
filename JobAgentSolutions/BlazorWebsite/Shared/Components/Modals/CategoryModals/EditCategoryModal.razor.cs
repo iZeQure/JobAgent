@@ -48,7 +48,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
             }
         }
 
-        private async Task OnValidSubmit_EditJobVacancy()
+        private async Task OnValidSubmit_EditCategory()
         {
             if (Model.IsProcessing is true)
             {

@@ -72,7 +72,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
             }
         }
 
-        private async Task OnValidSubmit_CreateJobAdvertAsync()
+        private async Task OnValidSubmit_CreateJobPage()
         {
             if (_jobPageModel.IsProcessing is true)
             {
