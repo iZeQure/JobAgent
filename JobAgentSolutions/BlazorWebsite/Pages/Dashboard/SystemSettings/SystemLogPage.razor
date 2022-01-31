@@ -1,12 +1,12 @@
-﻿@page "/admin/system/settings/view-Dblog"
+﻿@page "/admin/system/settings/view-Syslog"
 @attribute [Authorize(Roles = "Udvikler")]
 @inherits BasePage
-@using BlazorWebsite.Shared.Components.Modals.DbLogModals;
+@using BlazorWebsite.Shared.Components.Modals.SystemLogModals;
 
-<PageDocumentTitle DocumentTitle="JobAgent - Database Logs" />
+<PageDocumentTitle DocumentTitle="JobAgent - System Logs" />
 
 <div class="d-flex">
-    <PageHeadingTitle DisplayTitle="Database Logs" />
+    <PageHeadingTitle DisplayTitle="System Logs" />
     <div class="d-inline-block px-4 pt-4">
 
         @if (_logs == null)
@@ -14,7 +14,7 @@
             <a class="btn btn-sm btn-info cursor-pointer text-white no-gutters disabled">
                 <span class="d-inline-block">Ikke Aktiveret</span>
             </a>
-            <span class="d-inline-block"><small class="text-danger font-weight-bolder">* Opret en Database Log.</small></span>
+            <span class="d-inline-block"><small class="text-danger font-weight-bolder">* Opret en System Log.</small></span>
         }
         else
         {

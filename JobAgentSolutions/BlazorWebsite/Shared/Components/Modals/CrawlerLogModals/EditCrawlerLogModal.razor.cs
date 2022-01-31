@@ -49,7 +49,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
 
             try
             {
-                var logTask = LogService.GetAllDbLogsAsync();
+                var logTask = LogService.GetAllSystemLogsAsync();
 
                 await Task.WhenAll(logTask);
 
@@ -74,7 +74,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
             }
             using (var _ = Model.TimedEndOfOperation())
             {
-                DbLog DbLog = new()
+                SystemLog DbLog = new()
                 {
                     Id = Model.Id,
                     Action = Model.Action,

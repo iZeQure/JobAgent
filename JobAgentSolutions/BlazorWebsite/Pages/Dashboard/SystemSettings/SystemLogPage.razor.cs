@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Dashboard.SystemSettings
 {
-    public partial class DbLogPage
+    public partial class SystemLogPage
     {
         [Inject] protected ILogService LogService { get; set; }
 
         private LogModel _logModel = new();
         private ILog _log;
-        public IEnumerable<ILog> _logs = new List<DbLog>();
+        public IEnumerable<ILog> _logs = new List<SystemLog>();
         private int _logId;
 
         private bool dataIsLoading = true;
@@ -32,7 +32,7 @@ namespace BlazorWebsite.Pages.Dashboard.SystemSettings
             dataIsLoading = true;
             try
             {
-                var logTask = LogService.GetAllDbLogsAsync();
+                var logTask = LogService.GetAllSystemLogsAsync();
 
                 await Task.WhenAll(logTask);
 
@@ -81,7 +81,7 @@ namespace BlazorWebsite.Pages.Dashboard.SystemSettings
         {
             try
             {
-                var logs = await LogService.GetAllDbLogsAsync();
+                var logs = await LogService.GetAllSystemLogsAsync();
 
                 if (logs == null)
                 {

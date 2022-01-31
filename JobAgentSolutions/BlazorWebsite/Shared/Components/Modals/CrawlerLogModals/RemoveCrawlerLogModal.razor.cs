@@ -25,7 +25,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
             {
                 _isProcessing = true;
 
-                DbLog dbLog = new()
+                SystemLog dbLog = new()
                 {
                     Id = id
                 };

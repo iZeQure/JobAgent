@@ -52,7 +52,7 @@ namespace JobAgentClassLibrary.Extensions.ServiceCollection
             .AddScoped<IJobAdvertService, JobAdvertService>()
             .AddScoped<IVacantJobService, VacantJobService>()
             .AddScoped<IJobPageService, JobPageService>()
-            .AddScoped<ILogService, DbLogService>();
+            .AddScoped<ILogService, SystemLogService>();
 
         public static IServiceCollection AddRepositories(this IServiceCollection services) 
             => services
@@ -69,7 +69,7 @@ namespace JobAgentClassLibrary.Extensions.ServiceCollection
             .AddScoped<IStaticSearchFilterRepository, StaticSearchFilterRepository>()
             .AddScoped<IFilterTypeRepository, FilterTypeRepository>()
             .AddScoped<ISpecializationRepository, SpecializationRepository>()
-            .AddScoped<ILoggingRepository, DbLogRepository>();
+            .AddScoped<ILoggingRepository, SystemLogRepository>();
 
         public static IServiceCollection AddFactories(this IServiceCollection services)
             => services

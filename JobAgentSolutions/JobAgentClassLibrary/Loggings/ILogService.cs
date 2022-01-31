@@ -10,7 +10,7 @@ namespace JobAgentClassLibrary.Loggings
     {
         Task<ILog> LogError(Exception? exception, string message, string action, string createdBy, LogType logType);
         Task<ILog> CreateAsync(ILog entity);
-        Task<List<ILog>> GetAllDbLogsAsync();
+        Task<List<ILog>> GetAllSystemLogsAsync();
         Task<List<ILog>> GetAllCrawlerLogsAsync();
         Task<ILog> GetByIdAsync(int id);
         Task<bool> RemoveAsync(ILog entity);

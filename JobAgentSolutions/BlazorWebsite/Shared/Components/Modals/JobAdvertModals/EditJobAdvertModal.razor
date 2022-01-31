@@ -67,7 +67,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="inputRegisteredDate" class="admin-label col-form-label col-form-label-sm">Opslag Registeret :</label>
+                                <label for="inputRegisteredDate" class="admin-label col-form-label col-form-label-sm">Opslag Registeret:</label>
                                 <InputDate id="inputRegisteredDate" @bind-Value="@Model.RegistrationDateTime" TValue="DateTime" class="form-control form-control-sm"></InputDate>
                                 <ValidationMessage For="@(() => Model.RegistrationDateTime)" />
                             </div>
@@ -77,7 +77,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="inputConsultantArea" class="admin-label col-form-label col-form-label-sm">Kategori :</label>
+                                <label for="inputConsultantArea" class="admin-label col-form-label col-form-label-sm">Kategori:</label>
                                 <select class="form-control form-control-sm" @onchange="OnChange_SortSpecializationListByCategoryId">
                                     @if (Model.CategoryId == 0)
                                     {

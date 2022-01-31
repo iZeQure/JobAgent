@@ -17,8 +17,8 @@
         <ul class="nav flex-column">
 
             @if (AdminContext.User.IsInRole("Konsulent") ||
-AdminContext.User.IsInRole("System Administrator") ||
-AdminContext.User.IsInRole("Udvikler"))
+            AdminContext.User.IsInRole("System Administrator") ||
+            AdminContext.User.IsInRole("Udvikler"))
             {
                 <li class="nav-item">
                     <NavLink class="nav-link" href="/admin/settings/job-vacancies">
@@ -50,7 +50,7 @@ AdminContext.User.IsInRole("Udvikler"))
             }
 
             @if (AdminContext.User.IsInRole("System Administrator") ||
-AdminContext.User.IsInRole("Udvikler"))
+            AdminContext.User.IsInRole("Udvikler"))
             {
                 <li class="nav-item">
                     <NavLink class="nav-link" href="/admin/settings/register-user">
@@ -66,8 +66,8 @@ AdminContext.User.IsInRole("Udvikler"))
         </h6>
         <ul class="nav flex-column">
             @if (AdminContext.User.IsInRole("Konsulent") ||
-AdminContext.User.IsInRole("System Administrator") ||
-AdminContext.User.IsInRole("Udvikler"))
+            AdminContext.User.IsInRole("System Administrator") ||
+            AdminContext.User.IsInRole("Udvikler"))
             {
                 <li class="nav-item">
                     <NavLink class="nav-link" href="/admin/account/my-profile">
@@ -90,8 +90,8 @@ AdminContext.User.IsInRole("Udvikler"))
         </h6>
         <ul class="nav flex-column">
             @if (AdminContext.User.IsInRole("Konsulent") ||
-AdminContext.User.IsInRole("System Administrator") ||
-AdminContext.User.IsInRole("Udvikler"))
+            AdminContext.User.IsInRole("System Administrator") ||
+            AdminContext.User.IsInRole("Udvikler"))
             {
                 <li class="nav-item">
                     <NavLink class="nav-link" href="/admin/settings/jobpages">
@@ -109,7 +109,7 @@ AdminContext.User.IsInRole("Udvikler"))
             }
 
             @if (AdminContext.User.IsInRole("System Administrator") ||
-AdminContext.User.IsInRole("Udvikler"))
+            AdminContext.User.IsInRole("Udvikler"))
             {
                 <li class="nav-item">
                     <NavLink class="nav-link" href="/admin/robot/settings/static/search-filter">
@@ -122,14 +122,14 @@ AdminContext.User.IsInRole("Udvikler"))
 
 
         @if (AdminContext.User.IsInRole("System Administrator") ||
-AdminContext.User.IsInRole("Udvikler"))
+        AdminContext.User.IsInRole("Udvikler"))
         {
             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-light">
                 <span>System Indstillinger</span>
             </h6>
             <ul class="nav flex-column">
                 @if (AdminContext.User.IsInRole("System Administrator") ||
-AdminContext.User.IsInRole("Udvikler"))
+               AdminContext.User.IsInRole("Udvikler"))
                 {
                     <li class="nav-item">
                         <NavLink class="nav-link" href="/admin/system/settings/user-access">
@@ -142,9 +142,9 @@ AdminContext.User.IsInRole("Udvikler"))
                 {
 
                     <li class="nav-item">
-                        <NavLink class="nav-link" href="/admin/system/settings/view-Dblog">
+                        <NavLink class="nav-link" href="/admin/system/settings/view-Syslog">
                             <span><i class="fas fa-box"></i></span>
-                            Database Logs
+                            System Logs
                         </NavLink>
                     </li>
 

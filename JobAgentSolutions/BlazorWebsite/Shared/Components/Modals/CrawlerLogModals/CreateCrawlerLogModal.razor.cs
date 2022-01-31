@@ -66,7 +66,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
             }
             using (var _ = _logModel.TimedEndOfOperation())
             {
-                DbLog DbLog = new()
+                SystemLog DbLog = new()
                 {
                     Id = _logModel.Id,
                     Action = _logModel.Action,

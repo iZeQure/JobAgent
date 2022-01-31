@@ -6,9 +6,9 @@ using Microsoft.JSInterop;
 using System;
 using System.Threading.Tasks;
 
-namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
+namespace BlazorWebsite.Shared.Components.Modals.SystemLogModals
 {
-    public partial class RemoveDbLogModal : ComponentBase
+    public partial class RemoveSystemLogModal : ComponentBase
     {
         [Parameter] public int Id { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
@@ -24,7 +24,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
             {
                 _isProcessing = true;
 
-                DbLog dbLog = new()
+                SystemLog dbLog = new()
                 {
                     Id = id
                 };

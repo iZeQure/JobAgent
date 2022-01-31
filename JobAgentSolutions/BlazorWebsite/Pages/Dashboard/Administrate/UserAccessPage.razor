@@ -5,6 +5,10 @@
 
 <PageDocumentTitle DocumentTitle="Administrer - BrugerRettigheder" />
 
+<div class="d-flex">
+    <PageHeadingTitle DisplayTitle="Bruger Rettigheder" />
+</div>
+
 @if (dataIsLoading)
 {
     <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="dataIsLoading" Message="Indlæser Brugere.." />
@@ -18,7 +22,6 @@ else
     }
     else
     {
-        <PageHeadingTitle DisplayTitle="Administrer BrugerRettigheder" />
         <div class="table-responsive table-responsive-sm table-responsive-md">
             <table class="table table-striped table-hover">
                 <caption>Liste over system brugere..</caption>

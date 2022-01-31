@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Loggings
 {
-    public class DbLogService : ILogService
+    public class SystemLogService : ILogService
     {
         private readonly ILoggingRepository _repository;
         private readonly LogEntityFactory _logEntityFactory;
 
-        public DbLogService(ILoggingRepository repository, LogEntityFactory logEntityFactory)
+        public SystemLogService(ILoggingRepository repository, LogEntityFactory logEntityFactory)
         {
             _repository = repository;
             _logEntityFactory = logEntityFactory;
@@ -29,7 +29,7 @@ namespace JobAgentClassLibrary.Loggings
             return await _repository.GetAllCrawlerLogsAsync();
         }
 
-        public async Task<List<ILog>> GetAllDbLogsAsync()
+        public async Task<List<ILog>> GetAllSystemLogsAsync()
         {
             return await _repository.GetAllAsync();
         }

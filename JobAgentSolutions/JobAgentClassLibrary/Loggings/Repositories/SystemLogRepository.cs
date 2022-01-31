@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Loggings.Repositories
 {
-    public class DbLogRepository : ILoggingRepository
+    public class SystemLogRepository : ILoggingRepository
     {
         private readonly ISqlDbManager _sqlDbManager;
         private readonly LogEntityFactory _factory;
 
-        public DbLogRepository(ISqlDbManager sqlDbManager, LogEntityFactory factory)
+        public SystemLogRepository(ISqlDbManager sqlDbManager, LogEntityFactory factory)
         {
             _sqlDbManager = sqlDbManager;
             _factory = factory;
@@ -61,8 +61,8 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                 {
                     foreach (var result in queryResult)
                     {
-                        ILog log = (DbLog)_factory.CreateEntity(
-                            nameof(DbLog),
+                        ILog log = (SystemLog)_factory.CreateEntity(
+                            nameof(SystemLog),
                             result.LogId,
                             result.LogSeverity,
                             result.LogMessage,
@@ -93,8 +93,8 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                 {
                     foreach (var result in queryResult)
                     {
-                        ILog log = (DbLog)_factory.CreateEntity(
-                            nameof(DbLog),
+                        ILog log = (SystemLog)_factory.CreateEntity(
+                            nameof(SystemLog),
                             result.LogId,
                             result.LogSeverity,
                             result.LogMessage,
@@ -127,7 +127,7 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                 if (queryResult is not null)
                 {
                     log = (ILog)_factory.CreateEntity(
-                           nameof(DbLog),
+                           nameof(SystemLog),
                            queryResult.LogId,
                            queryResult.LogSeverity,
                            queryResult.LogMessage,

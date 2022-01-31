@@ -21,7 +21,7 @@ namespace JobAgentClassLibrary.Loggings.Factory
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public IAggregateRoot CreateEntity(string paramName, params object[] entityValues) => paramName switch
         {
-            nameof(DbLog) => new DbLog
+            nameof(SystemLog) => new SystemLog
             {
                 Id = ParseValue<int>(entityValues[0]),
                 LogSeverity = ParseValue<LogSeverity>(entityValues[1]),

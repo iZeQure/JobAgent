@@ -10,9 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
+namespace BlazorWebsite.Shared.Components.Modals.SystemLogModals
 {
-    public partial class EditDbLogModal : ComponentBase
+    public partial class EditSystemLogModal : ComponentBase
     {
         [Parameter] public LogModel Model { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
@@ -48,7 +48,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
 
             try
             {
-                var logTask = LogService.GetAllDbLogsAsync();
+                var logTask = LogService.GetAllSystemLogsAsync();
 
                 await Task.WhenAll(logTask);
 
@@ -73,7 +73,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
             }
             using (var _ = Model.TimedEndOfOperation())
             {
-                DbLog DbLog = new()
+                SystemLog DbLog = new()
                 {
                     Id = Model.Id,
                     Action = Model.Action,

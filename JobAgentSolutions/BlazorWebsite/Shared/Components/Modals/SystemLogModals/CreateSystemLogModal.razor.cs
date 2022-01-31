@@ -12,9 +12,9 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
+namespace BlazorWebsite.Shared.Components.Modals.SystemLogModals
 {
-    public partial class CreateDbLogModal : ComponentBase
+    public partial class CreateSystemLogModal : ComponentBase
     {
         [CascadingParameter] private Task<AuthenticationState> AuthState { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
@@ -61,7 +61,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
             _isProcessing = true;
             try
             {
-                DbLog DbLog = new()
+                SystemLog DbLog = new()
                 {
                     Id = _logModel.Id,
                     Action = _logModel.Action,

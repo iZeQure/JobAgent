@@ -14,7 +14,7 @@ namespace BlazorWebsite.Pages.Dashboard.SystemSettings
 
         private LogModel _logModel = new();
         private ILog _log;
-        public IEnumerable<ILog> _logs = new List<DbLog>();
+        public IEnumerable<ILog> _logs = new List<SystemLog>();
         private int _logId;
 
         private bool dataIsLoading = true;

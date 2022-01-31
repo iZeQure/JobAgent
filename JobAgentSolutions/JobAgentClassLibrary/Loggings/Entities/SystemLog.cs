@@ -3,7 +3,7 @@ using System;
 
 namespace JobAgentClassLibrary.Loggings.Entities
 {
-    public class DbLog : ILog
+    public class SystemLog : ILog
     {
         public LogSeverity LogSeverity { get; set; }
 
