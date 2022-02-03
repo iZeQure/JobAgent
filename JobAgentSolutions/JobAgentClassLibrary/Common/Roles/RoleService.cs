@@ -32,7 +32,7 @@ namespace JobAgentClassLibrary.Common.Roles
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to create role", nameof(CreateAsync), nameof(RoleService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to create role", nameof(CreateAsync), nameof(RoleService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -49,7 +49,7 @@ namespace JobAgentClassLibrary.Common.Roles
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to create roles", nameof(GetRolesAsync), nameof(RoleService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to create roles", nameof(GetRolesAsync), nameof(RoleService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -67,7 +67,7 @@ namespace JobAgentClassLibrary.Common.Roles
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get role by id", nameof(GetRoleByIdAsync), nameof(RoleService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get role by id", nameof(GetRoleByIdAsync), nameof(RoleService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -85,7 +85,7 @@ namespace JobAgentClassLibrary.Common.Roles
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to remove role", nameof(RemoveAsync), nameof(RoleService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to remove role", nameof(RemoveAsync), nameof(RoleService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -103,7 +103,7 @@ namespace JobAgentClassLibrary.Common.Roles
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to update role", nameof(UpdateAsync), nameof(RoleService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to update role", nameof(UpdateAsync), nameof(RoleService), LogType.SYSTEM);
                 throw;
             }
         }

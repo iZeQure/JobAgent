@@ -32,7 +32,7 @@ namespace JobAgentClassLibrary.Common.Filters
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to create FilterType", nameof(CreateAsync), nameof(FilterTypeService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to create FilterType", nameof(CreateAsync), nameof(FilterTypeService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -49,7 +49,7 @@ namespace JobAgentClassLibrary.Common.Filters
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get FilterTypes", nameof(GetAllAsync), nameof(FilterTypeService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get FilterTypes", nameof(GetAllAsync), nameof(FilterTypeService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -67,7 +67,7 @@ namespace JobAgentClassLibrary.Common.Filters
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get FilterType by id", nameof(GetByIdAsync), nameof(FilterTypeService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get FilterType by id", nameof(GetByIdAsync), nameof(FilterTypeService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -85,7 +85,7 @@ namespace JobAgentClassLibrary.Common.Filters
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to remove FilterType", nameof(RemoveAsync), nameof(FilterTypeService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to remove FilterType", nameof(RemoveAsync), nameof(FilterTypeService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -103,7 +103,7 @@ namespace JobAgentClassLibrary.Common.Filters
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to update FilterType", nameof(UpdateAsync), nameof(FilterTypeService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to update FilterType", nameof(UpdateAsync), nameof(FilterTypeService), LogType.SYSTEM);
                 throw;
             }
         }

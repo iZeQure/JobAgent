@@ -32,7 +32,7 @@ namespace JobAgentClassLibrary.Common.Areas
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to create area", nameof(CreateAsync), nameof(AreaService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to create area", nameof(CreateAsync), nameof(AreaService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -49,7 +49,7 @@ namespace JobAgentClassLibrary.Common.Areas
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get areas", nameof(GetAllAsync), nameof(AreaService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get areas", nameof(GetAllAsync), nameof(AreaService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -67,7 +67,7 @@ namespace JobAgentClassLibrary.Common.Areas
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get area by id", nameof(GetByIdAsync), nameof(AreaService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get area by id", nameof(GetByIdAsync), nameof(AreaService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -85,7 +85,7 @@ namespace JobAgentClassLibrary.Common.Areas
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to remove area", nameof(RemoveAsync), nameof(AreaService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to remove area", nameof(RemoveAsync), nameof(AreaService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -103,7 +103,7 @@ namespace JobAgentClassLibrary.Common.Areas
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to update area", nameof(UpdateAsync), nameof(AreaService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to update area", nameof(UpdateAsync), nameof(AreaService), LogType.SYSTEM);
                 throw;
             }
         }

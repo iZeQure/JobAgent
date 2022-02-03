@@ -32,7 +32,7 @@ namespace JobAgentClassLibrary.Common.JobPages
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to create JobPage", nameof(CreateAsync), nameof(JobPageService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to create JobPage", nameof(CreateAsync), nameof(JobPageService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -50,7 +50,7 @@ namespace JobAgentClassLibrary.Common.JobPages
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get JobPage by id", nameof(GetByIdAsync), nameof(JobPageService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get JobPage by id", nameof(GetByIdAsync), nameof(JobPageService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -67,7 +67,7 @@ namespace JobAgentClassLibrary.Common.JobPages
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get JobPages", nameof(GetJobPagesAsync), nameof(JobPageService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get JobPages", nameof(GetJobPagesAsync), nameof(JobPageService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -85,7 +85,7 @@ namespace JobAgentClassLibrary.Common.JobPages
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to remove JobPage", nameof(RemoveAsync), nameof(JobPageService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to remove JobPage", nameof(RemoveAsync), nameof(JobPageService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -103,7 +103,7 @@ namespace JobAgentClassLibrary.Common.JobPages
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to update JobPage", nameof(UpdateAsync), nameof(JobPageService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to update JobPage", nameof(UpdateAsync), nameof(JobPageService), LogType.SYSTEM);
                 throw;
             }
         }

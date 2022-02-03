@@ -32,7 +32,7 @@ namespace JobAgentClassLibrary.Common.Locations
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to create location", nameof(CreateAsync), nameof(LocationService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to create location", nameof(CreateAsync), nameof(LocationService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -50,7 +50,7 @@ namespace JobAgentClassLibrary.Common.Locations
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get location by id", nameof(GetByIdAsync), nameof(LocationService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get location by id", nameof(GetByIdAsync), nameof(LocationService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -67,7 +67,7 @@ namespace JobAgentClassLibrary.Common.Locations
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get locations", nameof(GetLocationsAsync), nameof(LocationService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get locations", nameof(GetLocationsAsync), nameof(LocationService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -85,7 +85,7 @@ namespace JobAgentClassLibrary.Common.Locations
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to remove location", nameof(RemoveAsync), nameof(LocationService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to remove location", nameof(RemoveAsync), nameof(LocationService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -104,7 +104,7 @@ namespace JobAgentClassLibrary.Common.Locations
             catch (Exception ex)
             {
 
-                await _logService.LogError(ex, "Failed to update location", nameof(UpdateAsync), nameof(LocationService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to update location", nameof(UpdateAsync), nameof(LocationService), LogType.SYSTEM);
                 throw;
             }
         }

@@ -26,7 +26,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to create VacantJob", nameof(CreateAsync), nameof(VacantJobService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to create VacantJob", nameof(CreateAsync), nameof(VacantJobService), LogType.SYSTEM);
                 return null;
             }
         }
@@ -39,7 +39,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs
             }
             catch (System.Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get all VacantJobs", nameof(GetAllAsync), nameof(VacantJobService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get all VacantJobs", nameof(GetAllAsync), nameof(VacantJobService), LogType.SYSTEM);
                 return null;
             }
         }
@@ -52,7 +52,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs
             }
             catch (System.Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get VacantJob by id", nameof(GetByIdAsync), nameof(VacantJobService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get VacantJob by id", nameof(GetByIdAsync), nameof(VacantJobService), LogType.SYSTEM);
                 return null;
             }
         }
@@ -65,7 +65,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs
             }
             catch (System.Exception ex)
             {
-                await _logService.LogError(ex, "Failed to remove VacantJob", nameof(RemoveAsync), nameof(VacantJobService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to remove VacantJob", nameof(RemoveAsync), nameof(VacantJobService), LogType.SYSTEM);
                 return false;
             }
         }
@@ -78,7 +78,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs
             }
             catch (System.Exception ex)
             {
-                await _logService.LogError(ex, "Failed to update VacantJob", nameof(UpdateAsync), nameof(VacantJobService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to update VacantJob", nameof(UpdateAsync), nameof(VacantJobService), LogType.SYSTEM);
                 return null;
             }
         }

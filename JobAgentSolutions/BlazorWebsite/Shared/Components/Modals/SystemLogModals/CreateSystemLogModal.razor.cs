@@ -69,7 +69,7 @@ namespace BlazorWebsite.Shared.Components.Modals.SystemLogModals
                     LogSeverity = _logModel.LogSeverity,
                     CreatedBy = _sessionUserEmail,
                     CreatedDateTime = DateTime.Now,
-                    LogType = LogType.DATABASE
+                    LogType = LogType.SYSTEM
                 };
 
                 bool isCreated = false;

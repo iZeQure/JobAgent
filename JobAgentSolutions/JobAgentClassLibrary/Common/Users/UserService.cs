@@ -77,7 +77,7 @@ namespace JobAgentClassLibrary.Common.Users
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to authenticate user", nameof(AuthenticateUserLoginAsync), nameof(UserService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to authenticate user", nameof(AuthenticateUserLoginAsync), nameof(UserService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -122,7 +122,7 @@ namespace JobAgentClassLibrary.Common.Users
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to create user", nameof(CreateAsync), nameof(UserService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to create user", nameof(CreateAsync), nameof(UserService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -150,7 +150,7 @@ namespace JobAgentClassLibrary.Common.Users
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get user by email", nameof(GetByEmailAsync), nameof(UserService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get user by email", nameof(GetByEmailAsync), nameof(UserService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -178,7 +178,7 @@ namespace JobAgentClassLibrary.Common.Users
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get user by id", nameof(GetUserByIdAsync), nameof(UserService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get user by id", nameof(GetUserByIdAsync), nameof(UserService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -196,7 +196,7 @@ namespace JobAgentClassLibrary.Common.Users
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get salt", nameof(GetSaltByEmailAddressAsync), nameof(UserService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get salt", nameof(GetSaltByEmailAddressAsync), nameof(UserService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -224,7 +224,7 @@ namespace JobAgentClassLibrary.Common.Users
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get user by accesstoken", nameof(GetUserByAccessTokenAsync), nameof(UserService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get user by accesstoken", nameof(GetUserByAccessTokenAsync), nameof(UserService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -257,7 +257,7 @@ namespace JobAgentClassLibrary.Common.Users
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get users", nameof(GetUsersAsync), nameof(UserService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get users", nameof(GetUsersAsync), nameof(UserService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -293,7 +293,7 @@ namespace JobAgentClassLibrary.Common.Users
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to grant user area", nameof(GrantAreaToUserAsync), nameof(UserService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to grant user area", nameof(GrantAreaToUserAsync), nameof(UserService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -311,7 +311,7 @@ namespace JobAgentClassLibrary.Common.Users
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to remove user", nameof(RemoveAsync), nameof(UserService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to remove user", nameof(RemoveAsync), nameof(UserService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -347,7 +347,7 @@ namespace JobAgentClassLibrary.Common.Users
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to revoke area from user", nameof(RevokeAreaFromUserAsync), nameof(UserService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to revoke area from user", nameof(RevokeAreaFromUserAsync), nameof(UserService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -375,7 +375,7 @@ namespace JobAgentClassLibrary.Common.Users
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to Update user", nameof(UpdateAsync), nameof(UserService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to Update user", nameof(UpdateAsync), nameof(UserService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -393,7 +393,7 @@ namespace JobAgentClassLibrary.Common.Users
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to update user password", nameof(UpdateUserPasswordAsync), nameof(UserService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to update user password", nameof(UpdateUserPasswordAsync), nameof(UserService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -413,7 +413,7 @@ namespace JobAgentClassLibrary.Common.Users
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to validate user token", nameof(ValidateUserAccessTokenAsync), nameof(UserService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to validate user token", nameof(ValidateUserAccessTokenAsync), nameof(UserService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -431,7 +431,7 @@ namespace JobAgentClassLibrary.Common.Users
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get user ares", nameof(GetUserConsultantAreasAsync), nameof(UserService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get user ares", nameof(GetUserConsultantAreasAsync), nameof(UserService), LogType.SYSTEM);
                 throw;
             }
         }

@@ -81,7 +81,7 @@ namespace BlazorWebsite.Shared.Components.Modals.SystemLogModals
                     LogSeverity = Model.LogSeverity,
                     CreatedBy = Model.CreatedBy,
                     CreatedDateTime = Model.CreatedDateTime,
-                    LogType = LogType.DATABASE
+                    LogType = LogType.SYSTEM
                 };
 
                 var result = await LogService.UpdateAsync(SystemLog);

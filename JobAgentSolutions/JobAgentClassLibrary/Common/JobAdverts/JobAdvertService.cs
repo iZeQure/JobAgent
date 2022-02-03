@@ -39,7 +39,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to create JobAdvert", nameof(CreateAsync), nameof(JobAdvertService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to create JobAdvert", nameof(CreateAsync), nameof(JobAdvertService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -56,7 +56,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get JobAdverts", nameof(GetJobAdvertsAsync), nameof(JobAdvertService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get JobAdverts", nameof(GetJobAdvertsAsync), nameof(JobAdvertService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -74,7 +74,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get JobAdvert by id", nameof(GetByIdAsync), nameof(JobAdvertService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get JobAdvert by id", nameof(GetByIdAsync), nameof(JobAdvertService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -92,7 +92,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get number of JobAdverts by category id", nameof(GetJobAdvertCountByCategoryId), nameof(JobAdvertService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get number of JobAdverts by category id", nameof(GetJobAdvertCountByCategoryId), nameof(JobAdvertService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -110,7 +110,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get number of JobAdverts by specialization id", nameof(GetJobAdvertCountBySpecializationId), nameof(JobAdvertService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get number of JobAdverts by specialization id", nameof(GetJobAdvertCountBySpecializationId), nameof(JobAdvertService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -127,7 +127,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get number of uncategorized JobAdverts", nameof(GetJobAdvertCountByUncategorized), nameof(JobAdvertService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get number of uncategorized JobAdverts", nameof(GetJobAdvertCountByUncategorized), nameof(JobAdvertService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -145,7 +145,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get remove JobAdvert", nameof(RemoveAsync), nameof(JobAdvertService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get remove JobAdvert", nameof(RemoveAsync), nameof(JobAdvertService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -163,7 +163,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get update JobAdvert", nameof(UpdateAsync), nameof(JobAdvertService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get update JobAdvert", nameof(UpdateAsync), nameof(JobAdvertService), LogType.SYSTEM);
                 throw;
             }
         }

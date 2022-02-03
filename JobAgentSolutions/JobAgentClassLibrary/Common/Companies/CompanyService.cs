@@ -32,7 +32,7 @@ namespace JobAgentClassLibrary.Common.Companies
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to create Company", nameof(CreateAsync), nameof(CompanyService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to create Company", nameof(CreateAsync), nameof(CompanyService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -49,7 +49,7 @@ namespace JobAgentClassLibrary.Common.Companies
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get Companies", nameof(GetAllAsync), nameof(CompanyService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get Companies", nameof(GetAllAsync), nameof(CompanyService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -67,7 +67,7 @@ namespace JobAgentClassLibrary.Common.Companies
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get Company by id", nameof(GetByIdAsync), nameof(CompanyService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get Company by id", nameof(GetByIdAsync), nameof(CompanyService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -85,7 +85,7 @@ namespace JobAgentClassLibrary.Common.Companies
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to remove Company", nameof(RemoveAsync), nameof(CompanyService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to remove Company", nameof(RemoveAsync), nameof(CompanyService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -103,7 +103,7 @@ namespace JobAgentClassLibrary.Common.Companies
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to update Company", nameof(UpdateAsync), nameof(CompanyService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to update Company", nameof(UpdateAsync), nameof(CompanyService), LogType.SYSTEM);
                 throw;
             }
         }

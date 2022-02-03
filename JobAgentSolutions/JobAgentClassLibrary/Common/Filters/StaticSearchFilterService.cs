@@ -32,7 +32,7 @@ namespace JobAgentClassLibrary.Common.Filters
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to create StaticSearchFilter", nameof(CreateAsync), nameof(StaticSearchFilterService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to create StaticSearchFilter", nameof(CreateAsync), nameof(StaticSearchFilterService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -49,7 +49,7 @@ namespace JobAgentClassLibrary.Common.Filters
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get StaticSearchFilters", nameof(GetAllAsync), nameof(StaticSearchFilterService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get StaticSearchFilters", nameof(GetAllAsync), nameof(StaticSearchFilterService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -67,7 +67,7 @@ namespace JobAgentClassLibrary.Common.Filters
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get StaticSearchFilter by id", nameof(GetByIdAsync), nameof(StaticSearchFilterService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get StaticSearchFilter by id", nameof(GetByIdAsync), nameof(StaticSearchFilterService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -85,7 +85,7 @@ namespace JobAgentClassLibrary.Common.Filters
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to remove StaticSearchFilter", nameof(RemoveAsync), nameof(StaticSearchFilterService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to remove StaticSearchFilter", nameof(RemoveAsync), nameof(StaticSearchFilterService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -103,7 +103,7 @@ namespace JobAgentClassLibrary.Common.Filters
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to update StaticSearchFilter", nameof(UpdateAsync), nameof(StaticSearchFilterService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to update StaticSearchFilter", nameof(UpdateAsync), nameof(StaticSearchFilterService), LogType.SYSTEM);
                 throw;
             }
         }

@@ -64,7 +64,7 @@ namespace BlazorWebsite.Pages.Dashboard.SystemSettings
                     LogSeverity = _log.LogSeverity,
                     CreatedBy = _log.CreatedBy,
                     CreatedDateTime = _log.CreatedDateTime,
-                    LogType = LogType.DATABASE
+                    LogType = LogType.SYSTEM
                 };
             }
             catch (Exception ex)

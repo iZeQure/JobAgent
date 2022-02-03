@@ -36,7 +36,7 @@ namespace JobAgentClassLibrary.Common.Categories
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to create category", nameof(CreateAsync), nameof(CategoryService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to create category", nameof(CreateAsync), nameof(CategoryService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -54,7 +54,7 @@ namespace JobAgentClassLibrary.Common.Categories
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to create specialization", nameof(CreateAsync), nameof(CategoryService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to create specialization", nameof(CreateAsync), nameof(CategoryService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -71,7 +71,7 @@ namespace JobAgentClassLibrary.Common.Categories
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get categories", nameof(GetCategoriesAsync), nameof(CategoryService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get categories", nameof(GetCategoriesAsync), nameof(CategoryService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -89,7 +89,7 @@ namespace JobAgentClassLibrary.Common.Categories
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get category by id", nameof(GetCategoryByIdAsync), nameof(CategoryService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get category by id", nameof(GetCategoryByIdAsync), nameof(CategoryService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -132,7 +132,7 @@ namespace JobAgentClassLibrary.Common.Categories
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get menu", nameof(GetMenuAsync), nameof(CategoryService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get menu", nameof(GetMenuAsync), nameof(CategoryService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -150,7 +150,7 @@ namespace JobAgentClassLibrary.Common.Categories
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get specialization by id", nameof(GetSpecializationByIdAsync), nameof(CategoryService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get specialization by id", nameof(GetSpecializationByIdAsync), nameof(CategoryService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -167,7 +167,7 @@ namespace JobAgentClassLibrary.Common.Categories
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get specializations", nameof(GetSpecializationsAsync), nameof(CategoryService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get specializations", nameof(GetSpecializationsAsync), nameof(CategoryService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -185,7 +185,7 @@ namespace JobAgentClassLibrary.Common.Categories
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to remove category", nameof(RemoveAsync), nameof(CategoryService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to remove category", nameof(RemoveAsync), nameof(CategoryService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -203,7 +203,7 @@ namespace JobAgentClassLibrary.Common.Categories
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to remove specialization", nameof(RemoveAsync), nameof(CategoryService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to remove specialization", nameof(RemoveAsync), nameof(CategoryService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -221,7 +221,7 @@ namespace JobAgentClassLibrary.Common.Categories
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to update category", nameof(UpdateAsync), nameof(CategoryService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to update category", nameof(UpdateAsync), nameof(CategoryService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -239,7 +239,7 @@ namespace JobAgentClassLibrary.Common.Categories
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to update specialization", nameof(UpdateAsync), nameof(CategoryService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to update specialization", nameof(UpdateAsync), nameof(CategoryService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -262,7 +262,7 @@ namespace JobAgentClassLibrary.Common.Categories
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get category details", nameof(GetCategoryWithSpecializationsById), nameof(CategoryService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get category details", nameof(GetCategoryWithSpecializationsById), nameof(CategoryService), LogType.SYSTEM);
                 throw;
             }
         }

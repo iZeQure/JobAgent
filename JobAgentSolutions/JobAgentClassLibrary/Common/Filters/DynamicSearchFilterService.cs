@@ -32,7 +32,7 @@ namespace JobAgentClassLibrary.Common.Filters
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to create DynamicSearchFilter", nameof(CreateAsync), nameof(DynamicSearchFilterService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to create DynamicSearchFilter", nameof(CreateAsync), nameof(DynamicSearchFilterService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -49,7 +49,7 @@ namespace JobAgentClassLibrary.Common.Filters
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get DynamicSeachFilters", nameof(GetAllAsync), nameof(DynamicSearchFilterService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get DynamicSeachFilters", nameof(GetAllAsync), nameof(DynamicSearchFilterService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -67,7 +67,7 @@ namespace JobAgentClassLibrary.Common.Filters
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to get DynamicSeachFilter by id", nameof(GetByIdAsync), nameof(DynamicSearchFilterService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to get DynamicSeachFilter by id", nameof(GetByIdAsync), nameof(DynamicSearchFilterService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -85,7 +85,7 @@ namespace JobAgentClassLibrary.Common.Filters
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to remove DynamicSeachFilter", nameof(RemoveAsync), nameof(DynamicSearchFilterService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to remove DynamicSeachFilter", nameof(RemoveAsync), nameof(DynamicSearchFilterService), LogType.SYSTEM);
                 throw;
             }
         }
@@ -103,7 +103,7 @@ namespace JobAgentClassLibrary.Common.Filters
             }
             catch (Exception ex)
             {
-                await _logService.LogError(ex, "Failed to update DynamicSeachFilter", nameof(UpdateAsync), nameof(DynamicSearchFilterService), LogType.SERVICE);
+                await _logService.LogError(ex, "Failed to update DynamicSeachFilter", nameof(UpdateAsync), nameof(DynamicSearchFilterService), LogType.SYSTEM);
                 throw;
             }
         }
