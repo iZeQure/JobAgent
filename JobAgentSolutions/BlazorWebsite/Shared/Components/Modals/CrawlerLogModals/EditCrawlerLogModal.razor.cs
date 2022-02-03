@@ -74,7 +74,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
             }
             using (var _ = Model.TimedEndOfOperation())
             {
-                SystemLog DbLog = new()
+                SystemLog SystemLog = new()
                 {
                     Id = Model.Id,
                     Action = Model.Action,
@@ -85,7 +85,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
                     LogType = Model.LogType
                 };
 
-                var result = await LogService.UpdateAsync(DbLog);
+                var result = await LogService.UpdateAsync(SystemLog);
 
                 if (result is null)
                 {

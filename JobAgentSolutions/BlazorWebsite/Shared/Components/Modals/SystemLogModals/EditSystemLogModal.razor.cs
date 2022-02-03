@@ -73,7 +73,7 @@ namespace BlazorWebsite.Shared.Components.Modals.SystemLogModals
             }
             using (var _ = Model.TimedEndOfOperation())
             {
-                SystemLog DbLog = new()
+                SystemLog SystemLog = new()
                 {
                     Id = Model.Id,
                     Action = Model.Action,
@@ -84,7 +84,7 @@ namespace BlazorWebsite.Shared.Components.Modals.SystemLogModals
                     LogType = LogType.DATABASE
                 };
 
-                var result = await LogService.UpdateAsync(DbLog);
+                var result = await LogService.UpdateAsync(SystemLog);
 
                 if (result is null)
                 {
@@ -96,7 +96,7 @@ namespace BlazorWebsite.Shared.Components.Modals.SystemLogModals
             if (Model.IsProcessing is false)
             {
                 RefreshProvider.CallRefreshRequest();
-                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditDbLog");
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditSystemLog");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
             }
         }

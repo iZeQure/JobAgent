@@ -24,12 +24,12 @@ namespace BlazorWebsite.Shared.Components.Modals.SystemLogModals
             {
                 _isProcessing = true;
 
-                SystemLog dbLog = new()
+                SystemLog systemLog = new()
                 {
                     Id = id
                 };
 
-                var result = await LogService.RemoveAsync(dbLog);
+                var result = await LogService.RemoveAsync(systemLog);
 
                 if (!result)
                 {
@@ -39,7 +39,7 @@ namespace BlazorWebsite.Shared.Components.Modals.SystemLogModals
                 }
 
                 RefreshProvider.CallRefreshRequest();
-                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalRemoveDbLog");
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalRemoveSystemLog");
             }
             catch (Exception ex)
             {

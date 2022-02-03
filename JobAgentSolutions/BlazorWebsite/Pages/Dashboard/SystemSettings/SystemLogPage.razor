@@ -18,7 +18,7 @@
         }
         else
         {
-            <a class="btn btn-sm btn-info cursor-pointer text-white" data-bs-toggle="modal" data-bs-target="#ModalCreateDbLog">
+            <a class="btn btn-sm btn-info cursor-pointer text-white" data-bs-toggle="modal" data-bs-target="#ModalCreateSystemLog">
                 Opret ny Log
             </a>
         }
@@ -76,13 +76,13 @@ else
                                 <td>@(log.CreatedDateTime)</td>
 
                                 @*<td>
-                                    <span data-bs-toggle="modal" data-bs-target="#ModalEditDbLog" @onclick="@(mouseEvent => OnClick_EditLink(log.Id))">
+                                    <span data-bs-toggle="modal" data-bs-target="#ModalEditSystemLog" @onclick="@(mouseEvent => OnClick_EditLink(log.Id))">
                                     <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne jobside." Color="Popover.PopoverType.Info" />
                                     </span>
                                     </td>
 
                                     <td>
-                                    <span data-bs-toggle="modal" data-bs-target="#ModalRemoveDbLog" @onclick="@(mouseEvent => ConfirmationWindow(log.Id))">
+                                    <span data-bs-toggle="modal" data-bs-target="#ModalRemoveSystemLog" @onclick="@(mouseEvent => ConfirmationWindow(log.Id))">
                                     <Popover Title="Forsigtig!" Body="Denne knap sletter den valgte jobside, forevigt!" Color="Popover.PopoverType.Danger" />
                                     </span>
                                     </td>*@
@@ -97,10 +97,10 @@ else
         }
     }
 
-    <CreateDbLogModal />
+    <CreateSystemLogModal />
 
-    <EditDbLogModal Model="_logModel" />
+    <EditSystemLogModal Model="_logModel" />
 
-    <RemoveDbLogModal Id="_logId" />
+    <RemoveSystemLogModal Id="_logId" />
 
 }

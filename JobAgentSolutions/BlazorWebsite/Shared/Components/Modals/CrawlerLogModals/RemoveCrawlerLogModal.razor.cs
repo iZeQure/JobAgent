@@ -24,12 +24,12 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
             {
                 _isProcessing = true;
 
-                SystemLog dbLog = new()
+                SystemLog SystemLog = new()
                 {
                     Id = id
                 };
 
-                var result = await LogService.RemoveAsync(dbLog);
+                var result = await LogService.RemoveAsync(SystemLog);
 
                 if (!result)
                 {

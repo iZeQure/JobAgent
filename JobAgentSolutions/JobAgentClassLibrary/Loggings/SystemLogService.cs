@@ -42,7 +42,7 @@ namespace JobAgentClassLibrary.Loggings
         public async Task<ILog> LogError(Exception exception, string message, string action, string createdBy, LogType logType)
         {
             string msg = $"{message} : {exception.Message}";
-            ILog log = (ILog)_logEntityFactory.CreateEntity("DbLog", 0, LogSeverity.ERROR, msg, action, createdBy, DateTime.Now, logType);
+            ILog log = (ILog)_logEntityFactory.CreateEntity("SystemLog", 0, LogSeverity.ERROR, msg, action, createdBy, DateTime.Now, logType);
             return await _repository.CreateAsync(log);
         }
 

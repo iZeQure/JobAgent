@@ -4,7 +4,7 @@ using System;
 
 namespace JobAgentClassLibrary.Loggings.Entities.EntityMaps
 {
-    [Table("DbLogInformation")]
+    [Table("SystemLogInformation")]
     public class LogInformation : ILog
     {
         public DateTime CreatedDateTime => LogCreatedDateTime;
