@@ -4,8 +4,6 @@ using JobAgentClassLibrary.Common.Users;
 using JobAgentClassLibrary.Common.Users.Factory;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using System.ComponentModel.DataAnnotations;
-using System.Net.Mail;
 using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Auth
