@@ -1,5 +1,4 @@
-﻿using BlazorWebsite.Data.Services;
-using JobAgentClassLibrary.Common.Companies;
+﻿using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.JobAdverts;
 using JobAgentClassLibrary.Common.JobAdverts.Entities;
@@ -14,15 +13,13 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages
 {
-    public partial class JobCardPage : ComponentBase
+    public partial class JobCardPage
     {
         [Parameter] public int CategoryId { get; set; }
         [Parameter] public int SpecializationId { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
         [Inject] protected IVacantJobService VacantJobService { get; set; }
         [Inject] protected IJobAdvertService JobAdvertService { get; set; }
-        [Inject] protected PaginationService PaginationService { get; set; }
-        [Inject] protected NavigationManager NavigationManager { get; set; }
 
         private CultureInfo cultureInfo = CultureInfo.CreateSpecificCulture("da-DK");
         private IEnumerable<IJobAdvert> _jobAdverts = new List<JobAdvert>();
@@ -75,6 +72,11 @@ namespace BlazorWebsite.Pages
             {
                 _isLoadingData = false;
             }
+        }
+
+        public async override Task RefreshContent()
+        {
+            await LoadDataAsync();
         }
     }
 }
