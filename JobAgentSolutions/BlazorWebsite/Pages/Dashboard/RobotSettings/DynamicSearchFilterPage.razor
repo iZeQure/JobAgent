@@ -1,5 +1,6 @@
 ﻿@page "/admin/robot/settings/dynamic/search-filter"
 @attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
+@inherits BasePage
 @using BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals;
 
 <PageDocumentTitle DocumentTitle="Administrer - Dynamiske Søgeord" />
@@ -24,15 +25,15 @@ else
     @if (_dynamicSearchFilters == null)
     {
         <MessageAlert Alert="MessageAlert.AlertType.Info"
-                      Message="Indlæser robot søgeord.." IsLoading="true" />
+              Message="Indlæser robot søgeord.." IsLoading="true" />
     }
     else
     {
-        @if (!_dynamicSearchFilters.Any())
+        @if (!PaginationService.CreatePaging(_dynamicSearchFilters).Any())
         {
             <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                          Message="Der blev ikke fundet nogen søgeord."
-                          MessageOptional="Opret søgeord, ved at trykke på knappen : Opret nyt søgeord." />
+              Message="Der blev ikke fundet nogen søgeord."
+              MessageOptional="Opret søgeord, ved at trykke på knappen : Opret nyt søgeord." />
         }
         else
         {
@@ -51,21 +52,21 @@ else
                     </thead>
                     <tbody>
 
-                        @foreach (var jobPage in _dynamicSearchFilters)
+                        @foreach (var dynamicSearchFilter in PaginationService.CreatePaging(_dynamicSearchFilters))
                         {
-                            <tr id="@(jobPage.Id)">
-                                <th scope="row">@(jobPage.Id)</th>
-                                <td>@(jobPage.Key)</td>
+                            <tr id="@(dynamicSearchFilter.Id)">
+                                <th scope="row">@(dynamicSearchFilter.Id)</th>
+                                <td>@(dynamicSearchFilter.Key)</td>
                                 @foreach (var category in _categories)
                                 {
-                                    if (jobPage.CategoryId == category.Id)
+                                    if (dynamicSearchFilter.CategoryId == category.Id)
                                     {
                                         <td>@category.Name</td>
                                     }
                                 }
                                 @foreach (var specialization in _specializations)
                                 {
-                                    if (jobPage.SpecializationId == specialization.Id)
+                                    if (dynamicSearchFilter.SpecializationId == specialization.Id)
                                     {
 
                                         <td>@(specialization.Name)</td>
@@ -73,13 +74,13 @@ else
                                 }
 
                                 <td>
-                                    <span data-bs-toggle="modal" data-bs-target="#ModalEditDynamicSearchFilter" @onclick="@(mouseEvent => OnClick_EditLink(jobPage.Id))">
+                                    <span data-bs-toggle="modal" data-bs-target="#ModalEditDynamicSearchFilter" @onclick="@(mouseEvent => OnClick_EditLinkAsync(dynamicSearchFilter.Id))">
                                         <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette søgeord." Color="Popover.PopoverType.Info" />
                                     </span>
                                 </td>
 
                                 <td>
-                                    <span data-bs-toggle="modal" data-bs-target="#ModalRemoveDynamicSearchFilter" @onclick="@(mouseEvent => ConfirmationWindow(jobPage.Id))">
+                                    <span data-bs-toggle="modal" data-bs-target="#ModalRemoveDynamicSearchFilter" @onclick="@(mouseEvent => ConfirmationWindow(dynamicSearchFilter.Id))">
                                         <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte søgeord, forevigt!" Color="Popover.PopoverType.Danger" />
                                     </span>
                                 </td>
@@ -88,6 +89,7 @@ else
                     </tbody>
                 </table>
             </div>
+            <Paging/>
         }
     }
 

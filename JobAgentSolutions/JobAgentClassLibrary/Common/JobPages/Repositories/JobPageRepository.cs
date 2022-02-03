@@ -45,7 +45,7 @@ namespace JobAgentClassLibrary.Common.JobPages.Repositories
             return null;
         }
 
-        public async Task<List<IJobPage>> GetAllAsync()
+        public async Task<List<IJobPage>> GetAllSystemLogsAsync()
         {
             List<IJobPage> jobPages = new();
 

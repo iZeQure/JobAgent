@@ -4,8 +4,10 @@ using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.JobPages;
 using JobAgentClassLibrary.Common.JobPages.Entities;
+using JobAgentClassLibrary.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using PolicyLibrary.Validators;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,10 +22,10 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
         [Inject] protected IJobPageService JobPageService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
 
+        private DefaultValidator defaultValidator = new();
         private IEnumerable<ICompany> _companies = new List<Company>();
 
         private string _errorMessage = "";
-        private bool _isProcessing = false;
         private bool _isLoading = false;
 
         protected override async Task OnInitializedAsync()
@@ -54,12 +56,35 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
             }
         }
 
-        private async Task OnValidSubmit_EditJobVacancy()
+        private async Task OnValidSubmit_EditJobVacancyAsync()
         {
-            _isProcessing = true;
-
-            try
+            if (Model.IsProcessing is true)
             {
+                return;
+            }
+            using (var _ = Model.TimedEndOfOperation())
+            {
+
+                if (Model.CompanyId <= 0)
+                {
+                    _errorMessage = "Vælg et company for at tilføje link.";
+                    return;
+                }
+
+                try
+                {
+                    if (!defaultValidator.ValidateUrl(Model.URL))
+                    {
+                        _errorMessage = "Ikke en valid URL.";
+                        return;
+                    }
+                }
+                catch (Exception)
+                {
+                    _errorMessage = "Fejl i Jobsidens Link. Prøv igen eller tjek for fejl.";
+                    return;
+                }
+
                 JobPage jobPage = new()
                 {
                     Id = Model.Id,
@@ -67,31 +92,20 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
                     URL = Model.URL
                 };
 
-                bool isUpdated = false;
                 var result = await JobPageService.UpdateAsync(jobPage);
 
-                if (result.Id == Model.Id && result.URL == Model.URL)
-                {
-                    isUpdated = true;
-                }
-
-                if (!isUpdated)
+                if (result is null)
                 {
                     _errorMessage = "Kunne ikke opdatere Jobside.";
                     return;
                 }
+            }
 
+            if (Model.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditJobPage");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
-            }
-            catch (Exception ex)
-            {
-                _errorMessage = ex.Message;
-            }
-            finally
-            {
-                _isProcessing = false;
             }
         }
 

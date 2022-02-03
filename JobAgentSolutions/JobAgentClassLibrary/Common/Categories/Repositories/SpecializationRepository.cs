@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Dapper;
 using JobAgentClassLibrary.Common.Categories.Factory;
 using JobAgentClassLibrary.Common.Categories.Entities.EntityMaps;
+using System;
 
 namespace JobAgentClassLibrary.Common.Categories.Repositories
 {
@@ -23,6 +24,11 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
 
         public async Task<ISpecialization> CreateAsync(ISpecialization entity)
         {
+            if (string.IsNullOrEmpty(entity.Name))
+            {
+                throw new ArgumentNullException(nameof(entity), "Specialization name is Null or Empty.");
+            }
+
             int entityId = 0;
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.CreateUser))
@@ -42,7 +48,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
             return null;
         }
 
-        public async Task<List<ISpecialization>> GetAllAsync()
+        public async Task<List<ISpecialization>> GetAllSystemLogsAsync()
         {
             List<ISpecialization> specializations = new();
 

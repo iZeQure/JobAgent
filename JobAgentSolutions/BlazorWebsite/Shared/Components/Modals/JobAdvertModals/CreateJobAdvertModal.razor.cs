@@ -8,6 +8,7 @@ using JobAgentClassLibrary.Common.JobAdverts;
 using JobAgentClassLibrary.Common.JobAdverts.Entities;
 using JobAgentClassLibrary.Common.VacantJobs;
 using JobAgentClassLibrary.Common.VacantJobs.Entities;
+using JobAgentClassLibrary.Extensions;
 using JobAgentClassLibrary.Security.Providers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -28,27 +29,26 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
         [Inject] protected ICategoryService CategoryService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
 
+        private EditContext _editContext;
         private JobAdvertModel _jobAdvertModel = new();
-        private IEnumerable<IVacantJob> _vacantJobs;
-        private IEnumerable<ICategory> _categories;
         private IEnumerable<ICompany> _companies;
+        private IEnumerable<ICategory> _categories;
+        private IEnumerable<IVacantJob> _vacantJobs;
         private IEnumerable<ISpecialization> _specializations;
         private IEnumerable<ISpecialization> _sortedSpecializations;
-        private EditContext _editContext;
 
         private string _errorMessage = "";
         private bool _isLoading = false;
-        private bool _isProcessing = false;
 
         protected override async Task OnInitializedAsync()
         {
             _editContext = new(_jobAdvertModel);
             _editContext.AddDataAnnotationsValidation();
 
-            await LoadModalInformation();
+            await LoadModalInformationAsync();
         }
 
-        private async Task LoadModalInformation()
+        private async Task LoadModalInformationAsync()
         {
             _isLoading = true;
 
@@ -86,8 +86,14 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
 
         private async Task OnValidSubmit_CreateJobAdvertAsync()
         {
-            _isProcessing = true;
-            try
+            if (_jobAdvertModel.IsProcessing is true)
+            {
+                return;
+            }
+
+            IJobAdvert result = null;
+
+            using (var _ = _jobAdvertModel.TimedEndOfOperation())
             {
                 JobAdvert jobAdvert = new()
                 {
@@ -97,32 +103,22 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
                     Title = _jobAdvertModel.Title,
                     Summary = _jobAdvertModel.Summary,
                     RegistrationDateTime = _jobAdvertModel.RegistrationDateTime
-                    
                 };
-                bool isCreated = false;
-                var result = await JobAdvertService.CreateAsync(jobAdvert);
 
-                if (result.Id == _jobAdvertModel.Id && result.Title == _jobAdvertModel.Title)
-                {
-                    isCreated = true;
-                }
+                result = await JobAdvertService.CreateAsync(jobAdvert);
 
-                if (isCreated)
+                if (result is null)
                 {
-                    RefreshProvider.CallRefreshRequest();
-                    await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateJobAdvert");
+                    _errorMessage = "Fejl i oprettelse af JobOpslag.";
                     return;
                 }
+            }
 
-                _errorMessage = "Kunne ikke oprette stilingsopslag!";
-            }
-            catch (Exception ex)
+            if (_jobAdvertModel.IsProcessing is false)
             {
-                _errorMessage = ex.Message;
-            }
-            finally
-            {
-                _isProcessing = false;
+                RefreshProvider.CallRefreshRequest();
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateJobAdvert");
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{result.Id}");
             }
         }
 

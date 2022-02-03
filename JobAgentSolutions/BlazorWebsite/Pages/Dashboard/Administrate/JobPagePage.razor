@@ -1,5 +1,6 @@
 ﻿@page "/admin/settings/jobpages"
 @attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
+@inherits BasePage
 @using BlazorWebsite.Shared.Components.Modals.JobPageModals;
 
 <PageDocumentTitle DocumentTitle="Administrer - Virksomheds Links" />
@@ -34,15 +35,15 @@ else
     @if (_jobPages == null)
     {
         <MessageAlert Alert="MessageAlert.AlertType.Info"
-                      Message="Indlæser robot links.." IsLoading="true" />
+              Message="Indlæser robot links.." IsLoading="true" />
     }
     else
     {
-        @if (!_jobPages.Any())
+        @if (!PaginationService.CreatePaging(_jobPages).Any())
         {
             <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                          Message="Der blev ikke fundet nogen links."
-                          MessageOptional="Opret links, ved at trykke på knappen : Opret nyt Link." />
+              Message="Der blev ikke fundet nogen links."
+              MessageOptional="Opret links, ved at trykke på knappen : Opret nyt Link." />
         }
         else
         {
@@ -60,7 +61,7 @@ else
                     </thead>
                     <tbody>
 
-                        @foreach (var jobPage in _jobPages.OrderBy(x => x.CompanyId))
+                        @foreach (var jobPage in PaginationService.CreatePaging(_jobPages.OrderBy(x => x.CompanyId)))
                         {
                             <tr id="@(jobPage.Id)">
                                 <th scope="row">@(jobPage.Id)</th>
@@ -74,7 +75,7 @@ else
                                 <td>@(jobPage.URL)</td>
 
                                 <td>
-                                    <span data-bs-toggle="modal" data-bs-target="#ModalEditJobPage" @onclick="@(mouseEvent => OnClick_EditLink(jobPage.Id))">
+                                    <span data-bs-toggle="modal" data-bs-target="#ModalEditJobPage" @onclick="@(mouseEvent => OnClick_EditLinkAsync(jobPage.Id))">
                                         <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne jobside." Color="Popover.PopoverType.Info" />
                                     </span>
                                 </td>
@@ -89,12 +90,13 @@ else
                     </tbody>
                 </table>
             </div>
+            <Paging />
         }
     }
 
     <CreateJobPageModal />
 
-    <EditJobPageModal Model ="_jobPageModel" />
+    <EditJobPageModal Model="_jobPageModel" />
 
     <RemoveJobPageModal Id="_jobPageId" />
 }

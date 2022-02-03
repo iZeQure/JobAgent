@@ -1,5 +1,4 @@
 ﻿using BlazorWebsite.Data.FormModels;
-using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.VacantJobs;
@@ -11,9 +10,8 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Dashboard.RobotSettings
 {
-    public partial class VacantJobPage : ComponentBase
+    public partial class VacantJobPage
     {
-        [Inject] private IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IVacantJobService VacantJobService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
 
@@ -27,12 +25,10 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
 
         protected override async Task OnInitializedAsync()
         {
-            RefreshProvider.RefreshRequest += RefreshContent;
-
-            await LoadData();
+            await LoadDataAsync();
         }
 
-        private async Task LoadData()
+        private async Task LoadDataAsync()
         {
             dataIsLoading = true;
             try
@@ -57,7 +53,7 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
             _vacantJobId = id;
         }
 
-        private async Task OnClick_EditLink(int id)
+        private async Task OnClick_EditLinkAsync(int id)
         {
             try
             {
@@ -80,7 +76,7 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
             }
         }
 
-        private async Task RefreshContent()
+        public override async Task RefreshContent()
         {
             try
             {

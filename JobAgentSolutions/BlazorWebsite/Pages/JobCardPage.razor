@@ -1,6 +1,7 @@
 ﻿@page "/job/uncategorized"
 @page "/job/{CategoryId:int}"
 @page "/job/{CategoryId:int}/{SpecializationId:int}"
+@inherits BasePage
 
 <div class="container-fluid my-3">
     @if (_isLoadingData)
@@ -35,7 +36,7 @@
     {
         <div id="job-wrapper">
             <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 g-4 px-3 py-3">
-                @foreach (var jobAdvert in _jobAdverts)
+                @foreach (var jobAdvert in PaginationService.CreatePaging(_jobAdverts))
                 {
                     @foreach (var company in _companies)
                     {
@@ -52,7 +53,7 @@
                                                     <p class="card-subtitle"><small>@company.Name</small></p>
                                                     <p class="card-text card-content">@jobAdvert.Summary</p>
                                                     <p class="card-subtitle"><small>Oprettet: @jobAdvert.RegistrationDateTime.ToString("dddd, d MMM yyyy", cultureInfo)</small></p>
-                                                    <a href="@vacantJob.URL" class="btn btn-outline-light">Se Stilling</a>
+                                                    <a target="_blank" href="@vacantJob.URL" class="btn btn-outline-light">Se Stilling</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -64,5 +65,7 @@
                 }
             </div>
         </div>
+
+        <Paging />
     }
 </div>

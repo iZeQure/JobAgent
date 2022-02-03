@@ -34,7 +34,7 @@ namespace JobAgentClassLibraryTests.RepositoryTests
             IArea firstArea;
 
             // Act
-            var areas = await _areaRepository.GetAllAsync();
+            var areas = await _areaRepository.GetAllSystemLogsAsync();
             firstArea = areas.First();
 
             // Assert

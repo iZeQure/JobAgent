@@ -1,6 +1,7 @@
 ﻿using BlazorWebsite.Data.FormModels;
 using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Core.Entities;
+using JobAgentClassLibrary.Extensions;
 using JobAgentClassLibrary.Loggings;
 using JobAgentClassLibrary.Loggings.Entities;
 using JobAgentClassLibrary.Security.Providers;
@@ -23,14 +24,12 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
         [Inject] protected ILogService LogService { get; set; }
 
         private LogModel _logModel = new();
-        private IEnumerable<ILog> _logs;
         private List<LogSeverity> _logSeverities = new();
         private List<LogType> _logTypes = new();
         private EditContext _editContext;
 
         private string _errorMessage = "";
         private bool _isLoading = false;
-        private bool _isProcessing = false;
         private string _sessionUserEmail;
 
         protected override async Task OnInitializedAsync()
@@ -57,46 +56,17 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
                     _sessionUserEmail = sessionClaim.Value;
                 }
             }
-
-            await LoadModalInformation();
-        }
-
-        private async Task LoadModalInformation()
-        {
-            _isLoading = true;
-
-            try
-            {
-                var logTask = LogService.GetAllDbLogsAsync();
-
-                try
-                {
-                    await TaskExtProvider.WhenAll(logTask);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-
-                _logs = logTask.Result;
-            }
-            catch (Exception)
-            {
-                _errorMessage = "Uventet fejl. Prøv at genindlæse siden.";
-            }
-            finally
-            {
-                _isLoading = false;
-                StateHasChanged();
-            }
         }
 
         private async Task OnValidSubmit_CreateLogAsync()
         {
-            _isProcessing = true;
-            try
+            if (_logModel.IsProcessing is true)
             {
-                DbLog DbLog = new()
+                return;
+            }
+            using (var _ = _logModel.TimedEndOfOperation())
+            {
+                SystemLog SystemLog = new()
                 {
                     Id = _logModel.Id,
                     Action = _logModel.Action,
@@ -107,31 +77,20 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
                     LogType = LogType.CRAWLER
                 };
 
-                bool isCreated = false;
-                var result = await LogService.CreateAsync(DbLog);
+                var result = await LogService.CreateAsync(SystemLog);
 
-                if (result.Id == _logModel.Id && result.Message == _logModel.Message)
+                if (result is null)
                 {
-                    isCreated = true;
+                    _errorMessage = "Fejl under oprettelse af Log.";
+                    return;
                 }
+            }
 
-                if (!isCreated)
-                {
-                    _errorMessage = "Kunne ikke oprette Robot Log grundet ukendt fejl";
-                }
-
+            if (_logModel.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateCrawlerLog");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{_logModel.Id}");
-
-            }
-            catch (Exception ex)
-            {
-                _errorMessage = ex.Message;
-            }
-            finally
-            {
-                _isProcessing = false;
             }
         }
 

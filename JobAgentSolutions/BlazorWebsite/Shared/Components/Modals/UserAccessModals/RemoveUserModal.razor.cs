@@ -1,15 +1,17 @@
 ﻿using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Users;
-using JobAgentClassLibrary.Common.Users.Entities;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Modals.UserAccessModals
 {
     public partial class RemoveUserModal : ComponentBase
     {
+        [CascadingParameter] private Task<AuthenticationState> AuthState { get; set; }
         [Parameter] public int Id { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
@@ -17,17 +19,32 @@ namespace BlazorWebsite.Shared.Components.Modals.UserAccessModals
 
         private string _errorMessage = "";
         private bool _isProcessing = false;
+        private string _sessionUserEmail;
 
-        private async Task OnClick_RemoveJobPage(int id)
+
+        private async Task OnClick_RemoveJobPageAsync(int id)
         {
             try
             {
                 _isProcessing = true;
 
-                IUser user = new User()
+                var session = await AuthState;
+
+                foreach (var sessionClaim in session.User.Claims)
                 {
-                    Id = id
-                };
+                    if (sessionClaim.Type == ClaimTypes.Email)
+                    {
+                        _sessionUserEmail = sessionClaim.Value;
+                    }
+                }
+
+                var user = await UserService.GetUserByIdAsync(id);
+
+                if (user.Email == _sessionUserEmail)
+                {
+                    _errorMessage = "Du kan ikke slette din egen bruger.";
+                    return;
+                }
 
                 var result = await UserService.RemoveAsync(user);
 

@@ -4,8 +4,10 @@ using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.VacantJobs;
 using JobAgentClassLibrary.Common.VacantJobs.Entities;
+using JobAgentClassLibrary.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using PolicyLibrary.Validators;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -17,13 +19,13 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
         [Parameter] public VacantJobModel Model { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
-        [Inject] protected IVacantJobService JobPageService { get; set; }
+        [Inject] protected IVacantJobService VacantJobService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
 
+        private DefaultValidator defaultValidator = new();
         private IEnumerable<ICompany> _companies = new List<Company>();
 
         private string _errorMessage = "";
-        private bool _isProcessing = false;
         private bool _isLoading = false;
 
         protected override async Task OnInitializedAsync()
@@ -54,12 +56,34 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
             }
         }
 
-        private async Task OnValidSubmit_EditJobVacancy()
+        private async Task OnValidSubmit_EditJobVacancyAsync()
         {
-            _isProcessing = true;
-
-            try
+            if (Model.IsProcessing is true)
             {
+                return;
+            }
+            using (var _ = Model.TimedEndOfOperation())
+            {
+                if (Model.CompanyId <= 0)
+                {
+                    _errorMessage = "Vælg et company for at tilføje link.";
+                    return;
+                }
+
+                try
+                {
+                    if (!defaultValidator.ValidateUrl(Model.URL))
+                    {
+                        _errorMessage = "Ikke en valid URL.";
+                        return;
+                    }
+                }
+                catch (Exception)
+                {
+                    _errorMessage = "Fejl i stillingsopslagets Link. Prøv igen eller tjek for fejl.";
+                    return;
+                }
+
                 VacantJob vacantJob = new()
                 {
                     Id = Model.Id,
@@ -67,31 +91,20 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
                     URL = Model.URL
                 };
 
-                bool isUpdated = false;
-                var result = await JobPageService.UpdateAsync(vacantJob);
+                var result = await VacantJobService.UpdateAsync(vacantJob);
 
-                if (result.Id == Model.Id && result.URL == Model.URL)
+                if (result is null)
                 {
-                    isUpdated = true;
-                }
-
-                if (!isUpdated)
-                {
-                    _errorMessage = "Kunne ikke opdatere stillingsopslaget.";
+                    _errorMessage = "Fejl under opdatering af stillingen.";
                     return;
                 }
+            }
 
+            if (Model.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditVacantJob");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
-            }
-            catch (Exception ex)
-            {
-                _errorMessage = ex.Message;
-            }
-            finally
-            {
-                _isProcessing = false;
             }
         }
 

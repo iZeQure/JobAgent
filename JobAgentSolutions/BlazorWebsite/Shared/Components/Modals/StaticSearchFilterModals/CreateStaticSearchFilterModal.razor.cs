@@ -2,12 +2,14 @@
 using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Filters;
 using JobAgentClassLibrary.Common.Filters.Entities;
+using JobAgentClassLibrary.Extensions;
 using JobAgentClassLibrary.Security.Providers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
@@ -16,62 +18,32 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
     {
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
-        [Inject] protected IStaticSearchFilterService StaticcSearchFilterService { get; set; }
+        [Inject] protected IStaticSearchFilterService StaticSearchFilterService { get; set; }
         [Inject] protected IFilterTypeService FilterTypeService { get; set; }
 
         private StaticSearchFilterModel _staticSearchFilterModel = new();
-        private IEnumerable<IStaticSearchFilter> _staticSearchFilters;
         private IEnumerable<IFilterType> _filterTypes;
         private EditContext _editContext;
 
         private string _errorMessage = "";
         private bool _isLoading = false;
-        private bool _isProcessing = false;
 
         protected override async Task OnInitializedAsync()
         {
             _editContext = new(_staticSearchFilterModel);
             _editContext.AddDataAnnotationsValidation();
 
-            await LoadModalInformation();
+            await LoadModalInformationAsync();
         }
 
-        private async Task LoadModalInformation()
+        private async Task LoadModalInformationAsync()
         {
             _isLoading = true;
 
             try
             {
-                var companyTask = StaticcSearchFilterService.GetAllAsync();
-                var filterTypeTask = FilterTypeService.GetAllAsync();
-
-                try
-                {
-                    await TaskExtProvider.WhenAll(companyTask, filterTypeTask);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-
-                _staticSearchFilters = companyTask.Result;
-                _filterTypes = filterTypeTask.Result;
-
-
-                foreach (var staticFilter in _staticSearchFilters)
-                {
-                    foreach (var filterType in _filterTypes)
-                    {
-                        if (staticFilter.FilterType.Id == filterType.Id)
-                        {
-                            staticFilter.FilterType.Name = filterType.Name;
-                            staticFilter.FilterType.Description = filterType.Description;
-                        }
-                    }
-                }
-
-                _staticSearchFilterModel.FilterType = new();
-
+                _filterTypes = await FilterTypeService.GetAllAsync();
+                _staticSearchFilterModel.FilterType = (FilterType)_filterTypes.FirstOrDefault();
             }
             catch (Exception)
             {
@@ -84,45 +56,48 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
             }
         }
 
-        private async Task OnValidSubmit_CreateJobAdvertAsync()
+        private async Task OnValidSubmit_CreateStaticSearchFilterAsync()
         {
-            _isProcessing = true;
             try
             {
-                StaticSearchFilter staticSearchFilter = new()
+                if (_staticSearchFilterModel.IsProcessing is true)
                 {
-                    Id = _staticSearchFilterModel.Id,
-                    Key = _staticSearchFilterModel.Key,
-                    FilterType = _staticSearchFilterModel.FilterType
-                    
-                };
-
-                bool isCreated = false;
-                var result = await StaticcSearchFilterService.CreateAsync(staticSearchFilter);
-
-                if (result.Id == _staticSearchFilterModel.Id && result.Key == _staticSearchFilterModel.Key)
-                {
-                    isCreated = true;
+                    return;
                 }
 
-                if (!isCreated)
-                {
-                    _errorMessage = "Kunne ikke oprette søgeord grundet ukendt fejl";
-                }
+                IStaticSearchFilter result = null;
 
+                using (var _ = _staticSearchFilterModel.TimedEndOfOperation())
+                {
+                    StaticSearchFilter staticSearchFilter = new()
+                    {
+                        Id = _staticSearchFilterModel.Id,
+                        Key = _staticSearchFilterModel.Key,
+                        FilterType = _staticSearchFilterModel.FilterType
+
+                    };
+
+                    result = await StaticSearchFilterService.CreateAsync(staticSearchFilter);
+
+                    if (result is null)
+                    {
+                        _errorMessage = "Fejl under oprettelse af filter.";
+                        return;
+                    }
+                }
+                _staticSearchFilterModel.Id = result.Id;
+            }
+            catch (Exception)
+            {
+                _errorMessage = "Noget gik galt.";
+                return;
+            }
+
+            if (_staticSearchFilterModel.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateStaticSearchFilter");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{_staticSearchFilterModel.Id}");
-
-            }
-            catch (Exception ex)
-            {
-                _errorMessage = ex.Message;
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                _isProcessing = false;
             }
         }
 

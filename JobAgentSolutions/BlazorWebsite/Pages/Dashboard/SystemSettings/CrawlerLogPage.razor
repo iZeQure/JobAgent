@@ -1,13 +1,13 @@
 ﻿@page "/admin/system/settings/view-Crawlerlog"
 @attribute [Authorize(Roles = "Udvikler")]
+@inherits BasePage
 @using BlazorWebsite.Shared.Components.Modals.CrawlerLogModals;
 
 <PageDocumentTitle DocumentTitle="JobAgent - Robot Logs" />
 
 <div class="d-flex">
     <PageHeadingTitle DisplayTitle="Robot Logs" />
-    <div class="d-inline-block px-4 pt-4">
-
+    @*<div class="d-inline-block px-4 pt-4">
         @if (_logs == null)
         {
             <a class="btn btn-sm btn-info cursor-pointer text-white no-gutters disabled">
@@ -21,28 +21,29 @@
                 Opret ny Log
             </a>
         }
-
-    </div>
+    </div>*@
 </div>
 
 @if (dataIsLoading)
 {
-    <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="dataIsLoading" Message="Indlæser Logs.." />
+    Message = "Indlæser Logs...";
+    <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="dataIsLoading" Message="@Message" />
+
 }
 else
 {
     @if (_logs == null)
     {
-        <MessageAlert Alert="MessageAlert.AlertType.Info"
-                      Message="Indlæser robot links.." IsLoading="true" />
+        Message = "Indlæser Logs...";
+        <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="dataIsLoading" Message="@Message" />
     }
     else
     {
-        @if (!_logs.Any())
+        @if (!PaginationService.CreatePaging(_logs).Any())
         {
             <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                          Message="Der blev ikke fundet nogen logs."
-                          MessageOptional="Opret logs, ved at trykke på knappen : Opret ny Log." />
+              Message="Der blev ikke fundet nogen logs."
+              MessageOptional="Opret logs, ved at trykke på knappen : Opret ny Log." />
         }
         else
         {
@@ -63,7 +64,7 @@ else
                     </thead>
                     <tbody>
 
-                        @foreach (var log in _logs)
+                        @foreach (var log in PaginationService.CreatePaging(_logs))
                         {
                             <tr id="@(log.Id)">
                                 <th scope="row">@(log.Id)</th>
@@ -73,23 +74,25 @@ else
                                 <td>@(log.CreatedBy)</td>
                                 <td>@(log.CreatedDateTime)</td>
 
-                                <td>
+                                @*<td>
                                     <span data-bs-toggle="modal" data-bs-target="#ModalEditCrawlerLog" @onclick="@(mouseEvent => OnClick_EditLink(log.Id))">
-                                        <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne jobside." Color="Popover.PopoverType.Info" />
+                                    <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne jobside." Color="Popover.PopoverType.Info" />
                                     </span>
-                                </td>
+                                    </td>
 
-                                <td>
+                                    <td>
                                     <span data-bs-toggle="modal" data-bs-target="#ModalRemoveCrawlerLog" @onclick="@(mouseEvent => ConfirmationWindow(log.Id))">
-                                        <Popover Title="Forsigtig!" Body="Denne knap sletter den valgte jobside, forevigt!" Color="Popover.PopoverType.Danger" />
+                                    <Popover Title="Forsigtig!" Body="Denne knap sletter den valgte jobside, forevigt!" Color="Popover.PopoverType.Danger" />
                                     </span>
-                                </td>
+                                    </td>*@
 
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
+
+            <Paging />
         }
     }
 

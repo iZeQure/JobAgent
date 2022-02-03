@@ -1,12 +1,13 @@
 ﻿@page "/admin/settings/job-vacancies"
 @attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
+@inherits BasePage
 @using BlazorWebsite.Shared.Components.Modals.JobAdvertModals;
 
 <PageDocumentTitle DocumentTitle="Administrer - Stillingsopslag" />
 
 <div class="d-flex">
     <PageHeadingTitle DisplayTitle="Administrer Stillingsopslag" />
-    <div class="d-inline-block px-4 pt-4" >
+    <div class="d-inline-block px-4 pt-4">
 
         @if (_createJobAdvertBtnIsDisabled)
         {
@@ -31,10 +32,10 @@
 }
 else
 {
-    @if (_paginationModel == null || _dataIsLoading)
+    @if (_jobAdverts == null || _dataIsLoading)
     {
         <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                      Message="Indlæser data, vent venligst!" />
+              Message="Indlæser data, vent venligst!" />
     }
     else
     {
@@ -42,7 +43,7 @@ else
             <div class="d-flex flex-row-reverse">
                 <div class="filter">
                     <select class="custom-select-sm" @bind="_categoryId">
-                        <option selected value="0">--- Vælg kategori ---</option>
+                        <option selected value="@int.MaxValue">--- Vælg kategori ---</option>
                         @if (_categories == null)
                         {
                             <option>Ingen Kategorier fundet!</option>
@@ -64,24 +65,24 @@ else
         <section id="filterControls" class="mb-3">
             <div class="d-flex flex-row-reverse">
                 <div class="action">
-                    <button class="btn btn-sm btn-outline-info" @onclick="@(() => FilterJobAdverts())">Filtrér</button>
-                    <button class="btn btn-sm btn-outline-dark" @onclick="@(() => ClearFilteredContent())">Ryd Filtrering</button>
+                    <button class="btn btn-sm btn-outline-info" @onclick="@(() => FilterJobAdvertsAsync())">Filtrér</button>
+                    <button class="btn btn-sm btn-outline-dark" @onclick="@(() => ClearFilteredContentAsync())">Ryd Filtrering</button>
                 </div>
             </div>
         </section>
 
-        @if (!_paginationModel.PaginatedJobAdverts.Any())
+        @if (!PaginationService.CreatePaging(_jobAdverts).Any())
         {
             if (_filteredContentFound == false)
             {
                 <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                              Message="Ingen resultater fundet." />
+              Message="Ingen resultater fundet." />
             }
             else
             {
                 <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                              Message="Der blev ikke fundet nogen stillingsopslag."
-                              MessageOptional="Opret opslag, ved at trykke på knappen : Opret nyt Stillingsopslag. - Hvis knappen ikke er aktiveret, er det fordi der ikke blev fundet nogen virksomheder." />
+              Message="Der blev ikke fundet nogen stillingsopslag."
+              MessageOptional="Opret opslag, ved at trykke på knappen : Opret nyt Stillingsopslag. - Hvis knappen ikke er aktiveret, er det fordi der ikke blev fundet nogen virksomheder." />
             }
         }
         else
@@ -101,7 +102,7 @@ else
                     </thead>
                     <tbody>
 
-                        @foreach (var jobAdvert in _paginationModel.PaginatedJobAdverts)
+                        @foreach (var jobAdvert in PaginationService.CreatePaging(_jobAdverts))
                         {
                             <tr id="@jobAdvert.Id">
                                 <th scope="row">@jobAdvert.Id</th>
@@ -109,44 +110,35 @@ else
 
                                 @if (jobAdvert.SpecializationId is not 0)
                                 {
-                                    <td>
-                                        <SpecializationDetails @key="jobAdvert" Id="jobAdvert.SpecializationId" />
-                                        @*@(Task.Run<string>(async () =>
+                                    @foreach (var category in _categories)
+                                    {
+                                        if (category.Id == jobAdvert.CategoryId)
                                         {
-                                            var specializationName = (await CategoryService.GetSpecializationByIdAsync(jobAdvert.SpecializationId)).Name ?? "Kunne ikke indlæse speciale.";
-                                            return specializationName;
-                                        }))*@
+                                            _categoryName = category.Name;
+                                        }
+                                    }
+                                    <td>
+                                        <p>@_categoryName</p>
+                                        <SpecializationDetails @key="jobAdvert" Id="jobAdvert.SpecializationId" />
                                     </td>
                                 }
                                 else
                                 {
                                     <td>
                                         <CategoryDetails @key="jobAdvert" Id="jobAdvert.CategoryId" />
-                                        @*@(Task.Run<string>(async () =>
-                                        {
-                                            var categoryName = (await CategoryService.GetCategoryByIdAsync(jobAdvert.CategoryId)).Name ?? "Kunne ikke indlæse kategori.";
-                                            return categoryName;
-                                        }))*@
                                     </td>
                                 }
+
                                 <td>
                                     <CompanyDetails @key="jobAdvert" Id="jobAdvert.Id" />
-                                    @*@(Task.Run<string>(async () =>
-                                    {
-                                        var vacantJob = await VacantJobService.GetByIdAsync(jobAdvert.Id);
-
-                                        if (vacantJob is null) return "Kunne ikke indlæse ejer på stillingsopslaget.";
-
-                                        var companyName = (await CompanyService.GetByIdAsync(vacantJob.CompanyId)).Name ?? "Kunne ikke indlæse virksomhed.";
-
-                                        return companyName;
-                                    }))*@
                                 </td>
+
                                 <td>
-                                    <span @onclick="(id => OnButtonClick_EditJobAdvert_LoadJobAdvertDetails(jobAdvert.Id))" data-bs-toggle="modal" data-bs-target="#ModalEditJobAdvert">
+                                    <span @onclick="(id => OnButtonClick_EditJobAdvert_LoadJobAdvertDetailsAsync(jobAdvert.Id))" data-bs-toggle="modal" data-bs-target="#ModalEditJobAdvert">
                                         <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette opslag." Color="Popover.PopoverType.Info" />
                                     </span>
                                 </td>
+
                                 <td>
                                     <span @onclick="@(id => OnButtonClick_RemoveJobAdvert_StoreId(jobAdvert.Id))" data-bs-toggle="modal" data-bs-target="#ModalRemoveJobAdvert">
                                         <Popover Title="Forsigtig!" Body="Denne knap sletter det valgte opslag, forevigt!" Color="Popover.PopoverType.Danger" />
@@ -159,18 +151,7 @@ else
                 </table>
             </div>
 
-            <nav aria-label="Page Navigation">
-                <ul class="pagination justify-content-center">
-                    @for (int i = 1; i <= _paginationModel.PageCount(); i++)
-                    {
-                        var pageNumber = i;
-
-                        <li class="@(i == _paginationModel.CurrentPage ? "page-item active" : "page-item")">
-                            <a class="page-link" href="/admin/settings/job-vacancies" @onclick="@(() => FilterJobAdverts(pageNumber))">@(i)</a>
-                        </li>
-                    }
-                </ul>
-            </nav>
+            <Paging />
         }
     }
 

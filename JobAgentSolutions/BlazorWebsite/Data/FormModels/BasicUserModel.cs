@@ -1,10 +1,11 @@
-﻿using System;
+﻿using JobAgentClassLibrary.Core.Entities;
+using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace BlazorWebsite.Data.FormModels
 {
-    public class BasicUserModel
+    public class BasicUserModel : BaseModel
     {
         public string FirstName { get; set; }
 

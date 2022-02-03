@@ -6,9 +6,9 @@ using Microsoft.JSInterop;
 using System;
 using System.Threading.Tasks;
 
-namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
+namespace BlazorWebsite.Shared.Components.Modals.SystemLogModals
 {
-    public partial class RemoveDbLogModal : ComponentBase
+    public partial class RemoveSystemLogModal : ComponentBase
     {
         [Parameter] public int Id { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
@@ -18,18 +18,18 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
         private string _errorMessage = "";
         private bool _isProcessing = false;
 
-        private async Task OnClick_RemoveJobPage(int id)
+        private async Task OnClick_RemoveLogAsync(int id)
         {
             try
             {
                 _isProcessing = true;
 
-                DbLog dbLog = new()
+                SystemLog systemLog = new()
                 {
                     Id = id
                 };
 
-                var result = await LogService.RemoveAsync(dbLog);
+                var result = await LogService.RemoveAsync(systemLog);
 
                 if (!result)
                 {
@@ -39,7 +39,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
                 }
 
                 RefreshProvider.CallRefreshRequest();
-                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalRemoveDbLog");
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalRemoveSystemLog");
             }
             catch (Exception ex)
             {

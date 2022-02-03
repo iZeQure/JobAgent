@@ -1,5 +1,4 @@
 ﻿using BlazorWebsite.Data.FormModels;
-using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Locations;
 using JobAgentClassLibrary.Common.Locations.Entities;
 using JobAgentClassLibrary.Common.Roles;
@@ -14,9 +13,8 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Dashboard.Administrate
 {
-    public partial class UserAccessPage : ComponentBase
+    public partial class UserAccessPage
     {
-        [Inject] private IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
         [Inject] protected IUserService UserService { get; set; }
         [Inject] protected IRoleService RoleService { get; set; }
@@ -27,19 +25,18 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
         private IEnumerable<IRole> _roles;
         private IEnumerable<ILocation> _locations;
         private IUser _user;
-        private int _userId;
 
-        private int _jobPageId = 0;
+        private int _userId;
         private bool dataIsLoading = true;
 
         protected override async Task OnInitializedAsync()
         {
             RefreshProvider.RefreshRequest += RefreshContent;
 
-            await LoadData();
+            await LoadDataAsync();
         }
 
-        private async Task LoadData()
+        private async Task LoadDataAsync()
         {
             dataIsLoading = true;
             try
@@ -66,7 +63,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             _userId = id;
         }
 
-        private async Task OnClick_EditLink(int id)
+        private async Task OnClick_EditLinkAsync(int id)
         {
             try
             {
@@ -92,7 +89,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             }
         }
 
-        private async Task RefreshContent()
+        public override async Task RefreshContent()
         {
             try
             {

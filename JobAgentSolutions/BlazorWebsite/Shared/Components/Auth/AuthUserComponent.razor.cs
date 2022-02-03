@@ -4,8 +4,6 @@ using JobAgentClassLibrary.Common.Users;
 using JobAgentClassLibrary.Common.Users.Factory;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using System.ComponentModel.DataAnnotations;
-using System.Net.Mail;
 using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Auth
@@ -46,14 +44,21 @@ namespace BlazorWebsite.Shared.Components.Auth
                     return;
                 }
 
-                var authUser = await UserService.AuthenticateUserLoginAsync(_authUserModel.Email, _authUserModel.Password);
-
-                if (authUser is not null)
+                try
                 {
-                    await MyAuthStateProvider.MarkUserAsAuthenticated(authUser);
+                    var authUser = await UserService.AuthenticateUserLoginAsync(_authUserModel.Email, _authUserModel.Password);
 
-                    NavigationManager.NavigateTo("/admin", true);
-                    return;
+                    if (authUser is not null)
+                    {
+                        await MyAuthStateProvider.MarkUserAsAuthenticated(authUser);
+
+                        NavigationManager.NavigateTo("/admin", true);
+                        return;
+                    }
+                }
+                catch (System.Exception)
+                {
+                    _message = "Autentificerings Fejl.";
                 }
 
                 _message = "Fejl, forkert email eller adgangskode.";

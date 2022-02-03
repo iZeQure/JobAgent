@@ -60,7 +60,6 @@ h5 {
     color: var(--bs-table-bg-override) !important;
     position: relative;
     font-family: var(--ff-h5);
-    font-size: .75rem;
     text-decoration: none;
     text-align: left;
     text-transform: uppercase;
@@ -222,6 +221,24 @@ input::placeholder {
 
 .page-content hr {
     color: var(--clr-neutral-900);
+}
+
+.page-link {
+    position: relative;
+    display: block;
+    color: #0d6efd;
+    text-decoration: none;
+    background-color: var(--clr-bg);
+    border: 1px solid #dee2e6;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.modal label {
+    color: var(--clr-white);
+    background-color: var(--clr-neutral-900);
+    padding: 5px 10px 5px 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
 }
 
 #userprofile-container p {

@@ -1,9 +1,10 @@
 ﻿using JobAgentClassLibrary.Common.Filters.Entities;
+using JobAgentClassLibrary.Core.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace BlazorWebsite.Data.FormModels
 {
-    public class StaticSearchFilterModel
+    public class StaticSearchFilterModel : BaseModel
     {
         [Required]
         public int Id { get; set; }

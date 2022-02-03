@@ -1,9 +1,9 @@
 ﻿using JobAgentClassLibrary.Common.VacantJobs.Entities;
 using JobAgentClassLibrary.Common.VacantJobs.Repositories;
+using JobAgentClassLibrary.Core.Entities;
+using JobAgentClassLibrary.Loggings;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Common.VacantJobs
@@ -11,6 +11,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs
     public class VacantJobService : IVacantJobService
     {
         private readonly IVacantJobRepository _repository;
+        private readonly ILogService _logService;
 
         public VacantJobService(IVacantJobRepository repository)
         {
@@ -19,29 +20,68 @@ namespace JobAgentClassLibrary.Common.VacantJobs
 
         public async Task<IVacantJob> CreateAsync(IVacantJob entity)
         {
-            return await _repository.CreateAsync(entity);
+            try
+            {
+                return await _repository.CreateAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to create VacantJob", nameof(CreateAsync), nameof(VacantJobService), LogType.SYSTEM);
+                return null;
+            }
         }
 
         public async Task<List<IVacantJob>> GetAllAsync()
         {
-            return await _repository.GetAllAsync();
+            try
+            {
+                return await _repository.GetAllSystemLogsAsync();
+            }
+            catch (System.Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to get all VacantJobs", nameof(GetAllAsync), nameof(VacantJobService), LogType.SYSTEM);
+                return null;
+            }
         }
 
         public async Task<IVacantJob> GetByIdAsync(int id)
         {
-            return await _repository.GetByIdAsync(id);
+            try
+            {
+                return await _repository.GetByIdAsync(id);
+            }
+            catch (System.Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to get VacantJob by id", nameof(GetByIdAsync), nameof(VacantJobService), LogType.SYSTEM);
+                return null;
+            }
         }
 
         public async Task<bool> RemoveAsync(IVacantJob entity)
         {
-            return await _repository.RemoveAsync(entity);
+            try
+            {
+                return await _repository.RemoveAsync(entity);
+            }
+            catch (System.Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to remove VacantJob", nameof(RemoveAsync), nameof(VacantJobService), LogType.SYSTEM);
+                return false;
+            }
         }
 
         public async Task<IVacantJob> UpdateAsync(IVacantJob entity)
         {
-            return await _repository.UpdateAsync(entity);
+            try
+            {
+                return await _repository.UpdateAsync(entity);
+            }
+            catch (System.Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to update VacantJob", nameof(UpdateAsync), nameof(VacantJobService), LogType.SYSTEM);
+                return null;
+            }
         }
-
 
     }
 }

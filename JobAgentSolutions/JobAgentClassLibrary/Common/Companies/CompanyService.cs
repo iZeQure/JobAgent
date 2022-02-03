@@ -1,5 +1,8 @@
 ﻿using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.Companies.Repositories;
+using JobAgentClassLibrary.Core.Entities;
+using JobAgentClassLibrary.Loggings;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -8,40 +11,101 @@ namespace JobAgentClassLibrary.Common.Companies
     public class CompanyService : ICompanyService
     {
         private readonly ICompanyRepository _repository;
+        private readonly ILogService _logService;
 
-        public CompanyService(ICompanyRepository repository)
+        public CompanyService(ICompanyRepository repository, ILogService logService)
         {
             _repository = repository;
+            _logService = logService;
         }
 
-
+        /// <summary>
+        /// Creates a new Company in the database
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns>The created Company</returns>
         public async Task<ICompany> CreateAsync(ICompany entity)
         {
-            return await _repository.CreateAsync(entity);
+            try
+            {
+                return await _repository.CreateAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to create Company", nameof(CreateAsync), nameof(CompanyService), LogType.SYSTEM);
+                throw;
+            }
         }
 
-
+        /// <summary>
+        /// returns a list of all Companies in the database
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<ICompany>> GetAllAsync()
         {
-            return await _repository.GetAllAsync();
+            try
+            {
+                return await _repository.GetAllSystemLogsAsync();
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to get Companies", nameof(GetAllAsync), nameof(CompanyService), LogType.SYSTEM);
+                throw;
+            }
         }
 
-
+        /// <summary>
+        /// Returns a specific Company from the database
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<ICompany> GetByIdAsync(int id)
         {
-            return await _repository.GetByIdAsync(id);
+            try
+            {
+                return await _repository.GetByIdAsync(id);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to get Company by id", nameof(GetByIdAsync), nameof(CompanyService), LogType.SYSTEM);
+                throw;
+            }
         }
 
-
+        /// <summary>
+        /// Removes a Company from the database
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public async Task<bool> RemoveAsync(ICompany entity)
         {
-            return await _repository.RemoveAsync(entity);
+            try
+            {
+                return await _repository.RemoveAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to remove Company", nameof(RemoveAsync), nameof(CompanyService), LogType.SYSTEM);
+                throw;
+            }
         }
 
-
+        /// <summary>
+        /// Updates a Company in the database
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public async Task<ICompany> UpdateAsync(ICompany entity)
         {
-            return await _repository.UpdateAsync(entity);
+            try
+            {
+                return await _repository.UpdateAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogError(ex, "Failed to update Company", nameof(UpdateAsync), nameof(CompanyService), LogType.SYSTEM);
+                throw;
+            }
         }
 
     }

@@ -1,5 +1,4 @@
 ﻿using BlazorWebsite.Data.FormModels;
-using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Core.Entities;
 using JobAgentClassLibrary.Loggings;
 using JobAgentClassLibrary.Loggings.Entities;
@@ -10,14 +9,13 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Dashboard.SystemSettings
 {
-    public partial class DbLogPage
+    public partial class SystemLogPage
     {
-        [Inject] private IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected ILogService LogService { get; set; }
 
         private LogModel _logModel = new();
         private ILog _log;
-        public IEnumerable<ILog> _logs = new List<DbLog>();
+        public IEnumerable<ILog> _logs = new List<SystemLog>();
         private int _logId;
 
         private bool dataIsLoading = true;
@@ -26,15 +24,15 @@ namespace BlazorWebsite.Pages.Dashboard.SystemSettings
         {
             RefreshProvider.RefreshRequest += RefreshContent;
 
-            await LoadData();
+            await LoadDataAsync();
         }
 
-        private async Task LoadData()
+        private async Task LoadDataAsync()
         {
             dataIsLoading = true;
             try
             {
-                var logTask = LogService.GetAllDbLogsAsync();
+                var logTask = LogService.GetAllSystemLogsAsync();
 
                 await Task.WhenAll(logTask);
 
@@ -52,7 +50,7 @@ namespace BlazorWebsite.Pages.Dashboard.SystemSettings
             _logId = id;
         }
 
-        private async Task OnClick_EditLink(int id)
+        private async Task OnClick_EditLinkAsync(int id)
         {
             try
             {
@@ -66,7 +64,7 @@ namespace BlazorWebsite.Pages.Dashboard.SystemSettings
                     LogSeverity = _log.LogSeverity,
                     CreatedBy = _log.CreatedBy,
                     CreatedDateTime = _log.CreatedDateTime,
-                    LogType = LogType.DATABASE
+                    LogType = LogType.SYSTEM
                 };
             }
             catch (Exception ex)
@@ -79,11 +77,11 @@ namespace BlazorWebsite.Pages.Dashboard.SystemSettings
             }
         }
 
-        private async Task RefreshContent()
+        public async override Task RefreshContent()
         {
             try
             {
-                var logs = await LogService.GetAllDbLogsAsync();
+                var logs = await LogService.GetAllSystemLogsAsync();
 
                 if (logs == null)
                 {
@@ -97,6 +95,5 @@ namespace BlazorWebsite.Pages.Dashboard.SystemSettings
                 StateHasChanged();
             }
         }
-
     }
 }

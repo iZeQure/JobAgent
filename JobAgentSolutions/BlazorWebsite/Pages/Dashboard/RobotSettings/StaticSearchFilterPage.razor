@@ -1,5 +1,6 @@
 ﻿@page "/admin/robot/settings/static/search-filter"
 @attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
+@inherits BasePage
 @using BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals;
 
 <PageDocumentTitle DocumentTitle="Administrer - Statiske Søgefiltre" />
@@ -24,15 +25,15 @@ else
     @if (_staticSearchFilters == null)
     {
         <MessageAlert Alert="MessageAlert.AlertType.Info"
-                      Message="Indlæser robot søgefiltre.." IsLoading="true" />
+              Message="Indlæser robot søgefiltre.." IsLoading="true" />
     }
     else
     {
-        @if (!_staticSearchFilters.Any())
+        @if (!PaginationService.CreatePaging(_staticSearchFilters).Any())
         {
             <MessageAlert Alert="MessageAlert.AlertType.Warning"
-                          Message="Der blev ikke fundet nogen søgefiltre."
-                          MessageOptional="Opret søgefilter, ved at trykke på knappen : Opret nyt søgefilter." />
+              Message="Der blev ikke fundet nogen søgefiltre."
+              MessageOptional="Opret søgefilter, ved at trykke på knappen : Opret nyt søgefilter." />
         }
         else
         {
@@ -50,15 +51,15 @@ else
                     </thead>
                     <tbody>
 
-                        @foreach (var staticSearchFilter in _staticSearchFilters)
+                        @foreach (var staticSearchFilter in PaginationService.CreatePaging(_staticSearchFilters))
                         {
                             <tr id="@(staticSearchFilter.Id)">
                                 <th scope="row">@(staticSearchFilter.Id)</th>
                                 <td>@(staticSearchFilter.Key)</td>
                                 <td>@(staticSearchFilter.FilterType.Name)</td>
-                                
+
                                 <td>
-                                    <span data-bs-toggle="modal" data-bs-target="#ModalEditStaticSearchFilter" @onclick="@(mouseEvent => OnClick_EditLink(staticSearchFilter.Id))">
+                                    <span data-bs-toggle="modal" data-bs-target="#ModalEditStaticSearchFilter" @onclick="@(mouseEvent => OnClick_EditLinkAsync(staticSearchFilter.Id))">
                                         <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på dette søgefilter." Color="Popover.PopoverType.Info" />
                                     </span>
                                 </td>
@@ -73,6 +74,8 @@ else
                     </tbody>
                 </table>
             </div>
+
+            <Paging />
         }
     }
 

@@ -1,6 +1,7 @@
 ﻿using BlazorWebsite.Data.FormModels;
 using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Core.Entities;
+using JobAgentClassLibrary.Extensions;
 using JobAgentClassLibrary.Loggings;
 using JobAgentClassLibrary.Loggings.Entities;
 using Microsoft.AspNetCore.Components;
@@ -9,9 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
+namespace BlazorWebsite.Shared.Components.Modals.SystemLogModals
 {
-    public partial class EditDbLogModal : ComponentBase
+    public partial class EditSystemLogModal : ComponentBase
     {
         [Parameter] public LogModel Model { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
@@ -23,7 +24,6 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
         private IEnumerable<ILog> _logs;
 
         private string _errorMessage = "";
-        private bool _isProcessing = false;
         private bool _isLoading = false;
 
         protected override async Task OnInitializedAsync()
@@ -48,7 +48,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
 
             try
             {
-                var logTask = LogService.GetAllDbLogsAsync();
+                var logTask = LogService.GetAllSystemLogsAsync();
 
                 await Task.WhenAll(logTask);
 
@@ -65,13 +65,15 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
             }
         }
 
-        private async Task OnValidSubmit_EditJobVacancy()
+        private async Task OnValidSubmit_EditLogAsync()
         {
-            _isProcessing = true;
-
-            try
+            if (Model.IsProcessing is true)
             {
-                DbLog DbLog = new()
+                return;
+            }
+            using (var _ = Model.TimedEndOfOperation())
+            {
+                SystemLog SystemLog = new()
                 {
                     Id = Model.Id,
                     Action = Model.Action,
@@ -79,34 +81,23 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
                     LogSeverity = Model.LogSeverity,
                     CreatedBy = Model.CreatedBy,
                     CreatedDateTime = Model.CreatedDateTime,
-                    LogType = LogType.DATABASE
+                    LogType = LogType.SYSTEM
                 };
 
-                bool isUpdated = false;
-                var result = await LogService.UpdateAsync(DbLog);
+                var result = await LogService.UpdateAsync(SystemLog);
 
-                if (result.Id == Model.Id && result.Message == Model.Message)
+                if (result is null)
                 {
-                    isUpdated = true;
-                }
-
-                if (!isUpdated)
-                {
-                    _errorMessage = "Kunne ikke opdatere Log.";
+                    _errorMessage = "Fejl i oprettelse af Log.";
                     return;
                 }
+            }
 
+            if (Model.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
-                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditDbLog");
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditSystemLog");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
-            }
-            catch (Exception ex)
-            {
-                _errorMessage = ex.Message;
-            }
-            finally
-            {
-                _isProcessing = false;
             }
         }
 

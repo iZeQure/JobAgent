@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using JobAgentClassLibrary.Core.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace BlazorWebsite.Data.FormModels
 {
-    public class VacantJobModel
+    public class VacantJobModel : BaseModel
     {
         [Required]
         public int Id { get; set; }
@@ -13,5 +14,6 @@ namespace BlazorWebsite.Data.FormModels
         [Required]
         [StringLength(maximumLength: 255, MinimumLength = 1)]
         public string URL { get; set; }
+
     }
 }

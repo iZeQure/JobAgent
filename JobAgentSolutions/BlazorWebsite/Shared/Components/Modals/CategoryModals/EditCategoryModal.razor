@@ -1,0 +1,93 @@
+﻿@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
+
+<div class="modal fade" id="ModalEditCategory" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+
+            @if (_isLoading)
+            {
+                <MessageAlert IsLoading="_isLoading" Message="Indlæser data. Vent venligst.." Alert="MessageAlert.AlertType.Info" />
+
+            }
+            <MessageAlert Message="@(_errorMessage)" Alert="MessageAlert.AlertType.Error" />
+
+            @if (Model == null)
+            {
+                <MessageAlert Alert="MessageAlert.AlertType.Warning" FullWidth="true" Message="Vent venligst, henter detailjer på Søgeordet!" />
+            }
+            else
+            {
+                <EditForm Model="Model" OnValidSubmit="OnValidSubmit_EditCategoryAsync">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Rediger Uddannelse:</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col">
+                                <label for="regInputCategory" class="admin-label col-form-label col-form-label-sm">Uddannelses Navn:</label>
+                                <input id="regInputCategory" class="form-control form-control-sm" type="text" @bind="Model.Categoryname" placeholder="Eksempel : DataTekniker" />
+                                <ValidationMessage For="@(() => Model.Categoryname)" />
+
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="row">
+                            <div class="col">
+                                <label for="regInputSpecialization" class="admin-label col-form-label col-form-label-sm">Tilføj Speciale:</label>
+                                <input id="regInputSpecialization" class="form-control form-control-sm" type="text" @bind="Model.SpecializationName" />
+                                <button type="button" class="btn btn-outline-primary mt-2" @onclick="() => OnButtonClick_AssignNewSpecializationToList(Model.SpecializationName)">Tilføj speciale</button>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        @if (_newSpecializationNames != null && _newSpecializationNames.Any())
+                        {
+                            <div class="row">
+                                <div class="col">
+                                    <label for="regShowNewSpecs" class="admin-label col-form-label col-form-label-sm">Nye specialer:</label>
+                                    @foreach (var name in _newSpecializationNames)
+                                    {
+                                        <p>@name</p>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <hr />
+
+                        @if (_category is not null)
+                        {
+                            if (_category.Specializations != null && _category.Specializations.Any())
+                            {
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="regShowNewSpecs" class="admin-label col-form-label col-form-label-sm">Specialer : </label>
+                                        <hr />
+                                        @foreach (var specializaton in _category.Specializations)
+                                        {
+                                            <span @onclick="@(mouseEvent => OnButtonClick_RemoveNewSpecializationAsync(specializaton))">
+                                                @specializaton.Name
+                                                <Popover Title="Forsigtig!" Body="Denne knap sletter specialet, forevigt!" Color="Popover.PopoverType.Danger" />
+                                            </span>
+                                            <hr />
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" disabled="@(Model.IsProcessing)" @onclick="OnClick_CancelRequest" @onclick:preventDefault>Annuller</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@(Model.IsProcessing)">Gem ændringer</button>
+                    </div>
+                </EditForm>
+            }
+        </div>
+    </div>
+</div>

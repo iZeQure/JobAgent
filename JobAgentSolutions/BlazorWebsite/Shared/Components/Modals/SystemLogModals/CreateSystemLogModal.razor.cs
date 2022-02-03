@@ -3,7 +3,6 @@ using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Core.Entities;
 using JobAgentClassLibrary.Loggings;
 using JobAgentClassLibrary.Loggings.Entities;
-using JobAgentClassLibrary.Security.Providers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
@@ -13,9 +12,9 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
+namespace BlazorWebsite.Shared.Components.Modals.SystemLogModals
 {
-    public partial class CreateDbLogModal : ComponentBase
+    public partial class CreateSystemLogModal : ComponentBase
     {
         [CascadingParameter] private Task<AuthenticationState> AuthState { get; set; }
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
@@ -23,13 +22,12 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
         [Inject] protected ILogService LogService { get; set; }
 
         private LogModel _logModel = new();
-        private IEnumerable<ILog> _logs;
-        private List<LogSeverity> _logSeverities = new();
-        private List<LogType> _logTypes = new();
+        private readonly List<LogSeverity> _logSeverities = new();
+        private readonly List<LogType> _logTypes = new();
         private EditContext _editContext;
 
         private string _errorMessage = "";
-        private bool _isLoading = false;
+        private readonly bool _isLoading = false;
         private bool _isProcessing = false;
         private string _sessionUserEmail;
 
@@ -43,7 +41,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
                 _logSeverities.Add(severity);
             }
 
-            foreach(LogType type in Enum.GetValues(typeof(LogType)))
+            foreach (LogType type in Enum.GetValues(typeof(LogType)))
             {
                 _logTypes.Add(type);
             }
@@ -57,46 +55,13 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
                     _sessionUserEmail = sessionClaim.Value;
                 }
             }
-
-            await LoadModalInformation();
         }
-
-        private async Task LoadModalInformation()
-        {
-            _isLoading = true;
-
-            try
-            {
-                var logTask = LogService.GetAllDbLogsAsync();
-
-                try
-                {
-                    await TaskExtProvider.WhenAll(logTask);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-
-                _logs = logTask.Result;
-            }
-            catch (Exception)
-            {
-                _errorMessage = "Uventet fejl. Prøv at genindlæse siden.";
-            }
-            finally
-            {
-                _isLoading = false;
-                StateHasChanged();
-            }
-        }
-
         private async Task OnValidSubmit_CreateLogAsync()
         {
             _isProcessing = true;
             try
             {
-                DbLog DbLog = new()
+                SystemLog SystemLog = new()
                 {
                     Id = _logModel.Id,
                     Action = _logModel.Action,
@@ -104,11 +69,11 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
                     LogSeverity = _logModel.LogSeverity,
                     CreatedBy = _sessionUserEmail,
                     CreatedDateTime = DateTime.Now,
-                    LogType = LogType.DATABASE
+                    LogType = LogType.SYSTEM
                 };
 
                 bool isCreated = false;
-                var result = await LogService.CreateAsync(DbLog);
+                var result = await LogService.CreateAsync(SystemLog);
 
                 if (result.Id == _logModel.Id && result.Message == _logModel.Message)
                 {
@@ -121,7 +86,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DbLogModals
                 }
 
                 RefreshProvider.CallRefreshRequest();
-                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateDbLog");
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateSystemLog");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{_logModel.Id}");
 
             }

@@ -2,6 +2,7 @@
 using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Filters;
 using JobAgentClassLibrary.Common.Filters.Entities;
+using JobAgentClassLibrary.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
@@ -23,7 +24,6 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
         private int _filterTypeId = 0;
 
         private string _errorMessage = "";
-        private bool _isProcessing = false;
         private bool _isLoading = false;
 
         protected override async Task OnInitializedAsync()
@@ -60,15 +60,17 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
             }
         }
 
-        private async Task OnValidSubmit_EditJobVacancy()
+        private async Task OnValidSubmit_EditStaticSearchFilterAsync()
         {
-            _isProcessing = true;
-
-            try
+            if (Model.IsProcessing is true)
             {
-                foreach(var item in _filterTypes)
+                return;
+            }
+            using (var _ = Model.TimedEndOfOperation())
+            {
+                foreach (var item in _filterTypes)
                 {
-                    if(_filterTypeId == item.Id)
+                    if (_filterTypeId == item.Id)
                     {
                         _filterType = new()
                         {
@@ -86,32 +88,20 @@ namespace BlazorWebsite.Shared.Components.Modals.StaticSearchFilterModals
                     FilterType = _filterType
                 };
 
-                bool isUpdated = false;
                 var result = await StaticSearchFilterService.UpdateAsync(staticSearchFilter);
 
-                if (result.Id == Model.Id && result.Key == Model.Key)
+                if (result is null)
                 {
-                    isUpdated = true;
-                }
-
-                if (!isUpdated)
-                {
-                    _errorMessage = "Kunne ikke opdatere Søgefilteret, grundet ukendt fejl.";
+                    _errorMessage = "Fejl under opdatering af filteret.";
                     return;
                 }
+            }
 
+            if (Model.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditStaticSearchFilter");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
-            }
-            catch (Exception ex)
-            {
-                _errorMessage = ex.Message;
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                _isProcessing = false;
             }
         }
 

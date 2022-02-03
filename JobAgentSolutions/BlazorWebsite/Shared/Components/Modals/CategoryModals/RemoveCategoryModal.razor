@@ -1,6 +1,6 @@
-﻿@attribute [Authorize(Roles = "Udvikler")]
+﻿@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
 
-<div class="modal fade" id="ModalRemoveDbLog" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+<div class="modal fade" id="ModalRemoveCategory" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
 
@@ -9,12 +9,12 @@
             @if (Id != 0)
             {
                 <div class="modal-header">
-                    <h5 class="modal-title">Er du sikker på du vil slette denne Log?</h5>
+                    <h5 class="modal-title">Er du sikker på du vil slette denne uddannelse?</h5>
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-info" data-bs-dismiss="modal" @onclick="CancelRequest">Annuller</button>
-                    <button type="button" class="btn btn-danger" @onclick="@(() => OnClick_RemoveJobPage(Id))" disabled="@_isProcessing">Slet Log</button>
+                    <button type="button" class="btn btn-danger" @onclick="@(() => OnClick_RemoveCategoryAsync(Id))" disabled="@_isProcessing">Slet Uddannelse</button>
                 </div>
             }
         </div>

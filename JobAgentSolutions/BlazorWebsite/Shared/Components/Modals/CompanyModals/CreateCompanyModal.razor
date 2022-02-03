@@ -2,10 +2,10 @@
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
 
-            <EditForm EditContext="_editContext" OnValidSubmit="OnValidSubmit_CreateCompany">
+            <EditForm EditContext="_editContext" OnValidSubmit="OnValidSubmit_CreateCompanyAsync">
 
                 <div class="modal-header">
-                    <h5 class="modal-title">Opret ny Virksomhed</h5>
+                    <h5 class="modal-title">Opret ny Virksomhed:</h5>
                 </div>
 
                 @if (_showError)
@@ -18,7 +18,7 @@
 
                     <div class="row">
                         <div class="col">
-                            <label for="regInputName" class="admin-label col-form-label col-form-label-sm">Virksomhedens Navn :</label>
+                            <label for="regInputName" class="admin-label col-form-label col-form-label-sm">Virksomhedens Navn:</label>
                             <input id="regInputName" type="text" class="form-control form-control-sm" placeholder="Indtast virksomhedens navn.." @bind="_companyModel.Name" />
                         </div>
                     </div>
@@ -26,8 +26,8 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="CancelRequest">Annuller</button>
-                    <button type="submit" class="btn btn-info text-light cursor-pointer" disabled="@_isProcessing">Opret Virksomhed</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" disabled="@_companyModel.IsProcessing" @onclick="CancelRequest">Annuller</button>
+                    <button type="submit" class="btn btn-info text-light cursor-pointer" disabled="@_companyModel.IsProcessing">Opret Virksomhed</button>
                 </div>
 
             </EditForm>

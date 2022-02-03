@@ -1,6 +1,4 @@
 ﻿using JobAgentClassLibrary.Common.Areas.Entities;
-using JobAgentClassLibrary.Common.Locations.Entities;
-using JobAgentClassLibrary.Common.Roles.Entities;
 using JobAgentClassLibrary.Core.Entities;
 using JobAgentClassLibrary.Core.Repositories;
 using System.Collections.Generic;

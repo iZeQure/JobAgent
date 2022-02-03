@@ -12,7 +12,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-info" data-bs-dismiss="modal" @onclick="CancelRequest">Annuller</button>
-                    <button type="button" class="btn btn-danger" @onclick="@(() => OnClick_RemoveJobPage(Id))" disabled="@_isProcessing">Slet Bruger</button>
+                    <button type="button" class="btn btn-danger" @onclick="@(() => OnClick_RemoveJobPageAsync(Id))" disabled="@_isProcessing">Slet Bruger</button>
                 </div>
             }
         </div>

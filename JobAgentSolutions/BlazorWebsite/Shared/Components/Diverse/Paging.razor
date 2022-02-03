@@ -1,0 +1,69 @@
+﻿@using BlazorWebsite.Data.Services
+@inject NavigationManager NavigationManager
+@inject PaginationService PaginationService
+
+<div class="container mb-3">
+    <div class="row align-self-center justify-content-center">
+        <div class="col-12">
+            @if (PaginationService.PageSize < PaginationService.TotalItems)
+            {
+                <nav aria-label="Page Navigation">
+                    <ul class="pagination justify-content-center">
+                        @if (PaginationService.CurrentPage > 3)
+                        {
+                            <li class="@(PaginationService.CurrentPage == 1 ? "page-item active" : "page-item")">
+                                <a class="page-link" href="@NavigationManager.Uri" @onclick="@(() => PaginationService.ChangePage(1))">Start</a>
+                            </li>
+                        }
+                        @for (int i = PaginationService.CurrentPage - 3; i <= PaginationService.CurrentPage + 3; i++)
+                        {
+                            if (i > 0 && i <= PaginationService.MaxPages)
+                            {
+                                var pageNumber = i;
+                                <li class="@(i == PaginationService.CurrentPage ? "page-item active" : "page-item")">
+                                    <a class="page-link" href="@NavigationManager.Uri" @onclick="@(() => PaginationService.ChangePage(pageNumber))">@(i)</a>
+                                </li>
+                            }
+                        }
+                        @if (PaginationService.CurrentPage < PaginationService.MaxPages - 3)
+                        {
+                            <li class="@(PaginationService.CurrentPage == PaginationService.MaxPages ? "page-item active" : "page-item")">
+                                <a class="page-link" href="@NavigationManager.Uri" @onclick="@(() => PaginationService.ChangePage(PaginationService.MaxPages))">Slut</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        </div>
+        <div class="col-3">
+            @if (PaginationService.MaxPages is not 1 ||
+            PaginationService.PageSize == PaginationService.TotalItems)
+            {
+                <select class="form-select form-select-sm" aria-label=".form-select-sm example" @bind="PaginationService.PageSize">
+                    <option selected>--Antal rækker på siden--</option>
+                    @switch (PaginationService.TotalItems)
+                    {
+                        case <= 10:
+                            <option value="10">10</option>
+                            break;
+                        case < 26:
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            break;
+                        case < 51:
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            break;
+                        case >= 51:
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="@PaginationService.TotalItems">Vis Alt</option>
+                            break;
+                    }
+                </select>
+            }
+        </div>
+    </div>
+</div>

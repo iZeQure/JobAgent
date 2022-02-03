@@ -1,5 +1,4 @@
 ﻿using BlazorWebsite.Data.FormModels;
-using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.JobPages;
@@ -11,9 +10,8 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Dashboard.Administrate
 {
-    public partial class JobPagePage : ComponentBase
+    public partial class JobPagePage
     {
-        [Inject] private IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJobPageService JobPageService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
 
@@ -27,12 +25,10 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
 
         protected override async Task OnInitializedAsync()
         {
-            RefreshProvider.RefreshRequest += RefreshContent;
-
-            await LoadData();
+            await LoadDataAsync();
         }
 
-        private async Task LoadData()
+        private async Task LoadDataAsync()
         {
             dataIsLoading = true;
             try
@@ -57,7 +53,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             _jobPageId = id;
         }
 
-        private async Task OnClick_EditLink(int id)
+        private async Task OnClick_EditLinkAsync(int id)
         {
             try
             {
@@ -70,7 +66,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
                     URL = _jobPage.URL
                 };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine($"Open EditModal error: {ex.Message}");
             }
@@ -80,7 +76,7 @@ namespace BlazorWebsite.Pages.Dashboard.Administrate
             }
         }
 
-        private async Task RefreshContent()
+        public override async Task RefreshContent()
         {
             try
             {

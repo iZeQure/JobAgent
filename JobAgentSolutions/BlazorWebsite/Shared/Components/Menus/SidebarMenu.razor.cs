@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Menus
 {
-    public partial class SidebarMenu : ComponentBase
+    public partial class SidebarMenu : ComponentBase, IDisposable
     {
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected ICategoryService CategoryService { get; set; }
@@ -70,7 +70,8 @@ namespace BlazorWebsite.Shared.Components.Menus
                 return;
             }
 
-            _menu = (await CategoryService.GetMenuAsync()).Where(x => x.Name.ToLower().Contains(getValue));
+            _menu = (await CategoryService.GetMenuAsync())
+                .Where(x => x.Name.ToLower().Contains(getValue)||x.Specializations.Any(y => y.Name.ToLower().Contains(getValue)));
             StateHasChanged();
         }
 
@@ -90,6 +91,12 @@ namespace BlazorWebsite.Shared.Components.Menus
                 default:
                     return NAVLINK_JOB_PREFIX + "uncategorized";
             }
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+            RefreshProvider.RefreshRequest -= UpdateContentAsync;
         }
     }
 }

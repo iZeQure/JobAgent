@@ -4,10 +4,12 @@ using JobAgentClassLibrary.Common.Categories;
 using JobAgentClassLibrary.Common.Categories.Entities;
 using JobAgentClassLibrary.Common.Filters;
 using JobAgentClassLibrary.Common.Filters.Entities;
+using JobAgentClassLibrary.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
@@ -24,8 +26,8 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
         private IEnumerable<ISpecialization> _specializations = new List<Specialization>();
 
         private string _errorMessage = "";
-        private bool _isProcessing = false;
         private bool _isLoading = false;
+        private bool _hasSpecs;
 
         protected override async Task OnInitializedAsync()
         {
@@ -38,13 +40,15 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
 
             try
             {
-                var companyTask = CategoryService.GetCategoriesAsync();
+                var categoryTask = CategoryService.GetCategoriesAsync();
                 var specializationTask = CategoryService.GetSpecializationsAsync();
 
-                await Task.WhenAll(companyTask, specializationTask);
+                await Task.WhenAll(categoryTask, specializationTask);
 
-                _categories = companyTask.Result;
+                _categories = categoryTask.Result;
                 _specializations = specializationTask.Result;
+
+                await DetermineIfAnySpezializationsAsync();
             }
             catch (Exception ex)
             {
@@ -57,11 +61,13 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
             }
         }
 
-        private async Task OnValidSubmit_EditJobVacancy()
+        private async Task OnValidSubmit_EditDynamicSearchFilterAsync()
         {
-            _isProcessing = true;
-
-            try
+            if (Model.IsProcessing is true)
+            {
+                return;
+            }
+            using (var _ = Model.TimedEndOfOperation())
             {
                 DynamicSearchFilter dynamicSearchFilter = new()
                 {
@@ -71,32 +77,40 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
                     Key = Model.Key
                 };
 
-                bool isUpdated = false;
                 var result = await DynamicSearchFilterService.UpdateAsync(dynamicSearchFilter);
 
-                if (result.Id == Model.Id && result.Key == Model.Key)
+                if (result is null)
                 {
-                    isUpdated = true;
-                }
-
-                if (!isUpdated)
-                {
-                    _errorMessage = "Kunne ikke opdatere Søgeordet, grundet ukendt fejl.";
+                    _errorMessage = "Fejl under opdatering af filteret.";
                     return;
                 }
+            }
 
+            if (Model.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditDynamicSearchFilter");
                 await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
             }
-            catch (Exception ex)
+        }
+
+        private async Task OnChange_CheckCategorySpecializationsAsync(ChangeEventArgs e)
+        {
+            Model.CategoryId = int.Parse(e.Value.ToString());
+            await DetermineIfAnySpezializationsAsync();
+        }
+
+        private async Task DetermineIfAnySpezializationsAsync()
+        {
+            ICategory category = await CategoryService.GetCategoryWithSpecializationsById(Model.CategoryId);
+
+            if (category.Specializations.Any())
             {
-                _errorMessage = ex.Message;
-                Console.WriteLine(ex.Message);
+                _hasSpecs = true;
             }
-            finally
+            else
             {
-                _isProcessing = false;
+                _hasSpecs = false;
             }
         }
 

@@ -31,7 +31,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
                 var proc = "[JA.spCreateCategory]";
                 var values = new
                 {
-                    @name = entity.Name
+                    @categoryName = entity.Name
                 };
 
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
@@ -42,7 +42,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
             return null;
         }
 
-        public async Task<List<ICategory>> GetAllAsync()
+        public async Task<List<ICategory>> GetAllSystemLogsAsync()
         {
             List<ICategory> categories = new();
 

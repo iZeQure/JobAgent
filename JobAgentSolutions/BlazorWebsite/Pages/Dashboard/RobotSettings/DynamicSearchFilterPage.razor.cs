@@ -1,5 +1,4 @@
 ﻿using BlazorWebsite.Data.FormModels;
-using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Categories;
 using JobAgentClassLibrary.Common.Categories.Entities;
 using JobAgentClassLibrary.Common.Filters;
@@ -11,10 +10,9 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Dashboard.RobotSettings
 {
-    public partial class DynamicSearchFilterPage : ComponentBase
+    public partial class DynamicSearchFilterPage
     {
-        [Inject] private IRefreshProvider RefreshProvider { get; set; }
-        [Inject] private ICategoryService CategoryService { get; set; }
+        [Inject] protected ICategoryService CategoryService { get; set; }
         [Inject] protected IDynamicSearchFilterService DynamicSearchFilterService { get; set; }
 
         private DynamicSearchFilterModel _dynamicSearchFilterModel = new();
@@ -28,12 +26,10 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
 
         protected override async Task OnInitializedAsync()
         {
-            RefreshProvider.RefreshRequest += RefreshContent;
-
-            await LoadData();
+            await LoadDataAsync();
         }
 
-        private async Task LoadData()
+        private async Task LoadDataAsync()
         {
             dataIsLoading = true;
             try
@@ -60,7 +56,7 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
             _dynamicSearchFilterId = id;
         }
 
-        private async Task OnClick_EditLink(int id)
+        private async Task OnClick_EditLinkAsync(int id)
         {
             try
             {
@@ -84,7 +80,7 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
             }
         }
 
-        private async Task RefreshContent()
+        public override async Task RefreshContent()
         {
             try
             {

@@ -4,10 +4,12 @@ using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.VacantJobs;
 using JobAgentClassLibrary.Common.VacantJobs.Entities;
+using JobAgentClassLibrary.Extensions;
 using JobAgentClassLibrary.Security.Providers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
+using PolicyLibrary.Validators;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -21,6 +23,7 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
         [Inject] protected IVacantJobService VacantJobService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
 
+        private DefaultValidator defaultValidator = new();
         private VacantJobModel _vacantJobModel = new();
         private IEnumerable<IVacantJob> _jobPages;
         private IEnumerable<ICompany> _companies;
@@ -28,17 +31,16 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
 
         private string _errorMessage = "";
         private bool _isLoading = false;
-        private bool _isProcessing = false;
 
         protected override async Task OnInitializedAsync()
         {
             _editContext = new(_vacantJobModel);
             _editContext.AddDataAnnotationsValidation();
 
-            await LoadModalInformation();
+            await LoadModalInformationAsync();
         }
 
-        private async Task LoadModalInformation()
+        private async Task LoadModalInformationAsync()
         {
             _isLoading = true;
 
@@ -72,42 +74,56 @@ namespace BlazorWebsite.Shared.Components.Modals.VacantJobModals
 
         private async Task OnValidSubmit_CreateJobAdvertAsync()
         {
-            _isProcessing = true;
-            try
+            if (_vacantJobModel.IsProcessing is true)
             {
+                return;
+            }
+
+            IVacantJob result = null;
+
+            using (var _ = _vacantJobModel.TimedEndOfOperation())
+            {
+                if (_vacantJobModel.CompanyId <= 0)
+                {
+                    _errorMessage = "Vælg et company for at tilføje link.";
+                    return;
+                }
+
+                try
+                {
+                    if (!defaultValidator.ValidateUrl(_vacantJobModel.URL))
+                    {
+                        _errorMessage = "Ikke en valid URL.";
+                        return;
+                    }
+                }
+                catch (Exception)
+                {
+                    _errorMessage = "Fejl i Jobsidens Link. Prøv igen eller tjek for fejl.";
+                    return;
+                }
+
                 VacantJob vacantJob = new()
                 {
                     Id = _vacantJobModel.Id,
                     CompanyId = _vacantJobModel.CompanyId,
                     URL = _vacantJobModel.URL
-
                 };
 
-                bool isCreated = false;
-                var result = await VacantJobService.CreateAsync(vacantJob);
+                result = await VacantJobService.CreateAsync(vacantJob);
 
-                if (result.Id == _vacantJobModel.Id && result.URL == _vacantJobModel.URL)
+                if (result is null)
                 {
-                    isCreated = true;
+                    _errorMessage = "Fejl i oprettelse af stilling.";
+                    return;
                 }
+            }
 
-                if (!isCreated)
-                {
-                    _errorMessage = "Kunne ikke oprette stilingsopslag grundet ukendt fejl";
-                }
-
+            if (_vacantJobModel.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateVacantJob");
-                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{_vacantJobModel.Id}");
-
-            }
-            catch (Exception ex)
-            {
-                _errorMessage = ex.Message;
-            }
-            finally
-            {
-                _isProcessing = false;
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{result.Id}");
             }
         }
 

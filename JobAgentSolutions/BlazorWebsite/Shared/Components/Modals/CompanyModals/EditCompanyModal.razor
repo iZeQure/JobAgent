@@ -5,10 +5,10 @@
             @if (Model != null)
             {
 
-                <EditForm Model="Model" OnValidSubmit="OnValidSubmit_UpdateCompany">
+                <EditForm Model="Model" OnValidSubmit="OnValidSubmit_UpdateCompanyAsync">
 
                     <div class="modal-header">
-                        <h5 class="modal-title" id="EditCompanyModalTitel">Virksommhedens Information :</h5>
+                        <h5 class="modal-title" id="EditCompanyModalTitel">Virksommhedens Information:</h5>
                     </div>
 
                     @if (_showError)
@@ -23,7 +23,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="inputName" class="admin-label col-form-label col-form-label-sm">Virksomhedens Navn :</label>
+                                <label for="inputName" class="admin-label col-form-label col-form-label-sm">Virksomhedens Navn:</label>
                                 <input id="inputName" type="text" class="form-control form-control-sm" placeholder="Indtast virksomhedens navn.." @bind="Model.Name" />
                             </div>
                         </div>
@@ -31,8 +31,8 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Annuller</button>
-                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_isProcessing">Gem ændringer</button>
+                        <button type="button" class="btn btn-danger" disabled="@Model.IsProcessing" data-bs-dismiss="modal">Annuller</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@Model.IsProcessing">Gem ændringer</button>
                     </div>
                 </EditForm>
             }

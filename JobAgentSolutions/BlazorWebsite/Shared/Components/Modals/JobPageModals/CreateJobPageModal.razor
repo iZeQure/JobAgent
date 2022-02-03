@@ -12,14 +12,14 @@
             }
             else
             {
-                <EditForm EditContext="_editContext" OnValidSubmit="OnValidSubmit_CreateJobAdvertAsync">
+                <EditForm EditContext="_editContext" OnValidSubmit="OnValidSubmit_CreateJobPageAsync">
                     <div class="modal-header">
-                        <h5 class="modal-title">Nyt Stillingsopslag :</h5>
+                        <h5 class="modal-title">Ny Jobside:</h5>
                     </div>
                     <div class="modal-body">
                         <div class="row">
                             <div class="col">
-                                <label for="regInputTitle" class="admin-label">Jobsiden's Link :</label>
+                                <label for="regInputTitle" class="admin-label col-form-label col-form-label-sm">Jobsiden's Link:</label>
                                 <input id="regInputTitle" class="form-control form-control-sm" type="text" @bind="_jobPageModel.URL" placeholder="Eksempel : www.dinhjemmeside.dk/jobs" />
                                 <ValidationMessage For="@(() => _jobPageModel.URL)" />
                             </div>
@@ -29,7 +29,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="regInputCompany" class="admin-label col-form-label col-form-label-sm">Stillingsopslag Tilhører :</label>
+                                <label for="regInputCompany" class="admin-label col-form-label col-form-label-sm">Stillingsopslag Tilhører:</label>
                                 @if (_jobPages == null || !_jobPages.Any())
                                 {
                                     <label class="col-form-label">Kunne ikke hente job sider eller er igang med at indlæse data..</label>
@@ -49,8 +49,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="OnClick_CancelRequest">Annuller</button>
-                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_isProcessing">Opret Jobside</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" disabled="@_jobPageModel.IsProcessing" @onclick="OnClick_CancelRequest">Annuller</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_jobPageModel.IsProcessing">Opret Jobside</button>
                     </div>
                 </EditForm>
             }

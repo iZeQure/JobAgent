@@ -29,12 +29,12 @@
     }
     else
     {
-        <EditForm Model="_regAccModel" OnValidSubmit="OnValidSubmit_RegisterAccountAsync" autocomplete="off">
+        <EditForm Model="_regAccModel" OnValidSubmit="OnValidSubmit_RegisterAccountAsyncAsync" autocomplete="off">
 
             <div class="row">
                 <div class="col">
                     <label for="inputEmail">Email Adresse :</label>
-                    <input id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" @bind-value="_regAccModel.Email" @onfocusout="OnEmailFocusOut_CheckForExistence" />
+                    <input id="inputEmail" type="email" class="form-control form-control-sm" placeholder="Email adresse" @bind-value="_regAccModel.Email" @onfocusout="OnEmailFocusOut_CheckForExistenceAsync" />
                     <ValidationMessage For="@(() => _regAccModel.Email)" />
                 </div>
             </div>

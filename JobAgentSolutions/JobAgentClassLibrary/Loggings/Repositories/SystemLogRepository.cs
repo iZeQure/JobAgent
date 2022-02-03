@@ -11,59 +11,16 @@ using System.Threading.Tasks;
 
 namespace JobAgentClassLibrary.Loggings.Repositories
 {
-    public class DbLogRepository : ILoggingRepository
+    public class SystemLogRepository : ILoggingRepository
     {
         private readonly ISqlDbManager _sqlDbManager;
         private readonly LogEntityFactory _factory;
 
-        public DbLogRepository(ISqlDbManager sqlDbManager, LogEntityFactory factory)
+        public SystemLogRepository(ISqlDbManager sqlDbManager, LogEntityFactory factory)
         {
             _sqlDbManager = sqlDbManager;
             _factory = factory;
         }
-
-        private int DetermineSeverityId(ILog entity)
-        {
-            int severityId = 0;
-
-            switch (entity.LogSeverity)
-            {
-                case LogSeverity.EMERGENCY:
-                    severityId = 1;
-                    break;
-
-                case LogSeverity.ALERT:
-                    severityId = 2;
-                    break;
-
-                case LogSeverity.CRITICAL:
-                    severityId = 3;
-                    break;
-
-                case LogSeverity.ERROR:
-                    severityId = 4;
-                    break;
-
-                case LogSeverity.WARNING:
-                    severityId = 5;
-                    break;
-
-                case LogSeverity.NOTIFICATION:
-                    severityId = 6;
-                    break;
-
-                case LogSeverity.INFO:
-                    severityId = 7;
-                    break;
-
-                case LogSeverity.DEBUG:
-                    severityId = 8;
-                    break;
-            }
-
-            return severityId;
-        }
-
 
         public async Task<ILog> CreateAsync(ILog entity)
         {
@@ -74,7 +31,7 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                 var proc = "[JA.spCreateLog]";
                 var values = new
                 {
-                    @severityId = DetermineSeverityId(entity),
+                    @severityId = (int)entity.LogSeverity,
                     @currentTime = entity.CreatedDateTime,
                     @createdBy = entity.CreatedBy,
                     @action = entity.Action,
@@ -90,7 +47,7 @@ namespace JobAgentClassLibrary.Loggings.Repositories
             return null;
         }
 
-        public async Task<List<ILog>> GetAllAsync()
+        public async Task<List<ILog>> GetAllSystemLogsAsync()
         {
             List<ILog> logs = new();
 
@@ -104,8 +61,8 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                 {
                     foreach (var result in queryResult)
                     {
-                        ILog log = (DbLog)_factory.CreateEntity(
-                            nameof(DbLog),
+                        ILog log = (SystemLog)_factory.CreateEntity(
+                            nameof(SystemLog),
                             result.LogId,
                             result.LogSeverity,
                             result.LogMessage,
@@ -136,8 +93,8 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                 {
                     foreach (var result in queryResult)
                     {
-                        ILog log = (DbLog)_factory.CreateEntity(
-                            nameof(DbLog),
+                        ILog log = (SystemLog)_factory.CreateEntity(
+                            nameof(SystemLog),
                             result.LogId,
                             result.LogSeverity,
                             result.LogMessage,
@@ -170,7 +127,7 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                 if (queryResult is not null)
                 {
                     log = (ILog)_factory.CreateEntity(
-                           nameof(DbLog),
+                           nameof(SystemLog),
                            queryResult.LogId,
                            queryResult.LogSeverity,
                            queryResult.LogMessage,
@@ -213,7 +170,7 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                 var values = new
                 {
                     @logId = entity.Id,
-                    @severityId = DetermineSeverityId(entity),
+                    @severityId = (int)entity.LogSeverity,
                     @createdDateTime = entity.CreatedDateTime,
                     @createdBy = entity.CreatedBy,
                     @action = entity.Action,

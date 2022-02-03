@@ -18,18 +18,18 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
         private string _errorMessage = "";
         private bool _isProcessing = false;
 
-        private async Task OnClick_RemoveJobPage(int id)
+        private async Task OnClick_RemoveLogAsync(int id)
         {
             try
             {
                 _isProcessing = true;
 
-                DbLog dbLog = new()
+                SystemLog SystemLog = new()
                 {
                     Id = id
                 };
 
-                var result = await LogService.RemoveAsync(dbLog);
+                var result = await LogService.RemoveAsync(SystemLog);
 
                 if (!result)
                 {

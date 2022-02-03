@@ -1,0 +1,65 @@
+﻿@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
+
+<div id="ModalCreateCategory" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+
+            <MessageAlert Message="@(_errorMessage)" Alert="MessageAlert.AlertType.Error" />
+
+            @if (_isLoading)
+            {
+                <MessageAlert IsLoading="@_isLoading" Alert="MessageAlert.AlertType.Info" Message="Vent venligst, henter nødvendig information.." />
+            }
+            else
+            {
+                <EditForm EditContext="_editContext" OnValidSubmit="OnValidSubmit_CreateCategoryAsync">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Ny Uddannelse:</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col">
+                                <label for="regInputCategory" class="admin-label col-form-label col-form-label-sm">Uddannelses Navn:</label>
+                                <input id="regInputCategory" class="form-control form-control-sm" type="text" @bind="_categoryModel.Categoryname" placeholder="Eksempel : DataTekniker" />
+                                <ValidationMessage For="@(() => _categoryModel.Categoryname)" />
+
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="row">
+                            <div class="col">
+                                <label for="regInputSpecialization" class="admin-label col-form-label col-form-label-sm">Tilføj Speciale:</label>
+                                <input id="regInputSpecialization" class="form-control form-control-sm" type="text" @bind="_categoryModel.SpecializationName" />
+                                <button type="button" class="btn btn-outline-primary mt-2" @onclick="() =>  OnButtonClick_AssignNewSpecializationToList(_categoryModel.SpecializationName)" disabled="@_isProcessingNewSpecializationToList">Tilføj speciale</button>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        @if (_newSpecializationNames is not null && _newSpecializationNames.Any())
+                        {
+                            <div class="row">
+                                <div class="col">
+                                    <label for="regShowNewSpecs" class="admin-label col-form-label col-form-label-sm">Valgte specialer:</label>
+                                    @foreach (var name in _newSpecializationNames)
+                                    {
+                                        <p>@name</p>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" disabled="@_categoryModel.IsProcessing" @onclick="OnClick_CancelRequest">Annuller</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_categoryModel.IsProcessing">Opret Uddannelse</button>
+                    </div>
+                </EditForm>
+            }
+        </div>
+    </div>
+</div>

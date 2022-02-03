@@ -7,21 +7,21 @@ using Microsoft.AspNetCore.Components.Authorization;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using static BlazorWebsite.Shared.Components.Diverse.MessageAlert;
 
 namespace BlazorWebsite.Pages.Dashboard.Account
 {
     public partial class ChangePassword
     {
         [CascadingParameter] private Task<AuthenticationState> AuthState { get; set; }
-        [Inject] protected IMessageClearProvider MessageClearProvider { get; set; }
+        [Inject] protected MessageClearProvider MessageClearProvider { get; set; }
         [Inject] public IUserService UserService { get; set; }
 
+        private AlertType alertType;
         private bool isProcessingPasswordChangeRequest = false;
         private string _sessionUserEmail = string.Empty;
-        private string _successMessage = string.Empty;
-        private string _errorMessage = string.Empty;
-        private string _infoMessage = string.Empty;
-        private bool _hasValidSession = true;
+        private string message = string.Empty;
+        
         private bool _isLoadingData = false;
 
         private ChangePasswordModel changePasswordModel;
@@ -45,25 +45,22 @@ namespace BlazorWebsite.Pages.Dashboard.Account
 
             if (string.IsNullOrEmpty(_sessionUserEmail))
             {
-                _errorMessage = "Fejl, Kunne ikke indlæse session. Prøv at logge ud og ind.";
-                _hasValidSession = false;
+                message = "Fejl, Kunne ikke indlæse session. Prøv at logge ud og ind.";
+                alertType = AlertType.Error;
             }
 
             changePasswordModel.Email = _sessionUserEmail;
-
-            await base.OnInitializedAsync();
         }
 
 
-        private async Task OnValidSubmit_ChangeUserPassword()
+        private async Task OnValidSubmit_ChangeUserPasswordAsync()
         {
-            ClearMessages();
-
             try
             {
                 isProcessingPasswordChangeRequest = true;
 
-                _infoMessage = "Arbejder på det, vent venligst..";
+                message = "Arbejder på det, vent venligst..";
+                alertType = AlertType.Info;
 
                 IUser user = await UserService.GetByEmailAsync(_sessionUserEmail);
 
@@ -81,13 +78,13 @@ namespace BlazorWebsite.Pages.Dashboard.Account
 
                 await UserService.UpdateUserPasswordAsync(authUser);
 
-                _infoMessage = "Adgangskode blev ændret.";
+                message = "Adgangskode blev ændret.";
 
             }
             catch (Exception ex)
             {
-                ClearMessages();
-                _errorMessage = "Kunne ikke ændre adgangskode, prøv igen senere.";
+                message = "Kunne ikke ændre adgangskode, prøv igen senere.";
+                alertType= AlertType.Error;
                 Console.WriteLine(ex.Message);
             }
             finally
@@ -100,7 +97,8 @@ namespace BlazorWebsite.Pages.Dashboard.Account
 
         private void OnInvalidSubmit_ChangeUserPassword()
         {
-            _errorMessage = "Venligst udfyld de manglende felter, markeret med rød.";
+            message = "Venligst udfyld de manglende felter, markeret med rød.";
+            alertType = AlertType.Warning;
         }
 
         private void ResetModelInformation()
@@ -109,11 +107,6 @@ namespace BlazorWebsite.Pages.Dashboard.Account
 
             changePasswordModel.Email = _sessionUserEmail;
         }
-
-        private void ClearMessages()
-        {
-            _infoMessage = string.Empty;
-            _errorMessage = string.Empty;
-        }
+       
     }
 }

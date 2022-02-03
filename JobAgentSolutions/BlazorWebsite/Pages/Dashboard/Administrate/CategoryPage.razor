@@ -1,0 +1,98 @@
+﻿@page "/admin/settings/categories"
+@attribute [Authorize(Roles = "Konsulent, System Administrator, Udvikler")]
+@inherits BasePage
+@using BlazorWebsite.Shared.Components.Modals.CategoryModals;
+
+<PageDocumentTitle DocumentTitle="Administrer - Uddannelser" />
+
+<div class="d-flex">
+    <PageHeadingTitle DisplayTitle="Uddannelser" />
+    <div class="d-inline-block px-4 pt-4">
+
+        @if (_specializations == null)
+        {
+            <a class="btn btn-sm btn-info cursor-pointer text-white no-gutters disabled">
+                <span class="d-inline-block">Ikke Aktiveret</span>
+            </a>
+            <span class="d-inline-block"><small class="text-danger font-weight-bolder">* Opret en Uddannelse for at tildele den jobopslag. *</small></span>
+        }
+        else
+        {
+            <a class="btn btn-sm btn-info cursor-pointer text-white" data-bs-toggle="modal" data-bs-target="#ModalCreateCategory">
+                Opret ny Uddannelse
+            </a>
+        }
+    </div>
+</div>
+
+@if (dataIsLoading)
+{
+    Message = "Indlæser Uddannelser...";
+    @*<MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="dataIsLoading" Message="Indlæser uddannelser.." />*@
+    <MessageAlert Alert="MessageAlert.AlertType.Info" IsLoading="dataIsLoading" Message="@Message" />
+}
+else
+{
+    @if (_categories == null)
+    {
+        <MessageAlert Alert="MessageAlert.AlertType.Info"
+              Message="Indlæser Uddannelser.." IsLoading="true" />
+    }
+    else
+    {
+        @if (!PaginationService.CreatePaging(_categories).Any())
+        {
+            <MessageAlert Alert="MessageAlert.AlertType.Warning"
+              Message="Der blev ikke fundet nogen uddannelser."
+              MessageOptional="Opret uddannelser, ved at trykke på knappen : Opret ny Uddannelse." />
+        }
+        else
+        {
+            <div class="table-responsive table-responsive-sm table-responsive-md">
+                <table class="table table-striped table-hover">
+                    <caption>Liste over uddannelser i systemet..</caption>
+                    <thead class="table-primary text-light">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Uddannelse</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var category in PaginationService.CreatePaging(_categories))
+                        {
+                            <tr id="@(category.Id)">
+                                <th scope="row">@(category.Id)</th>
+                                <td>@(category.Name)</td>
+                                <td></td>
+
+                                <td>
+                                    <span data-bs-toggle="modal" data-bs-target="#ModalEditCategory" @onclick="@(mouseEvent => OnClick_EditLinkAsync(category.Id))">
+                                        <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne uddannelse." Color="Popover.PopoverType.Info" />
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span data-bs-toggle="modal" data-bs-target="#ModalRemoveCategory" @onclick="@(mouseEvent => ConfirmationWindow(category.Id))">
+                                        <Popover Title="Forsigtig!" Body="Denne knap sletter den valgte uddannelse, forevigt!" Color="Popover.PopoverType.Danger" />
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <Paging />
+        }
+    }
+
+    <CreateCategoryModal />
+
+    <EditCategoryModal Model="_categoryModel" />
+
+    <RemoveCategoryModal Id="_categoryId" />
+}

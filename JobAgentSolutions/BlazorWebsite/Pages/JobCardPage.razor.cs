@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages
 {
-    public partial class JobCardPage : ComponentBase
+    public partial class JobCardPage
     {
         [Parameter] public int CategoryId { get; set; }
         [Parameter] public int SpecializationId { get; set; }
@@ -31,15 +31,15 @@ namespace BlazorWebsite.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            await LoadData();
+            await LoadDataAsync();
         }
 
         protected override async Task OnParametersSetAsync()
         {
-            await LoadData();
+            await LoadDataAsync();
         }
 
-        private async Task LoadData()
+        private async Task LoadDataAsync()
         {
             _isLoadingData = true;
             try
@@ -50,17 +50,17 @@ namespace BlazorWebsite.Pages
                 _companies = await CompanyService.GetAllAsync();
                 var jobAdverts = await JobAdvertService.GetJobAdvertsAsync();
 
-                if (CategoryId == 0 && SpecializationId == 0)
+                if (CategoryId is 0 && SpecializationId is 0)
                 {
-                    _jobAdverts = jobAdverts.Where(x => x.CategoryId == 0 && x.SpecializationId == 0);
+                    _jobAdverts = jobAdverts.Where(x => x.CategoryId is 0 && x.SpecializationId is 0);
                 }
-                else if (SpecializationId == 0)
+                else if (SpecializationId is 0)
                 {
                     _jobAdverts = jobAdverts.Where(x => x.CategoryId == CategoryId);
                 }
-                else if (SpecializationId != 0)
+                else if (SpecializationId is not 0)
                 {
-                    _jobAdverts = jobAdverts.Where(x => x.CategoryId == SpecializationId);
+                    _jobAdverts = jobAdverts.Where(x => x.SpecializationId == SpecializationId);
                 }
             }
             catch (Exception ex)
@@ -72,6 +72,11 @@ namespace BlazorWebsite.Pages
             {
                 _isLoadingData = false;
             }
+        }
+
+        public async override Task RefreshContent()
+        {
+            await LoadDataAsync();
         }
     }
 }

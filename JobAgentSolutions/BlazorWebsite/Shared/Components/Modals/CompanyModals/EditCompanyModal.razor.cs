@@ -2,6 +2,7 @@
 using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Companies;
 using JobAgentClassLibrary.Common.Companies.Entities;
+using JobAgentClassLibrary.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Threading.Tasks;
@@ -15,15 +16,18 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
 
-        private bool _isProcessing = false;
         private bool _showError = false;
         private string _errorMessage = string.Empty;
 
-        private async Task OnValidSubmit_UpdateCompany()
+        private async Task OnValidSubmit_UpdateCompanyAsync()
         {
-            try
+            if (Model.IsProcessing is true)
             {
-                _isProcessing = true;
+                return;
+            }
+            using (var _ = Model.TimedEndOfOperation())
+            {
+
 
                 Company company = new()
                 {
@@ -31,27 +35,20 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
                     Name = Model.Name
                 };
 
-                bool isUpdated = false;
                 var result = await CompanyService.UpdateAsync(company);
 
-                if(result.Id == company.Id && result.Name == company.Name)
+                if (result is null)
                 {
-                    isUpdated = true;
+                    _errorMessage = "Fejl under opdatering af Virksomheden.";
+                    return;
                 }
-
-                if (!isUpdated)
-                {
-                    _errorMessage = "Kunne ikke opdatere virksomhed grundet ukendt fejl.";
-                }
-                    RefreshProvider.CallRefreshRequest();
-                    await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditCompany");
-                    await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.CompanyId}"); 
-
             }
-            finally
+
+            if (Model.IsProcessing is false)
             {
-                _isProcessing = false;
-                StateHasChanged();
+                RefreshProvider.CallRefreshRequest();
+                await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditCompany");
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.CompanyId}"); 
             }
         }
     }

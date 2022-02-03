@@ -12,16 +12,16 @@
             }
             else
             {
-                <EditForm EditContext="_editContext" OnValidSubmit="OnValidSubmit_CreateJobAdvertAsync">
+                <EditForm EditContext="_editContext" OnValidSubmit="OnValidSubmit_CreateDynamicSearchFilterAsync">
 
                     <div class="modal-header">
-                        <h5 class="modal-title">Nyt Søgeord :</h5>
+                        <h5 class="modal-title">Nyt Søgeord:</h5>
                     </div>
 
                     <div class="modal-body">
                         <div class="row">
                             <div class="col">
-                                <label for="regInputKey" class="admin-label">Søgeordet : </label>
+                                <label for="regInputKey" class="admin-label col-form-label col-form-label-sm">Søgeordet:</label>
                                 <input id="regInputKey" class="form-control form-control-sm" type="text" @bind="_dynamicSearchFilterModel.Key" placeholder="Eksempel : Programmering" />
                                 <ValidationMessage For="@(() => _dynamicSearchFilterModel.Key)" />
 
@@ -33,22 +33,22 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="regInputCategory" class="admin-label">Kategori</label>
+                                <label for="regInputCategory" class="admin-label col-form-label col-form-label-sm">Kategori:</label>
                                 @if (_categories == null || !_categories.Any())
                                 {
                                     <label class="col-form-label">Kunne ikke hente kategorier eller er igang med at indlæse data...</label>
                                 }
                                 else
                                 {
-                                    <select id="regInputCategory" class="form-control form-control-sm" type="text" @bind="_dynamicSearchFilterModel.CategoryId">
+                                    <select id="regInputCategory" class="form-control form-control-sm" type="text" @onchange="OnChange_CheckCategorySpecializationsAsync">
                                         <option value="0" selected>---Vælg en kategori som passer til søgeordet---</option>
                                         @foreach (var category in _categories)
                                         {
                                             <option value="@category.Id">@category.Name</option>
                                         }
                                     </select>
+                                    <ValidationMessage For="@(() => _dynamicSearchFilterModel.CategoryId)" />
                                 }
-                                <ValidationMessage For="@(() => _dynamicSearchFilterModel.CategoryId)" />
 
                             </div>
                         </div>
@@ -58,29 +58,21 @@
                         <div class="row">
                             <div class="col">
 
-                                @if (_dynamicSearchFilterModel.CategoryId == 0)
-                                { }
-                                else
+                                @if (_dynamicSearchFilterModel.CategoryId is not 0 && _hasSpecs)
                                 {
-                                    <label for="regInputSpecialization" class="admin-label">Underkategori</label>
-                                    @if (_specializations == null || !_specializations.Any())
-                                    {
-                                        <label class="col-form-label">Kunne ikke hente underkategorier eller er igang med at indlæse data...</label>
-                                    }
-                                    else
-                                    {
-                                        <select id="regInputSpecialization" class="form-control form-control-sm" type="text" @bind="_dynamicSearchFilterModel.Specializationid">
+                                    <label for="regInputSpecialization" class="admin-label col-form-label col-form-label-sm">Specialer:</label>
 
-                                            <option value="0" selected>---Vælg en underkategori som passer til søgeordet---</option>
-                                            @foreach (var specialization in _specializations)
+                                    <select id="regInputSpecialization" class="form-control form-control-sm" type="text" @bind="_dynamicSearchFilterModel.Specializationid">
+
+                                        <option value="0" selected>---Vælg et speciale som passer til søgeordet---</option>
+                                        @foreach (var specialization in _specializations)
+                                        {
+                                            if (specialization.CategoryId == _dynamicSearchFilterModel.CategoryId)
                                             {
-                                                if (specialization.CategoryId == _dynamicSearchFilterModel.CategoryId)
-                                                {
-                                                    <option value="@specialization.Id">@specialization.Name</option>
-                                                }
+                                                <option value="@specialization.Id">@specialization.Name</option>
                                             }
-                                        </select>
-                                    }
+                                        }
+                                    </select>
                                     <ValidationMessage For="@(() => _dynamicSearchFilterModel.Specializationid)" />
                                 }
 
@@ -89,8 +81,8 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="OnClick_CancelRequest">Annuller</button>
-                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_isProcessing">Opret Søgeord</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" disabled="@_dynamicSearchFilterModel.IsProcessing" @onclick="OnClick_CancelRequest">Annuller</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@_dynamicSearchFilterModel.IsProcessing">Opret Søgeord</button>
                     </div>
                 </EditForm>
             }

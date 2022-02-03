@@ -17,10 +17,10 @@
             }
             else
             {
-                <EditForm Model="Model" OnValidSubmit="OnValidSubmit_EditJobVacancy">
+                <EditForm Model="Model" OnValidSubmit="OnValidSubmit_EditJobVacancyAsync">
 
                     <div class="modal-header">
-                        <h5 class="modal-title">Rediger Stillingsopslag :</h5>
+                        <h5 class="modal-title">Rediger Stillingsopslag:</h5>
                     </div>
 
                     <div class="modal-body">
@@ -36,7 +36,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <label for="inputCompany" class="admin-label col-form-label col-form-label-sm">Virksomhed :</label>
+                                <label for="inputCompany" class="admin-label col-form-label col-form-label-sm">Virksomhed:</label>
                                 <select class="form-control form-control-sm" @bind="Model.CompanyId">
 
                                     @foreach (var company in _companies)
@@ -50,8 +50,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="OnClick_CancelRequest" @onclick:preventDefault>Annuller</button>
-                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@(_isProcessing)">Gem ændringer</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" disabled="@(Model.IsProcessing)" @onclick="OnClick_CancelRequest" @onclick:preventDefault>Annuller</button>
+                        <button class="btn btn-info text-light cursor-pointer" type="submit" disabled="@(Model.IsProcessing)">Gem ændringer</button>
                     </div>
                 </EditForm>
             }

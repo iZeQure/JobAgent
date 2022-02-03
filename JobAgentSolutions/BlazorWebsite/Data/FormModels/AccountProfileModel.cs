@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JobAgentClassLibrary.Core.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Data.FormModels
 {
-    public class AccountProfileModel
+    public class AccountProfileModel : BaseModel
     {
         [Required(AllowEmptyStrings = false, ErrorMessage = "Email adresse er påkrævet.")]
         [StringLength(maximumLength: 255, MinimumLength = 1)]

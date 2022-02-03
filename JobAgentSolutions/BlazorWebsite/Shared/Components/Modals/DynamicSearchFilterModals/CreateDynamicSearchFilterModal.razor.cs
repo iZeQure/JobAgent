@@ -4,12 +4,14 @@ using JobAgentClassLibrary.Common.Categories;
 using JobAgentClassLibrary.Common.Categories.Entities;
 using JobAgentClassLibrary.Common.Filters;
 using JobAgentClassLibrary.Common.Filters.Entities;
+using JobAgentClassLibrary.Extensions;
 using JobAgentClassLibrary.Security.Providers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
@@ -22,43 +24,40 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
         [Inject] protected ICategoryService CategoryService { get; set; }
 
         private DynamicSearchFilterModel _dynamicSearchFilterModel = new();
-        private IEnumerable<IDynamicSearchFilter> _dynamicSearchFilters;
         private IEnumerable<ICategory> _categories;
         private IEnumerable<ISpecialization> _specializations;
         private EditContext _editContext;
 
         private string _errorMessage = "";
         private bool _isLoading = false;
-        private bool _isProcessing = false;
+        private bool _hasSpecs = false;
 
         protected override async Task OnInitializedAsync()
         {
             _editContext = new(_dynamicSearchFilterModel);
             _editContext.AddDataAnnotationsValidation();
 
-            await LoadModalInformation();
+            await LoadModalInformationAsync();
         }
 
-        private async Task LoadModalInformation()
+        private async Task LoadModalInformationAsync()
         {
             _isLoading = true;
 
             try
             {
-                var companyTask = DynamicSearchFilterService.GetAllAsync();
                 var categoryTask = CategoryService.GetCategoriesAsync();
                 var specializationTask = CategoryService.GetSpecializationsAsync();
 
                 try
                 {
-                    await TaskExtProvider.WhenAll(companyTask, categoryTask, specializationTask);
+                    await TaskExtProvider.WhenAll(categoryTask, specializationTask);
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error: {ex.Message}");
                 }
 
-                _dynamicSearchFilters = companyTask.Result;
                 _categories = categoryTask.Result;
                 _specializations = specializationTask.Result;
             }
@@ -73,45 +72,53 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
             }
         }
 
-        private async Task OnValidSubmit_CreateJobAdvertAsync()
+        private async Task OnValidSubmit_CreateDynamicSearchFilterAsync()
         {
-            _isProcessing = true;
-            try
+            if (_dynamicSearchFilterModel.IsProcessing is true)
+            {
+                return;
+            }
+
+            IDynamicSearchFilter result = null;
+
+            using (var _ = _dynamicSearchFilterModel.TimedEndOfOperation())
             {
                 DynamicSearchFilter dynamicSearchFilter = new()
                 {
-                    Id = _dynamicSearchFilterModel.Id,
                     CategoryId = _dynamicSearchFilterModel.CategoryId,
                     SpecializationId = _dynamicSearchFilterModel.Specializationid,
                     Key = _dynamicSearchFilterModel.Key
                 };
 
-                bool isCreated = false;
-                var result = await DynamicSearchFilterService.CreateAsync(dynamicSearchFilter);
+                result = await DynamicSearchFilterService.CreateAsync(dynamicSearchFilter);
 
-                if (result.Id == _dynamicSearchFilterModel.Id && result.Key == _dynamicSearchFilterModel.Key)
+                if (result is null)
                 {
-                    isCreated = true;
+                    _errorMessage = "Fejl under oprettelse af filteret.";
+                    return;
                 }
+            }
 
-                if (!isCreated)
-                {
-                    _errorMessage = "Kunne ikke oprette søgeord grundet ukendt fejl";
-                }
-
+            if (_dynamicSearchFilterModel.IsProcessing is false)
+            {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateDynamicSearchFilter");
-                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{_dynamicSearchFilterModel.Id}");
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{result.Id}"); 
+            }
+        }
 
-            }
-            catch (Exception ex)
+        private async Task OnChange_CheckCategorySpecializationsAsync(ChangeEventArgs e)
+        {
+            _dynamicSearchFilterModel.CategoryId = int.Parse(e.Value.ToString());
+            ICategory category = await CategoryService.GetCategoryWithSpecializationsById(_dynamicSearchFilterModel.CategoryId);
+
+            if (category.Specializations.Any())
             {
-                _errorMessage = ex.Message;
-                Console.WriteLine(ex.Message);
+                _hasSpecs = true;
             }
-            finally
+            else
             {
-                _isProcessing = false;
+                _hasSpecs = false;
             }
         }
 

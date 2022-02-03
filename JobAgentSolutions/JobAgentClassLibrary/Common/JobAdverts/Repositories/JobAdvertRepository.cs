@@ -47,7 +47,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
             return null;
         }
 
-        public async Task<List<IJobAdvert>> GetAllAsync()
+        public async Task<List<IJobAdvert>> GetAllSystemLogsAsync()
         {
             List<IJobAdvert> jobAdverts = new();
 
@@ -65,8 +65,8 @@ namespace JobAgentClassLibrary.Common.JobAdverts.Repositories
                             result.Id,
                             result.CategoryId,
                             result.SpecializationId,
-                            result.Title,
-                            result.Summary,
+                            result.Title ?? "",
+                            result.Summary ?? "",
                             result.RegistrationDateTime);
 
                         jobAdverts.Add(jobAdvert);

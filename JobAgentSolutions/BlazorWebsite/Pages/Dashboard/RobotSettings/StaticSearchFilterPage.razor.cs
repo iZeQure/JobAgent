@@ -1,5 +1,4 @@
 ﻿using BlazorWebsite.Data.FormModels;
-using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Filters;
 using JobAgentClassLibrary.Common.Filters.Entities;
 using Microsoft.AspNetCore.Components;
@@ -9,9 +8,8 @@ using System.Threading.Tasks;
 
 namespace BlazorWebsite.Pages.Dashboard.RobotSettings
 {
-    public partial class StaticSearchFilterPage : ComponentBase
+    public partial class StaticSearchFilterPage
     {
-        [Inject] private IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IStaticSearchFilterService StaticSearchFilterService { get; set; }
         [Inject] protected IFilterTypeService FilterTypeService { get; set; }
 
@@ -25,12 +23,10 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
 
         protected override async Task OnInitializedAsync()
         {
-            RefreshProvider.RefreshRequest += RefreshContent;
-
-            await LoadData();
+            await LoadDataAsync();
         }
 
-        private async Task LoadData()
+        private async Task LoadDataAsync()
         {
             dataIsLoading = true;
             try
@@ -43,11 +39,11 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
                 _staticSearchFilters = staticSearchFilterTask.Result;
                 _filterTypes = filterTypeTask.Result;
 
-                foreach(var staticFilter in _staticSearchFilters)
+                foreach (var staticFilter in _staticSearchFilters)
                 {
-                    foreach(var filterType in _filterTypes)
+                    foreach (var filterType in _filterTypes)
                     {
-                        if(staticFilter.FilterType.Id == filterType.Id)
+                        if (staticFilter.FilterType.Id == filterType.Id)
                         {
                             staticFilter.FilterType.Name = filterType.Name;
                             staticFilter.FilterType.Description = filterType.Description;
@@ -68,7 +64,7 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
             _staticSearchFilterId = id;
         }
 
-        private async Task OnClick_EditLink(int id)
+        private async Task OnClick_EditLinkAsync(int id)
         {
             try
             {
@@ -91,7 +87,7 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
             }
         }
 
-        private async Task RefreshContent()
+        public override async Task RefreshContent()
         {
             try
             {

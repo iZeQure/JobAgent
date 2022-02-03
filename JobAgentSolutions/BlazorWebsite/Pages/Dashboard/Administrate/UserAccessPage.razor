@@ -1,8 +1,13 @@
 ﻿@page "/admin/system/settings/user-access"
 @attribute [Authorize(Roles = "System Administrator, Udvikler")]
+@inherits BasePage
 @using BlazorWebsite.Shared.Components.Modals.UserAccessModals;
 
-<PageDocumentTitle DocumentTitle="Administrer - Virksomheds Links" />
+<PageDocumentTitle DocumentTitle="Administrer - BrugerRettigheder" />
+
+<div class="d-flex">
+    <PageHeadingTitle DisplayTitle="Bruger Rettigheder" />
+</div>
 
 @if (dataIsLoading)
 {
@@ -13,11 +18,10 @@ else
     @if (_users == null)
     {
         <MessageAlert Alert="MessageAlert.AlertType.Info"
-                      Message="Indlæser brugere.." IsLoading="true" />
+              Message="Indlæser brugere.." IsLoading="true" />
     }
     else
     {
-
         <div class="table-responsive table-responsive-sm table-responsive-md">
             <table class="table table-striped table-hover">
                 <caption>Liste over system brugere..</caption>
@@ -34,7 +38,7 @@ else
                 </thead>
                 <tbody>
 
-                    @foreach (var user in _users.OrderBy(x => x.FullName))
+                    @foreach (var user in PaginationService.CreatePaging(_users).OrderBy(x => x.FullName))
                     {
                         <tr id="@(user.Id)">
                             <th scope="row">@(user.Id)</th>
@@ -56,7 +60,7 @@ else
                             }
 
                             <td>
-                                <span data-bs-toggle="modal" data-bs-target="#ModalEditUserAccess" @onclick="@(mouseEvent => OnClick_EditLink(user.Id))">
+                                <span data-bs-toggle="modal" data-bs-target="#ModalEditUserAccess" @onclick="@(mouseEvent => OnClick_EditLinkAsync(user.Id))">
                                     <Popover Title="Ændre information" Body="Ved denne funktion, kan du ændre informationen på denne bruger." Color="Popover.PopoverType.Info" />
                                 </span>
                             </td>
@@ -71,10 +75,10 @@ else
                 </tbody>
             </table>
         </div>
+        <Paging />
     }
 
-    <EditUserAccessModal Model="_userModel" Roles="_roles" Locations="_locations"/>
+    <EditUserAccessModal Model="_userModel" Roles="_roles" Locations="_locations" />
 
-    <RemoveUserModal Id="_userId"/>
-
+    <RemoveUserModal Id="_userId" />
 }
