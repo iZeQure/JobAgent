@@ -1,10 +1,4 @@
-﻿using JobAgentClassLibrary.Common.Companies.Entities;
-using NUnit.Framework;
-using System.Linq;
-using System.Threading.Tasks;
-using WebCrawler.DataAccess;
-
-namespace WebCrawlerTests
+﻿namespace WebCrawlerTests
 {
     internal class DbCommunicatorTests
     {

@@ -1,32 +1,13 @@
-﻿
-using JobAgentClassLibrary.Common.Categories;
-using JobAgentClassLibrary.Common.Categories.Factory;
-using JobAgentClassLibrary.Common.Categories.Repositories;
-using JobAgentClassLibrary.Common.Companies;
-using JobAgentClassLibrary.Common.Companies.Factory;
-using JobAgentClassLibrary.Common.Companies.Repositories;
-using JobAgentClassLibrary.Common.Filters;
-using JobAgentClassLibrary.Common.Filters.Factory;
-using JobAgentClassLibrary.Common.Filters.Repositories;
-using JobAgentClassLibrary.Common.JobAdverts;
-using JobAgentClassLibrary.Common.JobAdverts.Factory;
-using JobAgentClassLibrary.Common.JobAdverts.Repositories;
-using JobAgentClassLibrary.Common.JobPages;
-using JobAgentClassLibrary.Common.JobPages.Factory;
-using JobAgentClassLibrary.Common.JobPages.Repositories;
-using JobAgentClassLibrary.Common.VacantJobs;
-using JobAgentClassLibrary.Common.VacantJobs.Factory;
-using JobAgentClassLibrary.Common.VacantJobs.Repositories;
-using JobAgentClassLibrary.Core.Database.Factories;
+﻿using JobAgentClassLibrary.Core.Database.Factories;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Settings;
+using JobAgentClassLibrary.Extensions.ServiceCollection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System.Threading.Tasks;
-using WebCrawler.DataAccess;
 using WebCrawler.DataScrappers;
 using WebCrawler.DataScrappers.Drivers;
 using WebCrawler.DataSorters;
@@ -73,29 +54,16 @@ namespace WebCrawler
             services.AddSingleton<ISqlDbFactory, SqlDbFactory>();
             services.AddSingleton<ISqlDbManager, SqlDbManager>();
 
-            services.AddSingleton<JobAdvertEntityFactory>();
-            services.AddSingleton<JobPageEntityFactory>();
-            services.AddSingleton<VacantJobEntityFactory>();
-            services.AddSingleton<CompanyEntityFactory>();
-            services.AddSingleton<CategoryEntityFactory>();
-            services.AddSingleton<DynamicSearchFilterEntityFactory>();
+            services.AddFactories();
+
 
             //------------------- Repositories
-            services.AddScoped<IJobAdvertRepository, JobAdvertRepository>();
-            services.AddScoped<IJobPageRepository, JobPageRepository>();
-            services.AddScoped<IVacantJobRepository, VacantJobRepository>();
-            services.AddScoped<ICompanyRepository, CompanyRepository>();
-            services.AddScoped<ICategoryRepository, CategoryRepository>();
-            services.AddScoped<ISpecializationRepository, SpecializationRepository>();
-            services.AddScoped<IDynamicSearchFilterRepository, DynamicSearchFilterRepository>();
+            services.AddRepositories();
+
 
             //------------------- Services 
-            services.AddScoped<IJobAdvertService, JobAdvertService>();
-            services.AddScoped<IJobPageService, JobPageService>();
-            services.AddScoped<IVacantJobService, VacantJobService>();
-            services.AddScoped<ICompanyService, CompanyService>();
-            services.AddScoped<ICategoryService, CategoryService>();
-            services.AddScoped<IDynamicSearchFilterService, DynamicSearchFilterService>();
+            services.AddEntityServices();
+            
 
             //------------------- Crawler
             services.AddSingleton<IWebDriver, ChromeDriver>();

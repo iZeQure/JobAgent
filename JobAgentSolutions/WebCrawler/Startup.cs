@@ -1,16 +1,6 @@
-﻿using JobAgentClassLibrary.Common.Categories.Entities;
-using Microsoft.Extensions.Logging;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using System;
-using System.Collections.Generic;
+﻿using OpenQA.Selenium;
 using System.Diagnostics;
-using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
-using WebCrawler.DataAccess;
-using WebCrawler.DataScrappers;
-using WebCrawler.DataSorters;
 using WebCrawler.Managers;
 
 namespace WebCrawler
