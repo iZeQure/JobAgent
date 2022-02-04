@@ -1,5 +1,7 @@
 ﻿using JobAgentClassLibrary.Common.Categories;
+using JobAgentClassLibrary.Common.Categories.Entities;
 using JobAgentClassLibrary.Common.Companies;
+using JobAgentClassLibrary.Common.Companies.Entities;
 using JobAgentClassLibrary.Common.Filters;
 using JobAgentClassLibrary.Common.Filters.Entities;
 using JobAgentClassLibrary.Common.JobAdverts;
@@ -35,6 +37,12 @@ namespace WebCrawler.Managers
         private readonly IJobAdvertService _jobAdvertService;
         private readonly ILogger<CrawlerManager> _logger;
         private readonly IDynamicSearchFilterService _dynamicSearchFilterService;
+
+        private List<ICompany> _companies;
+        private List<ICategory> _categories;
+        private List<ISpecialization> _specializations;
+        private List<WebData> _jobAdverts;
+        private List<WebData> _jobAdvertLinks;
 
         public List<string> KeyWords { get; set; }
         public List<string> Urls { get; set; }
@@ -135,18 +143,16 @@ namespace WebCrawler.Managers
         {
             VacantJobEntityFactory vacantJobEntityFactory = new VacantJobEntityFactory();
 
-            var companies = await _companyService.GetAllAsync();
-            var categories = await _categoryService.GetCategoriesAsync();
-            var specialization = await _categoryService.GetSpecializationsAsync();
+            await LoadDbData();
 
-            var jobAdverts = await GetJobAdverts();
-            var jobAdvertLinks = await GetJobAdvertLinks();
+            _jobAdverts = await GetJobAdverts();
+            _jobAdvertLinks = await GetJobAdvertLinks();
 
-            for (int i = 0; i < jobAdverts.Count; i++)
+            for (int i = 0; i < _jobAdverts.Count; i++)
             {
-                var Company = companies.FirstOrDefault(x => x.Name.ToLower() == GetCompanyNameFromWebSite(jobAdverts[i].Url).ToString());
+                var Company = _companies.FirstOrDefault(x => x.Name.ToLower() == GetCompanyNameFromWebSite(_jobAdverts[i].Url).ToString());
 
-                var newlyCreatedVacantJob = vacantJobEntityFactory.CreateEntity(nameof(VacantJob), 1, Company.Id, jobAdvertLinks[i].Text);
+                var newlyCreatedVacantJob = vacantJobEntityFactory.CreateEntity(nameof(VacantJob), 1, Company.Id, _jobAdvertLinks[i].Text);
                 int vacantId = await CheckForDublicatesOnVacantJob((IVacantJob)newlyCreatedVacantJob);
 
                 if (vacantId is 0)
@@ -155,15 +161,15 @@ namespace WebCrawler.Managers
                 }
 
                 // JobAdvert
-                var jobAdvertSpecialization = await GetSpecialization(jobAdvertLinks[i].Text);
+                var jobAdvertSpecialization = await GetSpecialization(_jobAdvertLinks[i].Text);
 
                 var newlyCreatedJobAdvert = CreateJobAdvert(
                    vacantId,
-                   categories.FirstOrDefault(x => x.Name == UrlCutter.GetCategoryFromUrl(jobAdverts[i].Url, categories)).Id,
-                   specialization.FirstOrDefault(x => x.Name == jobAdvertSpecialization.Specialization).Id,
-                   await GetTitleFromJobAdvert(jobAdvertLinks[i].Text),
-                   await GetSummaryFromJobAdvert(jobAdvertLinks[i].Text),
-                   jobAdverts[i].ExpireDate
+                   _categories.FirstOrDefault(x => x.Name == UrlCutter.GetCategoryFromUrl(_jobAdverts[i].Url, _categories)).Id,
+                   _specializations.FirstOrDefault(x => x.Name == jobAdvertSpecialization.Specialization).Id,
+                   await GetTitleFromJobAdvert(_jobAdvertLinks[i].Text),
+                   await GetSummaryFromJobAdvert(_jobAdvertLinks[i].Text),
+                   _jobAdverts[i].ExpireDate
                    );
                 //----------------------------------------------------------
                 int jobAdvertId = await CheckForDublicatesOnJobAdvert(newlyCreatedJobAdvert);
@@ -174,6 +180,17 @@ namespace WebCrawler.Managers
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Fills private lists with data from the database.
+        /// </summary>
+        /// <returns></returns>
+        private async Task LoadDbData()
+        {
+            _companies = await _companyService.GetAllAsync();
+            _categories = await _categoryService.GetCategoriesAsync();
+            _specializations = await _categoryService.GetSpecializationsAsync();
         }
 
         /// <summary>
