@@ -67,7 +67,7 @@ namespace WebCrawler.DataSorters
             return null;
         }
 
-        
+
         /// <summary>
         /// This method is used to get the category for a job
         /// Checks the url for key categories from db
@@ -90,7 +90,7 @@ namespace WebCrawler.DataSorters
             return null;
         }
 
-   
+
         /// <summary>
         /// Makes a new list with links that is not dublicated 
         /// </summary>
@@ -108,10 +108,10 @@ namespace WebCrawler.DataSorters
                     sortedList.Add(item);
                 }
             }
-            
+
             return sortedList;
         }
 
-        
+
     }
 }

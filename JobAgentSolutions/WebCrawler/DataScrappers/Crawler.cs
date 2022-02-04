@@ -59,7 +59,7 @@ namespace WebCrawler.DataScrappers
                 }
 
                 return links;
-            
+
             });
 
             return await Task.FromResult(await task);
@@ -75,7 +75,9 @@ namespace WebCrawler.DataScrappers
                 foreach (var item in WebElements)
                 {
                     if (!string.IsNullOrEmpty(item.Text))
+                    {
                         jobAdverts.Add(new WebData() { Text = item.Text, Url = Url, ExpireDate = GetDateFromstring(item.Text) });
+                    }
                 }
 
                 return jobAdverts;
@@ -87,7 +89,7 @@ namespace WebCrawler.DataScrappers
         public static DateTime GetDateFromstring(string dataString)
         {
             var dataArray = dataString.Split(' ');
-            
+
             foreach (var line in dataArray)
             {
                 if (DateTime.TryParse(line, out DateTime date))

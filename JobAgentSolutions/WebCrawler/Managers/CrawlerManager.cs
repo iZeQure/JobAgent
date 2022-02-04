@@ -118,7 +118,7 @@ namespace WebCrawler.Managers
         {
             List<IJobAdvert> jobAdverts = await _jobAdvertService.GetJobAdvertsAsync();
             var checkForDublicates = jobAdverts.FirstOrDefault(x => x.Title == jobAdvert.Title && x.Summary == jobAdvert.Summary);
-            if(checkForDublicates is not null)
+            if (checkForDublicates is not null)
             {
                 return checkForDublicates.Id;
             }
@@ -148,12 +148,12 @@ namespace WebCrawler.Managers
 
                 var newlyCreatedVacantJob = vacantJobEntityFactory.CreateEntity(nameof(VacantJob), 1, Company.Id, jobAdvertLinks[i].Text);
                 int vacantId = await CheckForDublicatesOnVacantJob((IVacantJob)newlyCreatedVacantJob);
-     
+
                 if (vacantId is 0)
                 {
                     vacantId = (await _vacantJobService.CreateAsync((IVacantJob)newlyCreatedVacantJob)).Id;
                 }
-                
+
                 // JobAdvert
                 var jobAdvertSpecialization = await GetSpecialization(jobAdvertLinks[i].Text);
 
@@ -169,7 +169,7 @@ namespace WebCrawler.Managers
                 int jobAdvertId = await CheckForDublicatesOnJobAdvert(newlyCreatedJobAdvert);
                 if (jobAdvertId == 0)
                 {
-                    await _jobAdvertService.CreateAsync((IJobAdvert)newlyCreatedJobAdvert);
+                    await _jobAdvertService.CreateAsync(newlyCreatedJobAdvert);
                 }
             }
 

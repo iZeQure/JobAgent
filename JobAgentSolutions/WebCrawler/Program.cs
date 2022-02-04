@@ -63,7 +63,7 @@ namespace WebCrawler
 
             //------------------- Services 
             services.AddEntityServices();
-            
+
 
             //------------------- Crawler
             services.AddSingleton<IWebDriver, ChromeDriver>();
