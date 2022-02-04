@@ -145,9 +145,6 @@ namespace WebCrawler.Managers
 
             await LoadDbData();
 
-            _jobAdverts = await GetJobAdverts();
-            _jobAdvertLinks = await GetJobAdvertLinks();
-
             for (int i = 0; i < _jobAdverts.Count; i++)
             {
                 var Company = _companies.FirstOrDefault(x => x.Name.ToLower() == GetCompanyNameFromWebSite(_jobAdverts[i].Url).ToString());
@@ -191,6 +188,8 @@ namespace WebCrawler.Managers
             _companies = await _companyService.GetAllAsync();
             _categories = await _categoryService.GetCategoriesAsync();
             _specializations = await _categoryService.GetSpecializationsAsync();
+            _jobAdverts = await GetJobAdverts();
+            _jobAdvertLinks = await GetJobAdvertLinks();
         }
 
         /// <summary>
