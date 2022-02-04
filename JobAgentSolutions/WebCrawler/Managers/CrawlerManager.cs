@@ -38,11 +38,11 @@ namespace WebCrawler.Managers
         private readonly ILogger<CrawlerManager> _logger;
         private readonly IDynamicSearchFilterService _dynamicSearchFilterService;
 
-        private List<ICompany> _companies;
-        private List<ICategory> _categories;
-        private List<ISpecialization> _specializations;
-        private List<WebData> _jobAdverts;
-        private List<WebData> _jobAdvertLinks;
+        private List<WebData> _jobAdverts = new();
+        private List<ICompany> _companies = new();
+        private List<ICategory> _categories = new();
+        private List<WebData> _jobAdvertLinks = new();
+        private List<ISpecialization> _specializations = new();
 
         public List<string> KeyWords { get; set; }
         public List<string> Urls { get; set; }
