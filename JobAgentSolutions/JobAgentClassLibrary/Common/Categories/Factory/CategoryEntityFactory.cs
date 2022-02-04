@@ -2,7 +2,6 @@
 using JobAgentClassLibrary.Core.Factories;
 using JobAgentClassLibrary.Core.Repositories;
 using System;
-using System.Collections.Generic;
 
 namespace JobAgentClassLibrary.Common.Categories.Factory
 {

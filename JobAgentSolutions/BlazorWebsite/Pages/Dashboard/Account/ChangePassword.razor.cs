@@ -21,7 +21,7 @@ namespace BlazorWebsite.Pages.Dashboard.Account
         private bool isProcessingPasswordChangeRequest = false;
         private string _sessionUserEmail = string.Empty;
         private string message = string.Empty;
-        
+
         private bool _isLoadingData = false;
 
         private ChangePasswordModel changePasswordModel;
@@ -84,7 +84,7 @@ namespace BlazorWebsite.Pages.Dashboard.Account
             catch (Exception ex)
             {
                 message = "Kunne ikke ændre adgangskode, prøv igen senere.";
-                alertType= AlertType.Error;
+                alertType = AlertType.Error;
                 Console.WriteLine(ex.Message);
             }
             finally
@@ -107,6 +107,6 @@ namespace BlazorWebsite.Pages.Dashboard.Account
 
             changePasswordModel.Email = _sessionUserEmail;
         }
-       
+
     }
 }

@@ -32,7 +32,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobAdvertModals
         private IEnumerable<ICategory> _categories = new List<Category>();
         private IEnumerable<ICompany> _companies = new List<Company>();
         private IEnumerable<ISpecialization> _specializations = new List<Specialization>();
-        private List<ISpecialization> _sortedSpecializations = new List<ISpecialization>();
+        private readonly List<ISpecialization> _sortedSpecializations = new List<ISpecialization>();
 
         private string _errorMessage = "";
         private bool _isLoading = false;

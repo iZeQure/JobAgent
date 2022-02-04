@@ -103,7 +103,7 @@ namespace BlazorWebsite.Shared.Components.Modals.DynamicSearchFilterModals
             {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalCreateDynamicSearchFilter");
-                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{result.Id}"); 
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{result.Id}");
             }
         }
 

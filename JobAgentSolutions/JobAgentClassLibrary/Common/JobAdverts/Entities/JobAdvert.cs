@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 
 namespace JobAgentClassLibrary.Common.JobAdverts.Entities
 {

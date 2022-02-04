@@ -19,9 +19,13 @@ namespace BlazorWebsite.Shared.Components.Diverse
             get
             {
                 if (FullWidth)
+                {
                     return "container-fluid";
+                }
                 else
+                {
                     return "container";
+                }
             }
         }
 

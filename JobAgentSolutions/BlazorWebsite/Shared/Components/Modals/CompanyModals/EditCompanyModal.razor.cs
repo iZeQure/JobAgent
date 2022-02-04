@@ -16,7 +16,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
         [Inject] protected IRefreshProvider RefreshProvider { get; set; }
         [Inject] protected IJSRuntime JSRuntime { get; set; }
 
-        private bool _showError = false;
+        private readonly bool _showError = false;
         private string _errorMessage = string.Empty;
 
         private async Task OnValidSubmit_UpdateCompanyAsync()
@@ -48,7 +48,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
             {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditCompany");
-                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.CompanyId}"); 
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.CompanyId}");
             }
         }
     }

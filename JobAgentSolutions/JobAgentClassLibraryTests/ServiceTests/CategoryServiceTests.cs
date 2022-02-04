@@ -24,7 +24,7 @@ namespace JobAgentClassLibraryTests.ServiceTests
 
             // Act
             var categories = await _moqRepository.GetAllSystemLogsAsync();
-            AsyncTestDelegate getAllAction = async () 
+            AsyncTestDelegate getAllAction = async ()
                 => await _moqRepository.GetAllSystemLogsAsync();
 
             // Assert

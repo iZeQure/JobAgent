@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
@@ -20,8 +19,8 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
         [Inject] protected IJSRuntime JSRuntime { get; set; }
         [Inject] protected ILogService LogService { get; set; }
 
-        private List<LogSeverity> _logSeverities = new();
-        private List<LogType> _logTypes = new();
+        private readonly List<LogSeverity> _logSeverities = new();
+        private readonly List<LogType> _logTypes = new();
         private IEnumerable<ILog> _logs;
 
         private string _errorMessage = "";
@@ -98,7 +97,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CrawlerLogModals
             {
                 RefreshProvider.CallRefreshRequest();
                 await JSRuntime.InvokeVoidAsync("toggleModalVisibility", "ModalEditCrawlerLog");
-                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}"); 
+                await JSRuntime.InvokeVoidAsync("onInformationChangeAnimateTableRow", $"{Model.Id}");
             }
         }
 

@@ -1,5 +1,5 @@
-﻿using JobAgentClassLibrary.Core.Repositories;
-using JobAgentClassLibrary.Common.Roles.Entities;
+﻿using JobAgentClassLibrary.Common.Roles.Entities;
+using JobAgentClassLibrary.Core.Repositories;
 
 namespace JobAgentClassLibrary.Common.Roles.Repositories
 {

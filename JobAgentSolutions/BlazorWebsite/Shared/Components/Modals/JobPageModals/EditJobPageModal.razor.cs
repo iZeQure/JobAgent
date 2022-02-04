@@ -22,7 +22,7 @@ namespace BlazorWebsite.Shared.Components.Modals.JobPageModals
         [Inject] protected IJobPageService JobPageService { get; set; }
         [Inject] protected ICompanyService CompanyService { get; set; }
 
-        private DefaultValidator defaultValidator = new();
+        private readonly DefaultValidator defaultValidator = new();
         private IEnumerable<ICompany> _companies = new List<Company>();
 
         private string _errorMessage = "";

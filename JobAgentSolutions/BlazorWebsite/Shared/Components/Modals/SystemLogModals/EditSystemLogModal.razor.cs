@@ -19,8 +19,8 @@ namespace BlazorWebsite.Shared.Components.Modals.SystemLogModals
         [Inject] protected IJSRuntime JSRuntime { get; set; }
         [Inject] protected ILogService LogService { get; set; }
 
-        private List<LogSeverity> _logSeverities = new();
-        private List<LogType> _logTypes = new();
+        private readonly List<LogSeverity> _logSeverities = new();
+        private readonly List<LogType> _logTypes = new();
         private IEnumerable<ILog> _logs;
 
         private string _errorMessage = "";

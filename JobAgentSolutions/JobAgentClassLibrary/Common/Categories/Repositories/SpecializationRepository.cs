@@ -1,13 +1,13 @@
-﻿using JobAgentClassLibrary.Common.Categories.Entities;
+﻿using Dapper;
+using JobAgentClassLibrary.Common.Categories.Entities;
+using JobAgentClassLibrary.Common.Categories.Entities.EntityMaps;
+using JobAgentClassLibrary.Common.Categories.Factory;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
-using Dapper;
-using JobAgentClassLibrary.Common.Categories.Factory;
-using JobAgentClassLibrary.Common.Categories.Entities.EntityMaps;
-using System;
 
 namespace JobAgentClassLibrary.Common.Categories.Repositories
 {
@@ -43,7 +43,10 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId > 0) return await GetByIdAsync(entityId);
+            if (entityId > 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
 
             return null;
         }
@@ -130,7 +133,10 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId >= 0) return await GetByIdAsync(entityId);
+            if (entityId >= 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
 
             return null;
         }

@@ -3,7 +3,6 @@ using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Filters;
 using JobAgentClassLibrary.Common.Filters.Entities;
 using JobAgentClassLibrary.Extensions;
-using JobAgentClassLibrary.Security.Providers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;

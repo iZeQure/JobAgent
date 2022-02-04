@@ -3,7 +3,6 @@ using BlazorWebsite.Data.Providers;
 using JobAgentClassLibrary.Common.Categories;
 using JobAgentClassLibrary.Common.Categories.Entities;
 using JobAgentClassLibrary.Extensions;
-using JobAgentClassLibrary.Security.Providers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
@@ -20,12 +19,12 @@ namespace BlazorWebsite.Shared.Components.Modals.CategoryModals
         [Inject] protected ICategoryService CategoryService { get; set; }
 
         private CategoryModel _categoryModel = new();
-        private IEnumerable<ISpecialization> _newSpecializations = new List<Specialization>();
+        private readonly IEnumerable<ISpecialization> _newSpecializations = new List<Specialization>();
         private List<string> _newSpecializationNames = new();
         private EditContext _editContext;
 
-        private bool _isProcessingNewSpecializationToList = false;
-        private bool _isLoading = false;
+        private readonly bool _isProcessingNewSpecializationToList = false;
+        private readonly bool _isLoading = false;
         private string _errorMessage;
 
         protected override Task OnInitializedAsync()

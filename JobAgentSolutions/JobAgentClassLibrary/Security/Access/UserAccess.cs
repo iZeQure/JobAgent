@@ -74,7 +74,7 @@ namespace JobAgentClassLibrary.Security.Access
                     var generatedConsultantAreaClaims = GenerateConsultantAreaClaimsEntities(authUser.ConsultantAreas, "ConsultantArea");
                     var userRole = await _roleService.GetRoleByIdAsync(authUser.RoleId);
                     var userLocation = await _locationService.GetByIdAsync(authUser.LocationId);
-                    
+
                     List<Claim> identityClaims = new()
                     {
                         new Claim(ClaimTypes.NameIdentifier, authUser.Id.ToString()),

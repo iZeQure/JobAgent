@@ -7,7 +7,7 @@ namespace PolicyLibrary.Validators.Rules
     {
         public void ValidateRule(object value, ref Validator validator)
         {
-            if(value is null)
+            if (value is null)
             {
                 string msg = "Value is null.";
                 validator.AddException(

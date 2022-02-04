@@ -7,7 +7,7 @@ namespace PolicyLibrary.Validators
 {
     public class DefaultValidator
     {
-        private List<IPolicyRule> _urlRules = new()
+        private readonly List<IPolicyRule> _urlRules = new()
         {
             new IsNotNullRule(),
             new IsNotEmptyRule(),

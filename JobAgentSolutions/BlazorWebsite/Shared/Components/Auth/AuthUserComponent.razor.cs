@@ -16,7 +16,7 @@ namespace BlazorWebsite.Shared.Components.Auth
         [Inject] protected NavigationManager NavigationManager { get; set; }
 
         private EditContext _formContext;
-        private AuthUserModel _authUserModel = new();
+        private readonly AuthUserModel _authUserModel = new();
         private bool _processignAuthRequest = false;
         private string _message = "";
 

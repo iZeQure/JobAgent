@@ -1,6 +1,5 @@
 ﻿using PolicyLibrary.Validators.Abstractions;
 using System;
-using System.Net;
 
 namespace PolicyLibrary.Validators.Rules
 {
@@ -21,7 +20,7 @@ namespace PolicyLibrary.Validators.Rules
                     validator.AddException(
                         new ArgumentException(msg, validator.Name));
                 }
-                
+
             }
         }
     }

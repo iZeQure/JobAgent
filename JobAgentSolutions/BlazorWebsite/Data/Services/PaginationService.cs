@@ -34,7 +34,10 @@ namespace BlazorWebsite.Data.Services
 
         private int PageCount<TPagingModel>(IEnumerable<TPagingModel> data)
         {
-            if (data is null) return 0;
+            if (data is null)
+            {
+                return 0;
+            }
 
             double smallestValue = Math.Ceiling(data.Count() / (double)_pageSize);
 

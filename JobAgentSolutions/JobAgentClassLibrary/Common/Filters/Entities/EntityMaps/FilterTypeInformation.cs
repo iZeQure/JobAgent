@@ -7,7 +7,7 @@ namespace JobAgentClassLibrary.Common.Filters.Entities.EntityMaps
     public class FilterTypeInformation : IFilterType
     {
         public int Id => FilterTypeId;
-        
+
         public string Name => FilterTypeName;
 
         public string Description => FilterTypeDescription;

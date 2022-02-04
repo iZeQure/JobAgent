@@ -38,7 +38,7 @@ namespace JobAgentClassLibrary.Extensions.ServiceCollection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddEntityServices(this IServiceCollection services) 
+        public static IServiceCollection AddEntityServices(this IServiceCollection services)
             => services
             .AddScoped<IAreaService, AreaService>()
             .AddScoped<IRoleService, RoleService>()
@@ -54,7 +54,7 @@ namespace JobAgentClassLibrary.Extensions.ServiceCollection
             .AddScoped<IJobPageService, JobPageService>()
             .AddScoped<ILogService, SystemLogService>();
 
-        public static IServiceCollection AddRepositories(this IServiceCollection services) 
+        public static IServiceCollection AddRepositories(this IServiceCollection services)
             => services
             .AddScoped<IUserRepository, UserRepository>()
             .AddScoped<ICompanyRepository, CompanyRepository>()

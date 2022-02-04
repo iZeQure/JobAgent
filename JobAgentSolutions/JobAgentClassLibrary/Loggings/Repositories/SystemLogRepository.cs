@@ -42,7 +42,10 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId != 0) return await GetByIdAsync(entityId);
+            if (entityId != 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
 
             return null;
         }
@@ -78,7 +81,7 @@ namespace JobAgentClassLibrary.Loggings.Repositories
 
             return logs;
         }
-        
+
         public async Task<List<ILog>> GetAllCrawlerLogsAsync()
         {
             List<ILog> logs = new();
@@ -181,7 +184,10 @@ namespace JobAgentClassLibrary.Loggings.Repositories
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId >= 0) return await GetByIdAsync(entityId);
+            if (entityId >= 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
 
             return null;
         }

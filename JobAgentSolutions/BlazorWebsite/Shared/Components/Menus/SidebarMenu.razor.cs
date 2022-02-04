@@ -71,7 +71,7 @@ namespace BlazorWebsite.Shared.Components.Menus
             }
 
             _menu = (await CategoryService.GetMenuAsync())
-                .Where(x => x.Name.ToLower().Contains(getValue)||x.Specializations.Any(y => y.Name.ToLower().Contains(getValue)));
+                .Where(x => x.Name.ToLower().Contains(getValue) || x.Specializations.Any(y => y.Name.ToLower().Contains(getValue)));
             StateHasChanged();
         }
 

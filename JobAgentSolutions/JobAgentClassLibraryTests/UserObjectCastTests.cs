@@ -1,6 +1,4 @@
-﻿using JobAgentClassLibrary.Common.Locations.Entities;
-using JobAgentClassLibrary.Common.Roles.Entities;
-using JobAgentClassLibrary.Common.Users.Entities;
+﻿using JobAgentClassLibrary.Common.Users.Entities;
 using NUnit.Framework;
 
 namespace JobAgentClassLibraryTests

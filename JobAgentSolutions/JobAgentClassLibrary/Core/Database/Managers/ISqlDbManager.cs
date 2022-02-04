@@ -1,5 +1,5 @@
-﻿using System;
-using JobAgentClassLibrary.Core.Entities;
+﻿using JobAgentClassLibrary.Core.Entities;
+using System;
 using System.Data.SqlClient;
 
 namespace JobAgentClassLibrary.Core.Database.Managers

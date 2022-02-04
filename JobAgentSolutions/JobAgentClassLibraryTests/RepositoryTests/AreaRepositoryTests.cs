@@ -91,7 +91,7 @@ namespace JobAgentClassLibraryTests.RepositoryTests
             IArea requestedArea;
 
             testArea = await _areaRepository.CreateAsync(CreateTestAreaObject());
-            
+
             //Act
             requestedArea = await _areaRepository.GetByIdAsync(testArea.Id);
 
@@ -124,7 +124,7 @@ namespace JobAgentClassLibraryTests.RepositoryTests
                 Id = testArea.Id,
                 Name = CreateTestAreaObject().Name
             };
-            
+
             updatedArea = await _areaRepository.UpdateAsync(newArea);
 
             //Cleanup
@@ -148,7 +148,7 @@ namespace JobAgentClassLibraryTests.RepositoryTests
 
             //Act
             bool cleanupSuccess = await _areaRepository.RemoveAsync(testArea);
-            
+
             //Assert
             Assert.IsTrue(cleanupSuccess);
         }

@@ -5,7 +5,7 @@ namespace JobAgentClassLibrary.Extensions.SmartUsing
 {
     internal class EndOfProcessOperation : IDisposable
     {
-        private BaseModel _model;
+        private readonly BaseModel _model;
 
         public EndOfProcessOperation(BaseModel model)
         {

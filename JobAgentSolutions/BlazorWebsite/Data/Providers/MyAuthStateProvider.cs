@@ -81,7 +81,7 @@ namespace BlazorWebsite.Data.Providers
 
             if (string.IsNullOrEmpty(authUser.AccessToken))
             {
-                throw new ArgumentNullException(nameof(authUser.AccessToken),"Token was either null or empty, failed to authenticate.");
+                throw new ArgumentNullException(nameof(authUser.AccessToken), "Token was either null or empty, failed to authenticate.");
             }
 
             // Set the access token in the local memory.

@@ -39,13 +39,16 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId != 0) return await GetByIdAsync(entityId);
+            if (entityId != 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
 
             return null;
         }
 
         public async Task<List<IRole>> GetAllSystemLogsAsync()
-       {
+        {
             List<IRole> roles = new();
 
             using (var conn = _sqlDbManager.GetSqlConnection(DbCredentialType.BasicUser))
@@ -128,7 +131,10 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId >= 0) return await GetByIdAsync(entityId);
+            if (entityId >= 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
 
             return null;
         }

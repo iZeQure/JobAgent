@@ -21,7 +21,7 @@ namespace BlazorWebsite.Pages
         [Inject] protected IVacantJobService VacantJobService { get; set; }
         [Inject] protected IJobAdvertService JobAdvertService { get; set; }
 
-        private CultureInfo cultureInfo = CultureInfo.CreateSpecificCulture("da-DK");
+        private readonly CultureInfo cultureInfo = CultureInfo.CreateSpecificCulture("da-DK");
         private IEnumerable<IJobAdvert> _jobAdverts = new List<JobAdvert>();
         private IEnumerable<IVacantJob> _vacantJobs = new List<VacantJob>();
         private IEnumerable<ICompany> _companies = new List<Company>();

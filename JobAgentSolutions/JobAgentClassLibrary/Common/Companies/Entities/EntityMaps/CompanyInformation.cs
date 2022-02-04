@@ -11,7 +11,7 @@ namespace JobAgentClassLibrary.Common.Companies.Entities.EntityMaps
 
         [Key]
         public int CompanyId { get; set; }
-        public string CompanyName {get;set;}
+        public string CompanyName { get; set; }
 
     }
 }

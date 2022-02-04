@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-
-namespace BlazorWebsite.Shared.Layouts
+﻿namespace BlazorWebsite.Shared.Layouts
 {
     public partial class DashboardLayout
     {

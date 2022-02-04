@@ -19,7 +19,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
 
         private EditContext _editContext;
         private CompanyModel _companyModel = new();
-        private bool _showError = false;
+        private readonly bool _showError = false;
         private string _errorMessage = string.Empty;
 
         protected override Task OnInitializedAsync()

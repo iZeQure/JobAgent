@@ -7,7 +7,7 @@ namespace JobAgentClassLibrary.Common.Filters.Entities.EntityMaps
     {
         public int Id => DynamicSearchFilterId;
 
-        public int CategoryId {get;set;}
+        public int CategoryId { get; set; }
 
         public int SpecializationId { get; set; }
 

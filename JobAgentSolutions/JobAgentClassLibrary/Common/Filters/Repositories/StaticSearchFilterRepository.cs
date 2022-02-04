@@ -4,10 +4,8 @@ using JobAgentClassLibrary.Common.Filters.Entities.EntityMaps;
 using JobAgentClassLibrary.Common.Filters.Factory;
 using JobAgentClassLibrary.Core.Database.Managers;
 using JobAgentClassLibrary.Core.Entities;
-using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -43,7 +41,10 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId != 0) return await GetByIdAsync(entityId);
+            if (entityId != 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
 
             return null;
         }
@@ -126,14 +127,17 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
                 var values = new
                 {
                     @id = entity.Id,
-                    @filterTypeId= entity.FilterType.Id,
+                    @filterTypeId = entity.FilterType.Id,
                     @key = entity.Key
                 };
 
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId >= 0) return await GetByIdAsync(entityId);
+            if (entityId >= 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
 
             return null;
         }

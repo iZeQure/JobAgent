@@ -1,5 +1,4 @@
 ﻿using JobAgentClassLibrary.Common.Categories.Entities;
-using JobAgentClassLibrary.Common.Categories.Factory;
 using JobAgentClassLibrary.Common.Categories.Repositories;
 using JobAgentClassLibrary.Core.Entities;
 using JobAgentClassLibrary.Loggings;
@@ -119,11 +118,17 @@ namespace JobAgentClassLibrary.Common.Categories
 
                 foreach (var c in categories)
                 {
-                    if (c.Id is 0) continue;
+                    if (c.Id is 0)
+                    {
+                        continue;
+                    }
 
                     var matches = specializations.Where(s => s.CategoryId == c.Id);
 
-                    if (!matches.Any()) continue;
+                    if (!matches.Any())
+                    {
+                        continue;
+                    }
 
                     c.AddRange(matches);
                 }

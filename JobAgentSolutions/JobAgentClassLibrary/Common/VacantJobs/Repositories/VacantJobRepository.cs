@@ -21,7 +21,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
             _sqlDbManager = sqlDbManager;
             _factory = factory;
         }
-        
+
         /// <summary>
         /// Creates a new VacantJob in the database
         /// </summary>
@@ -43,7 +43,10 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId != 0) return await GetByIdAsync(entityId);
+            if (entityId != 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
 
             return null;
         }
@@ -150,7 +153,10 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
                 entityId = await conn.ExecuteScalarAsync<int>(proc, values, commandType: CommandType.StoredProcedure);
             }
 
-            if (entityId >= 0) return await GetByIdAsync(entityId);
+            if (entityId >= 0)
+            {
+                return await GetByIdAsync(entityId);
+            }
 
             return null;
         }

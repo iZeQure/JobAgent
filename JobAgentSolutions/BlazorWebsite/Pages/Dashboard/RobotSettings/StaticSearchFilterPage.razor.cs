@@ -94,7 +94,10 @@ namespace BlazorWebsite.Pages.Dashboard.RobotSettings
                 var filters = await StaticSearchFilterService.GetAllAsync();
                 var filtertypes = await FilterTypeService.GetAllAsync();
 
-                if (filters == null || filtertypes == null) return;
+                if (filters == null || filtertypes == null)
+                {
+                    return;
+                }
 
                 _staticSearchFilters = filters;
                 _filterTypes = filtertypes;
