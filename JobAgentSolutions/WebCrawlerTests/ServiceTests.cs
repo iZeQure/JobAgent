@@ -6,7 +6,6 @@ using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using WebCrawler.DataAccess;
 
 namespace WebCrawlerTests
 {
@@ -18,7 +17,7 @@ namespace WebCrawlerTests
         [SetUp]
         public void Setup()
         {
-            var manager = SqlConfigurationSetup.SetupSqlDbManager();
+            //var manager = SqlConfigurationSetup.SetupSqlDbManager();
             var factory = new JobAdvertEntityFactory();
             _jobAdvertRepository = new JobAdvertRepository(manager, factory);
 
