@@ -5,6 +5,8 @@ using JobAgentClassLibrary.Common.Filters.Entities;
 using JobAgentClassLibrary.Common.JobAdverts;
 using JobAgentClassLibrary.Common.JobAdverts.Entities;
 using JobAgentClassLibrary.Common.JobAdverts.Factory;
+using JobAgentClassLibrary.Common.JobPages;
+using JobAgentClassLibrary.Common.JobPages.Entities;
 using JobAgentClassLibrary.Common.VacantJobs;
 using JobAgentClassLibrary.Common.VacantJobs.Entities;
 using JobAgentClassLibrary.Common.VacantJobs.Factory;
@@ -35,11 +37,12 @@ namespace WebCrawler.Managers
         private readonly IJobAdvertService _jobAdvertService;
         private readonly ILogger<CrawlerManager> _logger;
         private readonly IDynamicSearchFilterService _dynamicSearchFilterService;
+        private readonly IJobPageService _jobPageService;
 
         public List<string> KeyWords { get; set; }
-        public List<string> Urls { get; set; }
+        public List<IJobPage> JobPages { get; set; }
         public List<string> HtmlClassNames { get; set; }
-        public CrawlerManager(Crawler crawler, ICompanyService companyService, ICategoryService categoryService, IVacantJobService vacantJobService, IJobAdvertService jobAdvertService, ILogger<CrawlerManager> logger, IDynamicSearchFilterService dynamicSearchFilterService)
+        public CrawlerManager(Crawler crawler, ICompanyService companyService, ICategoryService categoryService, IVacantJobService vacantJobService, IJobAdvertService jobAdvertService, ILogger<CrawlerManager> logger, IDynamicSearchFilterService dynamicSearchFilterService, IJobPageService jobPageService)
         {
             _crawler = crawler;
             _companyService = companyService;
@@ -48,15 +51,20 @@ namespace WebCrawler.Managers
             _jobAdvertService = jobAdvertService;
             _logger = logger;
             _dynamicSearchFilterService = dynamicSearchFilterService;
+            _jobPageService = jobPageService;
 
-            Urls = new List<string>()
-            {
-                "https://pms.praktikpladsen.dk/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20programmering",
-                "https://pms.praktikpladsen.dk/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20infrastruktur",
-                "https://pms.praktikpladsen.dk/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/IT-supporter",
-                "https://pms.xn--lrepladsen-d6a.dk/soeg-opslag/0/Elektronik-%20og%20svagstr%C3%B8msuddannelsen/Elektronikfagtekniker?aftaleFilter=alle&medarbejdereFilter=alle",
-                "https://pms.xn--lrepladsen-d6a.dk/soeg-opslag/0/Automatik-%20og%20procesuddannelsen/-1?aftaleFilter=alle&medarbejdereFilter=alle"
-            };
+
+            JobPages = new();
+
+            //Getting changed to get links from db
+            //JobPages = new List<string>()
+            //{
+            //    "https://pms.praktikpladsen.dk/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20programmering",
+            //    "https://pms.praktikpladsen.dk/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20infrastruktur",
+            //    "https://pms.praktikpladsen.dk/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/IT-supporter",
+            //    "https://pms.xn--lrepladsen-d6a.dk/soeg-opslag/0/Elektronik-%20og%20svagstr%C3%B8msuddannelsen/Elektronikfagtekniker?aftaleFilter=alle&medarbejdereFilter=alle",
+            //    "https://pms.xn--lrepladsen-d6a.dk/soeg-opslag/0/Automatik-%20og%20procesuddannelsen/-1?aftaleFilter=alle&medarbejdereFilter=alle"
+            //};
 
             HtmlClassNames = new List<string>()
             {
@@ -228,16 +236,17 @@ namespace WebCrawler.Managers
         /// <returns></returns>
         public async Task<List<WebData>> GetRawJobAdvertData()
         {
+            JobPages = await _jobPageService.GetJobPagesAsync();
             Task<List<WebData>> task = Task<List<WebData>>.Factory.StartNew(() =>
             {
                 List<WebData> data = new();
                 //-----------------------------------------
                 // Make method to get links from db !!
                 //-----------------------------------------
-                foreach (var url in Urls)
+                foreach (var jobPage in JobPages)
                 {
-                    _crawler.Url = url;
-                    data.AddRange(_crawler.GetJobAdvert(By.ClassName(GetClassName(GetCompanyNameFromWebSite(url)))).Result);
+                    _crawler.Url = jobPage.URL;
+                    data.AddRange(_crawler.GetJobAdvert(By.ClassName(GetClassName(GetCompanyNameFromWebSite(jobPage.URL)))).Result);
                 }
                 return data;
             });
@@ -255,10 +264,10 @@ namespace WebCrawler.Managers
             Task<List<WebData>> task = Task<List<WebData>>.Factory.StartNew(() =>
             {
                 List<WebData> links = new();
-                foreach (var url in Urls)
+                foreach (var jobPage in JobPages)
                 {
                     //sets the url for the crawler to run on
-                    _crawler.Url = url;
+                    _crawler.Url = jobPage.URL;
 
                     // Adds the list of links found by the crawler 
                     links.AddRange(_crawler.GetJobAdvertLinks().Result);
