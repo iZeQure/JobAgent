@@ -38,7 +38,7 @@ namespace WebCrawler.Managers
 
         public List<string> KeyWords { get; set; }
         public List<string> Urls { get; set; }
-        public List<string> ClassNames { get; set; }
+        public List<string> HtmlClassNames { get; set; }
         public CrawlerManager(Crawler crawler, ICompanyService companyService, ICategoryService categoryService, IVacantJobService vacantJobService, IJobAdvertService jobAdvertService, ILogger<CrawlerManager> logger, IDynamicSearchFilterService dynamicSearchFilterService)
         {
             _crawler = crawler;
@@ -58,7 +58,7 @@ namespace WebCrawler.Managers
                 "https://pms.xn--lrepladsen-d6a.dk/soeg-opslag/0/Automatik-%20og%20procesuddannelsen/-1?aftaleFilter=alle&medarbejdereFilter=alle"
             };
 
-            ClassNames = new List<string>()
+            HtmlClassNames = new List<string>()
             {
                 "opslag-container-container"
             };
@@ -139,7 +139,7 @@ namespace WebCrawler.Managers
             var categories = await _categoryService.GetCategoriesAsync();
             var specialization = await _categoryService.GetSpecializationsAsync();
 
-            var jobAdverts = await GetJobAdverts();
+            var jobAdverts = await GetRawJobAdvertData();
             var jobAdvertLinks = await GetJobAdvertLinks();
 
             for (int i = 0; i < jobAdverts.Count; i++)
@@ -194,6 +194,12 @@ namespace WebCrawler.Managers
             return data[0].Text;
         }
 
+        /// <summary>
+        /// Used to get the title on a given jobadvert
+        /// Make sure the link is a jobadvert
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
         public async Task<string> GetTitleFromJobAdvert(string url)
         {
             List<IDynamicSearchFilter> keyWords = await _dynamicSearchFilterService.GetAllAsync();
@@ -216,12 +222,18 @@ namespace WebCrawler.Managers
             return result;
         }
 
-        public async Task<List<WebData>> GetJobAdverts()
+        /// <summary>
+        /// Gets the raw data from the page 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<WebData>> GetRawJobAdvertData()
         {
             Task<List<WebData>> task = Task<List<WebData>>.Factory.StartNew(() =>
             {
                 List<WebData> data = new();
-
+                //-----------------------------------------
+                // Make method to get links from db !!
+                //-----------------------------------------
                 foreach (var url in Urls)
                 {
                     _crawler.Url = url;
@@ -258,6 +270,12 @@ namespace WebCrawler.Managers
             return await Task.FromResult(await task);
         }
 
+        /// <summary>
+        /// Used to get the specialization from the jobadvert
+        /// Make sure the link is a jobadvert
+        /// </summary>
+        /// <param name="jobAdvertLink"></param>
+        /// <returns></returns>
         public async Task<WebData> GetSpecialization(string jobAdvertLink)
         {
             List<string> specialization = new()
@@ -287,6 +305,13 @@ namespace WebCrawler.Managers
             return data[0];
         }
 
+        /// <summary>
+        /// Compare a string to company name 
+        /// returns true if there is a match else false
+        /// </summary>
+        /// <param name="companyString"></param>
+        /// <param name="companyName"></param>
+        /// <returns></returns>
         private bool CheckIfStringHasCompanyName(string companyString, CompanyNames companyName)
         {
             if (companyString == companyName.ToString())
@@ -297,6 +322,11 @@ namespace WebCrawler.Managers
             return false;
         }
 
+        /// <summary>
+        /// Checks the url for a company name 
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
         public CompanyNames GetCompanyNameFromWebSite(string url)
         {
             var stringArray = url.Split('.');
@@ -314,12 +344,17 @@ namespace WebCrawler.Managers
             return 0;
         }
 
+        /// <summary>
+        /// Use to get the right keywords for the page 
+        /// </summary>
+        /// <param name="companyName"></param>
+        /// <returns></returns>
         public string GetClassName(CompanyNames companyName)
         {
             switch (companyName)
             {
                 case CompanyNames.praktikpladsen:
-                    return ClassNames[0];
+                    return HtmlClassNames[0];
 
                 default:
                     return null;
