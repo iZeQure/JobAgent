@@ -7,6 +7,8 @@ using JobAgentClassLibrary.Common.Filters.Entities;
 using JobAgentClassLibrary.Common.JobAdverts;
 using JobAgentClassLibrary.Common.JobAdverts.Entities;
 using JobAgentClassLibrary.Common.JobAdverts.Factory;
+using JobAgentClassLibrary.Common.JobPages;
+using JobAgentClassLibrary.Common.JobPages.Entities;
 using JobAgentClassLibrary.Common.VacantJobs;
 using JobAgentClassLibrary.Common.VacantJobs.Entities;
 using JobAgentClassLibrary.Common.VacantJobs.Factory;
@@ -37,6 +39,7 @@ namespace WebCrawler.Managers
         private readonly IJobAdvertService _jobAdvertService;
         private readonly ILogger<CrawlerManager> _logger;
         private readonly IDynamicSearchFilterService _dynamicSearchFilterService;
+        private readonly IJobPageService _jobPageService;
 
         private List<WebData> _jobAdverts = new();
         private List<ICompany> _companies = new();
@@ -45,9 +48,9 @@ namespace WebCrawler.Managers
         private List<ISpecialization> _specializations = new();
 
         public List<string> KeyWords { get; set; }
-        public List<string> Urls { get; set; }
-        public List<string> ClassNames { get; set; }
-        public CrawlerManager(Crawler crawler, ICompanyService companyService, ICategoryService categoryService, IVacantJobService vacantJobService, IJobAdvertService jobAdvertService, ILogger<CrawlerManager> logger, IDynamicSearchFilterService dynamicSearchFilterService)
+        public List<IJobPage> JobPages { get; set; }
+        public List<string> HtmlClassNames { get; set; }
+        public CrawlerManager(Crawler crawler, ICompanyService companyService, ICategoryService categoryService, IVacantJobService vacantJobService, IJobAdvertService jobAdvertService, ILogger<CrawlerManager> logger, IDynamicSearchFilterService dynamicSearchFilterService, IJobPageService jobPageService)
         {
             _crawler = crawler;
             _companyService = companyService;
@@ -56,17 +59,22 @@ namespace WebCrawler.Managers
             _jobAdvertService = jobAdvertService;
             _logger = logger;
             _dynamicSearchFilterService = dynamicSearchFilterService;
+            _jobPageService = jobPageService;
 
-            Urls = new List<string>()
-            {
-                "https://pms.praktikpladsen.dk/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20programmering",
-                "https://pms.praktikpladsen.dk/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20infrastruktur",
-                "https://pms.praktikpladsen.dk/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/IT-supporter",
-                "https://pms.xn--lrepladsen-d6a.dk/soeg-opslag/0/Elektronik-%20og%20svagstr%C3%B8msuddannelsen/Elektronikfagtekniker?aftaleFilter=alle&medarbejdereFilter=alle",
-                "https://pms.xn--lrepladsen-d6a.dk/soeg-opslag/0/Automatik-%20og%20procesuddannelsen/-1?aftaleFilter=alle&medarbejdereFilter=alle"
-            };
 
-            ClassNames = new List<string>()
+            JobPages = new();
+
+            //Getting changed to get links from db
+            //JobPages = new List<string>()
+            //{
+            //    "https://pms.praktikpladsen.dk/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20programmering",
+            //    "https://pms.praktikpladsen.dk/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/Datatekniker%20med%20speciale%20i%20infrastruktur",
+            //    "https://pms.praktikpladsen.dk/soeg-opslag/0/Data-%20og%20kommunikationsuddannelsen/IT-supporter",
+            //    "https://pms.xn--lrepladsen-d6a.dk/soeg-opslag/0/Elektronik-%20og%20svagstr%C3%B8msuddannelsen/Elektronikfagtekniker?aftaleFilter=alle&medarbejdereFilter=alle",
+            //    "https://pms.xn--lrepladsen-d6a.dk/soeg-opslag/0/Automatik-%20og%20procesuddannelsen/-1?aftaleFilter=alle&medarbejdereFilter=alle"
+            //};
+
+            HtmlClassNames = new List<string>()
             {
                 "opslag-container-container"
             };
@@ -145,7 +153,14 @@ namespace WebCrawler.Managers
 
             await LoadDbData();
 
+<<<<<<< HEAD
             for (int i = 0; i < _jobAdverts.Count; i++)
+=======
+            var jobAdverts = await GetRawJobAdvertData();
+            var jobAdvertLinks = await GetJobAdvertLinks();
+
+            for (int i = 0; i < jobAdverts.Count; i++)
+>>>>>>> 32/WebCrawler/WebCrawlerTests
             {
                 var Company = _companies.FirstOrDefault(x => x.Name.ToLower() == GetCompanyNameFromWebSite(_jobAdverts[i].Url).ToString());
 
@@ -210,6 +225,12 @@ namespace WebCrawler.Managers
             return data[0].Text;
         }
 
+        /// <summary>
+        /// Used to get the title on a given jobadvert
+        /// Make sure the link is a jobadvert
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
         public async Task<string> GetTitleFromJobAdvert(string url)
         {
             List<IDynamicSearchFilter> keyWords = await _dynamicSearchFilterService.GetAllAsync();
@@ -232,16 +253,23 @@ namespace WebCrawler.Managers
             return result;
         }
 
-        public async Task<List<WebData>> GetJobAdverts()
+        /// <summary>
+        /// Gets the raw data from the page 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<WebData>> GetRawJobAdvertData()
         {
+            JobPages = await _jobPageService.GetJobPagesAsync();
             Task<List<WebData>> task = Task<List<WebData>>.Factory.StartNew(() =>
             {
                 List<WebData> data = new();
-
-                foreach (var url in Urls)
+                //-----------------------------------------
+                // Make method to get links from db !!
+                //-----------------------------------------
+                foreach (var jobPage in JobPages)
                 {
-                    _crawler.Url = url;
-                    data.AddRange(_crawler.GetJobAdvert(By.ClassName(GetClassName(GetCompanyNameFromWebSite(url)))).Result);
+                    _crawler.Url = jobPage.URL;
+                    data.AddRange(_crawler.GetJobAdvert(By.ClassName(GetClassName(GetCompanyNameFromWebSite(jobPage.URL)))).Result);
                 }
                 return data;
             });
@@ -259,10 +287,10 @@ namespace WebCrawler.Managers
             Task<List<WebData>> task = Task<List<WebData>>.Factory.StartNew(() =>
             {
                 List<WebData> links = new();
-                foreach (var url in Urls)
+                foreach (var jobPage in JobPages)
                 {
                     //sets the url for the crawler to run on
-                    _crawler.Url = url;
+                    _crawler.Url = jobPage.URL;
 
                     // Adds the list of links found by the crawler 
                     links.AddRange(_crawler.GetJobAdvertLinks().Result);
@@ -274,6 +302,12 @@ namespace WebCrawler.Managers
             return await Task.FromResult(await task);
         }
 
+        /// <summary>
+        /// Used to get the specialization from the jobadvert
+        /// Make sure the link is a jobadvert
+        /// </summary>
+        /// <param name="jobAdvertLink"></param>
+        /// <returns></returns>
         public async Task<WebData> GetSpecialization(string jobAdvertLink)
         {
             List<string> specialization = new()
@@ -303,6 +337,13 @@ namespace WebCrawler.Managers
             return data[0];
         }
 
+        /// <summary>
+        /// Compare a string to company name 
+        /// returns true if there is a match else false
+        /// </summary>
+        /// <param name="companyString"></param>
+        /// <param name="companyName"></param>
+        /// <returns></returns>
         private bool CheckIfStringHasCompanyName(string companyString, CompanyNames companyName)
         {
             if (companyString == companyName.ToString())
@@ -313,6 +354,11 @@ namespace WebCrawler.Managers
             return false;
         }
 
+        /// <summary>
+        /// Checks the url for a company name 
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
         public CompanyNames GetCompanyNameFromWebSite(string url)
         {
             var stringArray = url.Split('.');
@@ -330,12 +376,17 @@ namespace WebCrawler.Managers
             return 0;
         }
 
+        /// <summary>
+        /// Use to get the right keywords for the page 
+        /// </summary>
+        /// <param name="companyName"></param>
+        /// <returns></returns>
         public string GetClassName(CompanyNames companyName)
         {
             switch (companyName)
             {
                 case CompanyNames.praktikpladsen:
-                    return ClassNames[0];
+                    return HtmlClassNames[0];
 
                 default:
                     return null;
