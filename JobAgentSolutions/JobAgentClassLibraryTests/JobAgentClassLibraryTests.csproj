@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\JobAgentClassLibrary\JobAgentClassLibrary.csproj" />
+    
   </ItemGroup>
 
 </Project>
