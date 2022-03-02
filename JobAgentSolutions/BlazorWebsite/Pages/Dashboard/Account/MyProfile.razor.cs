@@ -313,9 +313,5 @@ namespace BlazorWebsite.Pages.Dashboard.Account
             }
         }
 
-        private void Test()
-        {
-            Console.WriteLine($"Form Invalid.");
-        }
     }
 }
