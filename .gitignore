@@ -346,3 +346,4 @@ healthchecksdb
 dist/
 build/
 *.spec
+JobAgentSolutions/BlazorWebsite/appsettings.json
