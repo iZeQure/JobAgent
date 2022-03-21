@@ -191,5 +191,24 @@ namespace JobAgentClassLibrary.Loggings.Repositories
 
             return null;
         }
+
+        public async Task<List<ILog>> GetAllAsync()
+        {
+            var CombinedList = new List<ILog>();
+            var list1 = await GetAllSystemLogsAsync();
+            var list2 = await GetAllCrawlerLogsAsync();
+
+            foreach(var item in list1)
+            {
+                CombinedList.Add(item);
+            }
+
+            foreach(var item in list2)
+            {
+                CombinedList.Add(item);
+            }
+
+            return CombinedList;
+        }
     }
 }

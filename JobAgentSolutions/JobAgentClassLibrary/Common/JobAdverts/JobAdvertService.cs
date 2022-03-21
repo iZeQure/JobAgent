@@ -52,7 +52,7 @@ namespace JobAgentClassLibrary.Common.JobAdverts
         {
             try
             {
-                return await _repository.GetAllSystemLogsAsync();
+                return await _repository.GetAllAsync();
             }
             catch (Exception ex)
             {

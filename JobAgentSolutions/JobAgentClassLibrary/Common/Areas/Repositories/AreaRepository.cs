@@ -46,7 +46,7 @@ namespace JobAgentClassLibrary.Common.Areas.Repositories
         }
 
 
-        public async Task<List<IArea>> GetAllSystemLogsAsync()
+        public async Task<List<IArea>> GetAllAsync()
         {
             List<IArea> areas = new();
 

@@ -63,7 +63,7 @@ namespace JobAgentClassLibrary.Common.Locations
         {
             try
             {
-                return await _locationRepository.GetAllSystemLogsAsync();
+                return await _locationRepository.GetAllAsync();
             }
             catch (Exception ex)
             {

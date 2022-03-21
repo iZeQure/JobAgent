@@ -8,5 +8,6 @@ namespace JobAgentClassLibrary.Loggings.Repositories
     public interface ILoggingRepository : IRepository<ILog, int>
     {
         Task<List<ILog>> GetAllCrawlerLogsAsync();
+        Task<List<ILog>> GetAllSystemLogsAsync();
     }
 }

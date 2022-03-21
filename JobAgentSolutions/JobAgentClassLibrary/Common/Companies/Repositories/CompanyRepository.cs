@@ -48,7 +48,7 @@ namespace JobAgentClassLibrary.Common.Companies.Repositories
             return null;
         }
 
-        public async Task<List<ICompany>> GetAllSystemLogsAsync()
+        public async Task<List<ICompany>> GetAllAsync()
         {
             List<ICompany> companies = new();
 

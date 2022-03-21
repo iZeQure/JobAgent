@@ -237,7 +237,7 @@ namespace JobAgentClassLibrary.Common.Users
         {
             try
             {
-                var users = await _userRepository.GetAllSystemLogsAsync();
+                var users = await _userRepository.GetAllAsync();
 
                 if (users is not null)
                 {

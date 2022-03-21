@@ -66,7 +66,7 @@ namespace JobAgentClassLibrary.Common.Categories
         {
             try
             {
-                return await _categoryRepository.GetAllSystemLogsAsync();
+                return await _categoryRepository.GetAllAsync();
             }
             catch (Exception ex)
             {
@@ -101,8 +101,8 @@ namespace JobAgentClassLibrary.Common.Categories
         {
             try
             {
-                var categoriesTask = _categoryRepository.GetAllSystemLogsAsync();
-                var specializationsTask = _specializationRepository.GetAllSystemLogsAsync();
+                var categoriesTask = _categoryRepository.GetAllAsync();
+                var specializationsTask = _specializationRepository.GetAllAsync();
 
                 try
                 {
@@ -168,7 +168,7 @@ namespace JobAgentClassLibrary.Common.Categories
         {
             try
             {
-                return await _specializationRepository.GetAllSystemLogsAsync();
+                return await _specializationRepository.GetAllAsync();
             }
             catch (Exception ex)
             {

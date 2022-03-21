@@ -45,7 +45,7 @@ namespace JobAgentClassLibrary.Common.Roles
         {
             try
             {
-                return await _roleRepository.GetAllSystemLogsAsync();
+                return await _roleRepository.GetAllAsync();
             }
             catch (Exception ex)
             {

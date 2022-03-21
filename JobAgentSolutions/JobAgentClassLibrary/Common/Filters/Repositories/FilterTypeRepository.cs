@@ -46,7 +46,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
             return null;
         }
 
-        public async Task<List<IFilterType>> GetAllSystemLogsAsync()
+        public async Task<List<IFilterType>> GetAllAsync()
         {
             List<IFilterType> FilterTypes = new();
 

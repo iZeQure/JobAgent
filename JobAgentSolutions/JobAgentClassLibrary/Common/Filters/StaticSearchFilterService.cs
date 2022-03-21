@@ -45,7 +45,7 @@ namespace JobAgentClassLibrary.Common.Filters
         {
             try
             {
-                return await _repository.GetAllSystemLogsAsync();
+                return await _repository.GetAllAsync();
             }
             catch (Exception ex)
             {

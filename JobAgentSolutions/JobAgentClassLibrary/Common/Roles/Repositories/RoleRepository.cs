@@ -47,7 +47,7 @@ namespace JobAgentClassLibrary.Common.Roles.Repositories
             return null;
         }
 
-        public async Task<List<IRole>> GetAllSystemLogsAsync()
+        public async Task<List<IRole>> GetAllAsync()
         {
             List<IRole> roles = new();
 

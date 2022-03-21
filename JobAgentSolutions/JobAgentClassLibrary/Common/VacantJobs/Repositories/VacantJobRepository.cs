@@ -55,7 +55,7 @@ namespace JobAgentClassLibrary.Common.VacantJobs.Repositories
         /// Returns a list of all VacantJobs in the database
         /// </summary>
         /// <returns></returns>
-        public async Task<List<IVacantJob>> GetAllSystemLogsAsync()
+        public async Task<List<IVacantJob>> GetAllAsync()
         {
             List<IVacantJob> vacantJobs = new();
 

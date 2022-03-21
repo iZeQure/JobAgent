@@ -50,7 +50,7 @@ namespace JobAgentClassLibrary.Common.Filters.Repositories
         }
 
 
-        public async Task<List<IDynamicSearchFilter>> GetAllSystemLogsAsync()
+        public async Task<List<IDynamicSearchFilter>> GetAllAsync()
         {
             List<IDynamicSearchFilter> DynamicSearchFilters = new();
 

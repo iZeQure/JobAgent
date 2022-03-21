@@ -51,7 +51,7 @@ namespace JobAgentClassLibrary.Common.Categories.Repositories
             return null;
         }
 
-        public async Task<List<ISpecialization>> GetAllSystemLogsAsync()
+        public async Task<List<ISpecialization>> GetAllAsync()
         {
             List<ISpecialization> specializations = new();
 
