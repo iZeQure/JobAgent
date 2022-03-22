@@ -48,7 +48,7 @@ namespace BlazorWebsite.Shared.Components.Modals.CompanyModals
 
                 if (result is null)
                 {
-                    _errorMessage = "Fejl under oprettelse af Virksomehed.";
+                    _errorMessage = "Fejl under oprettelse af Virksomhed.";
                     return;
                 }
             }
