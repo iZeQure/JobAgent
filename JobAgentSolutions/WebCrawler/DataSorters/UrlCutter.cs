@@ -92,11 +92,11 @@ namespace WebCrawler.DataSorters
 
 
         /// <summary>
-        /// Makes a new list with links that is not dublicated 
+        /// Makes a new list with links that is not duplicated 
         /// </summary>
         /// <param name="links"></param>
         /// <returns></returns>
-        public static List<string> CheckListForDublicates(List<string> links)
+        public static List<string> CheckListForDuplicates(List<string> links)
         {
             List<string> sortedList = new();
             foreach (var item in links)

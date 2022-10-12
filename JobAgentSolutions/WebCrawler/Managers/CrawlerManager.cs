@@ -86,20 +86,20 @@ namespace WebCrawler.Managers
         /// </summary>
         /// <param name="jobAdvertLinks"></param>
         /// <returns></returns>
-        public async Task<int> CheckForDublicatesOnVacantJob(IVacantJob jobAdvertLinks)
+        public async Task<int> CheckForDuplicatesOnVacantJob(IVacantJob jobAdvertLinks)
         {
             var dbVacantJobs = await _vacantJobService.GetAllAsync();
-            var checkForDublicates = dbVacantJobs.FirstOrDefault(x => x.URL == jobAdvertLinks.URL);
-            if (checkForDublicates is not null)
+            var checkForDuplicates = dbVacantJobs.FirstOrDefault(x => x.URL == jobAdvertLinks.URL);
+            if (checkForDuplicates is not null)
             {
-                return checkForDublicates.Id;
+                return checkForDuplicates.Id;
             }
 
             return 0;
         }
 
         /// <summary>
-        /// Checks for dublicates
+        /// Checks for duplicates
         /// returns the id if found else it returns 0
         /// </summary>
         /// <param name="vacantId"></param>
@@ -125,18 +125,18 @@ namespace WebCrawler.Managers
         }
 
         /// <summary>
-        /// Checks for dublicates
+        /// Checks for duplicates
         /// returns the id if found else it returns 0
         /// </summary>
         /// <param name="jobAdvert"></param>
         /// <returns></returns>
-        public async Task<int> CheckForDublicatesOnJobAdvert(IJobAdvert jobAdvert)
+        public async Task<int> CheckForDuplicatesOnJobAdvert(IJobAdvert jobAdvert)
         {
             List<IJobAdvert> jobAdverts = await _jobAdvertService.GetJobAdvertsAsync();
-            var checkForDublicates = jobAdverts.FirstOrDefault(x => x.Title == jobAdvert.Title && x.Summary == jobAdvert.Summary);
-            if (checkForDublicates is not null)
+            var checkForDuplicates = jobAdverts.FirstOrDefault(x => x.Title == jobAdvert.Title && x.Summary == jobAdvert.Summary);
+            if (checkForDuplicates is not null)
             {
-                return checkForDublicates.Id;
+                return checkForDuplicates.Id;
             }
 
             return 0;
@@ -162,7 +162,7 @@ namespace WebCrawler.Managers
                 var Company = _companies.FirstOrDefault(x => x.Name.ToLower() == GetCompanyNameFromWebSite(_jobAdverts[i].Url).ToString());
 
                 var newlyCreatedVacantJob = vacantJobEntityFactory.CreateEntity(nameof(VacantJob), 1, Company.Id, _jobAdvertLinks[i].Text);
-                int vacantId = await CheckForDublicatesOnVacantJob((IVacantJob)newlyCreatedVacantJob);
+                int vacantId = await CheckForDuplicatesOnVacantJob((IVacantJob)newlyCreatedVacantJob);
 
                 if (vacantId is 0)
                 {
@@ -181,7 +181,7 @@ namespace WebCrawler.Managers
                    _jobAdverts[i].ExpireDate
                    );
                 //----------------------------------------------------------
-                int jobAdvertId = await CheckForDublicatesOnJobAdvert(newlyCreatedJobAdvert);
+                int jobAdvertId = await CheckForDuplicatesOnJobAdvert(newlyCreatedJobAdvert);
                 if (jobAdvertId == 0)
                 {
                     await _jobAdvertService.CreateAsync(newlyCreatedJobAdvert);
